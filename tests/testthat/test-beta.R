@@ -9,8 +9,6 @@ test_that("beta input check work", {
 
   expect_error(beta_est(1, mm, "A"),
                "R0 must be a positive numeric value")
-  expect_error(beta_est(1, mm, 1:2),
-               "R0 must be of length = 1")
   expect_error(beta_est(1, mm, -1),
                "R0 must be a positive numeric value")
 

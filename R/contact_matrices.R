@@ -1,3 +1,9 @@
+#' Process set of contact matrices
+#'
+#' @param contact_matrix_set Set of contact matrices
+#' @param population Vector of populaion by age
+#'
+#' @return Processed set of contact matrices
 matrix_set <- function(contact_matrix_set, population){
   if(is.matrix(contact_matrix_set)){
     contact_matrix_set <- list(contact_matrix_set)
@@ -9,15 +15,23 @@ matrix_set <- function(contact_matrix_set, population){
   aperm(array(unlist(mixing), dim = c(dim(mixing[[1]]), length(mixing))), c(3, 1, 2))
 }
 
+#' Divide matrix by population
+#'
+#' @param contact Matrix
+#' @param population Population vector
+#'
+#' @return Matrix
 div_pop <- function(contact, population){
   t(t(contact) / population)
 }
 
+#' Process a contact matrix
+#'
+#' @param mixing_matrix Matrix
+#' @param population Vector of population by age
+#'
+#' @return Processed matrix
 generate_contact_matrix <- function(mixing_matrix, population) {
-  if (length(population) != dim(mixing_matrix)[1]) {
-    return("Dimensions of demography and matrix must be equal")
-  }
-
   # Convert Unbalanced Matrix of Per-Capita Rates to Total Number of Contacts
   # Between Diff Age Groups and Balance By Taking the Mean of i->j and j->i
   MIJ <- t(sapply(seq(population),function(x){
