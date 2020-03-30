@@ -60,13 +60,14 @@ lambda[] <- beta * sum(s_ij[i,])
 ## Initial states:
 initial(S[]) <- S0[i]
 initial(E1[]) <- E0[i]
-initial(E2[]) <- E0[i]
+initial(E2[]) <- E02[i]
 initial(I[]) <- I0[i]
 initial(R[]) <- R0[i]
 
 ##Initial vectors
 S0[] <- user()
 E0[] <- user()
+E02[] <- user()
 I0[] <- user()
 R0[] <- user()
 
@@ -82,6 +83,7 @@ dim(n_SE) <- N_age
 
 dim(E1) <- c(N_age)
 dim(E0) <- c(N_age)
+dim(E02) <- c(N_age)
 dim(delta_E1) <- c(N_age)
 dim(n_EE) <- c(N_age)
 
