@@ -31,7 +31,7 @@ run_SEEIR_model <- function(R0 = 3, tt_R0 = 0,
                             S_init = NULL, E_init = 0, I_init = 1, R_init = 0,
                             dur_E  = 4.58, dur_I = 2.09,
                             population,
-                            baseline_contact_matrix = contact_matrices[[1]],
+                            baseline_contact_matrix,
                             contact_matrix_set, tt_contact_matrix = 0,
                             time_period = 365, replicates = 10) {
 

@@ -6,11 +6,12 @@
 #' @return Data.frame for variable
 df_output <- function(m, compartment){
   as.data.frame.table(m[[compartment]], responseName = "y") %>%
-    dplyr::mutate(t = as.numeric(Var1),
-                  age_group = as.numeric(Var2),
-                  replicate = as.numeric(Var3),
+    dplyr::mutate(t = as.numeric(.data$Var1),
+                  age_group = as.numeric(.data$Var2),
+                  replicate = as.numeric(.data$Var3),
                   compartment = compartment) %>%
-    dplyr::select(t, age_group, replicate, compartment, y)
+    dplyr::select(.data$t, .data$age_group, .data$replicate,
+                  .data$compartment, .data$y)
 }
 
 

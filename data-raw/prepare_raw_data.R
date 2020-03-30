@@ -18,4 +18,14 @@ population <- demog %>%
                       names_prefix = "X") %>%
   dplyr::mutate(age_group = stringr::str_replace(age_group, "[.]", "-"),
                 n = n * 1000)
+
+# Fix ASCII encoding package error
+Encoding(population$country) <- "latin1"
+population$country <- iconv(
+  population$country,
+  "latin1",
+  "UTF-8"
+)
+
+
 usethis::use_data(population, overwrite = TRUE)

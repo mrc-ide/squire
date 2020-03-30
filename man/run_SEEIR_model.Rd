@@ -15,7 +15,7 @@ run_SEEIR_model(
   dur_E = 4.58,
   dur_I = 2.09,
   population,
-  baseline_contact_matrix = contact_matrices[[1]],
+  baseline_contact_matrix,
   contact_matrix_set,
   tt_contact_matrix = 0,
   time_period = 365,
