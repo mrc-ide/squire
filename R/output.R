@@ -24,5 +24,6 @@ df_output <- function(m, compartment){
 long_output <- function(m){
   o1 <- dplyr::bind_rows(lapply(c("S", "E1", "E2", "I", "R"), df_output, m = m))
   o1$t <- m$time[o1$t,1]
+  o1$compartment <- factor(o1$compartment, levels = c("S", "E1", "E2", "I", "R"))
   return(o1)
 }
