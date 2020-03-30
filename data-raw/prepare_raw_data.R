@@ -2,6 +2,7 @@
 
 # Contact Matrices
 # TODO: have the full processing of raw data here
+# TODO: COntact matrices[[11]] has dim c(12, 12) - different to all others
 contact_matrices <- readRDS("data-raw/contact_matrices.rds")
 usethis::use_data(contact_matrices, overwrite = TRUE)
 
