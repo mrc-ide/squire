@@ -16,10 +16,7 @@ beta_est <- function(duration_infectiousness, mixing_matrix, R0) {
      duration_infectiousness < 0){
     stop("duration_infectiousness must be a positive numeric value")
   }
-  if(length(R0) > 1){
-    stop("R0 must be of length = 1")
-  }
-  if(!is.numeric(R0) | length(R0) > 1 | R0 < 0){
+  if(!is.numeric(R0) | any(R0 < 0)){
     stop("R0 must be a positive numeric value")
   }
   if(!is.matrix(mixing_matrix)){

@@ -1,0 +1,24 @@
+generate_contact_matrix <- function(country_population, mixing_matrix) {
+  if (length(country_population) != dim(mixing_matrix)[1]) {
+    return("Dimensions of demography and matrix must be equal")
+  }
+
+  # Convert Unbalanced Matrix of Per-Capita Rates to Total Number of Contacts
+  # Between Diff Age Groups and Balance By Taking the Mean of i->j and j->i
+  MIJ <- t(sapply(seq(country_population),function(x){
+    mixing_matrix[x,] * country_population[x]
+  }))
+  adjust_mat <- (MIJ + t(MIJ))/2 # symmetric and balanced
+
+  # Convert to New Per-Capita Rates By Dividing By Population
+  # Resulting Matrix Is Asymmetric But Balanced
+  # Asymmetric in that c_ij != c_ji BUT Total Number of Contacts i->j and j->i
+  # Is Balanced (so when we divide by pop at end, will be balanced)
+  contact_matrix <- t(sapply(seq(country_population), function(x) {
+    adjust_mat[x, ] / country_population[x]
+  }))
+
+  # Adjusting to create input for model i.e. per capita rates divided by
+  # population to give the number of contacts made on each individual
+  return(contact_matrix)
+}

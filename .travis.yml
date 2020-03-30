@@ -5,3 +5,5 @@ cache: packages
 os:
   - linux
   - osx
+after_success:
+  - Rscript -e 'covr::codecov()'
