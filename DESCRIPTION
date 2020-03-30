@@ -2,8 +2,11 @@ Package: squire
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Authors@R: c(
+  person("Patrick", "Walker", email = "patrick.walker06@imperial.ac.uk", role = c("aut")),
+  person("Charlie", "Whittaker", email = "charles.whittaker16@imperial.ac.uk", role = c("aut")),
+  person("Peter", "Winskill", email = "p.winskill@imperial.ac.uk", role = c("aut", "cre"))
+  )                
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 License: What license is it under?
@@ -11,3 +14,4 @@ Encoding: UTF-8
 LazyData: true
 Suggests: 
     testthat
+RoxygenNote: 7.0.2
