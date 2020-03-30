@@ -10,7 +10,7 @@ matrix_check <- function(population,
   dims <- c(length(population), dim(baseline_contact_matrix),
             sapply(contact_matrix_set, dim))
   if(length(unique(dims)) != 1){
-    stop("Lengh of popualtion vector, dimensions of baseline_contact_matrix
+    stop("Length of population vector, dimensions of baseline_contact_matrix
          and dimensions of matrices in contact_matrix_set must all be equal")
   }
   return(NULL)
@@ -36,11 +36,11 @@ init_check <- function(init, population){
       stop("init should be a data.frame with columns:, S, E, E2, I, R
            and rows 1:age_groups")
     }
-    if(!identical(names(init) == c("S", "E", "E2", "I", "R"))){
+    if(!all(names(init) == c("S", "E", "E2", "I", "R"))){
       stop("Names of init must be identical to S, E, E2, I, R if sepecified manually")
     }
   }
-  if(!identical(rowSums(init), population)){
+  if(!all(rowSums(init) == population)){
     stop("Row sums of init should be identical to population")
   }
   return(init)
@@ -67,8 +67,11 @@ check_time_change <- function(tt, time_period){
 #'
 #' @return Nothing if check pass
 pos_num <- function(x, name){
+  if(length(x) > 1){
+    stop(name, " must have length = 1")
+  }
   if(length(x) != 1 | !is.numeric(x) | x < 0){
-    stop(name, " must be a single positive number")
+    stop(name, " must be a positive number")
   }
   return(NULL)
 }
