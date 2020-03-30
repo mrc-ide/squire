@@ -13,8 +13,9 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    testthat
+    testthat (>= 2.1.0)
 RoxygenNote: 7.0.2
 Imports: 
     odin,
     dde
+Depends: R (>= 3.1.0)
