@@ -8,10 +8,7 @@ run_SEEIR_model(
   R0 = 3,
   tt_R0 = 0,
   dt = 0.1,
-  S_init = NULL,
-  E_init = 0,
-  I_init = 1,
-  R_init = 0,
+  init = NULL,
   dur_E = 4.58,
   dur_I = 2.09,
   population,
@@ -29,13 +26,7 @@ run_SEEIR_model(
 
 \item{dt}{Time step}
 
-\item{S_init}{Initial value for S}
-
-\item{E_init}{Initial value for E}
-
-\item{I_init}{Initial value for I}
-
-\item{R_init}{Initial value for R}
+\item{init}{Data.frame of initial conditions}
 
 \item{dur_E}{Mean duration of incubation period (days)}
 

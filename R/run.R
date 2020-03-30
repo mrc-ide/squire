@@ -3,10 +3,7 @@
 #' @param R0 Basic reproduction number
 #' @param tt_R0 Change time points for R0
 #' @param dt Time step
-#' @param S_init Initial value for S
-#' @param E_init Initial value for E
-#' @param I_init Initial value for I
-#' @param R_init Initial value for R
+#' @param init Data.frame of initial conditions
 #' @param dur_E Mean duration of incubation period (days)
 #' @param dur_I Mean duration of infectious period (days)
 #' @param population Population vector (for each age group)
@@ -28,17 +25,29 @@
 #' }
 run_SEEIR_model <- function(R0 = 3, tt_R0 = 0,
                             dt = 0.1,
-                            S_init = NULL, E_init = 0, I_init = 1, R_init = 0,
+                            init = NULL,
                             dur_E  = 4.58, dur_I = 2.09,
                             population,
                             baseline_contact_matrix,
                             contact_matrix_set, tt_contact_matrix = 0,
                             time_period = 365, replicates = 10) {
 
-  # Initialise S
-  if(is.null(S_init)){
-    S_init <- population - 1
+  # Initialise initial conditions
+  init <- init_check(init, population)
+  # Standardise contact matrix set
+  if(is.matrix(contact_matrix_set)){
+    contact_matrix_set <- list(contact_matrix_set)
   }
+  # Input checks
+  mc <- matrix_check(population, baseline_contact_matrix, contact_matrix_set)
+  stopifnot(length(R0) == length(tt_R0))
+  stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
+  tc <- lapply(list(tt_R0, tt_contact_matrix), check_time_change, time_period)
+  pn1 <- pos_num(dt, "dt")
+  pn2 <- pos_num(dur_E, "dur_E")
+  pn3 <- pos_num(dur_I, "dur_I")
+  pn4 <- pos_num(time_period, "time_period")
+  pn5 <- pos_num(replicates, "replicates")
 
   # Convert and Generate Parameters As Required
   gamma_E <- 2 * 1 / dur_E
@@ -48,22 +57,11 @@ run_SEEIR_model <- function(R0 = 3, tt_R0 = 0,
   # Convert contact matrices to input matrices
   matrices_set <- matrix_set(contact_matrix_set, population)
 
-  N_age <- nrow(baseline_contact_matrix)
-  if(length(E_init) != N_age){
-    E_init = rep(E_init, N_age)
-  }
-  if(length(I_init) != N_age){
-    I_init = rep(I_init, N_age)
-  }
-  if(length(R_init) != N_age){
-    R_init = rep(R_init, N_age)
-  }
-
   # Collate Parameters Into List
-  pars <- list(S0 = S_init, E0 = E_init, I0 = I_init, R0 = R_init,
+  pars <- list(S0 = init$S, E0 = init$E, E02 = init$E2, I0 = init$I, R0 = init$R,
                gamma_E = gamma_E, gamma_I = gamma_I,
                tt_beta = tt_R0, beta_set = beta_set,
-               N_age = N_age,
+               N_age = length(population),
                tt_matrix = tt_contact_matrix, mix_mat_set = matrices_set,
                dt = dt)
 

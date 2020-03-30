@@ -5,9 +5,6 @@
 #'
 #' @return Processed set of contact matrices
 matrix_set <- function(contact_matrix_set, population){
-  if(is.matrix(contact_matrix_set)){
-    contact_matrix_set <- list(contact_matrix_set)
-  }
   contact <- lapply(contact_matrix_set, generate_contact_matrix,
                     population = population)
   mixing <- lapply(contact, div_pop, population = population)
