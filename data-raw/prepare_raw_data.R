@@ -19,6 +19,23 @@ population <- demog %>%
   dplyr::mutate(age_group = stringr::str_replace(age_group, "[.]", "-"),
                 n = n * 1000)
 
+population$age_group <- factor(population$age_group, levels = c("0-4",
+                                                                "5-9",
+                                                                "10-14",
+                                                                "15-19",
+                                                                "20-24",
+                                                                "25-29",
+                                                                "30-34",
+                                                                "35-39",
+                                                                "40-44",
+                                                                "45-49",
+                                                                "50-54",
+                                                                "55-59",
+                                                                "60-64",
+                                                                "65-69",
+                                                                "70-74",
+                                                                "75+"))
+
 # Fix ASCII encoding package error
 Encoding(population$country) <- "latin1"
 population$country <- iconv(
@@ -27,5 +44,6 @@ population$country <- iconv(
   "UTF-8"
 )
 
+population <- as.data.frame(population)
 
 usethis::use_data(population, overwrite = TRUE)

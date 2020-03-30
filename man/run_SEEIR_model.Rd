@@ -53,7 +53,8 @@ Run the SEEIR model
 }
 \examples{
 \dontrun{
-m1 <- run_SEEIR_model(population = rep(1000, 16), dt = 1,
+pop <- get_population("Afghanistan")
+m1 <- run_SEEIR_model(population = pop$n, dt = 1,
 R0 = 2, baseline_contact_matrix = contact_matrices[[1]],
 contact_matrix_set=contact_matrices[[1]])
 }
