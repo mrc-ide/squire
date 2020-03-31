@@ -71,5 +71,19 @@ run_SEEIR_model <- function(R0 = 3, tt_R0 = 0,
   t <- seq(from = 1, to = time_period/dt)
   m <- mod$run(t, replicate = replicates)
   results <- mod$transform_variables(m)
-  return(results)
+
+  # Summarise inputs
+  parameters = list(R0 = R0, tt_R0 = tt_R0,
+                dt = dt,
+                init = init,
+                dur_E  = dur_E, dur_I = dur_I,
+                population = population,
+                baseline_contact_matrix = baseline_contact_matrix,
+                contact_matrix_set = contact_matrix_set,
+                tt_contact_matrix = tt_contact_matrix,
+                time_period = time_period, replicates = replicates)
+
+  out <- list(output = results, parameters = parameters)
+  out <- structure(out, class = "squire_simulation")
+  return(out)
 }
