@@ -2,7 +2,7 @@
 % Please edit documentation in R/contact_matrices.R
 \name{matrix_set}
 \alias{matrix_set}
-\title{Process set of contact matrices}
+\title{Process set of contact matrices ->  mixing matrices}
 \usage{
 matrix_set(contact_matrix_set, population)
 }
@@ -12,8 +12,8 @@ matrix_set(contact_matrix_set, population)
 \item{population}{Vector of populaion by age}
 }
 \value{
-Processed set of contact matrices
+Processed set of mixing matrices
 }
 \description{
-Process set of contact matrices
+Process set of contact matrices ->  mixing matrices
 }
