@@ -2,7 +2,7 @@
 #'
 #' @param x an onject
 check_squire <- function(x){
-  if(!methods::is(x) == "squire_simulation"){
+  if(!methods::is(x)[1] == "squire_simulation"){
     stop("Object must be a squire_simulation")
   }
 }
