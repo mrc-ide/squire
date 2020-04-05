@@ -46,12 +46,15 @@ plot.squire_simulation <- function (x, ...){
   pd <- long_output(x$output) %>%
     dplyr::group_by(.data$t, .data$compartment, .data$replicate) %>%
     dplyr::summarise(y = sum(.data$y))
+
+  pd_group <- dplyr::group_by(pd, t, compartment) %>% dplyr::summarise(y = mean(y))
   # Plot
   ggplot2::ggplot(pd, ggplot2::aes(x = .data$t, y = .data$y, col = .data$compartment,
-                 group = interaction(.data$compartment, .data$replicate))) +
+                                   group = interaction(.data$compartment, .data$replicate))) +
     ggplot2::geom_line(alpha = max(0.2, 1 / x$parameters$replicates)) +
-    ggplot2::stat_summary(ggplot2::aes(group = .data$compartment), fun = mean,
-                 geom = "line", size = 1.2) +
+    ggplot2::geom_line(data = pd_group,
+                       mapping = ggplot2::aes(group = .data$compartment),
+                       size = 1.2) +
     ggplot2::scale_color_discrete(name = "") +
     ggplot2::xlab("Time") +
     ggplot2::ylab("N") +

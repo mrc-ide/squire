@@ -22,8 +22,9 @@ df_output <- function(m, compartment){
 #' @return Long format model output data.frame
 #' @export
 long_output <- function(m){
-  o1 <- dplyr::bind_rows(lapply(c("S", "E1", "E2", "I", "R"), df_output, m = m))
+  vars <- names(m)[grepl("^[[:upper:]]+$", substr(names(m), 1, 1))]
+  o1 <- dplyr::bind_rows(lapply(vars, df_output, m = m))
   o1$t <- m$time[o1$t,1]
-  o1$compartment <- factor(o1$compartment, levels = c("S", "E1", "E2", "I", "R"))
+  o1$compartment <- factor(o1$compartment, levels = vars)
   return(o1)
 }
