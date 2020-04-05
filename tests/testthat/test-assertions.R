@@ -534,3 +534,12 @@ test_that("assert_decreasing working correctly", {
   expect_error(assert_decreasing(-5:5))
   expect_error(assert_decreasing("foo"))
 })
+
+
+#------------------------------------------------
+test_that("assert_file_exists working correctly", {
+  tf <- tempfile()
+  expect_error(assert_file_exists(tf), "file not found")
+  writeLines("asdas", tf)
+  expect_true(assert_file_exists(tf))
+})

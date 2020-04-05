@@ -524,7 +524,7 @@ assert_file_exists <- function(x, message = "file not found at path %s", name = 
 assert_increasing <- function(x, message = "%s must be increasing", name = deparse(substitute(x))) {
   assert_non_null(x, name = name)
   assert_numeric(x, name = name)
-  if (!all.equal(x, sort(x))) {
+  if (!identical(x, sort(x))) {
     stop(sprintf(message, name), call. = FALSE)
   }
   return(TRUE)
@@ -536,7 +536,7 @@ assert_increasing <- function(x, message = "%s must be increasing", name = depar
 assert_decreasing <- function(x, message = "%s must be decreasing", name = deparse(substitute(x))) {
   assert_non_null(x, name = name)
   assert_numeric(x, name = name)
-  if (!all.equal(x, sort(x, decreasing = TRUE))) {
+  if (!identical(x, sort(x, decreasing = TRUE))) {
     stop(sprintf(message, name), call. = FALSE)
   }
   return(TRUE)
