@@ -35,6 +35,8 @@ population$age_group <- factor(population$age_group, levels = c("0-4",
                                                                 "65-69",
                                                                 "70-74",
                                                                 "75+"))
+population$matrix <- demog$Matrix[match(population$country, demog$Region..subregion..country.or.area..)]
+
 
 # Fix ASCII encoding package error
 Encoding(population$country) <- "latin1"
@@ -45,5 +47,4 @@ population$country <- iconv(
 )
 
 population <- as.data.frame(population)
-
 usethis::use_data(population, overwrite = TRUE)

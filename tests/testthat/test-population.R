@@ -6,3 +6,12 @@ test_that("population getter works", {
   expect_equal(ncol(out), 3)
   expect_named(out, c("country", "age_group", "n"))
 })
+
+
+test_that("population getter works", {
+  expect_error(get_mixing_matrix("moon"))
+  out <- get_mixing_matrix("Angola")
+  expect_is(out, "matrix")
+  expect_equal(nrow(out), 16)
+  expect_equal(ncol(out), 16)
+})

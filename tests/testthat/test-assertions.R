@@ -1,4 +1,4 @@
-context("assertions_v5")
+context("assertions")
 
 #------------------------------------------------
 test_that("nice_format working correctly", {
