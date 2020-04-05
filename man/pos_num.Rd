@@ -4,7 +4,7 @@
 \alias{pos_num}
 \title{Check argument is a single positive numeric}
 \usage{
-pos_num(x, name)
+pos_num(x, name = deparse(substitute(x)))
 }
 \arguments{
 \item{x}{argument}

@@ -42,12 +42,14 @@ print.squire_simulation <- function(x, ...){
 #'
 #' @export
 plot.squire_simulation <- function (x, ...){
+
   # Convert output to long format
   pd <- long_output(x$output) %>%
     dplyr::group_by(.data$t, .data$compartment, .data$replicate) %>%
     dplyr::summarise(y = sum(.data$y))
 
-  pd_group <- dplyr::group_by(pd, t, compartment) %>% dplyr::summarise(y = mean(y))
+  pd_group <- dplyr::group_by(pd, .data$t, .data$compartment) %>%
+    dplyr::summarise(y = mean(.data$y))
   # Plot
   ggplot2::ggplot(pd, ggplot2::aes(x = .data$t, y = .data$y, col = .data$compartment,
                                    group = interaction(.data$compartment, .data$replicate))) +

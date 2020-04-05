@@ -46,6 +46,53 @@ init_check <- function(init, population){
   return(init)
 }
 
+
+#' Check and set up initial values for explict model
+#'
+#' @inheritParams run_SEEIR_model
+#'
+#' @return Checked initial values data.frame
+init_check_explicit <- function(init, population){
+  if(is.null(init)){
+    init = data.frame(
+      S = population - 3,
+      E1 = 0,
+      E2 = 0,
+      IMild = 1,
+      ICase1 = 1,
+      ICase2 = 1,
+      IOx1 = 0,
+      IOx2 = 0,
+      IMV1 = 0,
+      IMV2 = 0,
+      IRec1 = 0,
+      IRec2 = 0,
+      R = 0,
+      D = 0
+    )
+  } else {
+    if(!is.data.frame(init)){
+      stop("init should be a data.frame with columns:
+      S, E1, E2, IMild, ICase1, ICase2,
+      IOx1, IOx2, IMV1, IMV2, IRec1, IRec2,
+      R, D and rows 1:age_groups")
+    }
+    if(!all(names(init) == c("S","E1","E2","IMild",
+                             "ICase1","ICase2","IOx1",
+                             "IOx2","IMV1","IMV2",
+                             "IRec1","IRec2","R","D"))){
+      stop("If specified, names of init must be identical to:
+           S, E1, E2, IMild, ICase1, ICase2,
+           IOx1, IOx2, IMV1, IMV2, IRec1, IRec2,
+           R, D")
+    }
+  }
+  if(!all(rowSums(init) == population)){
+    stop("Row sums of init should be identical to population")
+  }
+  return(init)
+}
+
 #' Check time change inputs are correct
 #'
 #' @param tt Time change points
@@ -66,7 +113,7 @@ check_time_change <- function(tt, time_period){
 #' @param name Name of argument
 #'
 #' @return Nothing if check pass
-pos_num <- function(x, name){
+pos_num <- function(x, name = deparse(substitute(x))){
   if(length(x) > 1){
     stop(name, " must have length = 1")
   }

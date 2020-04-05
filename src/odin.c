@@ -71,6 +71,197 @@ void cinterpolate_free(void *obj);
 #endif
 
 #endif
+typedef struct explict_SEIR_internal {
+  double *beta_set;
+  double *D_0;
+  double *delta_D;
+  double *delta_E1;
+  double *delta_E2;
+  double *delta_ICase1;
+  double *delta_ICase2;
+  double *delta_IMild;
+  double *delta_IMV1;
+  double *delta_IMV2;
+  double *delta_IOx1;
+  double *delta_IOx2;
+  double *delta_IRec1;
+  double *delta_IRec2;
+  double *delta_R;
+  int dim_beta_set;
+  int dim_D;
+  int dim_D_0;
+  int dim_delta_D;
+  int dim_delta_E1;
+  int dim_delta_E2;
+  int dim_delta_ICase1;
+  int dim_delta_ICase2;
+  int dim_delta_IMild;
+  int dim_delta_IMV1;
+  int dim_delta_IMV2;
+  int dim_delta_IOx1;
+  int dim_delta_IOx2;
+  int dim_delta_IRec1;
+  int dim_delta_IRec2;
+  int dim_delta_R;
+  int dim_E1;
+  int dim_E1_0;
+  int dim_E2;
+  int dim_E2_0;
+  int dim_ICase1;
+  int dim_ICase1_0;
+  int dim_ICase2;
+  int dim_ICase2_0;
+  int dim_IMild;
+  int dim_IMild_0;
+  int dim_IMV1;
+  int dim_IMV1_0;
+  int dim_IMV2;
+  int dim_IMV2_0;
+  int dim_IOx1;
+  int dim_IOx1_0;
+  int dim_IOx2;
+  int dim_IOx2_0;
+  int dim_IRec1;
+  int dim_IRec1_0;
+  int dim_IRec2;
+  int dim_IRec2_0;
+  int dim_lambda;
+  int dim_m;
+  int dim_m_1;
+  int dim_m_2;
+  int dim_mix_mat_set;
+  int dim_mix_mat_set_1;
+  int dim_mix_mat_set_12;
+  int dim_mix_mat_set_2;
+  int dim_mix_mat_set_3;
+  int dim_n_E1_E2;
+  int dim_n_E2_I;
+  int dim_n_E2_ICase1;
+  int dim_n_E2_IMild;
+  int dim_n_ICase1_ICase2;
+  int dim_n_ICase2_Hosp;
+  int dim_n_ICase2_IMV1;
+  int dim_n_ICase2_IOx1;
+  int dim_n_IMild_R;
+  int dim_n_IMV1_IMV2;
+  int dim_n_IMV2_D;
+  int dim_n_IMV2_IRec1;
+  int dim_n_IMV2_RecD;
+  int dim_n_IOx1_IOx2;
+  int dim_n_IOx2_D;
+  int dim_n_IOx2_R;
+  int dim_n_IOx2_RD;
+  int dim_n_IRec1_IRec2;
+  int dim_n_IRec2_R;
+  int dim_n_S_E1;
+  int dim_p_S_E1;
+  int dim_prob_hosp;
+  int dim_prob_non_severe_death;
+  int dim_prob_severe;
+  int dim_prob_severe_death;
+  int dim_R;
+  int dim_R_0;
+  int dim_S;
+  int dim_S_0;
+  int dim_s_ij;
+  int dim_s_ij_1;
+  int dim_s_ij_2;
+  int dim_temp;
+  int dim_tt_beta;
+  int dim_tt_matrix;
+  double dt;
+  double *E1_0;
+  double *E2_0;
+  double gamma_E;
+  double gamma_hosp;
+  double gamma_mv;
+  double gamma_ox;
+  double gamma_R;
+  double gamma_rec;
+  double *ICase1_0;
+  double *ICase2_0;
+  double *IMild_0;
+  double *IMV1_0;
+  double *IMV2_0;
+  double *initial_D;
+  double *initial_E1;
+  double *initial_E2;
+  double *initial_ICase1;
+  double *initial_ICase2;
+  double *initial_IMild;
+  double *initial_IMV1;
+  double *initial_IMV2;
+  double *initial_IOx1;
+  double *initial_IOx2;
+  double *initial_IRec1;
+  double *initial_IRec2;
+  double *initial_R;
+  double *initial_S;
+  void *interpolate_beta;
+  void *interpolate_m;
+  double *IOx1_0;
+  double *IOx2_0;
+  double *IRec1_0;
+  double *IRec2_0;
+  double *lambda;
+  double *m;
+  double *mix_mat_set;
+  int N_age;
+  double *n_E1_E2;
+  double *n_E2_I;
+  double *n_E2_ICase1;
+  double *n_E2_IMild;
+  double *n_ICase1_ICase2;
+  double *n_ICase2_Hosp;
+  double *n_ICase2_IMV1;
+  double *n_ICase2_IOx1;
+  double *n_IMild_R;
+  double *n_IMV1_IMV2;
+  double *n_IMV2_D;
+  double *n_IMV2_IRec1;
+  double *n_IMV2_RecD;
+  double *n_IOx1_IOx2;
+  double *n_IOx2_D;
+  double *n_IOx2_R;
+  double *n_IOx2_RD;
+  double *n_IRec1_IRec2;
+  double *n_IRec2_R;
+  double *n_S_E1;
+  int offset_variable_D;
+  int offset_variable_E2;
+  int offset_variable_ICase1;
+  int offset_variable_ICase2;
+  int offset_variable_IMild;
+  int offset_variable_IMV1;
+  int offset_variable_IMV2;
+  int offset_variable_IOx1;
+  int offset_variable_IOx2;
+  int offset_variable_IRec1;
+  int offset_variable_IRec2;
+  int offset_variable_R;
+  double p_E1_E2;
+  double p_E2_I;
+  double p_ICase1_ICase2;
+  double p_ICase2_Hosp;
+  double p_IMild_R;
+  double p_IMV1_IMV2;
+  double p_IMV2_RecD;
+  double p_IOx1_IOx2;
+  double p_IOx2_RD;
+  double p_Rec1_Rec2;
+  double p_Rec2_R;
+  double *p_S_E1;
+  double *prob_hosp;
+  double *prob_non_severe_death;
+  double *prob_severe;
+  double *prob_severe_death;
+  double *R_0;
+  double *S_0;
+  double *s_ij;
+  double *temp;
+  double *tt_beta;
+  double *tt_matrix;
+} explict_SEIR_internal;
 typedef struct SEIR_internal {
   double *beta_set;
   double *delta_E1;
@@ -147,6 +338,17 @@ typedef struct SEIR_internal {
   double *tt_beta;
   double *tt_matrix;
 } SEIR_internal;
+explict_SEIR_internal* explict_SEIR_get_internal(SEXP internal_p, int closed_error);
+static void explict_SEIR_finalise(SEXP internal_p);
+SEXP explict_SEIR_create(SEXP user);
+void explict_SEIR_initmod_desolve(void(* odeparms) (int *, double *));
+SEXP explict_SEIR_contents(SEXP internal_p);
+SEXP explict_SEIR_set_user(SEXP internal_p, SEXP user);
+SEXP explict_SEIR_metadata(SEXP internal_p);
+SEXP explict_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
+void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
+void explict_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
+SEXP explict_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
 SEIR_internal* SEIR_get_internal(SEXP internal_p, int closed_error);
 static void SEIR_finalise(SEXP internal_p);
 SEXP SEIR_create(SEXP user);
@@ -184,6 +386,1327 @@ void interpolate_check_y(size_t nx, size_t ny, size_t i, const char *name_arg, c
 double odin_sum1(double *x, size_t from, size_t to);
 double odin_sum2(double* x, int from_i, int to_i, int from_j, int to_j, int dim_x_1);
 double odin_sum3(double* x, int from_i, int to_i, int from_j, int to_j, int from_k, int to_k, int dim_x_1, int dim_x_12);
+explict_SEIR_internal* explict_SEIR_get_internal(SEXP internal_p, int closed_error) {
+  explict_SEIR_internal *internal = NULL;
+  if (TYPEOF(internal_p) != EXTPTRSXP) {
+    Rf_error("Expected an external pointer");
+  }
+  internal = (explict_SEIR_internal*) R_ExternalPtrAddr(internal_p);
+  if (!internal && closed_error) {
+    Rf_error("Pointer has been invalidated");
+  }
+  return internal;
+}
+void explict_SEIR_finalise(SEXP internal_p) {
+  explict_SEIR_internal *internal = explict_SEIR_get_internal(internal_p, 0);
+  if (internal_p) {
+    cinterpolate_free(internal->interpolate_beta);
+    cinterpolate_free(internal->interpolate_m);
+    internal->interpolate_beta = NULL;
+    internal->interpolate_m = NULL;
+    Free(internal->beta_set);
+    Free(internal->D_0);
+    Free(internal->delta_D);
+    Free(internal->delta_E1);
+    Free(internal->delta_E2);
+    Free(internal->delta_ICase1);
+    Free(internal->delta_ICase2);
+    Free(internal->delta_IMild);
+    Free(internal->delta_IMV1);
+    Free(internal->delta_IMV2);
+    Free(internal->delta_IOx1);
+    Free(internal->delta_IOx2);
+    Free(internal->delta_IRec1);
+    Free(internal->delta_IRec2);
+    Free(internal->delta_R);
+    Free(internal->E1_0);
+    Free(internal->E2_0);
+    Free(internal->ICase1_0);
+    Free(internal->ICase2_0);
+    Free(internal->IMild_0);
+    Free(internal->IMV1_0);
+    Free(internal->IMV2_0);
+    Free(internal->initial_D);
+    Free(internal->initial_E1);
+    Free(internal->initial_E2);
+    Free(internal->initial_ICase1);
+    Free(internal->initial_ICase2);
+    Free(internal->initial_IMild);
+    Free(internal->initial_IMV1);
+    Free(internal->initial_IMV2);
+    Free(internal->initial_IOx1);
+    Free(internal->initial_IOx2);
+    Free(internal->initial_IRec1);
+    Free(internal->initial_IRec2);
+    Free(internal->initial_R);
+    Free(internal->initial_S);
+    Free(internal->IOx1_0);
+    Free(internal->IOx2_0);
+    Free(internal->IRec1_0);
+    Free(internal->IRec2_0);
+    Free(internal->lambda);
+    Free(internal->m);
+    Free(internal->mix_mat_set);
+    Free(internal->n_E1_E2);
+    Free(internal->n_E2_I);
+    Free(internal->n_E2_ICase1);
+    Free(internal->n_E2_IMild);
+    Free(internal->n_ICase1_ICase2);
+    Free(internal->n_ICase2_Hosp);
+    Free(internal->n_ICase2_IMV1);
+    Free(internal->n_ICase2_IOx1);
+    Free(internal->n_IMild_R);
+    Free(internal->n_IMV1_IMV2);
+    Free(internal->n_IMV2_D);
+    Free(internal->n_IMV2_IRec1);
+    Free(internal->n_IMV2_RecD);
+    Free(internal->n_IOx1_IOx2);
+    Free(internal->n_IOx2_D);
+    Free(internal->n_IOx2_R);
+    Free(internal->n_IOx2_RD);
+    Free(internal->n_IRec1_IRec2);
+    Free(internal->n_IRec2_R);
+    Free(internal->n_S_E1);
+    Free(internal->p_S_E1);
+    Free(internal->prob_hosp);
+    Free(internal->prob_non_severe_death);
+    Free(internal->prob_severe);
+    Free(internal->prob_severe_death);
+    Free(internal->R_0);
+    Free(internal->S_0);
+    Free(internal->s_ij);
+    Free(internal->temp);
+    Free(internal->tt_beta);
+    Free(internal->tt_matrix);
+    Free(internal);
+    R_ClearExternalPtr(internal_p);
+  }
+}
+SEXP explict_SEIR_create(SEXP user) {
+  explict_SEIR_internal *internal = (explict_SEIR_internal*) Calloc(1, explict_SEIR_internal);
+  internal->beta_set = NULL;
+  internal->D_0 = NULL;
+  internal->delta_D = NULL;
+  internal->delta_E1 = NULL;
+  internal->delta_E2 = NULL;
+  internal->delta_ICase1 = NULL;
+  internal->delta_ICase2 = NULL;
+  internal->delta_IMild = NULL;
+  internal->delta_IMV1 = NULL;
+  internal->delta_IMV2 = NULL;
+  internal->delta_IOx1 = NULL;
+  internal->delta_IOx2 = NULL;
+  internal->delta_IRec1 = NULL;
+  internal->delta_IRec2 = NULL;
+  internal->delta_R = NULL;
+  internal->E1_0 = NULL;
+  internal->E2_0 = NULL;
+  internal->ICase1_0 = NULL;
+  internal->ICase2_0 = NULL;
+  internal->IMild_0 = NULL;
+  internal->IMV1_0 = NULL;
+  internal->IMV2_0 = NULL;
+  internal->initial_D = NULL;
+  internal->initial_E1 = NULL;
+  internal->initial_E2 = NULL;
+  internal->initial_ICase1 = NULL;
+  internal->initial_ICase2 = NULL;
+  internal->initial_IMild = NULL;
+  internal->initial_IMV1 = NULL;
+  internal->initial_IMV2 = NULL;
+  internal->initial_IOx1 = NULL;
+  internal->initial_IOx2 = NULL;
+  internal->initial_IRec1 = NULL;
+  internal->initial_IRec2 = NULL;
+  internal->initial_R = NULL;
+  internal->initial_S = NULL;
+  internal->interpolate_m = NULL;
+  internal->IOx1_0 = NULL;
+  internal->IOx2_0 = NULL;
+  internal->IRec1_0 = NULL;
+  internal->IRec2_0 = NULL;
+  internal->lambda = NULL;
+  internal->m = NULL;
+  internal->mix_mat_set = NULL;
+  internal->n_E1_E2 = NULL;
+  internal->n_E2_I = NULL;
+  internal->n_E2_ICase1 = NULL;
+  internal->n_E2_IMild = NULL;
+  internal->n_ICase1_ICase2 = NULL;
+  internal->n_ICase2_Hosp = NULL;
+  internal->n_ICase2_IMV1 = NULL;
+  internal->n_ICase2_IOx1 = NULL;
+  internal->n_IMild_R = NULL;
+  internal->n_IMV1_IMV2 = NULL;
+  internal->n_IMV2_D = NULL;
+  internal->n_IMV2_IRec1 = NULL;
+  internal->n_IMV2_RecD = NULL;
+  internal->n_IOx1_IOx2 = NULL;
+  internal->n_IOx2_D = NULL;
+  internal->n_IOx2_R = NULL;
+  internal->n_IOx2_RD = NULL;
+  internal->n_IRec1_IRec2 = NULL;
+  internal->n_IRec2_R = NULL;
+  internal->n_S_E1 = NULL;
+  internal->p_S_E1 = NULL;
+  internal->prob_hosp = NULL;
+  internal->prob_non_severe_death = NULL;
+  internal->prob_severe = NULL;
+  internal->prob_severe_death = NULL;
+  internal->R_0 = NULL;
+  internal->S_0 = NULL;
+  internal->s_ij = NULL;
+  internal->temp = NULL;
+  internal->tt_beta = NULL;
+  internal->tt_matrix = NULL;
+  internal->beta_set = NULL;
+  internal->D_0 = NULL;
+  internal->dt = NA_REAL;
+  internal->E1_0 = NULL;
+  internal->E2_0 = NULL;
+  internal->gamma_E = NA_REAL;
+  internal->gamma_hosp = NA_REAL;
+  internal->gamma_mv = NA_REAL;
+  internal->gamma_ox = NA_REAL;
+  internal->gamma_R = NA_REAL;
+  internal->gamma_rec = NA_REAL;
+  internal->ICase1_0 = NULL;
+  internal->ICase2_0 = NULL;
+  internal->IMild_0 = NULL;
+  internal->IMV1_0 = NULL;
+  internal->IMV2_0 = NULL;
+  internal->IOx1_0 = NULL;
+  internal->IOx2_0 = NULL;
+  internal->IRec1_0 = NULL;
+  internal->IRec2_0 = NULL;
+  internal->mix_mat_set = NULL;
+  internal->N_age = NA_INTEGER;
+  internal->prob_hosp = NULL;
+  internal->prob_non_severe_death = NULL;
+  internal->prob_severe = NULL;
+  internal->prob_severe_death = NULL;
+  internal->R_0 = NULL;
+  internal->S_0 = NULL;
+  internal->tt_beta = NULL;
+  internal->tt_matrix = NULL;
+  SEXP ptr = PROTECT(R_MakeExternalPtr(internal, R_NilValue, R_NilValue));
+  R_RegisterCFinalizer(ptr, explict_SEIR_finalise);
+  UNPROTECT(1);
+  return ptr;
+}
+static explict_SEIR_internal *explict_SEIR_internal_ds;
+void explict_SEIR_initmod_desolve(void(* odeparms) (int *, double *)) {
+  static DL_FUNC get_desolve_gparms = NULL;
+  if (get_desolve_gparms == NULL) {
+    get_desolve_gparms =
+      R_GetCCallable("deSolve", "get_deSolve_gparms");
+  }
+  explict_SEIR_internal_ds = explict_SEIR_get_internal(get_desolve_gparms(), 1);
+}
+SEXP explict_SEIR_contents(SEXP internal_p) {
+  explict_SEIR_internal *internal = explict_SEIR_get_internal(internal_p, 1);
+  SEXP contents = PROTECT(allocVector(VECSXP, 189));
+  SEXP beta_set = PROTECT(allocVector(REALSXP, internal->dim_beta_set));
+  memcpy(REAL(beta_set), internal->beta_set, internal->dim_beta_set * sizeof(double));
+  SET_VECTOR_ELT(contents, 0, beta_set);
+  SEXP D_0 = PROTECT(allocVector(REALSXP, internal->dim_D_0));
+  memcpy(REAL(D_0), internal->D_0, internal->dim_D_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 1, D_0);
+  SEXP delta_D = PROTECT(allocVector(REALSXP, internal->dim_delta_D));
+  memcpy(REAL(delta_D), internal->delta_D, internal->dim_delta_D * sizeof(double));
+  SET_VECTOR_ELT(contents, 2, delta_D);
+  SEXP delta_E1 = PROTECT(allocVector(REALSXP, internal->dim_delta_E1));
+  memcpy(REAL(delta_E1), internal->delta_E1, internal->dim_delta_E1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 3, delta_E1);
+  SEXP delta_E2 = PROTECT(allocVector(REALSXP, internal->dim_delta_E2));
+  memcpy(REAL(delta_E2), internal->delta_E2, internal->dim_delta_E2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 4, delta_E2);
+  SEXP delta_ICase1 = PROTECT(allocVector(REALSXP, internal->dim_delta_ICase1));
+  memcpy(REAL(delta_ICase1), internal->delta_ICase1, internal->dim_delta_ICase1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 5, delta_ICase1);
+  SEXP delta_ICase2 = PROTECT(allocVector(REALSXP, internal->dim_delta_ICase2));
+  memcpy(REAL(delta_ICase2), internal->delta_ICase2, internal->dim_delta_ICase2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 6, delta_ICase2);
+  SEXP delta_IMild = PROTECT(allocVector(REALSXP, internal->dim_delta_IMild));
+  memcpy(REAL(delta_IMild), internal->delta_IMild, internal->dim_delta_IMild * sizeof(double));
+  SET_VECTOR_ELT(contents, 7, delta_IMild);
+  SEXP delta_IMV1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IMV1));
+  memcpy(REAL(delta_IMV1), internal->delta_IMV1, internal->dim_delta_IMV1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 8, delta_IMV1);
+  SEXP delta_IMV2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IMV2));
+  memcpy(REAL(delta_IMV2), internal->delta_IMV2, internal->dim_delta_IMV2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 9, delta_IMV2);
+  SEXP delta_IOx1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IOx1));
+  memcpy(REAL(delta_IOx1), internal->delta_IOx1, internal->dim_delta_IOx1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 10, delta_IOx1);
+  SEXP delta_IOx2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IOx2));
+  memcpy(REAL(delta_IOx2), internal->delta_IOx2, internal->dim_delta_IOx2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 11, delta_IOx2);
+  SEXP delta_IRec1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IRec1));
+  memcpy(REAL(delta_IRec1), internal->delta_IRec1, internal->dim_delta_IRec1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 12, delta_IRec1);
+  SEXP delta_IRec2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IRec2));
+  memcpy(REAL(delta_IRec2), internal->delta_IRec2, internal->dim_delta_IRec2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 13, delta_IRec2);
+  SEXP delta_R = PROTECT(allocVector(REALSXP, internal->dim_delta_R));
+  memcpy(REAL(delta_R), internal->delta_R, internal->dim_delta_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 14, delta_R);
+  SET_VECTOR_ELT(contents, 15, ScalarInteger(internal->dim_beta_set));
+  SET_VECTOR_ELT(contents, 16, ScalarInteger(internal->dim_D));
+  SET_VECTOR_ELT(contents, 17, ScalarInteger(internal->dim_D_0));
+  SET_VECTOR_ELT(contents, 18, ScalarInteger(internal->dim_delta_D));
+  SET_VECTOR_ELT(contents, 19, ScalarInteger(internal->dim_delta_E1));
+  SET_VECTOR_ELT(contents, 20, ScalarInteger(internal->dim_delta_E2));
+  SET_VECTOR_ELT(contents, 21, ScalarInteger(internal->dim_delta_ICase1));
+  SET_VECTOR_ELT(contents, 22, ScalarInteger(internal->dim_delta_ICase2));
+  SET_VECTOR_ELT(contents, 23, ScalarInteger(internal->dim_delta_IMild));
+  SET_VECTOR_ELT(contents, 24, ScalarInteger(internal->dim_delta_IMV1));
+  SET_VECTOR_ELT(contents, 25, ScalarInteger(internal->dim_delta_IMV2));
+  SET_VECTOR_ELT(contents, 26, ScalarInteger(internal->dim_delta_IOx1));
+  SET_VECTOR_ELT(contents, 27, ScalarInteger(internal->dim_delta_IOx2));
+  SET_VECTOR_ELT(contents, 28, ScalarInteger(internal->dim_delta_IRec1));
+  SET_VECTOR_ELT(contents, 29, ScalarInteger(internal->dim_delta_IRec2));
+  SET_VECTOR_ELT(contents, 30, ScalarInteger(internal->dim_delta_R));
+  SET_VECTOR_ELT(contents, 31, ScalarInteger(internal->dim_E1));
+  SET_VECTOR_ELT(contents, 32, ScalarInteger(internal->dim_E1_0));
+  SET_VECTOR_ELT(contents, 33, ScalarInteger(internal->dim_E2));
+  SET_VECTOR_ELT(contents, 34, ScalarInteger(internal->dim_E2_0));
+  SET_VECTOR_ELT(contents, 35, ScalarInteger(internal->dim_ICase1));
+  SET_VECTOR_ELT(contents, 36, ScalarInteger(internal->dim_ICase1_0));
+  SET_VECTOR_ELT(contents, 37, ScalarInteger(internal->dim_ICase2));
+  SET_VECTOR_ELT(contents, 38, ScalarInteger(internal->dim_ICase2_0));
+  SET_VECTOR_ELT(contents, 39, ScalarInteger(internal->dim_IMild));
+  SET_VECTOR_ELT(contents, 40, ScalarInteger(internal->dim_IMild_0));
+  SET_VECTOR_ELT(contents, 41, ScalarInteger(internal->dim_IMV1));
+  SET_VECTOR_ELT(contents, 42, ScalarInteger(internal->dim_IMV1_0));
+  SET_VECTOR_ELT(contents, 43, ScalarInteger(internal->dim_IMV2));
+  SET_VECTOR_ELT(contents, 44, ScalarInteger(internal->dim_IMV2_0));
+  SET_VECTOR_ELT(contents, 45, ScalarInteger(internal->dim_IOx1));
+  SET_VECTOR_ELT(contents, 46, ScalarInteger(internal->dim_IOx1_0));
+  SET_VECTOR_ELT(contents, 47, ScalarInteger(internal->dim_IOx2));
+  SET_VECTOR_ELT(contents, 48, ScalarInteger(internal->dim_IOx2_0));
+  SET_VECTOR_ELT(contents, 49, ScalarInteger(internal->dim_IRec1));
+  SET_VECTOR_ELT(contents, 50, ScalarInteger(internal->dim_IRec1_0));
+  SET_VECTOR_ELT(contents, 51, ScalarInteger(internal->dim_IRec2));
+  SET_VECTOR_ELT(contents, 52, ScalarInteger(internal->dim_IRec2_0));
+  SET_VECTOR_ELT(contents, 53, ScalarInteger(internal->dim_lambda));
+  SET_VECTOR_ELT(contents, 54, ScalarInteger(internal->dim_m));
+  SET_VECTOR_ELT(contents, 55, ScalarInteger(internal->dim_m_1));
+  SET_VECTOR_ELT(contents, 56, ScalarInteger(internal->dim_m_2));
+  SET_VECTOR_ELT(contents, 57, ScalarInteger(internal->dim_mix_mat_set));
+  SET_VECTOR_ELT(contents, 58, ScalarInteger(internal->dim_mix_mat_set_1));
+  SET_VECTOR_ELT(contents, 59, ScalarInteger(internal->dim_mix_mat_set_12));
+  SET_VECTOR_ELT(contents, 60, ScalarInteger(internal->dim_mix_mat_set_2));
+  SET_VECTOR_ELT(contents, 61, ScalarInteger(internal->dim_mix_mat_set_3));
+  SET_VECTOR_ELT(contents, 62, ScalarInteger(internal->dim_n_E1_E2));
+  SET_VECTOR_ELT(contents, 63, ScalarInteger(internal->dim_n_E2_I));
+  SET_VECTOR_ELT(contents, 64, ScalarInteger(internal->dim_n_E2_ICase1));
+  SET_VECTOR_ELT(contents, 65, ScalarInteger(internal->dim_n_E2_IMild));
+  SET_VECTOR_ELT(contents, 66, ScalarInteger(internal->dim_n_ICase1_ICase2));
+  SET_VECTOR_ELT(contents, 67, ScalarInteger(internal->dim_n_ICase2_Hosp));
+  SET_VECTOR_ELT(contents, 68, ScalarInteger(internal->dim_n_ICase2_IMV1));
+  SET_VECTOR_ELT(contents, 69, ScalarInteger(internal->dim_n_ICase2_IOx1));
+  SET_VECTOR_ELT(contents, 70, ScalarInteger(internal->dim_n_IMild_R));
+  SET_VECTOR_ELT(contents, 71, ScalarInteger(internal->dim_n_IMV1_IMV2));
+  SET_VECTOR_ELT(contents, 72, ScalarInteger(internal->dim_n_IMV2_D));
+  SET_VECTOR_ELT(contents, 73, ScalarInteger(internal->dim_n_IMV2_IRec1));
+  SET_VECTOR_ELT(contents, 74, ScalarInteger(internal->dim_n_IMV2_RecD));
+  SET_VECTOR_ELT(contents, 75, ScalarInteger(internal->dim_n_IOx1_IOx2));
+  SET_VECTOR_ELT(contents, 76, ScalarInteger(internal->dim_n_IOx2_D));
+  SET_VECTOR_ELT(contents, 77, ScalarInteger(internal->dim_n_IOx2_R));
+  SET_VECTOR_ELT(contents, 78, ScalarInteger(internal->dim_n_IOx2_RD));
+  SET_VECTOR_ELT(contents, 79, ScalarInteger(internal->dim_n_IRec1_IRec2));
+  SET_VECTOR_ELT(contents, 80, ScalarInteger(internal->dim_n_IRec2_R));
+  SET_VECTOR_ELT(contents, 81, ScalarInteger(internal->dim_n_S_E1));
+  SET_VECTOR_ELT(contents, 82, ScalarInteger(internal->dim_p_S_E1));
+  SET_VECTOR_ELT(contents, 83, ScalarInteger(internal->dim_prob_hosp));
+  SET_VECTOR_ELT(contents, 84, ScalarInteger(internal->dim_prob_non_severe_death));
+  SET_VECTOR_ELT(contents, 85, ScalarInteger(internal->dim_prob_severe));
+  SET_VECTOR_ELT(contents, 86, ScalarInteger(internal->dim_prob_severe_death));
+  SET_VECTOR_ELT(contents, 87, ScalarInteger(internal->dim_R));
+  SET_VECTOR_ELT(contents, 88, ScalarInteger(internal->dim_R_0));
+  SET_VECTOR_ELT(contents, 89, ScalarInteger(internal->dim_S));
+  SET_VECTOR_ELT(contents, 90, ScalarInteger(internal->dim_S_0));
+  SET_VECTOR_ELT(contents, 91, ScalarInteger(internal->dim_s_ij));
+  SET_VECTOR_ELT(contents, 92, ScalarInteger(internal->dim_s_ij_1));
+  SET_VECTOR_ELT(contents, 93, ScalarInteger(internal->dim_s_ij_2));
+  SET_VECTOR_ELT(contents, 94, ScalarInteger(internal->dim_temp));
+  SET_VECTOR_ELT(contents, 95, ScalarInteger(internal->dim_tt_beta));
+  SET_VECTOR_ELT(contents, 96, ScalarInteger(internal->dim_tt_matrix));
+  SET_VECTOR_ELT(contents, 97, ScalarReal(internal->dt));
+  SEXP E1_0 = PROTECT(allocVector(REALSXP, internal->dim_E1_0));
+  memcpy(REAL(E1_0), internal->E1_0, internal->dim_E1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 98, E1_0);
+  SEXP E2_0 = PROTECT(allocVector(REALSXP, internal->dim_E2_0));
+  memcpy(REAL(E2_0), internal->E2_0, internal->dim_E2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 99, E2_0);
+  SET_VECTOR_ELT(contents, 100, ScalarReal(internal->gamma_E));
+  SET_VECTOR_ELT(contents, 101, ScalarReal(internal->gamma_hosp));
+  SET_VECTOR_ELT(contents, 102, ScalarReal(internal->gamma_mv));
+  SET_VECTOR_ELT(contents, 103, ScalarReal(internal->gamma_ox));
+  SET_VECTOR_ELT(contents, 104, ScalarReal(internal->gamma_R));
+  SET_VECTOR_ELT(contents, 105, ScalarReal(internal->gamma_rec));
+  SEXP ICase1_0 = PROTECT(allocVector(REALSXP, internal->dim_ICase1_0));
+  memcpy(REAL(ICase1_0), internal->ICase1_0, internal->dim_ICase1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 106, ICase1_0);
+  SEXP ICase2_0 = PROTECT(allocVector(REALSXP, internal->dim_ICase2_0));
+  memcpy(REAL(ICase2_0), internal->ICase2_0, internal->dim_ICase2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 107, ICase2_0);
+  SEXP IMild_0 = PROTECT(allocVector(REALSXP, internal->dim_IMild_0));
+  memcpy(REAL(IMild_0), internal->IMild_0, internal->dim_IMild_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 108, IMild_0);
+  SEXP IMV1_0 = PROTECT(allocVector(REALSXP, internal->dim_IMV1_0));
+  memcpy(REAL(IMV1_0), internal->IMV1_0, internal->dim_IMV1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 109, IMV1_0);
+  SEXP IMV2_0 = PROTECT(allocVector(REALSXP, internal->dim_IMV2_0));
+  memcpy(REAL(IMV2_0), internal->IMV2_0, internal->dim_IMV2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 110, IMV2_0);
+  SEXP initial_D = PROTECT(allocVector(REALSXP, internal->dim_D));
+  memcpy(REAL(initial_D), internal->initial_D, internal->dim_D * sizeof(double));
+  SET_VECTOR_ELT(contents, 111, initial_D);
+  SEXP initial_E1 = PROTECT(allocVector(REALSXP, internal->dim_E1));
+  memcpy(REAL(initial_E1), internal->initial_E1, internal->dim_E1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 112, initial_E1);
+  SEXP initial_E2 = PROTECT(allocVector(REALSXP, internal->dim_E2));
+  memcpy(REAL(initial_E2), internal->initial_E2, internal->dim_E2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 113, initial_E2);
+  SEXP initial_ICase1 = PROTECT(allocVector(REALSXP, internal->dim_ICase1));
+  memcpy(REAL(initial_ICase1), internal->initial_ICase1, internal->dim_ICase1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 114, initial_ICase1);
+  SEXP initial_ICase2 = PROTECT(allocVector(REALSXP, internal->dim_ICase2));
+  memcpy(REAL(initial_ICase2), internal->initial_ICase2, internal->dim_ICase2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 115, initial_ICase2);
+  SEXP initial_IMild = PROTECT(allocVector(REALSXP, internal->dim_IMild));
+  memcpy(REAL(initial_IMild), internal->initial_IMild, internal->dim_IMild * sizeof(double));
+  SET_VECTOR_ELT(contents, 116, initial_IMild);
+  SEXP initial_IMV1 = PROTECT(allocVector(REALSXP, internal->dim_IMV1));
+  memcpy(REAL(initial_IMV1), internal->initial_IMV1, internal->dim_IMV1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 117, initial_IMV1);
+  SEXP initial_IMV2 = PROTECT(allocVector(REALSXP, internal->dim_IMV2));
+  memcpy(REAL(initial_IMV2), internal->initial_IMV2, internal->dim_IMV2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 118, initial_IMV2);
+  SEXP initial_IOx1 = PROTECT(allocVector(REALSXP, internal->dim_IOx1));
+  memcpy(REAL(initial_IOx1), internal->initial_IOx1, internal->dim_IOx1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 119, initial_IOx1);
+  SEXP initial_IOx2 = PROTECT(allocVector(REALSXP, internal->dim_IOx2));
+  memcpy(REAL(initial_IOx2), internal->initial_IOx2, internal->dim_IOx2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 120, initial_IOx2);
+  SEXP initial_IRec1 = PROTECT(allocVector(REALSXP, internal->dim_IRec1));
+  memcpy(REAL(initial_IRec1), internal->initial_IRec1, internal->dim_IRec1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 121, initial_IRec1);
+  SEXP initial_IRec2 = PROTECT(allocVector(REALSXP, internal->dim_IRec2));
+  memcpy(REAL(initial_IRec2), internal->initial_IRec2, internal->dim_IRec2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 122, initial_IRec2);
+  SEXP initial_R = PROTECT(allocVector(REALSXP, internal->dim_R));
+  memcpy(REAL(initial_R), internal->initial_R, internal->dim_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 123, initial_R);
+  SEXP initial_S = PROTECT(allocVector(REALSXP, internal->dim_S));
+  memcpy(REAL(initial_S), internal->initial_S, internal->dim_S * sizeof(double));
+  SET_VECTOR_ELT(contents, 124, initial_S);
+  SEXP IOx1_0 = PROTECT(allocVector(REALSXP, internal->dim_IOx1_0));
+  memcpy(REAL(IOx1_0), internal->IOx1_0, internal->dim_IOx1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 127, IOx1_0);
+  SEXP IOx2_0 = PROTECT(allocVector(REALSXP, internal->dim_IOx2_0));
+  memcpy(REAL(IOx2_0), internal->IOx2_0, internal->dim_IOx2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 128, IOx2_0);
+  SEXP IRec1_0 = PROTECT(allocVector(REALSXP, internal->dim_IRec1_0));
+  memcpy(REAL(IRec1_0), internal->IRec1_0, internal->dim_IRec1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 129, IRec1_0);
+  SEXP IRec2_0 = PROTECT(allocVector(REALSXP, internal->dim_IRec2_0));
+  memcpy(REAL(IRec2_0), internal->IRec2_0, internal->dim_IRec2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 130, IRec2_0);
+  SEXP lambda = PROTECT(allocVector(REALSXP, internal->dim_lambda));
+  memcpy(REAL(lambda), internal->lambda, internal->dim_lambda * sizeof(double));
+  SET_VECTOR_ELT(contents, 131, lambda);
+  SEXP m = PROTECT(allocVector(REALSXP, internal->dim_m));
+  memcpy(REAL(m), internal->m, internal->dim_m * sizeof(double));
+  odin_set_dim(m, 2, internal->dim_m_1, internal->dim_m_2);
+  SET_VECTOR_ELT(contents, 132, m);
+  SEXP mix_mat_set = PROTECT(allocVector(REALSXP, internal->dim_mix_mat_set));
+  memcpy(REAL(mix_mat_set), internal->mix_mat_set, internal->dim_mix_mat_set * sizeof(double));
+  odin_set_dim(mix_mat_set, 3, internal->dim_mix_mat_set_1, internal->dim_mix_mat_set_2, internal->dim_mix_mat_set_3);
+  SET_VECTOR_ELT(contents, 133, mix_mat_set);
+  SET_VECTOR_ELT(contents, 134, ScalarInteger(internal->N_age));
+  SEXP n_E1_E2 = PROTECT(allocVector(REALSXP, internal->dim_n_E1_E2));
+  memcpy(REAL(n_E1_E2), internal->n_E1_E2, internal->dim_n_E1_E2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 135, n_E1_E2);
+  SEXP n_E2_I = PROTECT(allocVector(REALSXP, internal->dim_n_E2_I));
+  memcpy(REAL(n_E2_I), internal->n_E2_I, internal->dim_n_E2_I * sizeof(double));
+  SET_VECTOR_ELT(contents, 136, n_E2_I);
+  SEXP n_E2_ICase1 = PROTECT(allocVector(REALSXP, internal->dim_n_E2_ICase1));
+  memcpy(REAL(n_E2_ICase1), internal->n_E2_ICase1, internal->dim_n_E2_ICase1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 137, n_E2_ICase1);
+  SEXP n_E2_IMild = PROTECT(allocVector(REALSXP, internal->dim_n_E2_IMild));
+  memcpy(REAL(n_E2_IMild), internal->n_E2_IMild, internal->dim_n_E2_IMild * sizeof(double));
+  SET_VECTOR_ELT(contents, 138, n_E2_IMild);
+  SEXP n_ICase1_ICase2 = PROTECT(allocVector(REALSXP, internal->dim_n_ICase1_ICase2));
+  memcpy(REAL(n_ICase1_ICase2), internal->n_ICase1_ICase2, internal->dim_n_ICase1_ICase2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 139, n_ICase1_ICase2);
+  SEXP n_ICase2_Hosp = PROTECT(allocVector(REALSXP, internal->dim_n_ICase2_Hosp));
+  memcpy(REAL(n_ICase2_Hosp), internal->n_ICase2_Hosp, internal->dim_n_ICase2_Hosp * sizeof(double));
+  SET_VECTOR_ELT(contents, 140, n_ICase2_Hosp);
+  SEXP n_ICase2_IMV1 = PROTECT(allocVector(REALSXP, internal->dim_n_ICase2_IMV1));
+  memcpy(REAL(n_ICase2_IMV1), internal->n_ICase2_IMV1, internal->dim_n_ICase2_IMV1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 141, n_ICase2_IMV1);
+  SEXP n_ICase2_IOx1 = PROTECT(allocVector(REALSXP, internal->dim_n_ICase2_IOx1));
+  memcpy(REAL(n_ICase2_IOx1), internal->n_ICase2_IOx1, internal->dim_n_ICase2_IOx1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 142, n_ICase2_IOx1);
+  SEXP n_IMild_R = PROTECT(allocVector(REALSXP, internal->dim_n_IMild_R));
+  memcpy(REAL(n_IMild_R), internal->n_IMild_R, internal->dim_n_IMild_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 143, n_IMild_R);
+  SEXP n_IMV1_IMV2 = PROTECT(allocVector(REALSXP, internal->dim_n_IMV1_IMV2));
+  memcpy(REAL(n_IMV1_IMV2), internal->n_IMV1_IMV2, internal->dim_n_IMV1_IMV2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 144, n_IMV1_IMV2);
+  SEXP n_IMV2_D = PROTECT(allocVector(REALSXP, internal->dim_n_IMV2_D));
+  memcpy(REAL(n_IMV2_D), internal->n_IMV2_D, internal->dim_n_IMV2_D * sizeof(double));
+  SET_VECTOR_ELT(contents, 145, n_IMV2_D);
+  SEXP n_IMV2_IRec1 = PROTECT(allocVector(REALSXP, internal->dim_n_IMV2_IRec1));
+  memcpy(REAL(n_IMV2_IRec1), internal->n_IMV2_IRec1, internal->dim_n_IMV2_IRec1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 146, n_IMV2_IRec1);
+  SEXP n_IMV2_RecD = PROTECT(allocVector(REALSXP, internal->dim_n_IMV2_RecD));
+  memcpy(REAL(n_IMV2_RecD), internal->n_IMV2_RecD, internal->dim_n_IMV2_RecD * sizeof(double));
+  SET_VECTOR_ELT(contents, 147, n_IMV2_RecD);
+  SEXP n_IOx1_IOx2 = PROTECT(allocVector(REALSXP, internal->dim_n_IOx1_IOx2));
+  memcpy(REAL(n_IOx1_IOx2), internal->n_IOx1_IOx2, internal->dim_n_IOx1_IOx2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 148, n_IOx1_IOx2);
+  SEXP n_IOx2_D = PROTECT(allocVector(REALSXP, internal->dim_n_IOx2_D));
+  memcpy(REAL(n_IOx2_D), internal->n_IOx2_D, internal->dim_n_IOx2_D * sizeof(double));
+  SET_VECTOR_ELT(contents, 149, n_IOx2_D);
+  SEXP n_IOx2_R = PROTECT(allocVector(REALSXP, internal->dim_n_IOx2_R));
+  memcpy(REAL(n_IOx2_R), internal->n_IOx2_R, internal->dim_n_IOx2_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 150, n_IOx2_R);
+  SEXP n_IOx2_RD = PROTECT(allocVector(REALSXP, internal->dim_n_IOx2_RD));
+  memcpy(REAL(n_IOx2_RD), internal->n_IOx2_RD, internal->dim_n_IOx2_RD * sizeof(double));
+  SET_VECTOR_ELT(contents, 151, n_IOx2_RD);
+  SEXP n_IRec1_IRec2 = PROTECT(allocVector(REALSXP, internal->dim_n_IRec1_IRec2));
+  memcpy(REAL(n_IRec1_IRec2), internal->n_IRec1_IRec2, internal->dim_n_IRec1_IRec2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 152, n_IRec1_IRec2);
+  SEXP n_IRec2_R = PROTECT(allocVector(REALSXP, internal->dim_n_IRec2_R));
+  memcpy(REAL(n_IRec2_R), internal->n_IRec2_R, internal->dim_n_IRec2_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 153, n_IRec2_R);
+  SEXP n_S_E1 = PROTECT(allocVector(REALSXP, internal->dim_n_S_E1));
+  memcpy(REAL(n_S_E1), internal->n_S_E1, internal->dim_n_S_E1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 154, n_S_E1);
+  SET_VECTOR_ELT(contents, 155, ScalarInteger(internal->offset_variable_D));
+  SET_VECTOR_ELT(contents, 156, ScalarInteger(internal->offset_variable_E2));
+  SET_VECTOR_ELT(contents, 157, ScalarInteger(internal->offset_variable_ICase1));
+  SET_VECTOR_ELT(contents, 158, ScalarInteger(internal->offset_variable_ICase2));
+  SET_VECTOR_ELT(contents, 159, ScalarInteger(internal->offset_variable_IMild));
+  SET_VECTOR_ELT(contents, 160, ScalarInteger(internal->offset_variable_IMV1));
+  SET_VECTOR_ELT(contents, 161, ScalarInteger(internal->offset_variable_IMV2));
+  SET_VECTOR_ELT(contents, 162, ScalarInteger(internal->offset_variable_IOx1));
+  SET_VECTOR_ELT(contents, 163, ScalarInteger(internal->offset_variable_IOx2));
+  SET_VECTOR_ELT(contents, 164, ScalarInteger(internal->offset_variable_IRec1));
+  SET_VECTOR_ELT(contents, 165, ScalarInteger(internal->offset_variable_IRec2));
+  SET_VECTOR_ELT(contents, 166, ScalarInteger(internal->offset_variable_R));
+  SET_VECTOR_ELT(contents, 167, ScalarReal(internal->p_E1_E2));
+  SET_VECTOR_ELT(contents, 168, ScalarReal(internal->p_E2_I));
+  SET_VECTOR_ELT(contents, 169, ScalarReal(internal->p_ICase1_ICase2));
+  SET_VECTOR_ELT(contents, 170, ScalarReal(internal->p_ICase2_Hosp));
+  SET_VECTOR_ELT(contents, 171, ScalarReal(internal->p_IMild_R));
+  SET_VECTOR_ELT(contents, 172, ScalarReal(internal->p_IMV1_IMV2));
+  SET_VECTOR_ELT(contents, 173, ScalarReal(internal->p_IMV2_RecD));
+  SET_VECTOR_ELT(contents, 174, ScalarReal(internal->p_IOx1_IOx2));
+  SET_VECTOR_ELT(contents, 175, ScalarReal(internal->p_IOx2_RD));
+  SET_VECTOR_ELT(contents, 176, ScalarReal(internal->p_Rec1_Rec2));
+  SET_VECTOR_ELT(contents, 177, ScalarReal(internal->p_Rec2_R));
+  SEXP p_S_E1 = PROTECT(allocVector(REALSXP, internal->dim_p_S_E1));
+  memcpy(REAL(p_S_E1), internal->p_S_E1, internal->dim_p_S_E1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 178, p_S_E1);
+  SEXP prob_hosp = PROTECT(allocVector(REALSXP, internal->dim_prob_hosp));
+  memcpy(REAL(prob_hosp), internal->prob_hosp, internal->dim_prob_hosp * sizeof(double));
+  SET_VECTOR_ELT(contents, 179, prob_hosp);
+  SEXP prob_non_severe_death = PROTECT(allocVector(REALSXP, internal->dim_prob_non_severe_death));
+  memcpy(REAL(prob_non_severe_death), internal->prob_non_severe_death, internal->dim_prob_non_severe_death * sizeof(double));
+  SET_VECTOR_ELT(contents, 180, prob_non_severe_death);
+  SEXP prob_severe = PROTECT(allocVector(REALSXP, internal->dim_prob_severe));
+  memcpy(REAL(prob_severe), internal->prob_severe, internal->dim_prob_severe * sizeof(double));
+  SET_VECTOR_ELT(contents, 181, prob_severe);
+  SEXP prob_severe_death = PROTECT(allocVector(REALSXP, internal->dim_prob_severe_death));
+  memcpy(REAL(prob_severe_death), internal->prob_severe_death, internal->dim_prob_severe_death * sizeof(double));
+  SET_VECTOR_ELT(contents, 182, prob_severe_death);
+  SEXP R_0 = PROTECT(allocVector(REALSXP, internal->dim_R_0));
+  memcpy(REAL(R_0), internal->R_0, internal->dim_R_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 183, R_0);
+  SEXP S_0 = PROTECT(allocVector(REALSXP, internal->dim_S_0));
+  memcpy(REAL(S_0), internal->S_0, internal->dim_S_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 184, S_0);
+  SEXP s_ij = PROTECT(allocVector(REALSXP, internal->dim_s_ij));
+  memcpy(REAL(s_ij), internal->s_ij, internal->dim_s_ij * sizeof(double));
+  odin_set_dim(s_ij, 2, internal->dim_s_ij_1, internal->dim_s_ij_2);
+  SET_VECTOR_ELT(contents, 185, s_ij);
+  SEXP temp = PROTECT(allocVector(REALSXP, internal->dim_temp));
+  memcpy(REAL(temp), internal->temp, internal->dim_temp * sizeof(double));
+  SET_VECTOR_ELT(contents, 186, temp);
+  SEXP tt_beta = PROTECT(allocVector(REALSXP, internal->dim_tt_beta));
+  memcpy(REAL(tt_beta), internal->tt_beta, internal->dim_tt_beta * sizeof(double));
+  SET_VECTOR_ELT(contents, 187, tt_beta);
+  SEXP tt_matrix = PROTECT(allocVector(REALSXP, internal->dim_tt_matrix));
+  memcpy(REAL(tt_matrix), internal->tt_matrix, internal->dim_tt_matrix * sizeof(double));
+  SET_VECTOR_ELT(contents, 188, tt_matrix);
+  SEXP nms = PROTECT(allocVector(STRSXP, 189));
+  SET_STRING_ELT(nms, 0, mkChar("beta_set"));
+  SET_STRING_ELT(nms, 1, mkChar("D_0"));
+  SET_STRING_ELT(nms, 2, mkChar("delta_D"));
+  SET_STRING_ELT(nms, 3, mkChar("delta_E1"));
+  SET_STRING_ELT(nms, 4, mkChar("delta_E2"));
+  SET_STRING_ELT(nms, 5, mkChar("delta_ICase1"));
+  SET_STRING_ELT(nms, 6, mkChar("delta_ICase2"));
+  SET_STRING_ELT(nms, 7, mkChar("delta_IMild"));
+  SET_STRING_ELT(nms, 8, mkChar("delta_IMV1"));
+  SET_STRING_ELT(nms, 9, mkChar("delta_IMV2"));
+  SET_STRING_ELT(nms, 10, mkChar("delta_IOx1"));
+  SET_STRING_ELT(nms, 11, mkChar("delta_IOx2"));
+  SET_STRING_ELT(nms, 12, mkChar("delta_IRec1"));
+  SET_STRING_ELT(nms, 13, mkChar("delta_IRec2"));
+  SET_STRING_ELT(nms, 14, mkChar("delta_R"));
+  SET_STRING_ELT(nms, 15, mkChar("dim_beta_set"));
+  SET_STRING_ELT(nms, 16, mkChar("dim_D"));
+  SET_STRING_ELT(nms, 17, mkChar("dim_D_0"));
+  SET_STRING_ELT(nms, 18, mkChar("dim_delta_D"));
+  SET_STRING_ELT(nms, 19, mkChar("dim_delta_E1"));
+  SET_STRING_ELT(nms, 20, mkChar("dim_delta_E2"));
+  SET_STRING_ELT(nms, 21, mkChar("dim_delta_ICase1"));
+  SET_STRING_ELT(nms, 22, mkChar("dim_delta_ICase2"));
+  SET_STRING_ELT(nms, 23, mkChar("dim_delta_IMild"));
+  SET_STRING_ELT(nms, 24, mkChar("dim_delta_IMV1"));
+  SET_STRING_ELT(nms, 25, mkChar("dim_delta_IMV2"));
+  SET_STRING_ELT(nms, 26, mkChar("dim_delta_IOx1"));
+  SET_STRING_ELT(nms, 27, mkChar("dim_delta_IOx2"));
+  SET_STRING_ELT(nms, 28, mkChar("dim_delta_IRec1"));
+  SET_STRING_ELT(nms, 29, mkChar("dim_delta_IRec2"));
+  SET_STRING_ELT(nms, 30, mkChar("dim_delta_R"));
+  SET_STRING_ELT(nms, 31, mkChar("dim_E1"));
+  SET_STRING_ELT(nms, 32, mkChar("dim_E1_0"));
+  SET_STRING_ELT(nms, 33, mkChar("dim_E2"));
+  SET_STRING_ELT(nms, 34, mkChar("dim_E2_0"));
+  SET_STRING_ELT(nms, 35, mkChar("dim_ICase1"));
+  SET_STRING_ELT(nms, 36, mkChar("dim_ICase1_0"));
+  SET_STRING_ELT(nms, 37, mkChar("dim_ICase2"));
+  SET_STRING_ELT(nms, 38, mkChar("dim_ICase2_0"));
+  SET_STRING_ELT(nms, 39, mkChar("dim_IMild"));
+  SET_STRING_ELT(nms, 40, mkChar("dim_IMild_0"));
+  SET_STRING_ELT(nms, 41, mkChar("dim_IMV1"));
+  SET_STRING_ELT(nms, 42, mkChar("dim_IMV1_0"));
+  SET_STRING_ELT(nms, 43, mkChar("dim_IMV2"));
+  SET_STRING_ELT(nms, 44, mkChar("dim_IMV2_0"));
+  SET_STRING_ELT(nms, 45, mkChar("dim_IOx1"));
+  SET_STRING_ELT(nms, 46, mkChar("dim_IOx1_0"));
+  SET_STRING_ELT(nms, 47, mkChar("dim_IOx2"));
+  SET_STRING_ELT(nms, 48, mkChar("dim_IOx2_0"));
+  SET_STRING_ELT(nms, 49, mkChar("dim_IRec1"));
+  SET_STRING_ELT(nms, 50, mkChar("dim_IRec1_0"));
+  SET_STRING_ELT(nms, 51, mkChar("dim_IRec2"));
+  SET_STRING_ELT(nms, 52, mkChar("dim_IRec2_0"));
+  SET_STRING_ELT(nms, 53, mkChar("dim_lambda"));
+  SET_STRING_ELT(nms, 54, mkChar("dim_m"));
+  SET_STRING_ELT(nms, 55, mkChar("dim_m_1"));
+  SET_STRING_ELT(nms, 56, mkChar("dim_m_2"));
+  SET_STRING_ELT(nms, 57, mkChar("dim_mix_mat_set"));
+  SET_STRING_ELT(nms, 58, mkChar("dim_mix_mat_set_1"));
+  SET_STRING_ELT(nms, 59, mkChar("dim_mix_mat_set_12"));
+  SET_STRING_ELT(nms, 60, mkChar("dim_mix_mat_set_2"));
+  SET_STRING_ELT(nms, 61, mkChar("dim_mix_mat_set_3"));
+  SET_STRING_ELT(nms, 62, mkChar("dim_n_E1_E2"));
+  SET_STRING_ELT(nms, 63, mkChar("dim_n_E2_I"));
+  SET_STRING_ELT(nms, 64, mkChar("dim_n_E2_ICase1"));
+  SET_STRING_ELT(nms, 65, mkChar("dim_n_E2_IMild"));
+  SET_STRING_ELT(nms, 66, mkChar("dim_n_ICase1_ICase2"));
+  SET_STRING_ELT(nms, 67, mkChar("dim_n_ICase2_Hosp"));
+  SET_STRING_ELT(nms, 68, mkChar("dim_n_ICase2_IMV1"));
+  SET_STRING_ELT(nms, 69, mkChar("dim_n_ICase2_IOx1"));
+  SET_STRING_ELT(nms, 70, mkChar("dim_n_IMild_R"));
+  SET_STRING_ELT(nms, 71, mkChar("dim_n_IMV1_IMV2"));
+  SET_STRING_ELT(nms, 72, mkChar("dim_n_IMV2_D"));
+  SET_STRING_ELT(nms, 73, mkChar("dim_n_IMV2_IRec1"));
+  SET_STRING_ELT(nms, 74, mkChar("dim_n_IMV2_RecD"));
+  SET_STRING_ELT(nms, 75, mkChar("dim_n_IOx1_IOx2"));
+  SET_STRING_ELT(nms, 76, mkChar("dim_n_IOx2_D"));
+  SET_STRING_ELT(nms, 77, mkChar("dim_n_IOx2_R"));
+  SET_STRING_ELT(nms, 78, mkChar("dim_n_IOx2_RD"));
+  SET_STRING_ELT(nms, 79, mkChar("dim_n_IRec1_IRec2"));
+  SET_STRING_ELT(nms, 80, mkChar("dim_n_IRec2_R"));
+  SET_STRING_ELT(nms, 81, mkChar("dim_n_S_E1"));
+  SET_STRING_ELT(nms, 82, mkChar("dim_p_S_E1"));
+  SET_STRING_ELT(nms, 83, mkChar("dim_prob_hosp"));
+  SET_STRING_ELT(nms, 84, mkChar("dim_prob_non_severe_death"));
+  SET_STRING_ELT(nms, 85, mkChar("dim_prob_severe"));
+  SET_STRING_ELT(nms, 86, mkChar("dim_prob_severe_death"));
+  SET_STRING_ELT(nms, 87, mkChar("dim_R"));
+  SET_STRING_ELT(nms, 88, mkChar("dim_R_0"));
+  SET_STRING_ELT(nms, 89, mkChar("dim_S"));
+  SET_STRING_ELT(nms, 90, mkChar("dim_S_0"));
+  SET_STRING_ELT(nms, 91, mkChar("dim_s_ij"));
+  SET_STRING_ELT(nms, 92, mkChar("dim_s_ij_1"));
+  SET_STRING_ELT(nms, 93, mkChar("dim_s_ij_2"));
+  SET_STRING_ELT(nms, 94, mkChar("dim_temp"));
+  SET_STRING_ELT(nms, 95, mkChar("dim_tt_beta"));
+  SET_STRING_ELT(nms, 96, mkChar("dim_tt_matrix"));
+  SET_STRING_ELT(nms, 97, mkChar("dt"));
+  SET_STRING_ELT(nms, 98, mkChar("E1_0"));
+  SET_STRING_ELT(nms, 99, mkChar("E2_0"));
+  SET_STRING_ELT(nms, 100, mkChar("gamma_E"));
+  SET_STRING_ELT(nms, 101, mkChar("gamma_hosp"));
+  SET_STRING_ELT(nms, 102, mkChar("gamma_mv"));
+  SET_STRING_ELT(nms, 103, mkChar("gamma_ox"));
+  SET_STRING_ELT(nms, 104, mkChar("gamma_R"));
+  SET_STRING_ELT(nms, 105, mkChar("gamma_rec"));
+  SET_STRING_ELT(nms, 106, mkChar("ICase1_0"));
+  SET_STRING_ELT(nms, 107, mkChar("ICase2_0"));
+  SET_STRING_ELT(nms, 108, mkChar("IMild_0"));
+  SET_STRING_ELT(nms, 109, mkChar("IMV1_0"));
+  SET_STRING_ELT(nms, 110, mkChar("IMV2_0"));
+  SET_STRING_ELT(nms, 111, mkChar("initial_D"));
+  SET_STRING_ELT(nms, 112, mkChar("initial_E1"));
+  SET_STRING_ELT(nms, 113, mkChar("initial_E2"));
+  SET_STRING_ELT(nms, 114, mkChar("initial_ICase1"));
+  SET_STRING_ELT(nms, 115, mkChar("initial_ICase2"));
+  SET_STRING_ELT(nms, 116, mkChar("initial_IMild"));
+  SET_STRING_ELT(nms, 117, mkChar("initial_IMV1"));
+  SET_STRING_ELT(nms, 118, mkChar("initial_IMV2"));
+  SET_STRING_ELT(nms, 119, mkChar("initial_IOx1"));
+  SET_STRING_ELT(nms, 120, mkChar("initial_IOx2"));
+  SET_STRING_ELT(nms, 121, mkChar("initial_IRec1"));
+  SET_STRING_ELT(nms, 122, mkChar("initial_IRec2"));
+  SET_STRING_ELT(nms, 123, mkChar("initial_R"));
+  SET_STRING_ELT(nms, 124, mkChar("initial_S"));
+  SET_STRING_ELT(nms, 125, mkChar("interpolate_beta"));
+  SET_STRING_ELT(nms, 126, mkChar("interpolate_m"));
+  SET_STRING_ELT(nms, 127, mkChar("IOx1_0"));
+  SET_STRING_ELT(nms, 128, mkChar("IOx2_0"));
+  SET_STRING_ELT(nms, 129, mkChar("IRec1_0"));
+  SET_STRING_ELT(nms, 130, mkChar("IRec2_0"));
+  SET_STRING_ELT(nms, 131, mkChar("lambda"));
+  SET_STRING_ELT(nms, 132, mkChar("m"));
+  SET_STRING_ELT(nms, 133, mkChar("mix_mat_set"));
+  SET_STRING_ELT(nms, 134, mkChar("N_age"));
+  SET_STRING_ELT(nms, 135, mkChar("n_E1_E2"));
+  SET_STRING_ELT(nms, 136, mkChar("n_E2_I"));
+  SET_STRING_ELT(nms, 137, mkChar("n_E2_ICase1"));
+  SET_STRING_ELT(nms, 138, mkChar("n_E2_IMild"));
+  SET_STRING_ELT(nms, 139, mkChar("n_ICase1_ICase2"));
+  SET_STRING_ELT(nms, 140, mkChar("n_ICase2_Hosp"));
+  SET_STRING_ELT(nms, 141, mkChar("n_ICase2_IMV1"));
+  SET_STRING_ELT(nms, 142, mkChar("n_ICase2_IOx1"));
+  SET_STRING_ELT(nms, 143, mkChar("n_IMild_R"));
+  SET_STRING_ELT(nms, 144, mkChar("n_IMV1_IMV2"));
+  SET_STRING_ELT(nms, 145, mkChar("n_IMV2_D"));
+  SET_STRING_ELT(nms, 146, mkChar("n_IMV2_IRec1"));
+  SET_STRING_ELT(nms, 147, mkChar("n_IMV2_RecD"));
+  SET_STRING_ELT(nms, 148, mkChar("n_IOx1_IOx2"));
+  SET_STRING_ELT(nms, 149, mkChar("n_IOx2_D"));
+  SET_STRING_ELT(nms, 150, mkChar("n_IOx2_R"));
+  SET_STRING_ELT(nms, 151, mkChar("n_IOx2_RD"));
+  SET_STRING_ELT(nms, 152, mkChar("n_IRec1_IRec2"));
+  SET_STRING_ELT(nms, 153, mkChar("n_IRec2_R"));
+  SET_STRING_ELT(nms, 154, mkChar("n_S_E1"));
+  SET_STRING_ELT(nms, 155, mkChar("offset_variable_D"));
+  SET_STRING_ELT(nms, 156, mkChar("offset_variable_E2"));
+  SET_STRING_ELT(nms, 157, mkChar("offset_variable_ICase1"));
+  SET_STRING_ELT(nms, 158, mkChar("offset_variable_ICase2"));
+  SET_STRING_ELT(nms, 159, mkChar("offset_variable_IMild"));
+  SET_STRING_ELT(nms, 160, mkChar("offset_variable_IMV1"));
+  SET_STRING_ELT(nms, 161, mkChar("offset_variable_IMV2"));
+  SET_STRING_ELT(nms, 162, mkChar("offset_variable_IOx1"));
+  SET_STRING_ELT(nms, 163, mkChar("offset_variable_IOx2"));
+  SET_STRING_ELT(nms, 164, mkChar("offset_variable_IRec1"));
+  SET_STRING_ELT(nms, 165, mkChar("offset_variable_IRec2"));
+  SET_STRING_ELT(nms, 166, mkChar("offset_variable_R"));
+  SET_STRING_ELT(nms, 167, mkChar("p_E1_E2"));
+  SET_STRING_ELT(nms, 168, mkChar("p_E2_I"));
+  SET_STRING_ELT(nms, 169, mkChar("p_ICase1_ICase2"));
+  SET_STRING_ELT(nms, 170, mkChar("p_ICase2_Hosp"));
+  SET_STRING_ELT(nms, 171, mkChar("p_IMild_R"));
+  SET_STRING_ELT(nms, 172, mkChar("p_IMV1_IMV2"));
+  SET_STRING_ELT(nms, 173, mkChar("p_IMV2_RecD"));
+  SET_STRING_ELT(nms, 174, mkChar("p_IOx1_IOx2"));
+  SET_STRING_ELT(nms, 175, mkChar("p_IOx2_RD"));
+  SET_STRING_ELT(nms, 176, mkChar("p_Rec1_Rec2"));
+  SET_STRING_ELT(nms, 177, mkChar("p_Rec2_R"));
+  SET_STRING_ELT(nms, 178, mkChar("p_S_E1"));
+  SET_STRING_ELT(nms, 179, mkChar("prob_hosp"));
+  SET_STRING_ELT(nms, 180, mkChar("prob_non_severe_death"));
+  SET_STRING_ELT(nms, 181, mkChar("prob_severe"));
+  SET_STRING_ELT(nms, 182, mkChar("prob_severe_death"));
+  SET_STRING_ELT(nms, 183, mkChar("R_0"));
+  SET_STRING_ELT(nms, 184, mkChar("S_0"));
+  SET_STRING_ELT(nms, 185, mkChar("s_ij"));
+  SET_STRING_ELT(nms, 186, mkChar("temp"));
+  SET_STRING_ELT(nms, 187, mkChar("tt_beta"));
+  SET_STRING_ELT(nms, 188, mkChar("tt_matrix"));
+  setAttrib(contents, R_NamesSymbol, nms);
+  UNPROTECT(76);
+  return contents;
+}
+SEXP explict_SEIR_set_user(SEXP internal_p, SEXP user) {
+  explict_SEIR_internal *internal = explict_SEIR_get_internal(internal_p, 1);
+  internal->dt = user_get_scalar_double(user, "dt", internal->dt, NA_REAL, NA_REAL);
+  internal->gamma_E = user_get_scalar_double(user, "gamma_E", internal->gamma_E, NA_REAL, NA_REAL);
+  internal->gamma_hosp = user_get_scalar_double(user, "gamma_hosp", internal->gamma_hosp, NA_REAL, NA_REAL);
+  internal->gamma_mv = user_get_scalar_double(user, "gamma_mv", internal->gamma_mv, NA_REAL, NA_REAL);
+  internal->gamma_ox = user_get_scalar_double(user, "gamma_ox", internal->gamma_ox, NA_REAL, NA_REAL);
+  internal->gamma_R = user_get_scalar_double(user, "gamma_R", internal->gamma_R, NA_REAL, NA_REAL);
+  internal->gamma_rec = user_get_scalar_double(user, "gamma_rec", internal->gamma_rec, NA_REAL, NA_REAL);
+  internal->N_age = user_get_scalar_int(user, "N_age", internal->N_age, NA_REAL, NA_REAL);
+  internal->tt_beta = (double*) user_get_array_dim(user, false, internal->tt_beta, "tt_beta", 1, NA_REAL, NA_REAL, &internal->dim_tt_beta);
+  internal->tt_matrix = (double*) user_get_array_dim(user, false, internal->tt_matrix, "tt_matrix", 1, NA_REAL, NA_REAL, &internal->dim_tt_matrix);
+  internal->dim_D = internal->N_age;
+  internal->dim_D_0 = internal->N_age;
+  internal->dim_delta_D = internal->N_age;
+  internal->dim_delta_E1 = internal->N_age;
+  internal->dim_delta_E2 = internal->N_age;
+  internal->dim_delta_ICase1 = internal->N_age;
+  internal->dim_delta_ICase2 = internal->N_age;
+  internal->dim_delta_IMild = internal->N_age;
+  internal->dim_delta_IMV1 = internal->N_age;
+  internal->dim_delta_IMV2 = internal->N_age;
+  internal->dim_delta_IOx1 = internal->N_age;
+  internal->dim_delta_IOx2 = internal->N_age;
+  internal->dim_delta_IRec1 = internal->N_age;
+  internal->dim_delta_IRec2 = internal->N_age;
+  internal->dim_delta_R = internal->N_age;
+  internal->dim_E1 = internal->N_age;
+  internal->dim_E1_0 = internal->N_age;
+  internal->dim_E2 = internal->N_age;
+  internal->dim_E2_0 = internal->N_age;
+  internal->dim_ICase1 = internal->N_age;
+  internal->dim_ICase1_0 = internal->N_age;
+  internal->dim_ICase2 = internal->N_age;
+  internal->dim_ICase2_0 = internal->N_age;
+  internal->dim_IMild = internal->N_age;
+  internal->dim_IMild_0 = internal->N_age;
+  internal->dim_IMV1 = internal->N_age;
+  internal->dim_IMV1_0 = internal->N_age;
+  internal->dim_IMV2 = internal->N_age;
+  internal->dim_IMV2_0 = internal->N_age;
+  internal->dim_IOx1 = internal->N_age;
+  internal->dim_IOx1_0 = internal->N_age;
+  internal->dim_IOx2 = internal->N_age;
+  internal->dim_IOx2_0 = internal->N_age;
+  internal->dim_IRec1 = internal->N_age;
+  internal->dim_IRec1_0 = internal->N_age;
+  internal->dim_IRec2 = internal->N_age;
+  internal->dim_IRec2_0 = internal->N_age;
+  internal->dim_lambda = internal->N_age;
+  internal->dim_m_1 = internal->N_age;
+  internal->dim_m_2 = internal->N_age;
+  internal->dim_n_E1_E2 = internal->N_age;
+  internal->dim_n_E2_I = internal->N_age;
+  internal->dim_n_E2_ICase1 = internal->N_age;
+  internal->dim_n_E2_IMild = internal->N_age;
+  internal->dim_n_ICase1_ICase2 = internal->N_age;
+  internal->dim_n_ICase2_Hosp = internal->N_age;
+  internal->dim_n_ICase2_IMV1 = internal->N_age;
+  internal->dim_n_ICase2_IOx1 = internal->N_age;
+  internal->dim_n_IMild_R = internal->N_age;
+  internal->dim_n_IMV1_IMV2 = internal->N_age;
+  internal->dim_n_IMV2_D = internal->N_age;
+  internal->dim_n_IMV2_IRec1 = internal->N_age;
+  internal->dim_n_IMV2_RecD = internal->N_age;
+  internal->dim_n_IOx1_IOx2 = internal->N_age;
+  internal->dim_n_IOx2_D = internal->N_age;
+  internal->dim_n_IOx2_R = internal->N_age;
+  internal->dim_n_IOx2_RD = internal->N_age;
+  internal->dim_n_IRec1_IRec2 = internal->N_age;
+  internal->dim_n_IRec2_R = internal->N_age;
+  internal->dim_n_S_E1 = internal->N_age;
+  internal->dim_p_S_E1 = internal->N_age;
+  internal->dim_prob_hosp = internal->N_age;
+  internal->dim_prob_non_severe_death = internal->N_age;
+  internal->dim_prob_severe = internal->N_age;
+  internal->dim_prob_severe_death = internal->N_age;
+  internal->dim_R = internal->N_age;
+  internal->dim_R_0 = internal->N_age;
+  internal->dim_S = internal->N_age;
+  internal->dim_S_0 = internal->N_age;
+  internal->dim_s_ij_1 = internal->N_age;
+  internal->dim_s_ij_2 = internal->N_age;
+  internal->dim_temp = internal->N_age;
+  internal->p_E1_E2 = 1 - exp(-(internal->gamma_E) * internal->dt);
+  internal->p_E2_I = 1 - exp(-(internal->gamma_E) * internal->dt);
+  internal->p_ICase1_ICase2 = 1 - exp(-(internal->gamma_hosp) * internal->dt);
+  internal->p_ICase2_Hosp = 1 - exp(-(internal->gamma_hosp) * internal->dt);
+  internal->p_IMild_R = 1 - exp(-(internal->gamma_R) * internal->dt);
+  internal->p_IMV1_IMV2 = 1 - exp(-(internal->gamma_mv) * internal->dt);
+  internal->p_IMV2_RecD = 1 - exp(-(internal->gamma_mv) * internal->dt);
+  internal->p_IOx1_IOx2 = 1 - exp(-(internal->gamma_ox) * internal->dt);
+  internal->p_IOx2_RD = 1 - exp(-(internal->gamma_ox) * internal->dt);
+  internal->p_Rec1_Rec2 = 1 - exp(-(internal->gamma_rec) * internal->dt);
+  internal->p_Rec2_R = 1 - exp(-(internal->gamma_rec) * internal->dt);
+  Free(internal->delta_D);
+  internal->delta_D = (double*) Calloc(internal->dim_delta_D, double);
+  Free(internal->delta_E1);
+  internal->delta_E1 = (double*) Calloc(internal->dim_delta_E1, double);
+  Free(internal->delta_E2);
+  internal->delta_E2 = (double*) Calloc(internal->dim_delta_E2, double);
+  Free(internal->delta_ICase1);
+  internal->delta_ICase1 = (double*) Calloc(internal->dim_delta_ICase1, double);
+  Free(internal->delta_ICase2);
+  internal->delta_ICase2 = (double*) Calloc(internal->dim_delta_ICase2, double);
+  Free(internal->delta_IMild);
+  internal->delta_IMild = (double*) Calloc(internal->dim_delta_IMild, double);
+  Free(internal->delta_IMV1);
+  internal->delta_IMV1 = (double*) Calloc(internal->dim_delta_IMV1, double);
+  Free(internal->delta_IMV2);
+  internal->delta_IMV2 = (double*) Calloc(internal->dim_delta_IMV2, double);
+  Free(internal->delta_IOx1);
+  internal->delta_IOx1 = (double*) Calloc(internal->dim_delta_IOx1, double);
+  Free(internal->delta_IOx2);
+  internal->delta_IOx2 = (double*) Calloc(internal->dim_delta_IOx2, double);
+  Free(internal->delta_IRec1);
+  internal->delta_IRec1 = (double*) Calloc(internal->dim_delta_IRec1, double);
+  Free(internal->delta_IRec2);
+  internal->delta_IRec2 = (double*) Calloc(internal->dim_delta_IRec2, double);
+  Free(internal->delta_R);
+  internal->delta_R = (double*) Calloc(internal->dim_delta_R, double);
+  Free(internal->initial_D);
+  internal->initial_D = (double*) Calloc(internal->dim_D, double);
+  Free(internal->initial_E1);
+  internal->initial_E1 = (double*) Calloc(internal->dim_E1, double);
+  Free(internal->initial_E2);
+  internal->initial_E2 = (double*) Calloc(internal->dim_E2, double);
+  Free(internal->initial_ICase1);
+  internal->initial_ICase1 = (double*) Calloc(internal->dim_ICase1, double);
+  Free(internal->initial_ICase2);
+  internal->initial_ICase2 = (double*) Calloc(internal->dim_ICase2, double);
+  Free(internal->initial_IMild);
+  internal->initial_IMild = (double*) Calloc(internal->dim_IMild, double);
+  Free(internal->initial_IMV1);
+  internal->initial_IMV1 = (double*) Calloc(internal->dim_IMV1, double);
+  Free(internal->initial_IMV2);
+  internal->initial_IMV2 = (double*) Calloc(internal->dim_IMV2, double);
+  Free(internal->initial_IOx1);
+  internal->initial_IOx1 = (double*) Calloc(internal->dim_IOx1, double);
+  Free(internal->initial_IOx2);
+  internal->initial_IOx2 = (double*) Calloc(internal->dim_IOx2, double);
+  Free(internal->initial_IRec1);
+  internal->initial_IRec1 = (double*) Calloc(internal->dim_IRec1, double);
+  Free(internal->initial_IRec2);
+  internal->initial_IRec2 = (double*) Calloc(internal->dim_IRec2, double);
+  Free(internal->initial_R);
+  internal->initial_R = (double*) Calloc(internal->dim_R, double);
+  Free(internal->initial_S);
+  internal->initial_S = (double*) Calloc(internal->dim_S, double);
+  Free(internal->lambda);
+  internal->lambda = (double*) Calloc(internal->dim_lambda, double);
+  Free(internal->n_E1_E2);
+  internal->n_E1_E2 = (double*) Calloc(internal->dim_n_E1_E2, double);
+  Free(internal->n_E2_I);
+  internal->n_E2_I = (double*) Calloc(internal->dim_n_E2_I, double);
+  Free(internal->n_E2_ICase1);
+  internal->n_E2_ICase1 = (double*) Calloc(internal->dim_n_E2_ICase1, double);
+  Free(internal->n_E2_IMild);
+  internal->n_E2_IMild = (double*) Calloc(internal->dim_n_E2_IMild, double);
+  Free(internal->n_ICase1_ICase2);
+  internal->n_ICase1_ICase2 = (double*) Calloc(internal->dim_n_ICase1_ICase2, double);
+  Free(internal->n_ICase2_Hosp);
+  internal->n_ICase2_Hosp = (double*) Calloc(internal->dim_n_ICase2_Hosp, double);
+  Free(internal->n_ICase2_IMV1);
+  internal->n_ICase2_IMV1 = (double*) Calloc(internal->dim_n_ICase2_IMV1, double);
+  Free(internal->n_ICase2_IOx1);
+  internal->n_ICase2_IOx1 = (double*) Calloc(internal->dim_n_ICase2_IOx1, double);
+  Free(internal->n_IMild_R);
+  internal->n_IMild_R = (double*) Calloc(internal->dim_n_IMild_R, double);
+  Free(internal->n_IMV1_IMV2);
+  internal->n_IMV1_IMV2 = (double*) Calloc(internal->dim_n_IMV1_IMV2, double);
+  Free(internal->n_IMV2_D);
+  internal->n_IMV2_D = (double*) Calloc(internal->dim_n_IMV2_D, double);
+  Free(internal->n_IMV2_IRec1);
+  internal->n_IMV2_IRec1 = (double*) Calloc(internal->dim_n_IMV2_IRec1, double);
+  Free(internal->n_IMV2_RecD);
+  internal->n_IMV2_RecD = (double*) Calloc(internal->dim_n_IMV2_RecD, double);
+  Free(internal->n_IOx1_IOx2);
+  internal->n_IOx1_IOx2 = (double*) Calloc(internal->dim_n_IOx1_IOx2, double);
+  Free(internal->n_IOx2_D);
+  internal->n_IOx2_D = (double*) Calloc(internal->dim_n_IOx2_D, double);
+  Free(internal->n_IOx2_R);
+  internal->n_IOx2_R = (double*) Calloc(internal->dim_n_IOx2_R, double);
+  Free(internal->n_IOx2_RD);
+  internal->n_IOx2_RD = (double*) Calloc(internal->dim_n_IOx2_RD, double);
+  Free(internal->n_IRec1_IRec2);
+  internal->n_IRec1_IRec2 = (double*) Calloc(internal->dim_n_IRec1_IRec2, double);
+  Free(internal->n_IRec2_R);
+  internal->n_IRec2_R = (double*) Calloc(internal->dim_n_IRec2_R, double);
+  Free(internal->n_S_E1);
+  internal->n_S_E1 = (double*) Calloc(internal->dim_n_S_E1, double);
+  Free(internal->p_S_E1);
+  internal->p_S_E1 = (double*) Calloc(internal->dim_p_S_E1, double);
+  Free(internal->temp);
+  internal->temp = (double*) Calloc(internal->dim_temp, double);
+  internal->D_0 = (double*) user_get_array(user, false, internal->D_0, "D_0", NA_REAL, NA_REAL, 1, internal->dim_D_0);
+  internal->dim_beta_set = internal->dim_tt_beta;
+  internal->dim_m = internal->dim_m_1 * internal->dim_m_2;
+  internal->dim_mix_mat_set_1 = internal->dim_tt_matrix;
+  internal->dim_mix_mat_set_2 = internal->N_age;
+  internal->dim_mix_mat_set_3 = internal->N_age;
+  internal->dim_s_ij = internal->dim_s_ij_1 * internal->dim_s_ij_2;
+  internal->E1_0 = (double*) user_get_array(user, false, internal->E1_0, "E1_0", NA_REAL, NA_REAL, 1, internal->dim_E1_0);
+  internal->E2_0 = (double*) user_get_array(user, false, internal->E2_0, "E2_0", NA_REAL, NA_REAL, 1, internal->dim_E2_0);
+  internal->ICase1_0 = (double*) user_get_array(user, false, internal->ICase1_0, "ICase1_0", NA_REAL, NA_REAL, 1, internal->dim_ICase1_0);
+  internal->ICase2_0 = (double*) user_get_array(user, false, internal->ICase2_0, "ICase2_0", NA_REAL, NA_REAL, 1, internal->dim_ICase2_0);
+  internal->IMild_0 = (double*) user_get_array(user, false, internal->IMild_0, "IMild_0", NA_REAL, NA_REAL, 1, internal->dim_IMild_0);
+  internal->IMV1_0 = (double*) user_get_array(user, false, internal->IMV1_0, "IMV1_0", NA_REAL, NA_REAL, 1, internal->dim_IMV1_0);
+  internal->IMV2_0 = (double*) user_get_array(user, false, internal->IMV2_0, "IMV2_0", NA_REAL, NA_REAL, 1, internal->dim_IMV2_0);
+  internal->IOx1_0 = (double*) user_get_array(user, false, internal->IOx1_0, "IOx1_0", NA_REAL, NA_REAL, 1, internal->dim_IOx1_0);
+  internal->IOx2_0 = (double*) user_get_array(user, false, internal->IOx2_0, "IOx2_0", NA_REAL, NA_REAL, 1, internal->dim_IOx2_0);
+  internal->IRec1_0 = (double*) user_get_array(user, false, internal->IRec1_0, "IRec1_0", NA_REAL, NA_REAL, 1, internal->dim_IRec1_0);
+  internal->IRec2_0 = (double*) user_get_array(user, false, internal->IRec2_0, "IRec2_0", NA_REAL, NA_REAL, 1, internal->dim_IRec2_0);
+  internal->offset_variable_D = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOx1 + internal->dim_IOx2 + internal->dim_IMV1 + internal->dim_IMV2 + internal->dim_IRec1 + internal->dim_IRec2 + internal->dim_R;
+  internal->offset_variable_E2 = internal->dim_S + internal->dim_E1;
+  internal->offset_variable_ICase1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild;
+  internal->offset_variable_ICase2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1;
+  internal->offset_variable_IMild = internal->dim_S + internal->dim_E1 + internal->dim_E2;
+  internal->offset_variable_IMV1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOx1 + internal->dim_IOx2;
+  internal->offset_variable_IMV2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOx1 + internal->dim_IOx2 + internal->dim_IMV1;
+  internal->offset_variable_IOx1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2;
+  internal->offset_variable_IOx2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOx1;
+  internal->offset_variable_IRec1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOx1 + internal->dim_IOx2 + internal->dim_IMV1 + internal->dim_IMV2;
+  internal->offset_variable_IRec2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOx1 + internal->dim_IOx2 + internal->dim_IMV1 + internal->dim_IMV2 + internal->dim_IRec1;
+  internal->offset_variable_R = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOx1 + internal->dim_IOx2 + internal->dim_IMV1 + internal->dim_IMV2 + internal->dim_IRec1 + internal->dim_IRec2;
+  internal->prob_hosp = (double*) user_get_array(user, false, internal->prob_hosp, "prob_hosp", NA_REAL, NA_REAL, 1, internal->dim_prob_hosp);
+  internal->prob_non_severe_death = (double*) user_get_array(user, false, internal->prob_non_severe_death, "prob_non_severe_death", NA_REAL, NA_REAL, 1, internal->dim_prob_non_severe_death);
+  internal->prob_severe = (double*) user_get_array(user, false, internal->prob_severe, "prob_severe", NA_REAL, NA_REAL, 1, internal->dim_prob_severe);
+  internal->prob_severe_death = (double*) user_get_array(user, false, internal->prob_severe_death, "prob_severe_death", NA_REAL, NA_REAL, 1, internal->dim_prob_severe_death);
+  internal->R_0 = (double*) user_get_array(user, false, internal->R_0, "R_0", NA_REAL, NA_REAL, 1, internal->dim_R_0);
+  internal->S_0 = (double*) user_get_array(user, false, internal->S_0, "S_0", NA_REAL, NA_REAL, 1, internal->dim_S_0);
+  Free(internal->m);
+  internal->m = (double*) Calloc(internal->dim_m, double);
+  Free(internal->s_ij);
+  internal->s_ij = (double*) Calloc(internal->dim_s_ij, double);
+  internal->beta_set = (double*) user_get_array(user, false, internal->beta_set, "beta_set", NA_REAL, NA_REAL, 1, internal->dim_beta_set);
+  internal->dim_mix_mat_set = internal->dim_mix_mat_set_1 * internal->dim_mix_mat_set_2 * internal->dim_mix_mat_set_3;
+  internal->dim_mix_mat_set_12 = internal->dim_mix_mat_set_1 * internal->dim_mix_mat_set_2;
+  for (int i = 1; i <= internal->dim_D; ++i) {
+    internal->initial_D[i - 1] = internal->D_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_E1; ++i) {
+    internal->initial_E1[i - 1] = internal->E1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_E2; ++i) {
+    internal->initial_E2[i - 1] = internal->E2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_ICase1; ++i) {
+    internal->initial_ICase1[i - 1] = internal->ICase1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_ICase2; ++i) {
+    internal->initial_ICase2[i - 1] = internal->ICase2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMild; ++i) {
+    internal->initial_IMild[i - 1] = internal->IMild_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMV1; ++i) {
+    internal->initial_IMV1[i - 1] = internal->IMV1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMV2; ++i) {
+    internal->initial_IMV2[i - 1] = internal->IMV2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOx1; ++i) {
+    internal->initial_IOx1[i - 1] = internal->IOx1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOx2; ++i) {
+    internal->initial_IOx2[i - 1] = internal->IOx2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IRec1; ++i) {
+    internal->initial_IRec1[i - 1] = internal->IRec1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IRec2; ++i) {
+    internal->initial_IRec2[i - 1] = internal->IRec2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_R; ++i) {
+    internal->initial_R[i - 1] = internal->R_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_S; ++i) {
+    internal->initial_S[i - 1] = internal->S_0[i - 1];
+  }
+  interpolate_check_y(internal->dim_tt_beta, internal->dim_beta_set, 0, "beta_set", "beta");
+  cinterpolate_free(internal->interpolate_beta);
+  internal->interpolate_beta = cinterpolate_alloc("constant", internal->dim_tt_beta, 1, internal->tt_beta, internal->beta_set, true, false);
+  internal->mix_mat_set = (double*) user_get_array(user, false, internal->mix_mat_set, "mix_mat_set", NA_REAL, NA_REAL, 3, internal->dim_mix_mat_set_1, internal->dim_mix_mat_set_2, internal->dim_mix_mat_set_3);
+  interpolate_check_y(internal->dim_tt_matrix, internal->dim_mix_mat_set_1, 1, "mix_mat_set", "m");
+  interpolate_check_y(internal->dim_m_1, internal->dim_mix_mat_set_2, 2, "mix_mat_set", "m");
+  interpolate_check_y(internal->dim_m_2, internal->dim_mix_mat_set_3, 3, "mix_mat_set", "m");
+  cinterpolate_free(internal->interpolate_m);
+  internal->interpolate_m = cinterpolate_alloc("constant", internal->dim_tt_matrix, internal->dim_m, internal->tt_matrix, internal->mix_mat_set, true, false);
+  return R_NilValue;
+}
+SEXP explict_SEIR_metadata(SEXP internal_p) {
+  explict_SEIR_internal *internal = explict_SEIR_get_internal(internal_p, 1);
+  SEXP ret = PROTECT(allocVector(VECSXP, 4));
+  SEXP nms = PROTECT(allocVector(STRSXP, 4));
+  SET_STRING_ELT(nms, 0, mkChar("variable_order"));
+  SET_STRING_ELT(nms, 1, mkChar("output_order"));
+  SET_STRING_ELT(nms, 2, mkChar("n_out"));
+  SET_STRING_ELT(nms, 3, mkChar("interpolate_t"));
+  setAttrib(ret, R_NamesSymbol, nms);
+  SEXP variable_length = PROTECT(allocVector(VECSXP, 14));
+  SEXP variable_names = PROTECT(allocVector(STRSXP, 14));
+  setAttrib(variable_length, R_NamesSymbol, variable_names);
+  SET_VECTOR_ELT(variable_length, 0, ScalarInteger(internal->dim_S));
+  SET_VECTOR_ELT(variable_length, 1, ScalarInteger(internal->dim_E1));
+  SET_VECTOR_ELT(variable_length, 2, ScalarInteger(internal->dim_E2));
+  SET_VECTOR_ELT(variable_length, 3, ScalarInteger(internal->dim_IMild));
+  SET_VECTOR_ELT(variable_length, 4, ScalarInteger(internal->dim_ICase1));
+  SET_VECTOR_ELT(variable_length, 5, ScalarInteger(internal->dim_ICase2));
+  SET_VECTOR_ELT(variable_length, 6, ScalarInteger(internal->dim_IOx1));
+  SET_VECTOR_ELT(variable_length, 7, ScalarInteger(internal->dim_IOx2));
+  SET_VECTOR_ELT(variable_length, 8, ScalarInteger(internal->dim_IMV1));
+  SET_VECTOR_ELT(variable_length, 9, ScalarInteger(internal->dim_IMV2));
+  SET_VECTOR_ELT(variable_length, 10, ScalarInteger(internal->dim_IRec1));
+  SET_VECTOR_ELT(variable_length, 11, ScalarInteger(internal->dim_IRec2));
+  SET_VECTOR_ELT(variable_length, 12, ScalarInteger(internal->dim_R));
+  SET_VECTOR_ELT(variable_length, 13, ScalarInteger(internal->dim_D));
+  SET_STRING_ELT(variable_names, 0, mkChar("S"));
+  SET_STRING_ELT(variable_names, 1, mkChar("E1"));
+  SET_STRING_ELT(variable_names, 2, mkChar("E2"));
+  SET_STRING_ELT(variable_names, 3, mkChar("IMild"));
+  SET_STRING_ELT(variable_names, 4, mkChar("ICase1"));
+  SET_STRING_ELT(variable_names, 5, mkChar("ICase2"));
+  SET_STRING_ELT(variable_names, 6, mkChar("IOx1"));
+  SET_STRING_ELT(variable_names, 7, mkChar("IOx2"));
+  SET_STRING_ELT(variable_names, 8, mkChar("IMV1"));
+  SET_STRING_ELT(variable_names, 9, mkChar("IMV2"));
+  SET_STRING_ELT(variable_names, 10, mkChar("IRec1"));
+  SET_STRING_ELT(variable_names, 11, mkChar("IRec2"));
+  SET_STRING_ELT(variable_names, 12, mkChar("R"));
+  SET_STRING_ELT(variable_names, 13, mkChar("D"));
+  SET_VECTOR_ELT(ret, 0, variable_length);
+  UNPROTECT(2);
+  SEXP output_length = PROTECT(allocVector(VECSXP, 2));
+  SEXP output_names = PROTECT(allocVector(STRSXP, 2));
+  setAttrib(output_length, R_NamesSymbol, output_names);
+  SET_VECTOR_ELT(output_length, 0, R_NilValue);
+  SET_VECTOR_ELT(output_length, 1, ScalarInteger(internal->dim_n_E2_I));
+  SET_STRING_ELT(output_names, 0, mkChar("time"));
+  SET_STRING_ELT(output_names, 1, mkChar("n_E2_I"));
+  SET_VECTOR_ELT(ret, 1, output_length);
+  UNPROTECT(2);
+  SET_VECTOR_ELT(ret, 2, ScalarInteger(1 + internal->dim_n_E2_I));
+  SEXP interpolate_t = PROTECT(allocVector(VECSXP, 3));
+  SEXP interpolate_t_nms = PROTECT(allocVector(STRSXP, 3));
+  setAttrib(interpolate_t, R_NamesSymbol, interpolate_t_nms);
+  SET_VECTOR_ELT(interpolate_t, 0, ScalarReal(fmax(internal->tt_beta[0], internal->tt_matrix[0])));
+  SET_VECTOR_ELT(interpolate_t, 1, ScalarReal(R_PosInf));
+  SET_STRING_ELT(interpolate_t_nms, 0, mkChar("min"));
+  SET_STRING_ELT(interpolate_t_nms, 1, mkChar("max"));
+  SET_VECTOR_ELT(ret, 3, interpolate_t);
+  UNPROTECT(2);
+  UNPROTECT(2);
+  return ret;
+}
+SEXP explict_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr) {
+  explict_SEIR_internal *internal = explict_SEIR_get_internal(internal_p, 1);
+  SEXP r_state = PROTECT(allocVector(REALSXP, internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOx1 + internal->dim_IOx2 + internal->dim_IMV1 + internal->dim_IMV2 + internal->dim_IRec1 + internal->dim_IRec2 + internal->dim_R + internal->dim_D));
+  double * state = REAL(r_state);
+  memcpy(state + 0, internal->initial_S, internal->dim_S * sizeof(double));
+  memcpy(state + internal->dim_S, internal->initial_E1, internal->dim_E1 * sizeof(double));
+  memcpy(state + internal->offset_variable_E2, internal->initial_E2, internal->dim_E2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMild, internal->initial_IMild, internal->dim_IMild * sizeof(double));
+  memcpy(state + internal->offset_variable_ICase1, internal->initial_ICase1, internal->dim_ICase1 * sizeof(double));
+  memcpy(state + internal->offset_variable_ICase2, internal->initial_ICase2, internal->dim_ICase2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IOx1, internal->initial_IOx1, internal->dim_IOx1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IOx2, internal->initial_IOx2, internal->dim_IOx2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMV1, internal->initial_IMV1, internal->dim_IMV1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMV2, internal->initial_IMV2, internal->dim_IMV2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IRec1, internal->initial_IRec1, internal->dim_IRec1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IRec2, internal->initial_IRec2, internal->dim_IRec2 * sizeof(double));
+  memcpy(state + internal->offset_variable_R, internal->initial_R, internal->dim_R * sizeof(double));
+  memcpy(state + internal->offset_variable_D, internal->initial_D, internal->dim_D * sizeof(double));
+  UNPROTECT(1);
+  return r_state;
+}
+void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output) {
+  double * S = state + 0;
+  double * E1 = state + internal->dim_S;
+  double * E2 = state + internal->offset_variable_E2;
+  double * IMild = state + internal->offset_variable_IMild;
+  double * ICase1 = state + internal->offset_variable_ICase1;
+  double * ICase2 = state + internal->offset_variable_ICase2;
+  double * IOx1 = state + internal->offset_variable_IOx1;
+  double * IOx2 = state + internal->offset_variable_IOx2;
+  double * IMV1 = state + internal->offset_variable_IMV1;
+  double * IMV2 = state + internal->offset_variable_IMV2;
+  double * IRec1 = state + internal->offset_variable_IRec1;
+  double * IRec2 = state + internal->offset_variable_IRec2;
+  double * R = state + internal->offset_variable_R;
+  double * D = state + internal->offset_variable_D;
+  for (int i = 1; i <= internal->dim_n_E1_E2; ++i) {
+    internal->n_E1_E2[i - 1] = Rf_rbinom(round(E1[i - 1]), internal->p_E1_E2);
+  }
+  for (int i = 1; i <= internal->dim_n_E2_I; ++i) {
+    internal->n_E2_I[i - 1] = Rf_rbinom(round(E2[i - 1]), internal->p_E2_I);
+  }
+  for (int i = 1; i <= internal->dim_n_ICase1_ICase2; ++i) {
+    internal->n_ICase1_ICase2[i - 1] = Rf_rbinom(round(ICase1[i - 1]), internal->p_ICase1_ICase2);
+  }
+  for (int i = 1; i <= internal->dim_n_ICase2_Hosp; ++i) {
+    internal->n_ICase2_Hosp[i - 1] = Rf_rbinom(round(ICase2[i - 1]), internal->p_ICase2_Hosp);
+  }
+  for (int i = 1; i <= internal->dim_n_IMild_R; ++i) {
+    internal->n_IMild_R[i - 1] = Rf_rbinom(round(IMild[i - 1]), internal->p_IMild_R);
+  }
+  for (int i = 1; i <= internal->dim_n_IMV1_IMV2; ++i) {
+    internal->n_IMV1_IMV2[i - 1] = Rf_rbinom(round(IMV1[i - 1]), internal->p_IMV1_IMV2);
+  }
+  for (int i = 1; i <= internal->dim_n_IMV2_RecD; ++i) {
+    internal->n_IMV2_RecD[i - 1] = Rf_rbinom(round(IMV2[i - 1]), internal->p_IMV2_RecD);
+  }
+  for (int i = 1; i <= internal->dim_n_IOx1_IOx2; ++i) {
+    internal->n_IOx1_IOx2[i - 1] = Rf_rbinom(round(IOx1[i - 1]), internal->p_IOx1_IOx2);
+  }
+  for (int i = 1; i <= internal->dim_n_IOx2_RD; ++i) {
+    internal->n_IOx2_RD[i - 1] = Rf_rbinom(round(IOx2[i - 1]), internal->p_IOx2_RD);
+  }
+  for (int i = 1; i <= internal->dim_n_IRec1_IRec2; ++i) {
+    internal->n_IRec1_IRec2[i - 1] = Rf_rbinom(round(IRec1[i - 1]), internal->p_Rec1_Rec2);
+  }
+  for (int i = 1; i <= internal->dim_n_IRec2_R; ++i) {
+    internal->n_IRec2_R[i - 1] = Rf_rbinom(round(IRec2[i - 1]), internal->p_Rec2_R);
+  }
+  for (int i = 1; i <= internal->dim_temp; ++i) {
+    internal->temp[i - 1] = IMild[i - 1] + ICase1[i - 1] + ICase2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_E2; ++i) {
+    internal->delta_E2[i - 1] = internal->n_E1_E2[i - 1] - internal->n_E2_I[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_ICase2; ++i) {
+    internal->delta_ICase2[i - 1] = internal->n_ICase1_ICase2[i - 1] - internal->n_ICase2_Hosp[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IMV2; ++i) {
+    internal->delta_IMV2[i - 1] = internal->n_IMV1_IMV2[i - 1] - internal->n_IMV2_RecD[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IOx2; ++i) {
+    internal->delta_IOx2[i - 1] = internal->n_IOx1_IOx2[i - 1] - internal->n_IOx2_RD[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IRec2; ++i) {
+    internal->delta_IRec2[i - 1] = internal->n_IRec1_IRec2[i - 1] - internal->n_IRec2_R[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_n_E2_ICase1; ++i) {
+    internal->n_E2_ICase1[i - 1] = fround(internal->n_E2_I[i - 1] * internal->prob_hosp[i - 1], 0);
+  }
+  for (int i = 1; i <= internal->dim_n_ICase2_IMV1; ++i) {
+    internal->n_ICase2_IMV1[i - 1] = fround(internal->n_ICase2_Hosp[i - 1] * internal->prob_severe[i - 1], 0);
+  }
+  for (int i = 1; i <= internal->dim_n_IMV2_D; ++i) {
+    internal->n_IMV2_D[i - 1] = fround(internal->n_IMV2_RecD[i - 1] * internal->prob_severe_death[i - 1], 0);
+  }
+  for (int i = 1; i <= internal->dim_n_IOx2_D; ++i) {
+    internal->n_IOx2_D[i - 1] = fround(internal->n_IOx2_RD[i - 1] * internal->prob_non_severe_death[i - 1], 0);
+  }
+  double beta = 0.0;
+  cinterpolate_eval(step, internal->interpolate_beta, &beta);
+  for (int i = 1; i <= internal->dim_delta_D; ++i) {
+    internal->delta_D[i - 1] = internal->n_IOx2_D[i - 1] + internal->n_IMV2_D[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_ICase1; ++i) {
+    internal->delta_ICase1[i - 1] = internal->n_E2_ICase1[i - 1] - internal->n_ICase1_ICase2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IMV1; ++i) {
+    internal->delta_IMV1[i - 1] = internal->n_ICase2_IMV1[i - 1] - internal->n_IMV1_IMV2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_n_E2_IMild; ++i) {
+    internal->n_E2_IMild[i - 1] = internal->n_E2_I[i - 1] - internal->n_E2_ICase1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_n_ICase2_IOx1; ++i) {
+    internal->n_ICase2_IOx1[i - 1] = internal->n_ICase2_Hosp[i - 1] - internal->n_ICase2_IMV1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_n_IMV2_IRec1; ++i) {
+    internal->n_IMV2_IRec1[i - 1] = internal->n_IMV2_RecD[i - 1] - internal->n_IMV2_D[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_n_IOx2_R; ++i) {
+    internal->n_IOx2_R[i - 1] = internal->n_IOx2_RD[i - 1] - internal->n_IOx2_D[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_E2; ++i) {
+    state_next[internal->offset_variable_E2 + i - 1] = E2[i - 1] + internal->delta_E2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_ICase2; ++i) {
+    state_next[internal->offset_variable_ICase2 + i - 1] = ICase2[i - 1] + internal->delta_ICase2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMV2; ++i) {
+    state_next[internal->offset_variable_IMV2 + i - 1] = IMV2[i - 1] + internal->delta_IMV2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOx2; ++i) {
+    state_next[internal->offset_variable_IOx2 + i - 1] = IOx2[i - 1] + internal->delta_IOx2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IRec2; ++i) {
+    state_next[internal->offset_variable_IRec2 + i - 1] = IRec2[i - 1] + internal->delta_IRec2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IMild; ++i) {
+    internal->delta_IMild[i - 1] = internal->n_E2_IMild[i - 1] - internal->n_IMild_R[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IOx1; ++i) {
+    internal->delta_IOx1[i - 1] = internal->n_ICase2_IOx1[i - 1] - internal->n_IOx1_IOx2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IRec1; ++i) {
+    internal->delta_IRec1[i - 1] = internal->n_IMV2_IRec1[i - 1] - internal->n_IRec1_IRec2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_R; ++i) {
+    internal->delta_R[i - 1] = internal->n_IRec2_R[i - 1] + internal->n_IOx2_R[i - 1] + internal->n_IMild_R[i - 1];
+  }
+  cinterpolate_eval(step, internal->interpolate_m, internal->m);
+  for (int i = 1; i <= internal->dim_D; ++i) {
+    state_next[internal->offset_variable_D + i - 1] = D[i - 1] + internal->delta_D[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_ICase1; ++i) {
+    state_next[internal->offset_variable_ICase1 + i - 1] = ICase1[i - 1] + internal->delta_ICase1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMV1; ++i) {
+    state_next[internal->offset_variable_IMV1 + i - 1] = IMV1[i - 1] + internal->delta_IMV1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_s_ij_1; ++i) {
+    for (int j = 1; j <= internal->dim_s_ij_2; ++j) {
+      internal->s_ij[i - 1 + internal->dim_s_ij_1 * (j - 1)] = internal->m[internal->dim_m_1 * (j - 1) + i - 1] * internal->temp[j - 1];
+    }
+  }
+  for (int i = 1; i <= internal->dim_IMild; ++i) {
+    state_next[internal->offset_variable_IMild + i - 1] = IMild[i - 1] + internal->delta_IMild[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOx1; ++i) {
+    state_next[internal->offset_variable_IOx1 + i - 1] = IOx1[i - 1] + internal->delta_IOx1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IRec1; ++i) {
+    state_next[internal->offset_variable_IRec1 + i - 1] = IRec1[i - 1] + internal->delta_IRec1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_R; ++i) {
+    state_next[internal->offset_variable_R + i - 1] = R[i - 1] + internal->delta_R[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_lambda; ++i) {
+    internal->lambda[i - 1] = beta * odin_sum2(internal->s_ij, i - 1, i, 0, internal->dim_s_ij_2, internal->dim_s_ij_1);
+  }
+  for (int i = 1; i <= internal->dim_p_S_E1; ++i) {
+    internal->p_S_E1[i - 1] = 1 - exp(-(internal->lambda[i - 1]) * internal->dt);
+  }
+  for (int i = 1; i <= internal->dim_n_S_E1; ++i) {
+    internal->n_S_E1[i - 1] = Rf_rbinom(round(S[i - 1]), internal->p_S_E1[i - 1]);
+  }
+  for (int i = 1; i <= internal->dim_delta_E1; ++i) {
+    internal->delta_E1[i - 1] = internal->n_S_E1[i - 1] - internal->n_E1_E2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_S; ++i) {
+    state_next[0 + i - 1] = S[i - 1] - internal->n_S_E1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_E1; ++i) {
+    state_next[internal->dim_S + i - 1] = E1[i - 1] + internal->delta_E1[i - 1];
+  }
+  double time = step * internal->dt;
+  output[0] = time;
+  memcpy(output + 1, internal->n_E2_I, internal->dim_n_E2_I * sizeof(double));
+}
+void explict_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal) {
+  explict_SEIR_rhs((explict_SEIR_internal*)internal, step, state, state_next, output);
+}
+SEXP explict_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
+  SEXP state_next = PROTECT(allocVector(REALSXP, LENGTH(state)));
+  explict_SEIR_internal *internal = explict_SEIR_get_internal(internal_p, 1);
+  SEXP output_ptr = PROTECT(allocVector(REALSXP, 1 + internal->dim_n_E2_I));
+  setAttrib(state_next, install("output"), output_ptr);
+  UNPROTECT(1);
+  double *output = REAL(output_ptr);
+  GetRNGstate();
+  explict_SEIR_rhs(internal, INTEGER(step)[0], REAL(state), REAL(state_next), output);
+  PutRNGstate();
+  UNPROTECT(1);
+  return state_next;
+}
 SEIR_internal* SEIR_get_internal(SEXP internal_p, int closed_error) {
   SEIR_internal *internal = NULL;
   if (TYPEOF(internal_p) != EXTPTRSXP) {

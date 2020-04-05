@@ -42,3 +42,17 @@ test_that("init checks", {
   bad2[1,1] <- 10
   expect_error(init_check(bad2, 1:10), "Row sums of init should be identical to population")
 })
+
+test_that("init explicit checks", {
+  t1 <- init_check_explicit(NULL, 1:10)
+  expect_type(t1, "list")
+  expect_equal(nrow(t1), 10)
+  expect_named(t1, c("S", "E1", "E2", "IMild", "ICase1", "ICase2",
+                     "IOx1", "IOx2", "IMV1", "IMV2", "IRec1", "IRec2", "R", "D"))
+  expect_error(init_check_explicit(1:2, 1:10), "init should be a data.frame with columns:")
+  bad <- data.frame(x = 1:10)
+  expect_error(init_check_explicit(bad, 1:10), "S, E1, E2, IMild, ICase1, ICase2")
+  bad2 <- t1
+  bad2[1,1] <- 10
+  expect_error(init_check_explicit(bad2, 1:10), "Row sums of init should be identical to population")
+})

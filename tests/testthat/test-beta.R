@@ -17,3 +17,36 @@ test_that("beta input check work", {
   expect_error(beta_est(1, data.frame(a = 1:2, b = 1:2), 1),
                "mixing_matrix must be a matrix")
 })
+
+
+test_that("beta_explicit input check work", {
+  mm <- matrix(runif(4), ncol = 2)
+  mm_na <- mm
+  mm_na[1] <- NA
+
+  expect_error(beta_est_explicit(dur_R = 0, dur_hosp = 5,
+                                 prob_hosp = c(0.2,0.1),
+                                 mixing_matrix = mm, R0 = 2),
+               "dur_R must be greater than zero")
+
+  expect_error(beta_est_explicit(dur_R = 2, dur_hosp = 0,
+                                 prob_hosp = c(0.2,0.1),
+                                 mixing_matrix = mm, R0 = 2),
+               "dur_hosp must be greater than zero")
+
+  expect_error(beta_est_explicit(dur_R = c(2,2), dur_hosp = 5,
+                                 prob_hosp = c(0.2,0.1),
+                                 mixing_matrix = mm, R0 = 2),
+               "dur_R must be of length 1")
+
+  expect_error(beta_est_explicit(dur_R = 2, dur_hosp = 5,
+                                 prob_hosp = c(0.2,NA),
+                                 mixing_matrix = mm, R0 = 2),
+               "prob_hosp must not contain NAs")
+
+  expect_error(beta_est_explicit(dur_R = 2, dur_hosp = 5,
+                                 prob_hosp = c(0.2,0.2),
+                                 mixing_matrix = mm_na, R0 = 2),
+               "mixing_matrix must not contain NAs")
+
+})
