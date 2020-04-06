@@ -159,8 +159,6 @@ run_explicit_SEEIR_model <- function(
   tt_R0 = 0,
   beta_set = NULL,
 
-
-
   # initial state, duration, reps
   time_period = 365,
   dt = 0.25,

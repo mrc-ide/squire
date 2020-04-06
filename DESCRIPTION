@@ -23,6 +23,7 @@ Imports:
     tidyr,
     rlang,
     magrittr,
+    purrr,
     crayon,
     methods,
     ggplot2
