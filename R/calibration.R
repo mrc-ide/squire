@@ -17,9 +17,9 @@
 #'
 #' @return Time series of deaths as \code{data.frame}
 death_data_format <- function(date = NULL,
-                         deaths = NULL,
-                         reporting_quality = 0.2
-                         ){
+                              deaths = NULL,
+                              reporting_quality = 0.2
+){
 
   # If no dates are provided make up some data
   if (is.null(date)) {
@@ -67,6 +67,7 @@ death_data_format <- function(date = NULL,
 #' @importFrom utils tail
 #' @importFrom stats rbinom time
 #'
+#' @return Long data frame of simulation replicates
 calibrate <- function(data, country, replicates = 100, ...) {
 
   # assertions
@@ -83,17 +84,24 @@ calibrate <- function(data, country, replicates = 100, ...) {
 
   # run model with fixed day step (to match up with daily deaths)
   r <- run_explicit_SEEIR_model(population = pop$n,
-                              baseline_contact_matrix = contact_matrix,
-                              contact_matrix_set = contact_matrix,
-                              replicates = replicates,
-                              dt = 1,
-                              ...)
+                                baseline_contact_matrix = contact_matrix,
+                                contact_matrix_set = contact_matrix,
+                                replicates = replicates,
+                                dt = 1,
+                                ...)
 
   # wide output and group by Infection classes
-  out <- wide_output(r$output) %>%
-    dplyr::mutate(E = .data$E1 + .data$E2,
-                  I = .data$IMild + .data$ICase1 + .data$ICase2 + .data$IOx1 +
-                    .data$IOx2 + .data$IMV1 + .data$IMV2 + .data$IRec1 + .data$IRec2)
+  out <- wide_output(r$output)
+
+  # Don't need to group by I
+  # dplyr::mutate(E = .data$E1 + .data$E2,
+  #               I = .data$IMild + .data$ICase1 + .data$ICase2 +
+  #                 .data$IOxGetLive1 + .data$IOxGetLive2 + .data$IOxGetDie1 +
+  #                 .data$IOxGetDie2 + .data$IOxNotGetLive1 + .data$IOxNotGetLive2 +
+  #                 .data$IOxNotGetDie1 + .data$IOxNotGetDie2 + .data$IMVGetLive1 +
+  #                 .data$IMVGetLive2 + .data$IMVGetDie1 + .data$IMVGetDie2 +
+  #                 .data$IMVNotGetLive1 + .data$IMVNotGetLive2 + .data$IMVNotGetDie1 +
+  #                 .data$IMVNotGetDie2 + .data$IRec1 + .data$IRec2)
 
   # reset the time
   l_dths <- data$deaths[1]
@@ -107,10 +115,9 @@ calibrate <- function(data, country, replicates = 100, ...) {
 
   out <- dplyr::group_by(out, replicate) %>%
     dplyr::mutate(new_time = .data$t - timings$t[timings$replicate == replicate[1]],
-           date = l_date + .data$new_time)
+                  date = l_date + .data$new_time)
 
-  vars <- names(out)[grepl("^[[:upper:]]+$", substr(names(out), 1, 1))]
-  long <- tidyr::pivot_longer(out, .data$S:.data$I)
+  long <- tidyr::pivot_longer(out, .data$S:.data$D)
 
-return(long)
+  return(long)
 }

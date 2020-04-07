@@ -95,6 +95,8 @@ run_SEEIR_model <- function(R0 = 3,
 #' -----------------------------------------------------------------------------
 #' Run the explicit SEEIR model
 #'
+#' @details All durations are in days.
+#'
 #' @param population Population vector (for each age group).
 #' @param baseline_contact_matrix Contact matrix (in absence of interventions).
 #'   Used in estimation of beta from R0 vector
@@ -118,22 +120,39 @@ run_SEEIR_model <- function(R0 = 3,
 #'   0.000268514, 0.000516788, 0.00081535, 0.001242525,
 #'   0.001729275, 0.002880196, 0.00598205, 0.010821894,
 #'   0.022736324, 0.035911156, 0.056362032, 0.081467057)
-#' @param prob_non_severe_death Probability of death from non severe infection.
+#' @param prob_non_severe_death_treatment Probability of death from non severe
+#'   treated infection.
 #'   Default = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
 #'   0.0125702, 0.0125702, 0.0125702, 0.013361147,
 #'   0.015104687, 0.019164124, 0.027477519, 0.041762108,
 #'   0.068531658, 0.105302319, 0.149305732, 0.20349534)
-#' @param prob_severe_death Probability of death from severe infection.
-#'   Default = c(0.5, 0.5, 0.5, 0.5,
-#'   0.5, 0.5, 0.5, 0.5,
-#'   0.5, 0.5, 0.5, 0.5,
-#'   0.5, 0.5, 0.5, 0.5)
+#' @param prob_severe_death_treatment Probability of death from severe infection
+#'   that is treated. Default = rep(0.5, 16)
+#' @param prob_non_severe_death_no_treatment Probability of death in non severe
+#'   hospital inections that aren't treated
+#' @param prob_severe_death_no_treatment Probability of death from severe infection
+#'   that is not treated. Default = rep(0.95, 16)
+#' @param p_dist Preferentiality of age group receiving treatment relative to
+#'   other age groups when demand exceeds healthcare capacity.
 #' @param dur_E Mean duration of incubation period (days). Default = 4.58
 #' @param dur_R Mean duration of mild infection (days). Default = 2.09
 #' @param dur_hosp Mean duration of hospitilsation (days). Default = 5
-#' @param dur_ox Mean duration of case requiring oxygen (days). Default = 6
-#' @param dur_mv Mean duration of mechanical ventilation (days). Default = 5.5
-#' @param dur_rec Mean duration of case recovering after ICU (days).  Default = 6
+#' @param dur_get_ox_survive Mean duration of oxygen given survive. Default = 6
+#' @param dur_get_ox_die Mean duration of oxygen given death. Default = 3.5
+#' @param dur_not_get_ox_survive Mean duration without oxygen given survive.
+#'   Default = 6 * 1.5
+#' @param dur_not_get_ox_die Mean duration without  oxygen given death.
+#'  Default = dur_get_ox_die * 0.5
+#' @param dur_get_mv_survive Mean duration of ventilation given survive.
+#'   Default = 5.5
+#' @param dur_get_mv_die Mean duration of ventilation given death. Default = 4
+#' @param dur_not_get_mv_survive Mean duration without ventilation given
+#'   survive. Default = 12
+#' @param dur_not_get_mv_die Mean duration without ventilation given
+#'   death. Default = 12
+#' @param dur_rec Duration of recovery after coming off ventilation. Default = 6
+#' @param hosp_bed_capacity General bed capacity. Default = 5 * sum(population)/1000
+#' @param ICU_bed_capacity ICU bed capacity. Default = 3 * hosp_bed_capacity/100
 #'
 #' @return Simulation output
 #' @export
@@ -285,6 +304,9 @@ run_explicit_SEEIR_model <- function(
                                 mixing_matrix = baseline_contact_matrix,
                                 R0 = R0)
   }
+
+  # normalise to sum to 1
+  p_dist <- p_dist/mean(p_dist)
 
   # Collate Parameters Into List
   pars <- list(N_age = length(population),

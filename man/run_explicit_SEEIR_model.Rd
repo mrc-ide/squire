@@ -23,17 +23,27 @@ run_explicit_SEEIR_model(
   prob_severe = c(3.73755e-05, 3.18497e-05, 5.88166e-05, 0.000120264, 0.000268514,
     0.000516788, 0.00081535, 0.001242525, 0.001729275, 0.002880196, 0.00598205,
     0.010821894, 0.022736324, 0.035911156, 0.056362032, 0.081467057),
-  prob_non_severe_death = c(0.0125702, 0.0125702, 0.0125702, 0.0125702, 0.0125702,
-    0.0125702, 0.0125702, 0.013361147, 0.015104687, 0.019164124, 0.027477519, 0.041762108,
-    0.068531658, 0.105302319, 0.149305732, 0.20349534),
-  prob_severe_death = c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-    0.5, 0.5, 0.5),
+  prob_non_severe_death_treatment = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
+    0.0125702, 0.0125702, 0.0125702, 0.013361147, 0.015104687, 0.019164124, 0.027477519,
+    0.041762108, 0.068531658, 0.105302319, 0.149305732, 0.20349534),
+  prob_non_severe_death_no_treatment = prob_non_severe_death_treatment * 2,
+  prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
+  prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
+  p_dist = rep(1, length(prob_hosp)),
   dur_E = 4.58,
   dur_R = 2.09,
   dur_hosp = 5,
-  dur_ox = 6,
-  dur_mv = 5.5,
-  dur_rec = 6
+  dur_get_ox_survive = 6,
+  dur_get_ox_die = 3.5,
+  dur_not_get_ox_survive = 6 * 1.5,
+  dur_not_get_ox_die = dur_get_ox_die * 0.5,
+  dur_get_mv_survive = 5.5,
+  dur_get_mv_die = 4,
+  dur_not_get_mv_survive = 12,
+  dur_not_get_mv_die = 1,
+  dur_rec = 6,
+  hosp_bed_capacity = 5 * sum(population)/1000,
+  ICU_bed_capacity = 3 * hosp_bed_capacity/100
 )
 }
 \arguments{
@@ -73,17 +83,24 @@ Default = c(3.73755e-05, 3.18497e-05, 5.88166e-05, 0.000120264,
 0.001729275, 0.002880196, 0.00598205, 0.010821894,
 0.022736324, 0.035911156, 0.056362032, 0.081467057)}
 
-\item{prob_non_severe_death}{Probability of death from non severe infection.
+\item{prob_non_severe_death_treatment}{Probability of death from non severe
+treated infection.
 Default = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
 0.0125702, 0.0125702, 0.0125702, 0.013361147,
 0.015104687, 0.019164124, 0.027477519, 0.041762108,
 0.068531658, 0.105302319, 0.149305732, 0.20349534)}
 
-\item{prob_severe_death}{Probability of death from severe infection.
-Default = c(0.5, 0.5, 0.5, 0.5,
-0.5, 0.5, 0.5, 0.5,
-0.5, 0.5, 0.5, 0.5,
-0.5, 0.5, 0.5, 0.5)}
+\item{prob_non_severe_death_no_treatment}{Probability of death in non severe
+hospital inections that aren't treated}
+
+\item{prob_severe_death_treatment}{Probability of death from severe infection
+that is treated. Default = rep(0.5, 16)}
+
+\item{prob_severe_death_no_treatment}{Probability of death from severe infection
+that is not treated. Default = rep(0.95, 16)}
+
+\item{p_dist}{Preferentiality of age group receiving treatment relative to
+other age groups when demand exceeds healthcare capacity.}
 
 \item{dur_E}{Mean duration of incubation period (days). Default = 4.58}
 
@@ -91,11 +108,32 @@ Default = c(0.5, 0.5, 0.5, 0.5,
 
 \item{dur_hosp}{Mean duration of hospitilsation (days). Default = 5}
 
-\item{dur_ox}{Mean duration of case requiring oxygen (days). Default = 6}
+\item{dur_get_ox_survive}{Mean duration of oxygen given survive. Default = 6}
 
-\item{dur_mv}{Mean duration of mechanical ventilation (days). Default = 5.5}
+\item{dur_get_ox_die}{Mean duration of oxygen given death. Default = 3.5}
 
-\item{dur_rec}{Mean duration of case recovering after ICU (days).  Default = 6}
+\item{dur_not_get_ox_survive}{Mean duration without oxygen given survive.
+Default = 6 * 1.5}
+
+\item{dur_not_get_ox_die}{Mean duration without  oxygen given death.
+Default = dur_get_ox_die * 0.5}
+
+\item{dur_get_mv_survive}{Mean duration of ventilation given survive.
+Default = 5.5}
+
+\item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 4}
+
+\item{dur_not_get_mv_survive}{Mean duration without ventilation given
+survive. Default = 12}
+
+\item{dur_not_get_mv_die}{Mean duration without ventilation given
+death. Default = 12}
+
+\item{dur_rec}{Duration of recovery after coming off ventilation. Default = 6}
+
+\item{hosp_bed_capacity}{General bed capacity. Default = 5 * sum(population)/1000}
+
+\item{ICU_bed_capacity}{ICU bed capacity. Default = 3 * hosp_bed_capacity/100}
 }
 \value{
 Simulation output
@@ -103,6 +141,9 @@ Simulation output
 \description{
 -----------------------------------------------------------------------------
 Run the explicit SEEIR model
+}
+\details{
+All durations are in days.
 }
 \examples{
 \dontrun{
