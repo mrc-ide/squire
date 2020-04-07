@@ -60,6 +60,13 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
+
+<hr>
+<div id="output-github_document" class="section level2">
+<h2 class="hasAnchor">
+<a href="#output-github_document" class="anchor"></a>output: github_document</h2>
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+</div>
 <div id="squire" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#squire" class="anchor"></a>squire</h1></div>
@@ -76,6 +83,22 @@
 <li>Simulate the impacts of different control interventions (including general social distancing, specific shielding of elderly populations, and more stringent suppression strategies).</li>
 </ul>
 <p>If you are new to squire, the best place to start is below, where we detail how to install the package, how to set up the model, and how to run it with and without control interventions.</p>
+</div>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p><i>squire</i> utilises the package [âODINâ] (<a href="https://github.com/mrc-ide/odin" class="uri">https://github.com/mrc-ide/odin</a>) to generate the model. [âODINâ] (<a href="https://github.com/mrc-ide/odin" class="uri">https://github.com/mrc-ide/odin</a>) implements a high-level language for implementing mathematical models and can be installed by running the following command:</p>
+<div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"odin"</span>)</pre></div>
+<p>The model generated using ODIN is written in C and so you will require a compiler to install dependencies for the package and to build any models with ODIN. Windows users should install <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a>. See the relevant section in <a href="https://cran.r-project.org/doc/manuals/r-release/R-admin.html#The-Windows-toolset">R-admin</a> for advice. Be sure to select the âedit PATHâ checkbox during installation or the tools will not be found.</p>
+<p>The function <code><a href="https://rdrr.io/pkg/odin/man/can_compile.html">odin::can_compile()</a></code> will check if it is able to compile things, but by the time you install the package that will probably have been satisfied.</p>
+<p>After installation of ODIN, ensure you have the devtools package installed by running the following:</p>
+<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)</pre></div>
+<p>Then install the <i>squire</i> package directly from GitHub by running:</p>
+<div class="sourceCode" id="cb3"><pre class="r">devtools::install_github("mrc-ide/squire")
+Note: do we need to refer to a specific branch here? </pre></div>
+<p>If you have any problems installing then please raise an issue on the <i>squire</i> <a href="https://github.com/mrc-ide/squire/issues"><code>GitHub</code></a>.</p>
+<p>If everything has installed correctly, we then need to load the package:</p>
+<div class="sourceCode" id="cb4"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">squire</span>)</pre></div>
 </div>
 <div id="model-structure" class="section level2">
 <h2 class="hasAnchor">
@@ -113,22 +136,6 @@
 <p>Individuals newly requiring hospitalisation (either a hospital or ICU bed) are then assigned to either receive care (if the relevant bed is available) or not (if maximum capacity would be exceeded otherwise). Whether or not an individual receives the required care modifies their probability of dying.</p>
 </div>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p><i>squire</i> utilises the package <a href="https://github.com/mrc-ide/odin">ODIN</a> to generate the model. <a href="https://github.com/mrc-ide/odin">ODIN</a> implements a high-level language for implementing mathematical models and can be installed by running the following command:</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"odin"</span>)</pre></div>
-<p>The model generated using ODIN is written in C and so you will require a compiler to install dependencies for the package and to build any models with ODIN. Windows users should install <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a>. See the relevant section in <a href="https://cran.r-project.org/doc/manuals/r-release/R-admin.html#The-Windows-toolset">R-admin</a> for advice. Be sure to select the âedit PATHâ checkbox during installation or the tools will not be found.</p>
-<p>The function <code><a href="https://rdrr.io/pkg/odin/man/can_compile.html">odin::can_compile()</a></code> will check if it is able to compile things, but by the time you install the package that will probably have been satisfied.</p>
-<p>After installation of ODIN, ensure you have the devtools package installed by running the following:</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)</pre></div>
-<p>Then install the <i>squire</i> package directly from GitHub by running:</p>
-<div class="sourceCode" id="cb3"><pre class="r">devtools::install_github("mrc-ide/squire")
-Note: do we need to refer to a specific branch here? </pre></div>
-<p>If you have any problems installing then please raise an issue on the <i>squire</i> <a href="https://github.com/mrc-ide/squire/issues"><code>GitHub</code></a>.</p>
-<p>If everything has installed correctly, we then need to load the package:</p>
-<div class="sourceCode" id="cb4"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">squire</span>)</pre></div>
-</div>
 <div id="getting-started" class="section level2">
 <h2 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting Started</h2>
@@ -149,6 +156,7 @@ Note: do we need to refer to a specific branch here? </pre></div>
 </div>
 </div>
 </div>
+
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
