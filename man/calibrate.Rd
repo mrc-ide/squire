@@ -15,6 +15,9 @@ calibrate(data, country, replicates = 100, ...)
 
 \item{...}{Other parameters to pass to \code{\link{run_explicit_SEEIR_model}}}
 }
+\value{
+Long data frame of simulation replicates
+}
 \description{
 Calibrate Model
 }

@@ -91,7 +91,7 @@ init_check_explicit <- function(init, population){
       IMVGetDie1, IMVGetDie2, IMVNotGetLive1, IMVNotGetLive2,
       IMVNotGetDie1, IMVNotGetDie2, IRec1, IRec2, R, D and rows 1:age_groups")
     }
-    if(!all(names(init) == c("S","E1","E2","ICase1","ICase2","IOxGetLive1",
+    if(!all(names(init) == c("S","E1","E2","IMild","ICase1","ICase2","IOxGetLive1",
                              "IOxGetLive2","IOxGetDie1","IOxGetDie2",
                              "IOxNotGetLive1","IOxNotGetLive2","IOxNotGetDie1",
                              "IOxNotGetDie2","IMVGetLive1","IMVGetLive2",
@@ -109,6 +109,10 @@ init_check_explicit <- function(init, population){
   if(!all(rowSums(init) == population)){
     stop("Row sums of init should be identical to population")
   }
+  if(!all(init >= 0)) {
+    stop("population size is not large enough in each age bracket")
+  }
+
   return(init)
 }
 
