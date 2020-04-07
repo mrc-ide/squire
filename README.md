@@ -40,4 +40,4 @@ Note: do we need to refer to a specific branch here?
 
 ## Model Structure
 
-![Model Structure](/images/Explicit_Healthcare_Model_Structure.JPG)
+![Model Structure](/images/Explicit_Healthcare_Model_Structure.JPG | width = 200)
