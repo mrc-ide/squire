@@ -30,13 +30,33 @@ If you are new to squire, the best place to start is below, where we detail how 
 
 ## Installation
 
-You can install squire from [GitHub](https://github.com/) with:
+<i>squire</i> utilises the package ['ODIN'] (https://github.com/mrc-ide/odin) to generate the model. ['ODIN'] (https://github.com/mrc-ide/odin) implements a high-level language for implementing mathematical models and can be installed by running the following command:
+
+```r
+install.packages("odin")
+```
+
+The model generated using ODIN is written in C and so you will require a compiler to install dependencies for the package and to build any models with ODIN. Windows users should install [Rtools](https://cran.r-project.org/bin/windows/Rtools/).  See the relevant section in [R-admin](https://cran.r-project.org/doc/manuals/r-release/R-admin.html#The-Windows-toolset) for advice.  Be sure to select the "edit PATH" checkbox during installation or the tools will not be found.
+
+The function `odin::can_compile()` will check if it is able to compile things, but by the time you install the package that will probably have been satisfied.
+
+After installation of ODIN, ensure you have the devtools package installed by running the following:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("mrc-ide/squire")
+install.packages("devtools")
 ```
+Then install the <i>squire</i> package directly from GitHub by running:
+
+``` r
+devtools::install_github("mrc-ide/squire")
 Note: do we need to refer to a specific branch here? 
+```
+If you have any problems installing then please raise an issue on the <i>squire</i> [`GitHub`](https://github.com/mrc-ide/squire/issues). 
+
+If everything has installed correctly, we then need to load the package: 
+``` r
+library(squire)
+```
 
 ## Model Structure
 
@@ -64,18 +84,12 @@ Individuals newly requiring hospitalisation (either a hospital or ICU bed) are t
 
 ## Getting Started
 
-* Run the model
-* 
+### Running the Model
 
+### Extracting Relevant Outputs 
 
-## Running the Model
+### Calibrating the Model to Observed Deaths Data
 
-
-## 
-
-
-## Calibrating the Model to Observed Deaths Data
-
-
+###
 
 
