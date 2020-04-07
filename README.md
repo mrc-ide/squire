@@ -28,9 +28,34 @@ squire is a package enabling users to quickly and easily generate calibrated est
 
 If you are new to squire, the best place to start is below, where we detail how to install the package, how to set up the model, and how to run it with and without control interventions. 
 
+## Model Structure
+
+### Overall Structure
+
+<img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style = "border: none; float: center;" width = "600px">
+
+squire uses an age-structured SEIR model, with the infectious class divided into different stages reflecting progression through different disese severity pathways. These compartments are:  
+* S = Susceptibles  
+* E = Exposed (Latent Infection)  
+* I<sub>Mild</sub> = Mild Infections (Not Requiring Hospitalisation)  
+* I<sub>Case</sub> = Infections Requiring Hospitalisation  
+* I<sub>Hospital</sub> = Hospitalised (Requires Hospital Bed)  
+* I<sub>ICU</sub> = ICU (Requires ICU Bed)  
+* I<sub>Rec</sub> = Recovering from ICU Stay (Requires Hospital Bed)  
+* R = Recovered  
+* D = Dead  
+
+### Decision Trees for Healthcare Capacity 
+<img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Oxygen_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "400px">
+
+Given initial inputs of hospital/ICU bed capacity and the average time cases spend in hospital, the model dynamically tracks available hospital and ICU beds over time. 
+
+Individuals newly requiring hospitalisation (either a hospital or ICU bed) are then assigned to either receive care (if the relevant bed is available) or not (if maximum capacity would be exceeded otherwise). Whether or not an individual receives the required care modifies their probability of dying.  
+
+
 ## Installation
 
-<i>squire</i> utilises the package ['ODIN'] (https://github.com/mrc-ide/odin) to generate the model. ['ODIN'] (https://github.com/mrc-ide/odin) implements a high-level language for implementing mathematical models and can be installed by running the following command:
+<i>squire</i> utilises the package [ODIN](https://github.com/mrc-ide/odin) to generate the model. [ODIN](https://github.com/mrc-ide/odin) implements a high-level language for implementing mathematical models and can be installed by running the following command:
 
 ```r
 install.packages("odin")
@@ -58,29 +83,6 @@ If everything has installed correctly, we then need to load the package:
 library(squire)
 ```
 
-## Model Structure
-
-### Overall Structure
-
-<img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style = "border: none; float: center;" width = "600px">
-
-squire uses an age-structured SEIR model, with the infectious class divided into different stages reflecting progression through different disese severity pathways. These compartments are:  
-* S = Susceptibles  
-* E = Exposed (Latent Infection)  
-* I<sub>Mild</sub> = Mild Infections (Not Requiring Hospitalisation)  
-* I<sub>Case</sub> = Infections Requiring Hospitalisation  
-* I<sub>Hospital</sub> = Hospitalised (Requires Hospital Bed)  
-* I<sub>ICU</sub> = ICU (Requires ICU Bed)  
-* I<sub>Rec</sub> = Recovering from ICU Stay (Requires Hospital Bed)  
-* R = Recovered  
-* D = Dead  
-
-### Decision Trees for Healthcare Capacity 
-<img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Oxygen_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "400px">
-
-Given initial inputs of hospital/ICU bed capacity and the average time cases spend in hospital, the model dynamically tracks available hospital and ICU beds over time. 
-
-Individuals newly requiring hospitalisation (either a hospital or ICU bed) are then assigned to either receive care (if the relevant bed is available) or not (if maximum capacity would be exceeded otherwise). Whether or not an individual receives the required care modifies their probability of dying.  
 
 ## Getting Started
 
