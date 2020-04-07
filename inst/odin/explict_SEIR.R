@@ -6,14 +6,35 @@ dt <- user() # Specified timestep
 time <- step * dt # Tracking actual time
 output(time) <- TRUE
 N_age <- user() # Number of age groups
+
+## RATES
+##------------------------------------------------------------------------------
 gamma_E <- user() # rate of progression through latent infection
 gamma_R <- user() # rate of progression from mild infection to recovery
 gamma_hosp <- user() # rate of progression from symptom onset to requiring hospitalisation
-gamma_ox_survive <- user() # rate of progression through requiring oxygen compartment conditional on survival
-gamma_ox_die <- user() # rate of progression through requiring oxygen compartment conditional on death
-gamma_mv_survive <- user() # rate of progression through requiring mechanical ventilation compartment conditional on survival
-gamma_mv_die <- user() # rate of progression through requiring mechanical ventilation compartment conditional on death
+
+# rate of progression through requiring oxygen compartment conditional on getting oxygen and surviving
+gamma_get_ox_survive <- user()
+# rate of progression through requiring oxygen compartment conditional on getting oxygen and dying
+gamma_get_ox_die <- user()
+# rate of progression through requiring oxygen compartment conditional on not getting oxygen and surviving
+gamma_not_get_ox_survive <- user()
+# rate of progression through requiring oxygen compartment conditional on not getting oxygen and dying
+gamma_not_get_ox_die <- user()
+
+# rate of progression through requiring mechanical ventilation compartment conditional on getting ventilation and surviving
+gamma_get_mv_survive <- user()
+# rate of progression through requiring mechanical ventilation compartment conditional on getting ventilation and dying
+gamma_get_mv_die <- user()
+# rate of progression through requiring mechanical ventilation compartment conditional on not getting ventilation and surviving
+gamma_not_get_mv_survive <- user()
+# rate of progression through requiring mechanical ventilation compartment conditional on not getting ventilation and dying
+gamma_not_get_mv_die <- user()
+
 gamma_rec <- user() # rate of progression through post-ICU recovery compartment
+
+## Probabilities
+# ------------------------------------------------------------------------------
 
 prob_hosp[] <- user() # probability of requiring hospitalisation by age
 prob_severe[] <- user() # probability of severe disease (requiring mechanical ventilation) by age
@@ -77,28 +98,28 @@ p_ICase1_ICase2 <- 1 - exp(-gamma_hosp * dt) # Delay between symptom onset and r
 p_ICase2_Hosp <- 1 - exp(-gamma_hosp * dt) # Progression to requiring hospitalisation. Number split between I_Oxygen and I_MV
 
 # Transition Probabilities for Those Requiring Oxygen -> Recovery
-p_IOxGetLive1_IOxGetLive2 <- 1 - exp(-gamma_ox_survive * dt) # Progression through requiring oxygen and receiving it -> Recovery
-p_IOxGetLive2_R <- 1 - exp(-gamma_ox_survive * dt) # Progression through requiring oxygen and recieving it -> Recovery
-p_IOxNotGetLive1_IOxNotGetLive2 <- 1 - exp(-gamma_ox_survive * dt) # Progression through requiring oxygen and not receiving it -> Recovery
-p_IOxNotGetLive2_R <- 1 - exp(-gamma_ox_survive * dt) # Progression through requiring oxygen and not receiving it -> Recovery
+p_IOxGetLive1_IOxGetLive2 <- 1 - exp(-gamma_get_ox_survive * dt) # Progression through requiring oxygen and receiving it -> Recovery
+p_IOxGetLive2_R <- 1 - exp(-gamma_get_ox_survive * dt) # Progression through requiring oxygen and recieving it -> Recovery
+p_IOxNotGetLive1_IOxNotGetLive2 <- 1 - exp(-gamma_not_get_ox_survive * dt) # Progression through requiring oxygen and not receiving it -> Recovery
+p_IOxNotGetLive2_R <- 1 - exp(-gamma_not_get_ox_survive * dt) # Progression through requiring oxygen and not receiving it -> Recovery
 
 # Transition Probabilities for Those Requiring Oxygen -> Death
-p_IOxGetDie1_IOxGetDie2 <- 1 - exp(-gamma_ox_die * dt) # Progression through requiring oxygen and receiving it -> Death
-p_IOxGetDie2_D <- 1 - exp(-gamma_ox_die * dt) # Progression through requiring oxygen and receiving it -> Death
-p_IOxNotGetDie1_IOxNotGetDie2 <- 1 - exp(-gamma_ox_die * dt) # Progression through requiring oxygen and not receiving it -> Death
-p_IOxNotGetDie2_D <- 1 - exp(-gamma_ox_die * dt) # Progression through requiring oxygen and not receiving it -> Death
+p_IOxGetDie1_IOxGetDie2 <- 1 - exp(-gamma_get_ox_die * dt) # Progression through requiring oxygen and receiving it -> Death
+p_IOxGetDie2_D <- 1 - exp(-gamma_get_ox_die * dt) # Progression through requiring oxygen and receiving it -> Death
+p_IOxNotGetDie1_IOxNotGetDie2 <- 1 - exp(-gamma_not_get_ox_die * dt) # Progression through requiring oxygen and not receiving it -> Death
+p_IOxNotGetDie2_D <- 1 - exp(-gamma_not_get_ox_die * dt) # Progression through requiring oxygen and not receiving it -> Death
 
 # Transition Probabilities for Those Requiring Mechanical Ventilation -> Recovery
-p_IMVGetLive1_IMVGetLive2 <- 1 - exp(-gamma_mv_survive * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
-p_IMVGetLive2_Rec <- 1 - exp(-gamma_mv_survive * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
-p_IMVNotGetLive1_IMVNotGetLive2 <- 1 - exp(-gamma_mv_survive * dt) # Progression through requiring mechanical ventilation and not recieving it -> Recovery
-p_IMVNotGetLive2_R <- 1 - exp(-gamma_mv_survive * dt) # Progression through requiring mechanical ventilation and not recieving it -> Recovery
+p_IMVGetLive1_IMVGetLive2 <- 1 - exp(-gamma_get_mv_survive * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
+p_IMVGetLive2_Rec <- 1 - exp(-gamma_get_mv_survive * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
+p_IMVNotGetLive1_IMVNotGetLive2 <- 1 - exp(-gamma_not_get_mv_survive * dt) # Progression through requiring mechanical ventilation and not recieving it -> Recovery
+p_IMVNotGetLive2_R <- 1 - exp(-gamma_not_get_mv_survive * dt) # Progression through requiring mechanical ventilation and not recieving it -> Recovery
 
 # Transition Probabilities for Those Requiring Mechanical Ventilation -> Death
-p_IMVGetDie1_IMVGetDie2 <- 1 - exp(-gamma_mv_die * dt) # Progression through requiring mechanical ventilation and receving it -> Death
-p_IMVGetDie2_D <- 1 - exp(-gamma_mv_die * dt) # Progression through requiring mechanical ventilation and receving it -> Death
-p_IMVNotGetDie1_IMVNotGetDie2 <- 1 - exp(-gamma_mv_die * dt) # Progression through requiring mechanical ventilation and not receving it -> Death
-p_IMVNotGetDie2_D <- 1 - exp(-gamma_mv_die * dt) # Progression through requiring mechanical ventilation and not receving it -> Death
+p_IMVGetDie1_IMVGetDie2 <- 1 - exp(-gamma_get_mv_die * dt) # Progression through requiring mechanical ventilation and receving it -> Death
+p_IMVGetDie2_D <- 1 - exp(-gamma_get_mv_die * dt) # Progression through requiring mechanical ventilation and receving it -> Death
+p_IMVNotGetDie1_IMVNotGetDie2 <- 1 - exp(-gamma_not_get_mv_die * dt) # Progression through requiring mechanical ventilation and not receving it -> Death
+p_IMVNotGetDie2_D <- 1 - exp(-gamma_not_get_mv_die * dt) # Progression through requiring mechanical ventilation and not receving it -> Death
 
 # Transition Probabilities for Those Recovering from ICU
 p_Rec1_Rec2 <- 1 - exp(-gamma_rec * dt) # Progression through recovery from ICU in hospital bed to eventual discharge (R)
@@ -127,7 +148,34 @@ total_number_requiring_IMV <- sum(number_requiring_IMV)
 current_free_ICUs <- ICU_bed_capacity - ICU_occ # Number of ICU beds that are currently free
 total_number_get_IMV <- if(current_free_ICUs <= 0) 0 else(if(current_free_ICUs - total_number_requiring_IMV >= 0) total_number_requiring_IMV else(current_free_ICUs)) # Working out the number of new ICU requiring infections that get a bed
 
-number_get_IMV[] <-  rmultinom(total_number_get_IMV, p_dist) # Assigning the new ICU requiring cases to the available ICU beds
+imv_multinom_prob[] <- if(total_number_requiring_IMV == 0) p_dist[i]/N_age else ((number_requiring_IMV[i]*p_dist[i])/total_number_requiring_IMV)
+#number_get_IMV[] <-  rmultinom(total_number_get_IMV, imv_multinom_prob) # Assigning the new ICU requiring cases to the available ICU beds based numbers needing and probability of being chosen for bed
+
+number_get_IMV[1] <- rbinom(total_number_get_IMV, imv_multinom_prob[1]/sum(imv_multinom_prob[1:16]))
+number_get_IMV[2] <- rbinom(total_number_get_IMV - number_get_IMV[1], imv_multinom_prob[2]/sum(imv_multinom_prob[2:16]))
+number_get_IMV[3] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:2]), imv_multinom_prob[3]/sum(imv_multinom_prob[3:16]))
+number_get_IMV[4] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:3]), imv_multinom_prob[4]/sum(imv_multinom_prob[4:16]))
+number_get_IMV[5] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:4]), imv_multinom_prob[5]/sum(imv_multinom_prob[5:16]))
+number_get_IMV[6] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:5]), imv_multinom_prob[6]/sum(imv_multinom_prob[6:16]))
+number_get_IMV[7] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:6]), imv_multinom_prob[7]/sum(imv_multinom_prob[7:16]))
+number_get_IMV[8] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:7]), imv_multinom_prob[8]/sum(imv_multinom_prob[8:16]))
+number_get_IMV[9] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:8]), imv_multinom_prob[9]/sum(imv_multinom_prob[9:16]))
+number_get_IMV[10] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:9]), imv_multinom_prob[10]/sum(imv_multinom_prob[10:16]))
+number_get_IMV[11] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:10]), imv_multinom_prob[11]/sum(imv_multinom_prob[11:16]))
+number_get_IMV[12] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:11]), imv_multinom_prob[12]/sum(imv_multinom_prob[12:16]))
+number_get_IMV[13] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:12]), imv_multinom_prob[13]/sum(imv_multinom_prob[13:16]))
+number_get_IMV[14] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:13]), imv_multinom_prob[14]/sum(imv_multinom_prob[14:16]))
+number_get_IMV[15] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:14]), imv_multinom_prob[15]/sum(imv_multinom_prob[15:16]))
+number_get_IMV[16] <- rbinom(total_number_get_IMV - sum(number_get_IMV[1:15]), imv_multinom_prob[16]/sum(imv_multinom_prob[16:16]))
+
+
+
+output(number_notget_IMV[]) <- TRUE
+output(number_requiring_IMV[]) <- TRUE
+output(number_get_IMV[]) <- TRUE
+output(imv_multinom_prob[]) <- TRUE
+output(total_number_get_IMV) <- TRUE
+
 n_IMVGetDie1[] <- round(number_get_IMV[i] * prob_severe_death_treatment[i]) # Number of individuals requiring mechanical ventilation and who recieve it who die
 n_IMVGetDie1_IMVGetDie2[] <- rbinom(IMVGetDie1[i], p_IMVGetDie1_IMVGetDie2) # Progression through the "require and receive mechanical ventilation but still die" compartment
 n_IMVGetDie2_D[] <- rbinom(IMVGetDie2[i], p_IMVGetDie2_D) # Progression to death for those in the "require and receive mechanical ventilation but still die" compartment
@@ -150,7 +198,26 @@ total_number_requiring_Ox <- sum(number_requiring_Ox)
 current_free_hosp <- hosp_bed_capacity - hosp_occ # Number of hospital beds that are currently free
 total_number_get_hosp <- if (current_free_hosp <= 0) 0 else (if(current_free_hosp - total_number_requiring_Ox >= 0) total_number_requiring_Ox else(current_free_hosp)) # Working out the number of new hospital bed requiring infections that get a bed
 
-number_get_Ox[] <-  rmultinom(total_number_get_hosp, p_dist) # Assigning the new hospital bed requiring cases to the available hospital beds
+ox_multinom_prob[] <- if(total_number_requiring_Ox == 0) p_dist[i]/N_age else ((number_requiring_Ox[i]*p_dist[i])/total_number_requiring_Ox)
+#number_get_Ox[] <- rmultinom(total_number_get_hosp, ox_multinom_prob) # Assigning the new hospital bed requiring cases to the available hospital beds based numbers needing and probability of being chosen for bed
+
+number_get_Ox[1] <- rbinom(total_number_get_hosp, ox_multinom_prob[1]/sum(ox_multinom_prob[1:16]))
+number_get_Ox[2] <- rbinom(total_number_get_hosp - number_get_Ox[1], ox_multinom_prob[2]/sum(ox_multinom_prob[2:16]))
+number_get_Ox[3] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:2]), ox_multinom_prob[3]/sum(ox_multinom_prob[3:16]))
+number_get_Ox[4] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:3]), ox_multinom_prob[4]/sum(ox_multinom_prob[4:16]))
+number_get_Ox[5] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:4]), ox_multinom_prob[5]/sum(ox_multinom_prob[5:16]))
+number_get_Ox[6] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:5]), ox_multinom_prob[6]/sum(ox_multinom_prob[6:16]))
+number_get_Ox[7] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:6]), ox_multinom_prob[7]/sum(ox_multinom_prob[7:16]))
+number_get_Ox[8] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:7]), ox_multinom_prob[8]/sum(ox_multinom_prob[8:16]))
+number_get_Ox[9] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:8]), ox_multinom_prob[9]/sum(ox_multinom_prob[9:16]))
+number_get_Ox[10] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:9]), ox_multinom_prob[10]/sum(ox_multinom_prob[10:16]))
+number_get_Ox[11] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:10]), ox_multinom_prob[11]/sum(ox_multinom_prob[11:16]))
+number_get_Ox[12] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:11]), ox_multinom_prob[12]/sum(ox_multinom_prob[12:16]))
+number_get_Ox[13] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:12]), ox_multinom_prob[13]/sum(ox_multinom_prob[13:16]))
+number_get_Ox[14] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:13]), ox_multinom_prob[14]/sum(ox_multinom_prob[14:16]))
+number_get_Ox[15] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:14]), ox_multinom_prob[15]/sum(ox_multinom_prob[15:16]))
+number_get_Ox[16] <- rbinom(total_number_get_hosp - sum(number_get_Ox[1:15]), ox_multinom_prob[16]/sum(ox_multinom_prob[16:16]))
+
 n_IOxGetDie1[] <- round(number_get_Ox[i] * prob_non_severe_death_treatment[i]) # Number of individuals requiring oxygen and who recieve it who die
 n_IOxGetDie1_IOxGetDie2[] <- rbinom(IOxGetDie1[i], p_IOxGetDie1_IOxGetDie2) # Progression through the "require and receive oxygen but still die" compartment
 n_IOxGetDie2_D[] <- rbinom(IOxGetDie2[i], p_IOxGetDie2_D) # Progression through the "require and receive oxygen but still die" compartment to death
@@ -159,6 +226,12 @@ n_IOxGetLive1_IOxGetLive2[] <- rbinom(IOxGetLive1[i], p_IOxGetLive1_IOxGetLive2)
 n_IOxGetLive2_R[] <- rbinom(IOxGetLive2[i], p_IOxGetLive2_R) # Progression through the "require and receive oxygen and survive" compartment to recovery
 
 number_notget_Ox[] <- number_requiring_Ox[i] - number_get_Ox[i] # Calculating the number of cases requiring a hospital bed and who do not receive it
+output(number_notget_Ox[]) <- TRUE
+output(number_requiring_Ox[]) <- TRUE
+output(number_get_Ox[]) <- TRUE
+output(ox_multinom_prob[]) <- TRUE
+output(total_number_get_hosp) <- TRUE
+
 n_IOxNotGetDie1[] <- round(number_notget_Ox[i] * prob_non_severe_death_no_treatment[i]) # Number of individuals requiring oxygen but do not receive it and who die
 n_IOxNotGetDie1_IOxNotGetDie2[] <- rbinom(IOxNotGetDie1[i], p_IOxNotGetDie1_IOxNotGetDie2) # Progression through the "require but do not receive oxygen and die" compartment
 n_IOxNotGetDie2_D[] <- rbinom(IOxNotGetDie2[i], p_IOxNotGetDie2_D) # Progression through the "require but do not receive oxygen and die" compartment to death
@@ -197,9 +270,9 @@ delta_IMVGetDie2[] <- n_IMVGetDie1_IMVGetDie2[i] - n_IMVGetDie2_D[i]
 delta_IMVNotGetDie1[] <- n_IMVNotGetDie1[i] - n_IMVNotGetDie1_IMVNotGetDie2[i]
 delta_IMVNotGetDie2[] <-  n_IMVNotGetDie1_IMVNotGetDie2[i] - n_IMVNotGetDie_2_D[i]
 
-delta_IRec1[] <- n_IMVGetLive2_Rec[i] + n_IRec1_IRec2[i]
+delta_IRec1[] <- n_IMVGetLive2_Rec[i] - n_IRec1_IRec2[i]
 delta_IRec2[] <- n_IRec1_IRec2[i] - n_IRec2_R[i]
-delta_R[] <- n_IOxGetLive2_R[i] + n_IOxNotGetLive2_R[i] + n_IRec2_R[i] + n_IMVNotGetLive2_R[i]
+delta_R[] <- n_IOxGetLive2_R[i] + n_IOxNotGetLive2_R[i] + n_IRec2_R[i] + n_IMVNotGetLive2_R[i] + n_IMild_R[i]
 delta_D[] <- n_IOxGetDie2_D[i] + n_IOxNotGetDie2_D[i] + n_IMVGetDie2_D[i] + n_IMVNotGetDie_2_D[i]
 
 ##Compute the Force of infection
@@ -376,6 +449,7 @@ dim(n_ICase1_ICase2) <- N_age
 dim(n_ICase2_Hosp) <- N_age
 dim(number_requiring_IMV) <- N_age
 dim(number_get_IMV) <- N_age
+dim(imv_multinom_prob) <- N_age
 dim(n_IMVGetDie1) <- N_age
 dim(n_IMVGetDie1_IMVGetDie2) <- N_age
 dim(n_IMVGetDie2_D) <- N_age
@@ -391,6 +465,7 @@ dim(n_IMVNotGetLive1_IMVNotGetLive2) <- N_age
 dim(n_IMVNotGetLive2_R) <- N_age
 dim(number_requiring_Ox) <- N_age
 dim(number_get_Ox) <- N_age
+dim(ox_multinom_prob) <- N_age
 dim(n_IOxGetDie1) <- N_age
 dim(n_IOxGetDie1_IOxGetDie2) <- N_age
 dim(n_IOxGetDie2_D) <- N_age

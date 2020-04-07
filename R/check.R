@@ -61,10 +61,22 @@ init_check_explicit <- function(init, population){
       IMild = 1,
       ICase1 = 1,
       ICase2 = 1,
-      IOx1 = 0,
-      IOx2 = 0,
-      IMV1 = 0,
-      IMV2 = 0,
+      IOxGetLive1 = 0,
+      IOxGetLive2 = 0,
+      IOxGetDie1 = 0,
+      IOxGetDie2 = 0,
+      IOxNotGetLive1 = 0,
+      IOxNotGetLive2 = 0,
+      IOxNotGetDie1 = 0,
+      IOxNotGetDie2 = 0,
+      IMVGetLive1 = 0,
+      IMVGetLive2 = 0,
+      IMVGetDie1 = 0,
+      IMVGetDie2 = 0,
+      IMVNotGetLive1 = 0,
+      IMVNotGetLive2 = 0,
+      IMVNotGetDie1 = 0,
+      IMVNotGetDie2 = 0,
       IRec1 = 0,
       IRec2 = 0,
       R = 0,
@@ -73,18 +85,25 @@ init_check_explicit <- function(init, population){
   } else {
     if(!is.data.frame(init)){
       stop("init should be a data.frame with columns:
-      S, E1, E2, IMild, ICase1, ICase2,
-      IOx1, IOx2, IMV1, IMV2, IRec1, IRec2,
-      R, D and rows 1:age_groups")
+      S, E1, E2, ICase1, ICase2, IOxGetLive1, IOxGetLive2,
+      IOxGetDie1, IOxGetDie2, IOxNotGetLive1, IOxNotGetLive2,
+      IOxNotGetDie1, IOxNotGetDie2, IMVGetLive1, IMVGetLive2,
+      IMVGetDie1, IMVGetDie2, IMVNotGetLive1, IMVNotGetLive2,
+      IMVNotGetDie1, IMVNotGetDie2, IRec1, IRec2, R, D and rows 1:age_groups")
     }
-    if(!all(names(init) == c("S","E1","E2","IMild",
-                             "ICase1","ICase2","IOx1",
-                             "IOx2","IMV1","IMV2",
+    if(!all(names(init) == c("S","E1","E2","ICase1","ICase2","IOxGetLive1",
+                             "IOxGetLive2","IOxGetDie1","IOxGetDie2",
+                             "IOxNotGetLive1","IOxNotGetLive2","IOxNotGetDie1",
+                             "IOxNotGetDie2","IMVGetLive1","IMVGetLive2",
+                             "IMVGetDie1","IMVGetDie2","IMVNotGetLive1",
+                             "IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2",
                              "IRec1","IRec2","R","D"))){
       stop("If specified, names of init must be identical to:
-           S, E1, E2, IMild, ICase1, ICase2,
-           IOx1, IOx2, IMV1, IMV2, IRec1, IRec2,
-           R, D")
+      S, E1, E2, ICase1, ICase2, IOxGetLive1, IOxGetLive2,
+      IOxGetDie1, IOxGetDie2, IOxNotGetLive1, IOxNotGetLive2,
+      IOxNotGetDie1, IOxNotGetDie2, IMVGetLive1, IMVGetLive2,
+      IMVGetDie1, IMVGetDie2, IMVNotGetLive1, IMVNotGetLive2,
+      IMVNotGetDie1, IMVNotGetDie2, IRec1, IRec2, R, D")
     }
   }
   if(!all(rowSums(init) == population)){

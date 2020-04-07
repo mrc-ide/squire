@@ -166,6 +166,7 @@ run_explicit_SEEIR_model <- function(
   init = NULL,
 
   # parameters
+  # probabilities
   prob_hosp = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
                 0.008100662, 0.015590734, 0.024597885, 0.035377529,
                 0.04385549, 0.058495518, 0.08747709, 0.109730508,
@@ -174,20 +175,37 @@ run_explicit_SEEIR_model <- function(
                   0.000268514, 0.000516788, 0.00081535, 0.001242525,
                   0.001729275, 0.002880196, 0.00598205, 0.010821894,
                   0.022736324, 0.035911156, 0.056362032, 0.081467057),
-  prob_non_severe_death = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
+  prob_non_severe_death_treatment = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
                             0.0125702, 0.0125702, 0.0125702, 0.013361147,
                             0.015104687, 0.019164124, 0.027477519, 0.041762108,
                             0.068531658, 0.105302319, 0.149305732, 0.20349534),
-  prob_severe_death = c(0.5, 0.5, 0.5, 0.5,
-                        0.5, 0.5, 0.5, 0.5,
-                        0.5, 0.5, 0.5, 0.5,
-                        0.5, 0.5, 0.5, 0.5),
+  prob_non_severe_death_no_treatment = prob_non_severe_death_treatment * 2,
+  prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
+  prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
+  p_dist = rep(1, length(prob_hosp)),
+
+  # durations
   dur_E  = 4.58,
   dur_R = 2.09,
   dur_hosp = 5,
-  dur_ox = 6,
-  dur_mv = 5.5,
-  dur_rec = 6) {
+
+  dur_get_ox_survive = 6,
+  dur_get_ox_die = 3.5,
+  dur_not_get_ox_survive = 6 * 1.5,
+  dur_not_get_ox_die = dur_get_ox_die * 0.5,
+
+  dur_get_mv_survive = 5.5,
+  dur_get_mv_die = 4,
+  dur_not_get_mv_survive = 12,
+  dur_not_get_mv_die = 1,
+
+  dur_rec = 6,
+
+  # health system capacity
+  hosp_bed_capacity = 5*sum(population)/1000,
+  ICU_bed_capacity = 3*hosp_bed_capacity/100
+
+  ) {
 
   # Grab function arguments
   args <- as.list(environment())
@@ -212,32 +230,57 @@ run_explicit_SEEIR_model <- function(
   stopifnot(length(R0) == length(tt_R0))
   stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
   tc <- lapply(list(tt_R0, tt_contact_matrix), check_time_change, time_period)
-  pn1 <- pos_num(dt, "dt")
-  pn2 <- pos_num(dur_E, "dur_E")
-  pn3 <- pos_num(dur_R, "dur_R")
-  pn4 <- pos_num(dur_hosp, "dur_hosp")
-  pn5 <- pos_num(dur_ox, "dur_ox")
-  pn6 <- pos_num(dur_mv, "dur_mv")
-  pn7 <- pos_num(dur_rec, "dur_rec")
-  pn8 <- pos_num(time_period, "time_period")
-  pn9 <- pos_num(replicates, "replicates")
+
+  assert_pos(dt)
+  assert_pos(dur_E)
+  assert_pos(dur_R)
+  assert_pos(dur_get_ox_survive)
+  assert_pos(dur_get_ox_die)
+  assert_pos(dur_not_get_ox_survive)
+  assert_pos(dur_not_get_ox_die)
+  assert_pos(dur_get_mv_survive)
+  assert_pos(dur_get_mv_die)
+  assert_pos(dur_not_get_mv_survive)
+  assert_pos(dur_not_get_mv_die)
+  assert_pos(time_period)
+  assert_pos(replicates)
 
   assert_length(prob_hosp, length(population))
   assert_length(prob_severe, length(population))
-  assert_length(prob_non_severe_death, length(population))
-  assert_length(prob_severe_death, length(population))
+  assert_length(prob_non_severe_death_treatment, length(population))
+  assert_length(prob_non_severe_death_no_treatment, length(population))
+  assert_length(prob_severe_death_treatment, length(population))
+  assert_length(prob_severe_death_no_treatment, length(population))
+  assert_length(p_dist, length(population))
+
+  assert_numeric(prob_hosp, length(population))
+  assert_numeric(prob_severe, length(population))
+  assert_numeric(prob_non_severe_death_treatment, length(population))
+  assert_numeric(prob_non_severe_death_no_treatment, length(population))
+  assert_numeric(prob_severe_death_treatment, length(population))
+  assert_numeric(prob_severe_death_no_treatment, length(population))
+  assert_numeric(p_dist, length(population))
 
   # Convert and Generate Parameters As Required
   # ----------------------------------------------------------------------------
+
+  # durations
   gamma_E = 2 * 1/dur_E
   gamma_R = 1/dur_R
   gamma_hosp = 2 * 1/dur_hosp
-  gamma_ox = 2 * 1/dur_ox
-  gamma_mv = 2 * 1/dur_mv
+  gamma_get_ox_survive = 2 * 1/dur_get_ox_survive
+  gamma_get_ox_die = 2 * 1/dur_get_ox_die
+  gamma_not_get_ox_survive = 2 * 1/dur_not_get_ox_survive
+  gamma_not_get_ox_die = 2 * 1/dur_not_get_ox_die
+  gamma_get_mv_survive = 2 * 1/dur_get_mv_survive
+  gamma_get_mv_die = 2 * 1/dur_get_mv_die
+  gamma_not_get_mv_survive = 2 * 1/dur_not_get_mv_survive
+  gamma_not_get_mv_die = 2 * 1/dur_not_get_mv_die
   gamma_rec = 2 * 1/dur_rec
 
   if (is.null(beta_set)) {
-  beta_set <- beta_est_explicit(dur_R = dur_R, dur_hosp = dur_hosp,
+  beta_set <- beta_est_explicit(dur_R = dur_R,
+                                dur_hosp = dur_hosp,
                                 prob_hosp = prob_hosp,
                                 mixing_matrix = baseline_contact_matrix,
                                 R0 = R0)
@@ -251,10 +294,22 @@ run_explicit_SEEIR_model <- function(
                IMild_0 = init$IMild,
                ICase1_0 = init$ICase1,
                ICase2_0 = init$ICase2,
-               IOx1_0 = init$IOx1,
-               IOx2_0 = init$IOx1,
-               IMV1_0 = init$IMV1,
-               IMV2_0 = init$IMV2,
+               IOxGetLive1_0 = init$IOxGetLive1,
+               IOxGetLive2_0 = init$IOxGetLive2,
+               IOxGetDie1_0 = init$IOxGetDie1,
+               IOxGetDie2_0 = init$IOxGetDie2,
+               IOxNotGetLive1_0 = init$IOxNotGetLive1,
+               IOxNotGetLive2_0 = init$IOxNotGetLive2,
+               IOxNotGetDie1_0 = init$IOxNotGetDie1,
+               IOxNotGetDie2_0 = init$IOxNotGetDie2,
+               IMVGetLive1_0 = init$IMVGetLive1,
+               IMVGetLive2_0 = init$IMVGetLive2,
+               IMVGetDie1_0 = init$IMVGetDie1,
+               IMVGetDie2_0 = init$IMVGetDie2,
+               IMVNotGetLive1_0 = init$IMVNotGetLive1,
+               IMVNotGetLive2_0 = init$IMVNotGetLive2,
+               IMVNotGetDie1_0 = init$IMVNotGetDie1,
+               IMVNotGetDie2_0 = init$IMVNotGetDie2,
                IRec1_0 = init$IRec1,
                IRec2_0 = init$IRec2,
                R_0 = init$R,
@@ -262,13 +317,24 @@ run_explicit_SEEIR_model <- function(
                gamma_E = gamma_E,
                gamma_R = gamma_R,
                gamma_hosp = gamma_hosp,
-               gamma_ox = gamma_ox,
-               gamma_mv = gamma_mv,
+               gamma_get_ox_survive = gamma_get_ox_survive,
+               gamma_get_ox_die = gamma_get_ox_die,
+               gamma_not_get_ox_survive = gamma_not_get_ox_survive,
+               gamma_not_get_ox_die = gamma_not_get_ox_die,
+               gamma_get_mv_survive = gamma_get_mv_survive,
+               gamma_get_mv_die = gamma_get_mv_die,
+               gamma_not_get_mv_survive = gamma_not_get_mv_survive,
+               gamma_not_get_mv_die = gamma_not_get_mv_die,
                gamma_rec = gamma_rec,
                prob_hosp = prob_hosp,
                prob_severe = prob_severe,
-               prob_non_severe_death = prob_non_severe_death,
-               prob_severe_death = prob_severe_death,
+               prob_non_severe_death_treatment = prob_non_severe_death_treatment,
+               prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
+               prob_severe_death_treatment = prob_severe_death_treatment,
+               prob_severe_death_no_treatment = prob_severe_death_no_treatment,
+               p_dist = p_dist,
+               hosp_bed_capacity = hosp_bed_capacity,
+               ICU_bed_capacity = ICU_bed_capacity,
                tt_matrix = tt_contact_matrix,
                mix_mat_set = matrices_set,
                tt_beta = tt_R0,
