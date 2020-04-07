@@ -158,13 +158,13 @@ n_IOxGetLive1[] <- number_get_Ox[i] - n_IOxGetDie1[i]  # Number of individuals r
 n_IOxGetLive1_IOxGetLive2[] <- rbinom(IOxGetLive1[i], p_IOxGetLive1_IOxGetLive2) # Progression through the "require and receive oxygen and survive" compartment
 n_IOxGetLive2_R[] <- rbinom(IOxGetLive2[i], p_IOxGetLive2_R) # Progression through the "require and receive oxygen and survive" compartment to recovery
 
-number_notget_Ox[] <- number_requiring_Ox[i] - number_get_Ox[i]
-n_IOxNotGetDie1[] <- round(number_notget_Ox[i] * prob_non_severe_death_no_treatment[i])
-n_IOxNotGetDie1_IOxNotGetDie2[] <- rbinom(IOxNotGetDie1[i], p_IOxNotGetDie1_IOxNotGetDie2)
-n_IOxNotGetDie2_D[] <- rbinom(IOxNotGetDie2[i], p_IOxNotGetDie2_D)
-n_IOxNotGetLive1[] <- number_notget_Ox[i] - n_IOxNotGetDie1[i]
-n_IOxNotGetLive1_IOxNotGetLive2[] <- rbinom(IOxNotGetLive1[i], p_IOxNotGetLive1_IOxNotGetLive2)
-n_IOxNotGetLive2_R[] <- rbinom(IOxNotGetLive2[i], p_IOxNotGetLive2_R)
+number_notget_Ox[] <- number_requiring_Ox[i] - number_get_Ox[i] # Calculating the number of cases requiring a hospital bed and who do not receive it
+n_IOxNotGetDie1[] <- round(number_notget_Ox[i] * prob_non_severe_death_no_treatment[i]) # Number of individuals requiring oxygen but do not receive it and who die
+n_IOxNotGetDie1_IOxNotGetDie2[] <- rbinom(IOxNotGetDie1[i], p_IOxNotGetDie1_IOxNotGetDie2) # Progression through the "require but do not receive oxygen and die" compartment
+n_IOxNotGetDie2_D[] <- rbinom(IOxNotGetDie2[i], p_IOxNotGetDie2_D) # Progression through the "require but do not receive oxygen and die" compartment to death
+n_IOxNotGetLive1[] <- number_notget_Ox[i] - n_IOxNotGetDie1[i] # Number of individuals requiring oxygen but who do not receive it and who survive
+n_IOxNotGetLive1_IOxNotGetLive2[] <- rbinom(IOxNotGetLive1[i], p_IOxNotGetLive1_IOxNotGetLive2) # Progression through the "require but do not receive oxygen and survive" compartment
+n_IOxNotGetLive2_R[] <- rbinom(IOxNotGetLive2[i], p_IOxNotGetLive2_R) # Progression through the "require but do not receive oxygen and survive" compartment to recovery
 
 n_IRec1_IRec2[] <- rbinom(IRec1[i], p_Rec1_Rec2) # Number progressing through ICU recovery compartment
 n_IRec2_R[] <- rbinom(IRec2[i], p_Rec2_R) # Number recovering completely
