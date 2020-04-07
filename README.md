@@ -43,12 +43,12 @@ Note: do we need to refer to a specific branch here?
 <img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style = "border: none; float: center;" width = "600px">
 
 **Model Compartments:**  
-S = Susceptibles  
-E = Exposed (Latent Infection)  
-I<sub>Mild</sub> = Mild Infections (Not Requiring Hospitalisation)  
-I_Case = Infections Requiring Hospitalisation  
-I_Hospital = Hospitalised (Requires Hospital Bed)  
-I_ICU = ICU (Requires ICU Bed)  
-I_Rec = Recovering from ICU Stay (Requires Hospital Bed)  
-R = Recovered  
-D = Dead  
+*S = Susceptibles  
+*E = Exposed (Latent Infection)  
+*I<sub>Mild</sub> = Mild Infections (Not Requiring Hospitalisation)  
+*I<sub>Case</sub> = Infections Requiring Hospitalisation  
+*I<sub>Hospital</sub> = Hospitalised (Requires Hospital Bed)  
+*I<sub>ICU</sub> = ICU (Requires ICU Bed)  
+*I<sub>Rec</sub> = Recovering from ICU Stay (Requires Hospital Bed)  
+*R = Recovered  
+*D = Dead  
