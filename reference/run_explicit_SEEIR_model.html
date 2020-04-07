@@ -135,17 +135,27 @@ Run the explicit SEEIR model</p>
   <span class='kw'>prob_severe</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3.73755e-05</span>, <span class='fl'>3.18497e-05</span>, <span class='fl'>5.88166e-05</span>, <span class='fl'>0.000120264</span>, <span class='fl'>0.000268514</span>,
     <span class='fl'>0.000516788</span>, <span class='fl'>0.00081535</span>, <span class='fl'>0.001242525</span>, <span class='fl'>0.001729275</span>, <span class='fl'>0.002880196</span>, <span class='fl'>0.00598205</span>,
     <span class='fl'>0.010821894</span>, <span class='fl'>0.022736324</span>, <span class='fl'>0.035911156</span>, <span class='fl'>0.056362032</span>, <span class='fl'>0.081467057</span>),
-  <span class='kw'>prob_non_severe_death</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.0125702</span>, <span class='fl'>0.0125702</span>, <span class='fl'>0.0125702</span>, <span class='fl'>0.0125702</span>, <span class='fl'>0.0125702</span>,
-    <span class='fl'>0.0125702</span>, <span class='fl'>0.0125702</span>, <span class='fl'>0.013361147</span>, <span class='fl'>0.015104687</span>, <span class='fl'>0.019164124</span>, <span class='fl'>0.027477519</span>, <span class='fl'>0.041762108</span>,
-    <span class='fl'>0.068531658</span>, <span class='fl'>0.105302319</span>, <span class='fl'>0.149305732</span>, <span class='fl'>0.20349534</span>),
-  <span class='kw'>prob_severe_death</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>,
-    <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>),
+  <span class='kw'>prob_non_severe_death_treatment</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.0125702</span>, <span class='fl'>0.0125702</span>, <span class='fl'>0.0125702</span>, <span class='fl'>0.0125702</span>,
+    <span class='fl'>0.0125702</span>, <span class='fl'>0.0125702</span>, <span class='fl'>0.0125702</span>, <span class='fl'>0.013361147</span>, <span class='fl'>0.015104687</span>, <span class='fl'>0.019164124</span>, <span class='fl'>0.027477519</span>,
+    <span class='fl'>0.041762108</span>, <span class='fl'>0.068531658</span>, <span class='fl'>0.105302319</span>, <span class='fl'>0.149305732</span>, <span class='fl'>0.20349534</span>),
+  <span class='kw'>prob_non_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='no'>prob_non_severe_death_treatment</span> * <span class='fl'>2</span>,
+  <span class='kw'>prob_severe_death_treatment</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>0.5</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>prob_hosp</span>)),
+  <span class='kw'>prob_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>0.95</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>prob_hosp</span>)),
+  <span class='kw'>p_dist</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>prob_hosp</span>)),
   <span class='kw'>dur_E</span> <span class='kw'>=</span> <span class='fl'>4.58</span>,
   <span class='kw'>dur_R</span> <span class='kw'>=</span> <span class='fl'>2.09</span>,
   <span class='kw'>dur_hosp</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>dur_ox</span> <span class='kw'>=</span> <span class='fl'>6</span>,
-  <span class='kw'>dur_mv</span> <span class='kw'>=</span> <span class='fl'>5.5</span>,
-  <span class='kw'>dur_rec</span> <span class='kw'>=</span> <span class='fl'>6</span>
+  <span class='kw'>dur_get_ox_survive</span> <span class='kw'>=</span> <span class='fl'>6</span>,
+  <span class='kw'>dur_get_ox_die</span> <span class='kw'>=</span> <span class='fl'>3.5</span>,
+  <span class='kw'>dur_not_get_ox_survive</span> <span class='kw'>=</span> <span class='fl'>6</span> * <span class='fl'>1.5</span>,
+  <span class='kw'>dur_not_get_ox_die</span> <span class='kw'>=</span> <span class='no'>dur_get_ox_die</span> * <span class='fl'>0.5</span>,
+  <span class='kw'>dur_get_mv_survive</span> <span class='kw'>=</span> <span class='fl'>5.5</span>,
+  <span class='kw'>dur_get_mv_die</span> <span class='kw'>=</span> <span class='fl'>4</span>,
+  <span class='kw'>dur_not_get_mv_survive</span> <span class='kw'>=</span> <span class='fl'>12</span>,
+  <span class='kw'>dur_not_get_mv_die</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>dur_rec</span> <span class='kw'>=</span> <span class='fl'>6</span>,
+  <span class='kw'>hosp_bed_capacity</span> <span class='kw'>=</span> <span class='fl'>5</span> * <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='no'>population</span>)/<span class='fl'>1000</span>,
+  <span class='kw'>ICU_bed_capacity</span> <span class='kw'>=</span> <span class='fl'>3</span> * <span class='no'>hosp_bed_capacity</span>/<span class='fl'>100</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -214,20 +224,33 @@ Default = c(3.73755e-05, 3.18497e-05, 5.88166e-05, 0.000120264,
 0.022736324, 0.035911156, 0.056362032, 0.081467057)</p></td>
     </tr>
     <tr>
-      <th>prob_non_severe_death</th>
-      <td><p>Probability of death from non severe infection.
+      <th>prob_non_severe_death_treatment</th>
+      <td><p>Probability of death from non severe
+treated infection.
 Default = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
 0.0125702, 0.0125702, 0.0125702, 0.013361147,
 0.015104687, 0.019164124, 0.027477519, 0.041762108,
 0.068531658, 0.105302319, 0.149305732, 0.20349534)</p></td>
     </tr>
     <tr>
-      <th>prob_severe_death</th>
-      <td><p>Probability of death from severe infection.
-Default = c(0.5, 0.5, 0.5, 0.5,
-0.5, 0.5, 0.5, 0.5,
-0.5, 0.5, 0.5, 0.5,
-0.5, 0.5, 0.5, 0.5)</p></td>
+      <th>prob_non_severe_death_no_treatment</th>
+      <td><p>Probability of death in non severe
+hospital inections that aren't treated</p></td>
+    </tr>
+    <tr>
+      <th>prob_severe_death_treatment</th>
+      <td><p>Probability of death from severe infection
+that is treated. Default = rep(0.5, 16)</p></td>
+    </tr>
+    <tr>
+      <th>prob_severe_death_no_treatment</th>
+      <td><p>Probability of death from severe infection
+that is not treated. Default = rep(0.95, 16)</p></td>
+    </tr>
+    <tr>
+      <th>p_dist</th>
+      <td><p>Preferentiality of age group receiving treatment relative to
+other age groups when demand exceeds healthcare capacity.</p></td>
     </tr>
     <tr>
       <th>dur_E</th>
@@ -242,22 +265,62 @@ Default = c(0.5, 0.5, 0.5, 0.5,
       <td><p>Mean duration of hospitilsation (days). Default = 5</p></td>
     </tr>
     <tr>
-      <th>dur_ox</th>
-      <td><p>Mean duration of case requiring oxygen (days). Default = 6</p></td>
+      <th>dur_get_ox_survive</th>
+      <td><p>Mean duration of oxygen given survive. Default = 6</p></td>
     </tr>
     <tr>
-      <th>dur_mv</th>
-      <td><p>Mean duration of mechanical ventilation (days). Default = 5.5</p></td>
+      <th>dur_get_ox_die</th>
+      <td><p>Mean duration of oxygen given death. Default = 3.5</p></td>
+    </tr>
+    <tr>
+      <th>dur_not_get_ox_survive</th>
+      <td><p>Mean duration without oxygen given survive.
+Default = 6 * 1.5</p></td>
+    </tr>
+    <tr>
+      <th>dur_not_get_ox_die</th>
+      <td><p>Mean duration without  oxygen given death.
+Default = dur_get_ox_die * 0.5</p></td>
+    </tr>
+    <tr>
+      <th>dur_get_mv_survive</th>
+      <td><p>Mean duration of ventilation given survive.
+Default = 5.5</p></td>
+    </tr>
+    <tr>
+      <th>dur_get_mv_die</th>
+      <td><p>Mean duration of ventilation given death. Default = 4</p></td>
+    </tr>
+    <tr>
+      <th>dur_not_get_mv_survive</th>
+      <td><p>Mean duration without ventilation given
+survive. Default = 12</p></td>
+    </tr>
+    <tr>
+      <th>dur_not_get_mv_die</th>
+      <td><p>Mean duration without ventilation given
+death. Default = 12</p></td>
     </tr>
     <tr>
       <th>dur_rec</th>
-      <td><p>Mean duration of case recovering after ICU (days).  Default = 6</p></td>
+      <td><p>Duration of recovery after coming off ventilation. Default = 6</p></td>
+    </tr>
+    <tr>
+      <th>hosp_bed_capacity</th>
+      <td><p>General bed capacity. Default = 5 * sum(population)/1000</p></td>
+    </tr>
+    <tr>
+      <th>ICU_bed_capacity</th>
+      <td><p>ICU bed capacity. Default = 3 * hosp_bed_capacity/100</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Simulation output</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>All durations are in days.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
