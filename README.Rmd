@@ -62,5 +62,5 @@ Note: do we need to refer to a specific branch here?
 
 
 ### Decision Trees
-<img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Oxygen_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "300px"> <img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Mechanical_Ventilation_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "300px">
+<img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Oxygen_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "300px"> <img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Mechanical_Ventilation_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "400px">
 
