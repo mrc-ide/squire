@@ -47,4 +47,5 @@ Note: do we need to refer to a specific branch here?
 
 ## Model Structure
 
-![Model Structure](/images/Explicit_Healthcare_Model_Structure.JPG | width = 200)
+<img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style = "border: none; float: center;" width = "600px">
+
