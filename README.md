@@ -81,12 +81,21 @@ library(squire)
 
 ## Getting Started
 
-### Running the Model
+### Running the Model (Unmitigated)
 
-### Extracting Relevant Outputs 
+1. Introduce users to basic running of the model, using baseline parameters and no control interventions  
+2. Show an example by which you change parameters of the model then have a section basically being like "you can change any of the model parameters by modifying the appopriate argument in the run function; a list of model parameters can be found here" or maybe for the meantime, we can just link to the documentation for the run function, which will have details about each parameter as a list  
+3. Extracting and Plotting Relevant Outputs  
+
+Note: highlight the R0->beta function. 
+
+### Running the Model (Control)
+1. Example of the model where the contact matrix has been modified to simulate generic control interventions to emulate a less-stringent mitigation scenario. Control applied indefinitely.
+2. Example of the model where the contact matrix has been modified to simulate generic control interventions to emulate a more-stringent mitigation scenario. Control applied indefinitely.
+3. Example of the model where the contact matrix has been modified to simulate generic control interventions to emulate a more-stringent mitigation scenario. Control applied and then lifted (and then maybe applied again). 
 
 ### Calibrating the Model to Observed Deaths Data
 
-###
+NOTE SOMEWHERE WE'LL PROBABLY NEED TO CREATE A LIST OF ALL THE MODEL PARAMETERS
 
 
