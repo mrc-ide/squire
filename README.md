@@ -42,6 +42,8 @@ Note: do we need to refer to a specific branch here?
 
 <img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style = "border: none; float: center;" width = "600px">
 
+The model used by squire is an age-structured SEIR model, with the infectious class divided into various different stages to reflect progression through different disese severity pathways. 
+
 **Model Compartments:**  
 * S = Susceptibles  
 * E = Exposed (Latent Infection)  
@@ -56,4 +58,6 @@ Note: do we need to refer to a specific branch here?
 
 ### Decision Trees
 <img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Oxygen_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "300px"> <img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Mechanical_Ventilation_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "400px">
+
+In addition, we explicitly model healthcare capacity and include mortality dependent both on disease severity and the ability to access healtcare. 
 
