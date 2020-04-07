@@ -60,20 +60,45 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
+
+<hr>
+<div id="output-github_document" class="section level2">
+<h2 class="hasAnchor">
+<a href="#output-github_document" class="anchor"></a>output: github_document</h2>
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+</div>
 <div id="squire" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#squire" class="anchor"></a>squire</h1></div>
 <!-- badges: start -->
 
-<p>The goal of squire is to â¦</p>
+<p>squire enables users to simulate models of SARS-CoV-2 epidemics. This is done using an age-structured SEIR model that also explicitly considers healthcare capacity and disease severity.</p>
+<div id="overview" class="section level2">
+<h2 class="hasAnchor">
+<a href="#overview" class="anchor"></a>Overview</h2>
+<p>squire is a package enabling users to quickly and easily generate calibrated estimates of SARS-CoV-2 epidemic trajectories under different control scenarios. It consists of the following:</p>
+<ul>
+<li>An age-structured SEIR model incorporating explicit passage through healthcare settings and explicit progression through disease severity stages.</li>
+<li>The ability to calibrate the model to different epidemic start-dates based on available death data.</li>
+<li>Simulate the impacts of different control interventions (including general social distancing, specific shielding of elderly populations, and more stringent suppression strategies).</li>
+</ul>
+<p>If you are new to squire, the best place to start is below, where we detail how to install the package, how to set up the model, and how to run it with and without control interventions.</p>
+</div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>You can install squire from <a href="https://github.com/">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="r"><span class="co"># install.packages("devtools")</span>
 <span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"mrc-ide/squire"</span>)</pre></div>
+<p>Note: do we need to refer to a specific branch here?</p>
+</div>
+<div id="model-structure" class="section level2">
+<h2 class="hasAnchor">
+<a href="#model-structure" class="anchor"></a>Model Structure</h2>
+<p><img src="/images/Explicit_Healthcare_Model_Structure.JPG%20%7C%20width%20=%20200" alt="Model Structure"></p>
 </div>
 </div>
+
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
