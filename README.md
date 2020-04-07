@@ -40,11 +40,11 @@ Note: do we need to refer to a specific branch here?
 
 ## Model Structure
 
+### Overall Structure
+
 <img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style = "border: none; float: center;" width = "600px">
 
-The model used by squire is an age-structured SEIR model, with the infectious class divided into various different stages to reflect progression through different disese severity pathways. 
-
-**Model Compartments:**  
+squire uses an age-structured SEIR model, with the infectious class divided into different stages reflecting progression through different disese severity pathways. These compartments are:  
 * S = Susceptibles  
 * E = Exposed (Latent Infection)  
 * I<sub>Mild</sub> = Mild Infections (Not Requiring Hospitalisation)  
@@ -55,9 +55,27 @@ The model used by squire is an age-structured SEIR model, with the infectious cl
 * R = Recovered  
 * D = Dead  
 
+### Decision Trees for Healthcare Capacity 
+<img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Oxygen_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "400px">
 
-### Decision Trees
-<img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Oxygen_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "300px"> <img src="https://github.com/mrc-ide/squire/blob/healthcare_capacity/images/Explicit_Healthcare_Mechanical_Ventilation_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "400px">
+Given initial inputs of hospital/ICU bed capacity and the average time cases spend in hospital, the model dynamically tracks available hospital and ICU beds over time. 
 
-In addition, we explicitly model healthcare capacity and include mortality dependent both on disease severity and the ability to access healtcare. 
+Individuals newly requiring hospitalisation (either a hospital or ICU bed) are then assigned to either receive care (if the relevant bed is available) or not (if maximum capacity would be exceeded otherwise). Whether or not an individual receives the required care modifies their probability of dying.  
+
+## Getting Started
+
+* Run the model
+* 
+
+
+## Running the Model
+
+
+## 
+
+
+## Calibrating the Model to Observed Deaths Data
+
+
+
 
