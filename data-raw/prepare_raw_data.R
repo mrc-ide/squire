@@ -37,6 +37,7 @@ population$age_group <- factor(population$age_group, levels = c("0-4",
                                                                 "75+"))
 population$matrix <- demog$Matrix[match(population$country, demog$Region..subregion..country.or.area..)]
 
+population$prop_80_plus<-1-(demog$X75.79/(demog$X75.79+demog$X80.84+demog$X85.89+demog$X90.94+demog$X95.99+demog$X100.))[match(population$country, demog$Region..subregion..country.or.area..)]
 
 # Fix ASCII encoding package error
 Encoding(population$country) <- "latin1"
