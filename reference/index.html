@@ -12,8 +12,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -79,16 +79,24 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fa fa-home"></span>
      
   </a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">News</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/mrc-ide/squire">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -116,8 +124,8 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-running-the-model" class="hasAnchor"><a href="#section-running-the-model" class="anchor"></a>Running the model</h2>
+          <p class="section-desc"><p>Functions for running squire models and calibrating them</p></p>
         </th>
       </tr>
       
@@ -128,135 +136,9 @@
       <tr>
         
         <td>
-          <p><code><a href="beta_est.html">beta_est()</a></code> </p>
+          <p><code><a href="run_explicit_SEEIR_model.html">run_explicit_SEEIR_model()</a></code> </p>
         </td>
-        <td><p>Estimate beta parameter</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="beta_est_explicit.html">beta_est_explicit()</a></code> </p>
-        </td>
-        <td><p>Estimate beta parameter</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="calibrate.html">calibrate()</a></code> </p>
-        </td>
-        <td><p>Calibrate Model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_squire.html">check_squire()</a></code> </p>
-        </td>
-        <td><p>Check object is an squire_simulation</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_time_change.html">check_time_change()</a></code> </p>
-        </td>
-        <td><p>Check time change inputs are correct</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="contact_matrices.html">contact_matrices</a></code> </p>
-        </td>
-        <td><p>Contact matrices</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="death_data_format.html">death_data_format()</a></code> </p>
-        </td>
-        <td><p>Generate death time seris</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="df_output.html">df_output()</a></code> </p>
-        </td>
-        <td><p>Create data.frame from odin output element</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="df_output_wide.html">df_output_wide()</a></code> </p>
-        </td>
-        <td><p>Create wide data.frame from odin output element</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="div_pop.html">div_pop()</a></code> </p>
-        </td>
-        <td><p>Divide matrix by population</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_mixing_matrix.html">get_mixing_matrix()</a></code> </p>
-        </td>
-        <td><p>Get mixing matrix</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_population.html">get_population()</a></code> </p>
-        </td>
-        <td><p>Get population data</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="init_check.html">init_check()</a></code> </p>
-        </td>
-        <td><p>Check and set up initial values</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="init_check_explicit.html">init_check_explicit()</a></code> </p>
-        </td>
-        <td><p>Check and set up initial values for explict model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="long_output.html">long_output()</a></code> </p>
-        </td>
-        <td><p>Convert model output to long format</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="matrix_check.html">matrix_check()</a></code> </p>
-        </td>
-        <td><p>Check dimensions of inputs</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="matrix_set.html">matrix_set()</a></code> </p>
-        </td>
-        <td><p>Process set of contact matrices -&gt;  mixing matrices</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot.squire_simulation.html">plot(<i>&lt;squire_simulation&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>squire simulation plot</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="population.html">population</a></code> </p>
-        </td>
-        <td><p>Population</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pos_num.html">pos_num()</a></code> </p>
-        </td>
-        <td><p>Check argument is a single positive numeric</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="print.squire_simulation.html">print(<i>&lt;squire_simulation&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>squire simulation print</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="process_contact_matrix.html">process_contact_matrix()</a></code> </p>
-        </td>
-        <td><p>Process a contact matrix</p></td>
+        <td><p>Run the explicit SEEIR model</p></td>
       </tr><tr>
         
         <td>
@@ -266,19 +148,82 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="run_explicit_SEEIR_model.html">run_explicit_SEEIR_model()</a></code> </p>
+          <p><code><a href="calibrate.html">calibrate()</a></code> </p>
         </td>
-        <td><p>Run the explicit SEEIR model</p></td>
+        <td><p>Calibrate Model</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-country-level-parameters" class="hasAnchor"><a href="#section-country-level-parameters" class="anchor"></a>Country level parameters</h2>
+          <p class="section-desc"><p>Functions for getting country demography and mixing matrices</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="get_population.html">get_population()</a></code> </p>
+        </td>
+        <td><p>Get population data</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="summary.squire_simulation.html">summary(<i>&lt;squire_simulation&gt;</i>)</a></code> </p>
+          <p><code><a href="get_mixing_matrix.html">get_mixing_matrix()</a></code> </p>
         </td>
-        <td><p>squire simulation summary</p></td>
+        <td><p>Get mixing matrix</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-beta-estimation" class="hasAnchor"><a href="#section-beta-estimation" class="anchor"></a>Beta estimation</h2>
+          <p class="section-desc"><p>Functions for estimating beta for a given R0</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="beta_est_explicit.html">beta_est_explicit()</a></code> </p>
+        </td>
+        <td><p>Estimate beta parameter</p></td>
       </tr><tr>
+        
+        <td>
+          <p><code><a href="beta_est.html">beta_est()</a></code> </p>
+        </td>
+        <td><p>Estimate beta parameter</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-model-output-summaries" class="hasAnchor"><a href="#section-model-output-summaries" class="anchor"></a>Model output summaries</h2>
+          <p class="section-desc"><p>Functions for summarising the model components</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
         
         <td>
           <p><code><a href="wide_output.html">wide_output()</a></code> </p>
+        </td>
+        <td><p>Convert model output to long format</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="long_output.html">long_output()</a></code> </p>
         </td>
         <td><p>Convert model output to long format</p></td>
       </tr>
