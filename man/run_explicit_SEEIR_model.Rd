@@ -2,19 +2,19 @@
 % Please edit documentation in R/run.R
 \name{run_explicit_SEEIR_model}
 \alias{run_explicit_SEEIR_model}
-\title{-----------------------------------------------------------------------------
-Run the explicit SEEIR model}
+\title{Run the explicit SEEIR model}
 \usage{
 run_explicit_SEEIR_model(
-  population,
-  baseline_contact_matrix,
-  contact_matrix_set,
+  country = NULL,
+  population = NULL,
+  baseline_contact_matrix = NULL,
   tt_contact_matrix = 0,
+  contact_matrix_set = NULL,
   R0 = 3,
   tt_R0 = 0,
   beta_set = NULL,
   time_period = 365,
-  dt = 0.25,
+  dt = 0.5,
   replicates = 10,
   init = NULL,
   prob_hosp = c(0.001127564, 0.000960857, 0.001774408, 0.003628171, 0.008100662,
@@ -47,14 +47,22 @@ run_explicit_SEEIR_model(
 )
 }
 \arguments{
-\item{population}{Population vector (for each age group).}
+\item{country}{Character for country beign simulated. WIll be used to
+generate \code{population} and \code{baseline_contact_matrix} if
+unprovided. Either \code{country} or \code{population} and
+\code{baseline_contact_matrix} must be provided.}
+
+\item{population}{Population vector (for each age group). Default = NULL,
+which will cause population to be sourced from \code{country}}
 
 \item{baseline_contact_matrix}{Contact matrix (in absence of interventions).
-Used in estimation of beta from R0 vector}
-
-\item{contact_matrix_set}{Contact matrices used in simulation}
+Used in estimation of beta from R0 vector. Default = NULL, which will
+use \code{country} to generate this.}
 
 \item{tt_contact_matrix}{Time change points for matrix change. Default = 0}
+
+\item{contact_matrix_set}{Contact matrices used in simulation. Default =
+NULL, which will generate this using \code{baseline_contact_matrix}}
 
 \item{R0}{Basic Reproduction Number. Default = 3}
 
@@ -65,7 +73,7 @@ Default = NULL, which causes beta to be estimated from R0}
 
 \item{time_period}{Length of simulation. Default = 365}
 
-\item{dt}{Time Step. Default = 0.25}
+\item{dt}{Time Step. Default = 0.5}
 
 \item{replicates}{Number of replicates. Default = 10}
 
@@ -139,7 +147,6 @@ death. Default = 12}
 Simulation output
 }
 \description{
------------------------------------------------------------------------------
 Run the explicit SEEIR model
 }
 \details{

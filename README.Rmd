@@ -63,7 +63,7 @@ Individuals newly requiring hospitalisation (either a hospital or ICU bed) are t
 
 <i>squire</i> utilises the package [ODIN](https://github.com/mrc-ide/odin) to generate the model. [ODIN](https://github.com/mrc-ide/odin) implements a high-level language for implementing mathematical models and can be installed by running the following command:
 
-```r
+```{r, eval=FALSE}
 install.packages("odin")
 ```
 
@@ -73,40 +73,207 @@ The function `odin::can_compile()` will check if it is able to compile things, b
 
 After installation of ODIN, ensure you have the devtools package installed by running the following:
 
-``` r
+```{r, eval=FALSE}
 install.packages("devtools")
 ```
+
 Then install the <i>squire</i> package directly from GitHub by running:
 
-``` r
+```{r, eval=FALSE}
 devtools::install_github("mrc-ide/squire")
-Note: do we need to refer to a specific branch here? 
 ```
+
 If you have any problems installing then please raise an issue on the <i>squire</i> [`GitHub`](https://github.com/mrc-ide/squire/issues). 
 
 If everything has installed correctly, we then need to load the package: 
-``` r
+
+```{r}
 library(squire)
 ```
-
 
 ## Getting Started
 
 ### Running the Model (Unmitigated)
 
-1. Introduce users to basic running of the model, using baseline parameters and no control interventions  
-2. Show an example by which you change parameters of the model then have a section basically being like "you can change any of the model parameters by modifying the appopriate argument in the run function; a list of model parameters can be found here" or maybe for the meantime, we can just link to the documentation for the run function, which will have details about each parameter as a list  
+1. Running the model using baseline parameters and no control interventions  
+
+The full model is referred to as the **explicit_SEEIR** model, with hospital
+pathways explicltly exploring whether individuals will require a general 
+hospital bed providing oxygen or an ICU bed that provides ventilation. 
+
+To run the model we need to provide at least one of the following arguments:
+
+* `country`
+* `population` and `baseline_contact_matrix`
+
+If the `country` is provided, the `population` and `baseline_contact_matrix` 
+will be generated (if not also specified) using the demographics and matrices
+specified in the [global report](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-12-global-impact-covid-19/).
+
+To run the model by providing the `country` we use `run_explicit_SEEIR_model()`:
+
+```{r basic model run country}
+r <- run_explicit_SEEIR_model(country = "Afghanistan")
+```
+
+The returned object is a `squire_simulation` object, which is a list of two 
+ojects: 
+
+* `output` - model output
+* `parameters` - model parameters
+
+`squire_simulation` objects can be plotted as follows:
+
+```{r base plot}
+plot(r)
+```
+This plot will plot each of the compartments of the model output. 
+
+2. Changing parameters in the model. 
+
+The model has a number of parameters for setting the R0, demography, contact 
+matrices, the durations of each compartment and the health care outcomes and
+healthcare availability. In addition, the initial state of the population can
+be changed as well as simulation parameters, such as the number of replicates, 
+length of simulation and the timestep. For a full list of model inputs, please
+see the function [documentation](https://mrc-ide.github.io/squire/reference/run_explicit_SEEIR_model.html)
+
+For example, changing the initial R0 (default = 3), number of replicates (
+default = 10), simualtion length (default = 365 days) and time step (default = 
+0.5 days), as well as setting the population and contact matrix manually:
+
+```{r set params}
+
+# Get the population
+pop <- get_population("United Kingdom")
+population <- pop$n
+
+# Get the mixing matrix
+contact_matrix <- get_mixing_matrix("United Kingdom")
+
+# run the model
+r <- run_explicit_SEEIR_model(population = population, 
+                              baseline_contact_matrix = contact_matrix,
+                              R0 = 2.5, 
+                              time_period = 200,
+                              dt = 1,
+                              replicates = 5)
+plot(r)
+```
+
+We can also change the R0 and contact matrix at set time points, to reflect 
+changing behaviour resulting from interventions. For example to set a 80%
+reduction in the contact matrix after 50 days :
+
+```{r set contact matrix decrease}
+
+# run the model
+r <- run_explicit_SEEIR_model(population = population, 
+                              baseline_contact_matrix = contact_matrix,
+                              tt_contact_matrix = c(0, 50),
+                              contact_matrix_set = list(contact_matrix,
+                                                        contact_matrix*0.2),
+                              R0 = 2.5, 
+                              time_period = 200,
+                              dt = 1,
+                              replicates = 5)
+plot(r)
+```
+
+To show an 80% reduction after 50 days but only maintained for 30 days :
+
+```{r set contact matrix decrease and relax}
+
+# run the model
+r <- run_explicit_SEEIR_model(population = population, 
+                              baseline_contact_matrix = contact_matrix,
+                              tt_contact_matrix = c(0, 50, 80),
+                              contact_matrix_set = list(contact_matrix,
+                                                        contact_matrix*0.2,
+                                                        contact_matrix),
+                              R0 = 2.5, 
+                              time_period = 200,
+                              dt = 1,
+                              replicates = 5)
+plot(r)
+```
+
+Alternatively, we could set a changing R0, which falls below 1 after 50 days:
+
+```{r set R0 decrease}
+
+# run the model
+r <- run_explicit_SEEIR_model(population = population, 
+                              baseline_contact_matrix = contact_matrix,
+                              tt_R0 = c(0, 50),
+                              R0 = c(2.5, 0.9),
+                              time_period = 200,
+                              dt = 1,
+                              replicates = 5)
+plot(r)
+```
+
 3. Extracting and Plotting Relevant Outputs  
 
-Note: highlight the R0->beta function. 
+Alternative summaries of the models can be created, which give commonly reported
+measures, such as deaths, number of ICU beds and general hospital beds required. 
 
-### Running the Model (Control)
-1. Example of the model where the contact matrix has been modified to simulate generic control interventions to emulate a less-stringent mitigation scenario. Control applied indefinitely.
-2. Example of the model where the contact matrix has been modified to simulate generic control interventions to emulate a more-stringent mitigation scenario. Control applied indefinitely.
-3. Example of the model where the contact matrix has been modified to simulate generic control interventions to emulate a more-stringent mitigation scenario. Control applied and then lifted (and then maybe applied again). 
+```{r death ICU and bed summaries}
 
-### Calibrating the Model to Observed Deaths Data
+# Still to do
 
-NOTE SOMEWHERE WE'LL PROBABLY NEED TO CREATE A LIST OF ALL THE MODEL PARAMETERS
+```
+
+The number of deaths over time will depend heavily on the available healthcare
+capacity of a country, with excess mortality occurring when critical care patients, 
+who require mechanical ventilation, are unable to access one due to shortages:
+
+```{r death ICU and bed summaries with higher ICU beds}
+
+# Still to do
+
+```
+
+4.  Calibrating the Model to Observed Deaths Data
+
+The model can be simply calibrated to time series of deaths reported in settings. 
+This can be conducted using the `calibrate` function, by providing a data frame
+of date and deaths. For example:
+
+```{r example data}
+
+# create dummy data
+df <- data.frame("date" = Sys.Date() - 0:6,
+                 "deaths" = c(6, 2, 1, 1, 0, 0, 0))
+df
+```
+
+```{r calibrate run}
+
+# run caliibrate
+out <- calibrate(data = df, country = "Senegal", replicates = 10)
+
+head(out)
+```
+
+Simulation replicates are aligned to the current death total and the outputs of
+each simulation replicate are returned in long format. To plot the deaths over
+time up until the next week:
+
+```{r deaths over time}
+
+# summarise deaths
+deaths <- dplyr::group_by(out[out$name == "D", ],date, replicate)
+deaths <- dplyr::summarise(deaths, value = sum(value))
+deaths <- deaths[deaths$date < Sys.Date() + 7,]
+
+# plot the deaths
+ggplot2::ggplot(deaths, ggplot2::aes(x = date, y = value, group = replicate)) + 
+  ggplot2::geom_line() + 
+  ggplot2::geom_vline(xintercept = Sys.Date()) +
+  ggplot2::geom_hline(yintercept = df$deaths[1]) +
+  ggplot2::xlab("Date") + 
+  ggplot2::ylab("Cumulative Deaths")
 
 
+```

@@ -7,8 +7,8 @@
 #' @param dur_E Mean duration of incubation period (days)
 #' @param dur_I Mean duration of infectious period (days)
 #' @param population Population vector (for each age group)
-#' @param baseline_contact_matrix Contact matrix (in absence of interventions). Used in estimation
-#' of beta from R0 vector
+#' @param baseline_contact_matrix Contact matrix (in absence of interventions).
+#'   Used in estimation of beta from R0 vector
 #' @param contact_matrix_set Contact matrices used in simulation
 #' @param tt_contact_matrix Time change points for matrix change
 #' @param time_period Length of simulation
@@ -92,22 +92,29 @@ run_SEEIR_model <- function(R0 = 3,
   return(out)
 }
 
-#' -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #' Run the explicit SEEIR model
 #'
 #' @details All durations are in days.
 #'
-#' @param population Population vector (for each age group).
+#' @param population Population vector (for each age group). Default = NULL,
+#'   which will cause population to be sourced from \code{country}
+#' @param country Character for country beign simulated. WIll be used to
+#'   generate \code{population} and \code{baseline_contact_matrix} if
+#'   unprovided. Either \code{country} or \code{population} and
+#'   \code{baseline_contact_matrix} must be provided.
 #' @param baseline_contact_matrix Contact matrix (in absence of interventions).
-#'   Used in estimation of beta from R0 vector
-#' @param contact_matrix_set Contact matrices used in simulation
+#'   Used in estimation of beta from R0 vector. Default = NULL, which will
+#'   use \code{country} to generate this.
+#' @param contact_matrix_set Contact matrices used in simulation. Default =
+#'   NULL, which will generate this using \code{baseline_contact_matrix}
 #' @param tt_contact_matrix Time change points for matrix change. Default = 0
 #' @param R0 Basic Reproduction Number. Default = 3
 #' @param tt_R0 Change time points for R0. Default = 0
 #' @param beta_set Alternative parameterisation via beta rather than R0.
 #'   Default = NULL, which causes beta to be estimated from R0
 #' @param time_period Length of simulation. Default = 365
-#' @param dt Time Step. Default = 0.25
+#' @param dt Time Step. Default = 0.5
 #' @param replicates  Number of replicates. Default = 10
 #' @param init Data.frame of initial conditions. Default = NULL
 #' @param prob_hosp probability of hospitalisation by age.
@@ -168,10 +175,11 @@ run_SEEIR_model <- function(R0 = 3,
 run_explicit_SEEIR_model <- function(
 
   # demography
-  population,
-  baseline_contact_matrix,
-  contact_matrix_set,
+  country = NULL,
+  population = NULL,
+  baseline_contact_matrix = NULL,
   tt_contact_matrix = 0,
+  contact_matrix_set = NULL,
 
   # transmission
   R0 = 3,
@@ -180,7 +188,7 @@ run_explicit_SEEIR_model <- function(
 
   # initial state, duration, reps
   time_period = 365,
-  dt = 0.25,
+  dt = 0.5,
   replicates = 10,
   init = NULL,
 
@@ -228,6 +236,34 @@ run_explicit_SEEIR_model <- function(
 
   # Grab function arguments
   args <- as.list(environment())
+
+  # Handle country population args
+  if (is.null(country) &&
+      (is.null(population) && is.null(baseline_contact_matrix))) {
+    stop("User must provide either the country being simulated or
+         both the population size and baseline_contact_matrix")
+  }
+
+  # If a country was provided then grab the population and matrices if needed
+  if (!is.null(country) & is.null(population)) {
+    population <- get_population(country)
+
+  if (is.null(baseline_contact_matrix)) {
+      baseline_contact_matrix <- contact_matrices[[population$matrix[1]]]
+  }
+
+    population <- population$n
+
+  }
+
+  # populate contact matrix set if not provided
+  if (is.null(contact_matrix_set)) {
+      contact_matrix_set <- vector("list", length(tt_contact_matrix))
+      for(i in seq_along(tt_contact_matrix)) {
+        contact_matrix_set[[i]] <- baseline_contact_matrix
+      }
+  }
+
 
   # Initail state and matrix formatting
   # ----------------------------------------------------------------------------

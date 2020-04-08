@@ -43,6 +43,7 @@ death_data_format <- function(date = NULL,
 
   # order by date
   deaths <- deaths[order(date, decreasing = TRUE)]
+  date <- sort(date, decreasing = TRUE)
 
   # check that deaths are increasing
   assert_decreasing(deaths)
@@ -67,6 +68,7 @@ death_data_format <- function(date = NULL,
 #' @importFrom utils tail
 #' @importFrom stats rbinom time
 #'
+#' @export
 #' @return Long data frame of simulation replicates
 calibrate <- function(data, country, replicates = 100, ...) {
 

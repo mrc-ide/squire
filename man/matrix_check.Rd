@@ -9,8 +9,8 @@ matrix_check(population, baseline_contact_matrix, contact_matrix_set)
 \arguments{
 \item{population}{Population vector (for each age group)}
 
-\item{baseline_contact_matrix}{Contact matrix (in absence of interventions). Used in estimation
-of beta from R0 vector}
+\item{baseline_contact_matrix}{Contact matrix (in absence of interventions).
+Used in estimation of beta from R0 vector}
 
 \item{contact_matrix_set}{Contact matrices used in simulation}
 }
