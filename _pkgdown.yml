@@ -1,1 +1,42 @@
 destination: docs
+
+
+template:
+  params:
+    bootswatch: flatly
+
+reference:
+  - title: "Running the model"
+    desc: "Functions for running squire models and calibrating them"
+    contents:
+      - run_explicit_SEEIR_model
+      - run_SEEIR_model
+      - calibrate
+  - title: "Country level parameters"
+    desc: "Functions for getting country demography and mixing matrices"
+    contents:
+      - get_population
+      - get_mixing_matrix
+  - title: "Beta estimation"
+    desc: "Functions for estimating beta for a given R0"
+    contents:
+      - beta_est_explicit
+      - beta_est
+  - title: "Model output summaries"
+    desc: "Functions for summarising the model components"
+    contents:
+      - wide_output
+      - long_output
+
+navbar:
+  type: default
+  left:
+    - href: index.html
+      icon: fa-home
+    - text: Reference
+      href: reference/index.html
+    - text: News
+      href: news/index.html
+  right:
+    - icon: fa-github
+      href: https://github.com/mrc-ide/squire
