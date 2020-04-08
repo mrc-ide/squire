@@ -113,8 +113,7 @@
 <p>After installation of ODIN, ensure you have the devtools package installed by running the following:</p>
 <div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)</pre></div>
 <p>Then install the <i>squire</i> package directly from GitHub by running:</p>
-<div class="sourceCode" id="cb3"><pre class="r">devtools::install_github("mrc-ide/squire")
-Note: do we need to refer to a specific branch here? </pre></div>
+<div class="sourceCode" id="cb3"><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"mrc-ide/squire"</span>)</pre></div>
 <p>If you have any problems installing then please raise an issue on the <i>squire</i> <a href="https://github.com/mrc-ide/squire/issues"><code>GitHub</code></a>.</p>
 <p>If everything has installed correctly, we then need to load the package:</p>
 <div class="sourceCode" id="cb4"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">squire</span>)</pre></div>
@@ -126,27 +125,148 @@ Note: do we need to refer to a specific branch here? </pre></div>
 <h3 class="hasAnchor">
 <a href="#running-the-model-unmitigated" class="anchor"></a>Running the Model (Unmitigated)</h3>
 <ol>
-<li>Introduce users to basic running of the model, using baseline parameters and no control interventions<br>
+<li>Running the model using baseline parameters and no control interventions</li>
+</ol>
+<p>The full model is referred to as the <strong>explicit_SEEIR</strong> model, with hospital pathways explicltly exploring whether individuals will require a general hospital bed providing oxygen or an ICU bed that provides ventilation.</p>
+<p>To run the model we need to provide at least one of the following arguments:</p>
+<ul>
+<li><code>country</code></li>
+<li>
+<code>population</code> and <code>baseline_contact_matrix</code>
 </li>
-<li>Show an example by which you change parameters of the model then have a section basically being like âyou can change any of the model parameters by modifying the appopriate argument in the run function; a list of model parameters can be found hereâ or maybe for the meantime, we can just link to the documentation for the run function, which will have details about each parameter as a list<br>
-</li>
+</ul>
+<p>If the <code>country</code> is provided, the <code>population</code> and <code>baseline_contact_matrix</code> will be generated (if not also specified) using the demographics and matrices specified in the <a href="https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-12-global-impact-covid-19/">global report</a>.</p>
+<p>To run the model by providing the <code>country</code> we use <code><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model()</a></code>:</p>
+<div class="sourceCode" id="cb5"><pre class="r"><span class="no">r</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(<span class="kw">country</span> <span class="kw">=</span> <span class="st">"Afghanistan"</span>)</pre></div>
+<p>The returned object is a <code>squire_simulation</code> object, which is a list of two ojects:</p>
+<ul>
+<li>
+<code>output</code> - model output</li>
+<li>
+<code>parameters</code> - model parameters</li>
+</ul>
+<p><code>squire_simulation</code> objects can be plotted as follows:</p>
+<div class="sourceCode" id="cb6"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>)</pre></div>
+<p><img src="reference/figures/README-base%20plot-1.png" width="100%"> This plot will plot each of the compartments of the model output.</p>
+<ol>
+<li>Changing parameters in the model.</li>
+</ol>
+<p>The model has a number of parameters for setting the R0, demography, contact matrices, the durations of each compartment and the health care outcomes and healthcare availability. In addition, the initial state of the population can be changed as well as simulation parameters, such as the number of replicates, length of simulation and the timestep. For a full list of model inputs, please see the function <a href="https://mrc-ide.github.io/squire/reference/run_explicit_SEEIR_model.html">documentation</a></p>
+<p>For example, changing the initial R0 (default = 3), number of replicates ( default = 10), simualtion length (default = 365 days) and time step (default = 0.25 days), as well as setting the population and contact matrix manually:</p>
+<div class="sourceCode" id="cb7"><pre class="r">
+<span class="co"># Get the population</span>
+<span class="no">pop</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/get_population.html">get_population</a></span>(<span class="st">"United Kingdom"</span>)
+<span class="no">population</span> <span class="kw">&lt;-</span> <span class="no">pop</span>$<span class="no">n</span>
+
+<span class="co"># Get the mixing matrix</span>
+<span class="no">contact_matrix</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/get_mixing_matrix.html">get_mixing_matrix</a></span>(<span class="st">"United Kingdom"</span>)
+
+<span class="co"># run the model</span>
+<span class="no">r</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(<span class="kw">population</span> <span class="kw">=</span> <span class="no">population</span>,
+                              <span class="kw">baseline_contact_matrix</span> <span class="kw">=</span> <span class="no">contact_matrix</span>,
+                              <span class="kw">R0</span> <span class="kw">=</span> <span class="fl">2.5</span>,
+                              <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
+                              <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">1</span>,
+                              <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">5</span>)
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>)</pre></div>
+<p><img src="reference/figures/README-set%20params-1.png" width="100%"></p>
+<p>We can also change the R0 and contact matrix at set time points, to reflect changing behaviour resulting from interventions. For example to set a 80% reduction in the contact matrix after 50 days :</p>
+<div class="sourceCode" id="cb8"><pre class="r">
+<span class="co"># run the model</span>
+<span class="no">r</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(<span class="kw">population</span> <span class="kw">=</span> <span class="no">population</span>,
+                              <span class="kw">baseline_contact_matrix</span> <span class="kw">=</span> <span class="no">contact_matrix</span>,
+                              <span class="kw">tt_contact_matrix</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">50</span>),
+                              <span class="kw">contact_matrix_set</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">contact_matrix</span>,
+                                                        <span class="no">contact_matrix</span>*<span class="fl">0.2</span>),
+                              <span class="kw">R0</span> <span class="kw">=</span> <span class="fl">2.5</span>,
+                              <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
+                              <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">1</span>,
+                              <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">5</span>)
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>)</pre></div>
+<p><img src="reference/figures/README-set%20contact%20matrix%20decrease-1.png" width="100%"></p>
+<p>To show an 80% reduction after 50 days but only maintained for 30 days :</p>
+<div class="sourceCode" id="cb9"><pre class="r">
+<span class="co"># run the model</span>
+<span class="no">r</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(<span class="kw">population</span> <span class="kw">=</span> <span class="no">population</span>,
+                              <span class="kw">baseline_contact_matrix</span> <span class="kw">=</span> <span class="no">contact_matrix</span>,
+                              <span class="kw">tt_contact_matrix</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">50</span>, <span class="fl">80</span>),
+                              <span class="kw">contact_matrix_set</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">contact_matrix</span>,
+                                                        <span class="no">contact_matrix</span>*<span class="fl">0.2</span>,
+                                                        <span class="no">contact_matrix</span>),
+                              <span class="kw">R0</span> <span class="kw">=</span> <span class="fl">2.5</span>,
+                              <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
+                              <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">1</span>,
+                              <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">5</span>)
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>)</pre></div>
+<p><img src="reference/figures/README-set%20contact%20matrix%20decrease%20and%20relax-1.png" width="100%"></p>
+<p>Alternatively, we could set a changing R0, which falls below 1 after 50 days:</p>
+<div class="sourceCode" id="cb10"><pre class="r">
+<span class="co"># run the model</span>
+<span class="no">r</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(<span class="kw">population</span> <span class="kw">=</span> <span class="no">population</span>,
+                              <span class="kw">baseline_contact_matrix</span> <span class="kw">=</span> <span class="no">contact_matrix</span>,
+                              <span class="kw">tt_R0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">50</span>),
+                              <span class="kw">R0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2.5</span>, <span class="fl">0.9</span>),
+                              <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
+                              <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">1</span>,
+                              <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">5</span>)
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>)</pre></div>
+<p><img src="reference/figures/README-set%20R0%20decrease-1.png" width="100%"></p>
+<ol>
 <li>Extracting and Plotting Relevant Outputs</li>
 </ol>
-<p>Note: highlight the R0-&gt;beta function.</p>
-</div>
-<div id="running-the-model-control" class="section level3">
-<h3 class="hasAnchor">
-<a href="#running-the-model-control" class="anchor"></a>Running the Model (Control)</h3>
+<p>Alternative summaries of the models can be created, which give commonly reported measures, such as deaths, number of ICU beds and general hospital beds required.</p>
+<div class="sourceCode" id="cb11"><pre class="r">
+# Still to do</pre></div>
+<p>The number of deaths over time will depend heavily on the available healthcare capacity of a country, with excess mortality occurring when critical care patients, who require mechanical ventilation, are unable to access one due to shortages:</p>
+<div class="sourceCode" id="cb12"><pre class="r">
+# Still to do</pre></div>
 <ol>
-<li>Example of the model where the contact matrix has been modified to simulate generic control interventions to emulate a less-stringent mitigation scenario. Control applied indefinitely.</li>
-<li>Example of the model where the contact matrix has been modified to simulate generic control interventions to emulate a more-stringent mitigation scenario. Control applied indefinitely.</li>
-<li>Example of the model where the contact matrix has been modified to simulate generic control interventions to emulate a more-stringent mitigation scenario. Control applied and then lifted (and then maybe applied again).</li>
+<li>Calibrating the Model to Observed Deaths Data</li>
 </ol>
-</div>
-<div id="calibrating-the-model-to-observed-deaths-data" class="section level3">
-<h3 class="hasAnchor">
-<a href="#calibrating-the-model-to-observed-deaths-data" class="anchor"></a>Calibrating the Model to Observed Deaths Data</h3>
-<p>NOTE SOMEWHERE WEâLL PROBABLY NEED TO CREATE A LIST OF ALL THE MODEL PARAMETERS</p>
+<p>The model can be simply calibrated to time series of deaths reported in settings. This can be conducted using the <code>calibrate</code> function, by providing a data frame of date and deaths. For example:</p>
+<div class="sourceCode" id="cb13"><pre class="r">
+<span class="co"># create dummy data</span>
+<span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="st">"date"</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span>() - <span class="fl">0</span>:<span class="fl">6</span>,
+                 <span class="st">"deaths"</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">6</span>, <span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>))
+<span class="no">df</span>
+<span class="co">#&gt;         date deaths</span>
+<span class="co">#&gt; 1 2020-04-08      6</span>
+<span class="co">#&gt; 2 2020-04-07      2</span>
+<span class="co">#&gt; 3 2020-04-06      1</span>
+<span class="co">#&gt; 4 2020-04-05      1</span>
+<span class="co">#&gt; 5 2020-04-04      0</span>
+<span class="co">#&gt; 6 2020-04-03      0</span>
+<span class="co">#&gt; 7 2020-04-02      0</span></pre></div>
+<div class="sourceCode" id="cb14"><pre class="r">
+<span class="co"># run caliibrate</span>
+<span class="no">out</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>, <span class="kw">country</span> <span class="kw">=</span> <span class="st">"Senegal"</span>, <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">10</span>)
+
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">out</span>)
+<span class="co">#&gt; # A tibble: 6 x 7</span>
+<span class="co">#&gt; # Groups:   replicate [1]</span>
+<span class="co">#&gt;       t age_group replicate new_time date       name     value</span>
+<span class="co">#&gt;   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1     1         1         1      -35 2020-03-04 S      2615338</span>
+<span class="co">#&gt; 2     1         1         1      -35 2020-03-04 E1           0</span>
+<span class="co">#&gt; 3     1         1         1      -35 2020-03-04 E2           0</span>
+<span class="co">#&gt; 4     1         1         1      -35 2020-03-04 IMild        1</span>
+<span class="co">#&gt; 5     1         1         1      -35 2020-03-04 ICase1       1</span>
+<span class="co">#&gt; 6     1         1         1      -35 2020-03-04 ICase2       1</span></pre></div>
+<p>Simulation replicates are aligned to the current death total and the outputs of each simulation replicate are returned in long format. To plot the deaths over time up until the next week:</p>
+<div class="sourceCode" id="cb15"><pre class="r">
+<span class="co"># summarise deaths</span>
+<span class="no">deaths</span> <span class="kw">&lt;-</span> <span class="kw pkg">dplyr</span><span class="kw ns">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="no">out</span>[<span class="no">out</span>$<span class="no">name</span> <span class="kw">==</span> <span class="st">"D"</span>, ],<span class="no">date</span>, <span class="no">replicate</span>)
+<span class="no">deaths</span> <span class="kw">&lt;-</span> <span class="kw pkg">dplyr</span><span class="kw ns">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="no">deaths</span>, <span class="kw">value</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">value</span>))
+<span class="no">deaths</span> <span class="kw">&lt;-</span> <span class="no">deaths</span>[<span class="no">deaths</span>$<span class="no">date</span> <span class="kw">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span>() + <span class="fl">7</span>,]
+
+<span class="co"># plot the deaths</span>
+<span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">deaths</span>, <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">date</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">value</span>, <span class="kw">group</span> <span class="kw">=</span> <span class="no">replicate</span>)) +
+  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() +
+  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span>(<span class="kw">xintercept</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span>()) +
+  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span>(<span class="kw">yintercept</span> <span class="kw">=</span> <span class="no">df</span>$<span class="no">deaths</span>[<span class="fl">1</span>]) +
+  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Date"</span>) +
+  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Cumulative Deaths"</span>)</pre></div>
+<p><img src="reference/figures/README-deaths%20over%20time-1.png" width="100%"></p>
 </div>
 </div>
 </div>
