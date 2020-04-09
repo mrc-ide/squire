@@ -4,20 +4,10 @@
 \alias{run_SEEIR_model}
 \title{Run the SEEIR model}
 \usage{
-run_SEEIR_model(
-  R0 = 3,
-  tt_R0 = 0,
-  dt = 0.1,
-  init = NULL,
-  dur_E = 4.58,
-  dur_I = 2.09,
-  population,
-  baseline_contact_matrix,
-  contact_matrix_set,
-  tt_contact_matrix = 0,
-  time_period = 365,
-  replicates = 10
-)
+run_SEEIR_model(R0 = 3, tt_R0 = 0, dt = 0.1, init = NULL,
+  dur_E = 4.58, dur_I = 2.09, population, baseline_contact_matrix,
+  contact_matrix_set, tt_contact_matrix = 0, time_period = 365,
+  replicates = 10)
 }
 \arguments{
 \item{R0}{Basic reproduction number}

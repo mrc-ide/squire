@@ -9,9 +9,6 @@ calibrate_output_parsing(r)
 \arguments{
 \item{r}{Output of \code{\link{calibrate_stripped}}}
 }
-\value{
-
-}
 \description{
 Format output of calibration for plotting
 }

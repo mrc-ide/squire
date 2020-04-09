@@ -4,48 +4,32 @@
 \alias{run_explicit_SEEIR_model}
 \title{Run the explicit SEEIR model}
 \usage{
-run_explicit_SEEIR_model(
-  country = NULL,
-  population = NULL,
-  baseline_contact_matrix = NULL,
-  tt_contact_matrix = 0,
-  contact_matrix_set = NULL,
-  R0 = 3,
-  tt_R0 = 0,
-  beta_set = NULL,
-  time_period = 365,
-  dt = 0.5,
-  replicates = 10,
-  init = NULL,
-  output_transform = TRUE,
-  prob_hosp = c(0.001127564, 0.000960857, 0.001774408, 0.003628171, 0.008100662,
-    0.015590734, 0.024597885, 0.035377529, 0.04385549, 0.058495518, 0.08747709,
-    0.109730508, 0.153943118, 0.177242143, 0.221362219, 0.267628264),
-  prob_severe = c(3.73755e-05, 3.18497e-05, 5.88166e-05, 0.000120264, 0.000268514,
-    0.000516788, 0.00081535, 0.001242525, 0.001729275, 0.002880196, 0.00598205,
-    0.010821894, 0.022736324, 0.035911156, 0.056362032, 0.081467057),
-  prob_non_severe_death_treatment = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
-    0.0125702, 0.0125702, 0.0125702, 0.013361147, 0.015104687, 0.019164124, 0.027477519,
-    0.041762108, 0.068531658, 0.105302319, 0.149305732, 0.20349534),
-  prob_non_severe_death_no_treatment = prob_non_severe_death_treatment * 2,
-  prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
+run_explicit_SEEIR_model(country = NULL, population = NULL,
+  baseline_contact_matrix = NULL, tt_contact_matrix = 0,
+  contact_matrix_set = NULL, R0 = 3, tt_R0 = 0, beta_set = NULL,
+  time_period = 365, dt = 0.5, replicates = 10, init = NULL,
+  output_transform = TRUE, prob_hosp = c(0.001127564, 0.000960857,
+  0.001774408, 0.003628171, 0.008100662, 0.015590734, 0.024597885,
+  0.035377529, 0.04385549, 0.058495518, 0.08747709, 0.109730508,
+  0.153943118, 0.177242143, 0.221362219, 0.267628264),
+  prob_severe = c(3.73755e-05, 3.18497e-05, 5.88166e-05, 0.000120264,
+  0.000268514, 0.000516788, 0.00081535, 0.001242525, 0.001729275,
+  0.002880196, 0.00598205, 0.010821894, 0.022736324, 0.035911156,
+  0.056362032, 0.081467057),
+  prob_non_severe_death_treatment = c(0.0125702, 0.0125702, 0.0125702,
+  0.0125702, 0.0125702, 0.0125702, 0.0125702, 0.013361147, 0.015104687,
+  0.019164124, 0.027477519, 0.041762108, 0.068531658, 0.105302319,
+  0.149305732, 0.20349534),
+  prob_non_severe_death_no_treatment = prob_non_severe_death_treatment *
+  2, prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
   prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
-  p_dist = rep(1, length(prob_hosp)),
-  dur_E = 4.58,
-  dur_R = 2.09,
-  dur_hosp = 5,
-  dur_get_ox_survive = 6,
-  dur_get_ox_die = 3.5,
-  dur_not_get_ox_survive = 6 * 1.5,
-  dur_not_get_ox_die = dur_get_ox_die * 0.5,
-  dur_get_mv_survive = 5.5,
-  dur_get_mv_die = 4,
-  dur_not_get_mv_survive = 12,
-  dur_not_get_mv_die = 1,
-  dur_rec = 6,
-  hosp_bed_capacity = 5 * sum(population)/1000,
-  ICU_bed_capacity = 3 * hosp_bed_capacity/100
-)
+  p_dist = rep(1, length(prob_hosp)), dur_E = 4.58, dur_R = 2.09,
+  dur_hosp = 5, dur_get_ox_survive = 6, dur_get_ox_die = 3.5,
+  dur_not_get_ox_survive = 6 * 1.5, dur_not_get_ox_die = dur_get_ox_die
+  * 0.5, dur_get_mv_survive = 5.5, dur_get_mv_die = 4,
+  dur_not_get_mv_survive = 12, dur_not_get_mv_die = 1, dur_rec = 6,
+  hosp_bed_capacity = 5 * sum(population)/1000, ICU_bed_capacity = 3 *
+  hosp_bed_capacity/100)
 }
 \arguments{
 \item{country}{Character for country beign simulated. WIll be used to
