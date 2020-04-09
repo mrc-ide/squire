@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate death time seris — death_data_format • squire</title>
+<title>Format output of calibration for plotting — calibrate_output_parsing • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Generate death time seris — death_data_format" />
-<meta property="og:description" content="Generate death time seris" />
+<meta property="og:title" content="Format output of calibration for plotting — calibrate_output_parsing" />
+<meta property="og:description" content="Format output of calibration for plotting" />
 
 
 
@@ -111,57 +111,35 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generate death time seris</h1>
+    <h1>Format output of calibration for plotting</h1>
     
-    <div class="hidden name"><code>death_data_format.Rd</code></div>
+    <div class="hidden name"><code>calibrate_output_parsing.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generate death time seris</p>
+    <p>Format output of calibration for plotting</p>
     </div>
 
-    <pre class="usage"><span class='fu'>death_data_format</span>(
-  <span class='kw'>date</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>deaths</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>cases</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>reporting_quality</span> <span class='kw'>=</span> <span class='fl'>0.2</span>
-)</pre>
+    <pre class="usage"><span class='fu'>calibrate_output_parsing</span>(<span class='no'>r</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>date</th>
-      <td><p>Character or Date vector of time series</p></td>
-    </tr>
-    <tr>
-      <th>deaths</th>
-      <td><p>Numeric vector of deaths</p></td>
-    </tr>
-    <tr>
-      <th>cases</th>
-      <td><p>Numeric vector of deaths</p></td>
-    </tr>
-    <tr>
-      <th>reporting_quality</th>
-      <td><p>When generating synthetic data, what is the
-reporting quality, i.e. probability of reporting a death prior to the current
-total</p></td>
+      <th>r</th>
+      <td><p>Output of <code><a href='calibrate_stripped.html'>calibrate_stripped</a></code></p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Time series of deaths as <code>data.frame</code></p>
+    
+
+
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Create a data frame for time series of
-  deaths. If not provided, dummy data will
-  be generated. The resulting data frame will be used
-  when calibrating the model to fit to timeseries of
-  deaths.</p>
-<p>In the future maybe extend this to include ITU cases
-  and general hospital cases.</p>
+    <p>Calibration output is taken to give time series of infections, cases,
+cases requiring hospitilisation, case requiring critical care facilities.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

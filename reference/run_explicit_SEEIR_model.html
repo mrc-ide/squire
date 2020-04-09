@@ -133,6 +133,7 @@
   <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
   <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>,
   <span class='kw'>init</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>output_transform</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>prob_hosp</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.001127564</span>, <span class='fl'>0.000960857</span>, <span class='fl'>0.001774408</span>, <span class='fl'>0.003628171</span>, <span class='fl'>0.008100662</span>,
     <span class='fl'>0.015590734</span>, <span class='fl'>0.024597885</span>, <span class='fl'>0.035377529</span>, <span class='fl'>0.04385549</span>, <span class='fl'>0.058495518</span>, <span class='fl'>0.08747709</span>,
     <span class='fl'>0.109730508</span>, <span class='fl'>0.153943118</span>, <span class='fl'>0.177242143</span>, <span class='fl'>0.221362219</span>, <span class='fl'>0.267628264</span>),
@@ -220,6 +221,11 @@ Default = NULL, which causes beta to be estimated from R0</p></td>
     <tr>
       <th>init</th>
       <td><p>Data.frame of initial conditions. Default = NULL</p></td>
+    </tr>
+    <tr>
+      <th>output_transform</th>
+      <td><p>Transport model outputs into useful format.
+Default == FALSE</p></td>
     </tr>
     <tr>
       <th>prob_hosp</th>

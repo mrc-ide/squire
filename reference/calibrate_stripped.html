@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate death time seris — death_data_format • squire</title>
+<title>Calibrate Model — calibrate_stripped • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Generate death time seris — death_data_format" />
-<meta property="og:description" content="Generate death time seris" />
+<meta property="og:title" content="Calibrate Model — calibrate_stripped" />
+<meta property="og:description" content="Calibrate Model" />
 
 
 
@@ -111,57 +111,44 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generate death time seris</h1>
+    <h1>Calibrate Model</h1>
     
-    <div class="hidden name"><code>death_data_format.Rd</code></div>
+    <div class="hidden name"><code>calibrate_stripped.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generate death time seris</p>
+    <p>Calibrate Model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>death_data_format</span>(
-  <span class='kw'>date</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>deaths</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>cases</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>reporting_quality</span> <span class='kw'>=</span> <span class='fl'>0.2</span>
-)</pre>
+    <pre class="usage"><span class='fu'>calibrate_stripped</span>(<span class='no'>data</span>, <span class='no'>country</span>, <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>date</th>
-      <td><p>Character or Date vector of time series</p></td>
+      <th>data</th>
+      <td><p>Data frame with 2 variables: date and deaths</p></td>
     </tr>
     <tr>
-      <th>deaths</th>
-      <td><p>Numeric vector of deaths</p></td>
+      <th>country</th>
+      <td><p>Character. Country data originates from.</p></td>
     </tr>
     <tr>
-      <th>cases</th>
-      <td><p>Numeric vector of deaths</p></td>
+      <th>replicates</th>
+      <td><p>Simulation Repetitions. Default = 10</p></td>
     </tr>
     <tr>
-      <th>reporting_quality</th>
-      <td><p>When generating synthetic data, what is the
-reporting quality, i.e. probability of reporting a death prior to the current
-total</p></td>
+      <th>...</th>
+      <td><p>Other parameters to pass to <code><a href='run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model</a></code></p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Time series of deaths as <code>data.frame</code></p>
+    <p>List of unformatted odin outputs with the date</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Create a data frame for time series of
-  deaths. If not provided, dummy data will
-  be generated. The resulting data frame will be used
-  when calibrating the model to fit to timeseries of
-  deaths.</p>
-<p>In the future maybe extend this to include ITU cases
-  and general hospital cases.</p>
+    <p>Fit the explicit_SEEIR model to time series of deaths</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
