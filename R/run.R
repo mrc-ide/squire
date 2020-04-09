@@ -232,8 +232,8 @@ run_explicit_SEEIR_model <- function(
   dur_rec = 6,
 
   # health system capacity
-  hosp_bed_capacity = 5*sum(population)/1000,
-  ICU_bed_capacity = 3*hosp_bed_capacity/100
+  hosp_bed_capacity = NULL,
+  ICU_bed_capacity = NULL
 
   ) {
 
@@ -251,9 +251,9 @@ run_explicit_SEEIR_model <- function(
   if (!is.null(country) & is.null(population)) {
     population <- get_population(country)
 
-  if (is.null(baseline_contact_matrix)) {
-      baseline_contact_matrix <- contact_matrices[[population$matrix[1]]]
-  }
+    if (is.null(baseline_contact_matrix)) {
+        baseline_contact_matrix <- contact_matrices[[population$matrix[1]]]
+    }
 
     population <- population$n
 
@@ -267,6 +267,13 @@ run_explicit_SEEIR_model <- function(
       }
   }
 
+  # populate hospital and ICU bed capacity if not provided
+  if (is.null(hosp_bed_capacity)) {
+    hosp_bed_capacity <- round(5*sum(population)/1000)
+  }
+  if (is.null(ICU_bed_capacity)) {
+    ICU_bed_capacity <- round(3*hosp_bed_capacity/100)
+  }
 
   # Initail state and matrix formatting
   # ----------------------------------------------------------------------------
@@ -415,6 +422,10 @@ run_explicit_SEEIR_model <- function(
 
   # Summarise inputs
   parameters <- args
+  parameters$population <- population
+  parameters$baseline_contact_matrix <- baseline_contact_matrix
+  parameters$hosp_bed_capacity <- hosp_bed_capacity
+  parameters$ICU_bed_capacity <- ICU_bed_capacity
   parameters$beta_set <- beta_set
 
   out <- list(output = results, parameters = parameters, model = mod)
