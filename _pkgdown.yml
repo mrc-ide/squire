@@ -10,7 +10,7 @@ reference:
     desc: "Functions for running squire models and calibrating them"
     contents:
       - run_explicit_SEEIR_model
-      - run_SEEIR_model
+      - run_simple_SEEIR_model
       - calibrate
   - title: "Country level parameters"
     desc: "Functions for getting country demography and mixing matrices"

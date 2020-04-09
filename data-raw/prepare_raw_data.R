@@ -1,33 +1,7 @@
 # Process raw data
 
 # Contact Matrices sourced from literature used in the global report
-# We will adjust these to have an 75-59 and an 80+ contact matrix row to reflect
-# available UK severity probabilities
 contact_matrices <- readRDS("data-raw/contact_matrices.rds")
-
-for(i in seq_along(contact_matrices)) {
-
-  if(nrow(contact_matrices[[i]]) == 16) {
-    contact_matrices[[i]] <- as.matrix(contact_matrices[[i]])
-    contact_matrices[[i]] <- rbind(contact_matrices[[i]], contact_matrices[[i]][16,])
-    contact_matrices[[i]] <- cbind(contact_matrices[[i]], contact_matrices[[i]][,16])
-
-    mm<-rbind(mm,mm[16,])
-    mm<-cbind(mm,mm[,16]*squire::population$n[which(squire::population$country==country)][17]/sum(squire::population$n[which(squire::population$country==country)][16:17]))
-    mm[,16]<-mm[,16]*squire::population$n[which(squire::population$country==country)][16]/sum(squire::population$n[which(squire::population$country==country)][16:17])
-    return(mm)
-
-
-    rn <- c("[0,5)","[5,10)","[10,15)","[15,20)","[20,25)","[25,30)","[30,35)",
-            "[35,40)","[40,45)","[45,50)","[50,55)","[55,60)","[60,65)","[65,70)",
-            "[70,75)","[75,80)","80+")
-    rownames(contact_matrices[[i]]) <- rn
-    colnames(contact_matrices[[i]]) <- rn
-  }
-
-}
-
-
 usethis::use_data(contact_matrices, overwrite = TRUE)
 
 # Demography

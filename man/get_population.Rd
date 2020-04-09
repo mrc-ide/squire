@@ -4,10 +4,13 @@
 \alias{get_population}
 \title{Get population data}
 \usage{
-get_population(country)
+get_population(country, simple_SEIR = FALSE)
 }
 \arguments{
 \item{country}{Country name}
+
+\item{simple_SEIR}{Logical. Is the population for the \code{simple_SEIR}.
+Default = FALSE}
 }
 \value{
 Population data.frame

@@ -1,13 +1,12 @@
 test_that("output df works", {
-  pop = get_population("Afghanistan")
+  pop = get_population("Afghanistan", simple_SEIR = TRUE)
 
   set.seed(123)
-  r1 <- run_SEEIR_model(population = pop$n,
+  r1 <- run_simple_SEEIR_model(population = pop$n,
                         dt = 1,
                         R0 = 2,
                         time_period = 100,
                         replicates = 10,
-                        baseline_contact_matrix = contact_matrices[[1]],
                         contact_matrix_set=contact_matrices[[1]])
 
   o1 <- long_output(r1$output)
@@ -18,14 +17,13 @@ test_that("output df works", {
 
 test_that("squire object check and summary", {
 
-  pop = get_population("Afghanistan")
+  pop = get_population("Afghanistan", simple_SEIR = TRUE)
   set.seed(123)
-  r1 <- run_SEEIR_model(population = pop$n,
+  r1 <- run_simple_SEEIR_model(population = pop$n,
                         dt = 1,
                         R0 = 2,
                         time_period = 400,
                         replicates = 10,
-                        baseline_contact_matrix = contact_matrices[[1]],
                         contact_matrix_set=contact_matrices[[1]])
 
   # check correctly identifies
@@ -45,16 +43,53 @@ test_that("squire object check and summary", {
 
 test_that("squire object check and summary", {
 
-  pop = get_population("Afghanistan")
+  pop = get_population("Afghanistan", simple_SEIR = TRUE)
   set.seed(123)
-  r1 <- run_SEEIR_model(population = pop$n,
+  r1 <- run_simple_SEEIR_model(population = pop$n,
                         dt = 1,
                         R0 = 2,
                         time_period = 100,
                         replicates = 10,
-                        baseline_contact_matrix = contact_matrices[[1]],
                         contact_matrix_set=contact_matrices[[1]])
 
+  # check plotting actually happens
+  pl <- plot(r1)
+  expect_is(pl, "ggplot")
+
+})
+
+
+
+test_that("squire object check and summary", {
+
+  pop = get_population("Afghanistan", simple_SEIR = TRUE)
+  set.seed(123)
+  r1 <- run_simple_SEEIR_model(population = pop$n,
+                        dt = 1,
+                        R0 = 2,
+                        time_period = 100,
+                        replicates = 10,
+                        contact_matrix_set=contact_matrices[[1]])
+
+  # check plotting actually happens
+  pl <- plot(r1)
+  expect_is(pl, "ggplot")
+
+})
+
+
+test_that("squire object check and summary", {
+
+  pop = get_population("Afghanistan", simple_SEIR = TRUE)
+  set.seed(123)
+  r1 <- run_simple_SEEIR_model(population = pop$n,
+                        dt = 1,
+                        R0 = 2,
+                        time_period = 100,
+                        replicates = 10,
+                        contact_matrix_set=contact_matrices[[1]])
+
+  get_wide <- wide_output(r1$output)
   # check plotting actually happens
   pl <- plot(r1)
   expect_is(pl, "ggplot")

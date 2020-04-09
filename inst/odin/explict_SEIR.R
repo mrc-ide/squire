@@ -296,7 +296,7 @@ dim(tt_beta) <- user()
 dim(beta_set) <- length(tt_beta)
 
 # Generating Force of Infection
-  temp[] <- IMild[i] + ICase1[i] + ICase2[i]
+temp[] <- IMild[i] + ICase1[i] + ICase2[i]
 s_ij[,] <- m[i, j] * temp[j]
 lambda[] <- beta * sum(s_ij[i, ])
 

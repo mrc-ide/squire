@@ -1,11 +1,12 @@
 test_that("object methods ", {
   # Get a population
-  pop <- get_population("Afghanistan")
+  pop <- get_population("Afghanistan", simple_SEIR = TRUE)
   # Run model
-  m1 <- run_SEEIR_model(population = pop$n, dt = 1,
+  m1 <- run_simple_SEEIR_model(population = pop$n,
+                        dt = 1,
                         time_period = 100,
                         replicates = 30,
-                        R0 = 4, baseline_contact_matrix = contact_matrices[[1]],
+                        R0 = 4,
                         contact_matrix_set=contact_matrices[[1]])
   expect_type(m1, "list")
   expect_s3_class(m1, "squire_simulation")

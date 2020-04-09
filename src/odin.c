@@ -418,7 +418,7 @@ typedef struct explict_SEIR_internal {
   double *tt_beta;
   double *tt_matrix;
 } explict_SEIR_internal;
-typedef struct SEIR_internal {
+typedef struct simple_SEIR_internal {
   double *beta_set;
   double *delta_E1;
   double *delta_E2;
@@ -493,7 +493,7 @@ typedef struct SEIR_internal {
   double *temp;
   double *tt_beta;
   double *tt_matrix;
-} SEIR_internal;
+} simple_SEIR_internal;
 explict_SEIR_internal* explict_SEIR_get_internal(SEXP internal_p, int closed_error);
 static void explict_SEIR_finalise(SEXP internal_p);
 SEXP explict_SEIR_create(SEXP user);
@@ -505,17 +505,17 @@ SEXP explict_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
 void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
 void explict_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
 SEXP explict_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
-SEIR_internal* SEIR_get_internal(SEXP internal_p, int closed_error);
-static void SEIR_finalise(SEXP internal_p);
-SEXP SEIR_create(SEXP user);
-void SEIR_initmod_desolve(void(* odeparms) (int *, double *));
-SEXP SEIR_contents(SEXP internal_p);
-SEXP SEIR_set_user(SEXP internal_p, SEXP user);
-SEXP SEIR_metadata(SEXP internal_p);
-SEXP SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
-void SEIR_rhs(SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
-void SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
-SEXP SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
+simple_SEIR_internal* simple_SEIR_get_internal(SEXP internal_p, int closed_error);
+static void simple_SEIR_finalise(SEXP internal_p);
+SEXP simple_SEIR_create(SEXP user);
+void simple_SEIR_initmod_desolve(void(* odeparms) (int *, double *));
+SEXP simple_SEIR_contents(SEXP internal_p);
+SEXP simple_SEIR_set_user(SEXP internal_p, SEXP user);
+SEXP simple_SEIR_metadata(SEXP internal_p);
+SEXP simple_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
+void simple_SEIR_rhs(simple_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
+void simple_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
+SEXP simple_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
 double user_get_scalar_double(SEXP user, const char *name,
                               double default_value, double min, double max);
 int user_get_scalar_int(SEXP user, const char *name,
@@ -3010,19 +3010,19 @@ SEXP explict_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
   UNPROTECT(1);
   return state_next;
 }
-SEIR_internal* SEIR_get_internal(SEXP internal_p, int closed_error) {
-  SEIR_internal *internal = NULL;
+simple_SEIR_internal* simple_SEIR_get_internal(SEXP internal_p, int closed_error) {
+  simple_SEIR_internal *internal = NULL;
   if (TYPEOF(internal_p) != EXTPTRSXP) {
     Rf_error("Expected an external pointer");
   }
-  internal = (SEIR_internal*) R_ExternalPtrAddr(internal_p);
+  internal = (simple_SEIR_internal*) R_ExternalPtrAddr(internal_p);
   if (!internal && closed_error) {
     Rf_error("Pointer has been invalidated");
   }
   return internal;
 }
-void SEIR_finalise(SEXP internal_p) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 0);
+void simple_SEIR_finalise(SEXP internal_p) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 0);
   if (internal_p) {
     cinterpolate_free(internal->interpolate_beta);
     cinterpolate_free(internal->interpolate_m);
@@ -3059,8 +3059,8 @@ void SEIR_finalise(SEXP internal_p) {
     R_ClearExternalPtr(internal_p);
   }
 }
-SEXP SEIR_create(SEXP user) {
-  SEIR_internal *internal = (SEIR_internal*) Calloc(1, SEIR_internal);
+SEXP simple_SEIR_create(SEXP user) {
+  simple_SEIR_internal *internal = (simple_SEIR_internal*) Calloc(1, simple_SEIR_internal);
   internal->beta_set = NULL;
   internal->delta_E1 = NULL;
   internal->delta_E2 = NULL;
@@ -3103,21 +3103,21 @@ SEXP SEIR_create(SEXP user) {
   internal->tt_beta = NULL;
   internal->tt_matrix = NULL;
   SEXP ptr = PROTECT(R_MakeExternalPtr(internal, R_NilValue, R_NilValue));
-  R_RegisterCFinalizer(ptr, SEIR_finalise);
+  R_RegisterCFinalizer(ptr, simple_SEIR_finalise);
   UNPROTECT(1);
   return ptr;
 }
-static SEIR_internal *SEIR_internal_ds;
-void SEIR_initmod_desolve(void(* odeparms) (int *, double *)) {
+static simple_SEIR_internal *simple_SEIR_internal_ds;
+void simple_SEIR_initmod_desolve(void(* odeparms) (int *, double *)) {
   static DL_FUNC get_desolve_gparms = NULL;
   if (get_desolve_gparms == NULL) {
     get_desolve_gparms =
       R_GetCCallable("deSolve", "get_deSolve_gparms");
   }
-  SEIR_internal_ds = SEIR_get_internal(get_desolve_gparms(), 1);
+  simple_SEIR_internal_ds = simple_SEIR_get_internal(get_desolve_gparms(), 1);
 }
-SEXP SEIR_contents(SEXP internal_p) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_contents(SEXP internal_p) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP contents = PROTECT(allocVector(VECSXP, 74));
   SEXP beta_set = PROTECT(allocVector(REALSXP, internal->dim_beta_set));
   memcpy(REAL(beta_set), internal->beta_set, internal->dim_beta_set * sizeof(double));
@@ -3327,8 +3327,8 @@ SEXP SEIR_contents(SEXP internal_p) {
   UNPROTECT(29);
   return contents;
 }
-SEXP SEIR_set_user(SEXP internal_p, SEXP user) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_set_user(SEXP internal_p, SEXP user) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   internal->dt = user_get_scalar_double(user, "dt", internal->dt, NA_REAL, NA_REAL);
   internal->gamma_E = user_get_scalar_double(user, "gamma_E", internal->gamma_E, NA_REAL, NA_REAL);
   internal->gamma_I = user_get_scalar_double(user, "gamma_I", internal->gamma_I, NA_REAL, NA_REAL);
@@ -3442,8 +3442,8 @@ SEXP SEIR_set_user(SEXP internal_p, SEXP user) {
   internal->interpolate_m = cinterpolate_alloc("constant", internal->dim_tt_matrix, internal->dim_m, internal->tt_matrix, internal->mix_mat_set, true, false);
   return R_NilValue;
 }
-SEXP SEIR_metadata(SEXP internal_p) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_metadata(SEXP internal_p) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP ret = PROTECT(allocVector(VECSXP, 4));
   SEXP nms = PROTECT(allocVector(STRSXP, 4));
   SET_STRING_ELT(nms, 0, mkChar("variable_order"));
@@ -3488,8 +3488,8 @@ SEXP SEIR_metadata(SEXP internal_p) {
   UNPROTECT(2);
   return ret;
 }
-SEXP SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP r_state = PROTECT(allocVector(REALSXP, internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_I + internal->dim_R));
   double * state = REAL(r_state);
   memcpy(state + 0, internal->initial_S, internal->dim_S * sizeof(double));
@@ -3500,7 +3500,7 @@ SEXP SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr) {
   UNPROTECT(1);
   return r_state;
 }
-void SEIR_rhs(SEIR_internal* internal, size_t step, double * state, double * state_next, double * output) {
+void simple_SEIR_rhs(simple_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output) {
   double * S = state + 0;
   double * E1 = state + internal->dim_S;
   double * E2 = state + internal->offset_variable_E2;
@@ -3566,18 +3566,18 @@ void SEIR_rhs(SEIR_internal* internal, size_t step, double * state, double * sta
   output[0] = time;
   memcpy(output + 1, internal->n_EI, internal->dim_n_EI * sizeof(double));
 }
-void SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal) {
-  SEIR_rhs((SEIR_internal*)internal, step, state, state_next, output);
+void simple_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal) {
+  simple_SEIR_rhs((simple_SEIR_internal*)internal, step, state, state_next, output);
 }
-SEXP SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
+SEXP simple_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
   SEXP state_next = PROTECT(allocVector(REALSXP, LENGTH(state)));
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP output_ptr = PROTECT(allocVector(REALSXP, 1 + internal->dim_n_EI));
   setAttrib(state_next, install("output"), output_ptr);
   UNPROTECT(1);
   double *output = REAL(output_ptr);
   GetRNGstate();
-  SEIR_rhs(internal, INTEGER(step)[0], REAL(state), REAL(state_next), output);
+  simple_SEIR_rhs(internal, INTEGER(step)[0], REAL(state), REAL(state_next), output);
   PutRNGstate();
   UNPROTECT(1);
   return state_next;

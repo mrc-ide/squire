@@ -12,6 +12,6 @@ test_that("population getter works", {
   expect_error(get_mixing_matrix("moon"))
   out <- get_mixing_matrix("Angola")
   expect_is(out, "matrix")
-  expect_equal(nrow(out), 17)
-  expect_equal(ncol(out), 17)
+  expect_equal(nrow(out), 16)
+  expect_equal(ncol(out), 16)
 })

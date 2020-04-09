@@ -1,9 +1,9 @@
 #' Check dimensions of inputs
 #'
-#' @inheritParams run_SEEIR_model
+#' @inheritParams run_simple_SEEIR_model
 #'
 #' @return Null if checks pass
-matrix_check_new <- function(population, contact_matrix_set){
+matrix_check <- function(population, contact_matrix_set){
 
   dims <- c(length(population),
             sapply(contact_matrix_set, dim))
@@ -14,28 +14,9 @@ matrix_check_new <- function(population, contact_matrix_set){
   return(NULL)
 }
 
-#' Check dimensions of inputs
-#'
-#' @inheritParams run_SEEIR_model
-#'
-#' @return Null if checks pass
-matrix_check <- function(population,
-                         baseline_contact_matrix,
-                         contact_matrix_set){
-
-  dims <- c(length(population), dim(baseline_contact_matrix),
-            sapply(contact_matrix_set, dim))
-  if(length(unique(dims)) != 1){
-    stop("Length of population vector, dimensions of baseline_contact_matrix
-         and dimensions of matrices in contact_matrix_set must all be equal")
-  }
-  return(NULL)
-}
-
-
 #' Check and set up initial values
 #'
-#' @inheritParams run_SEEIR_model
+#' @inheritParams run_simple_SEEIR_model
 #'
 #' @return Checked initial values data.frame
 init_check <- function(init, population){
@@ -65,7 +46,7 @@ init_check <- function(init, population){
 
 #' Check and set up initial values for explict model
 #'
-#' @inheritParams run_SEEIR_model
+#' @inheritParams run_explicit_SEEIR_model
 #'
 #' @return Checked initial values data.frame
 init_check_explicit <- function(init, population){
@@ -135,7 +116,7 @@ init_check_explicit <- function(init, population){
 #' Check time change inputs are correct
 #'
 #' @param tt Time change points
-#' @inheritParams run_SEEIR_model
+#' @inheritParams run_simple_SEEIR_model
 #'
 #' @return Nothing if check pass
 check_time_change <- function(tt, time_period){

@@ -12,3 +12,4 @@
 man/figures
 images
 scripts
+^.*\.covrignore$
