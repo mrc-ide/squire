@@ -7,8 +7,6 @@
 
 [![Travis build
 status](https://travis-ci.org/mrc-ide/squire.svg?branch=master)](https://travis-ci.org/mrc-ide/squire)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/mrc-ide/squire?branch=master&svg=true)](https://ci.appveyor.com/project/mrc-ide/squire)
 [![Codecov test
 coverage](https://codecov.io/gh/mrc-ide/squire/branch/master/graph/badge.svg)](https://codecov.io/gh/mrc-ide/squire?branch=master)
 <!-- badges: end -->
@@ -175,7 +173,7 @@ full list of model inputs, please see the function
 
 For example, changing the initial R0 (default = 3), number of replicates
 ( default = 10), simualtion length (default = 365 days) and time step
-(default = 0.25 days), as well as setting the population and contact
+(default = 0.5 days), as well as setting the population and contact
 matrix manually:
 
 ``` r
@@ -292,13 +290,13 @@ df <- data.frame("date" = Sys.Date() - 0:6,
                  "deaths" = c(6, 2, 1, 1, 0, 0, 0))
 df
 #>         date deaths
-#> 1 2020-04-08      6
-#> 2 2020-04-07      2
-#> 3 2020-04-06      1
-#> 4 2020-04-05      1
-#> 5 2020-04-04      0
-#> 6 2020-04-03      0
-#> 7 2020-04-02      0
+#> 1 2020-04-09      6
+#> 2 2020-04-08      2
+#> 3 2020-04-07      1
+#> 4 2020-04-06      1
+#> 5 2020-04-05      0
+#> 6 2020-04-04      0
+#> 7 2020-04-03      0
 ```
 
 ``` r
@@ -311,12 +309,12 @@ head(out)
 #> # Groups:   replicate [1]
 #>       t age_group replicate new_time date       name     value
 #>   <dbl>     <dbl>     <dbl>    <dbl> <date>     <chr>    <dbl>
-#> 1     1         1         1      -35 2020-03-04 S      2615338
-#> 2     1         1         1      -35 2020-03-04 E1           0
-#> 3     1         1         1      -35 2020-03-04 E2           0
-#> 4     1         1         1      -35 2020-03-04 IMild        1
-#> 5     1         1         1      -35 2020-03-04 ICase1       1
-#> 6     1         1         1      -35 2020-03-04 ICase2       1
+#> 1     1         1         1      -36 2020-03-04 S      2615338
+#> 2     1         1         1      -36 2020-03-04 E1           0
+#> 3     1         1         1      -36 2020-03-04 E2           0
+#> 4     1         1         1      -36 2020-03-04 IMild        1
+#> 5     1         1         1      -36 2020-03-04 ICase1       1
+#> 6     1         1         1      -36 2020-03-04 ICase2       1
 ```
 
 Simulation replicates are aligned to the current death total and the

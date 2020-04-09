@@ -42,7 +42,7 @@ death_data_format <- function(date = NULL,
     deaths[length(deaths)] <- n_deaths
 
     # cases
-    cases <- round(deaths*runif(length(deaths), 0.8, 1.2))
+    cases <- round(deaths*stats::runif(length(deaths), 0.8, 1.2))
 
   } else {
     if(is.null(deaths)) {
@@ -188,12 +188,14 @@ calibrate_stripped <- function(data, country, replicates = 10, ...) {
 #' Format output of calibration for plotting
 #'
 #' @details Calibration output is taken to give time series of infections, cases,
-#' cases requiring hospitilisation, case requiring critical care facilities.
+#' cases requiring hospitilisation, case requiring critical care facilities. Used
+#' in plotting for nowcasting reports.
 #'
 #' @param r Output of \code{\link{calibrate_stripped}}
 #'
 #' @export
-#' @return
+#' @return \code{list} with \code{df}: data frame of case numbers, hospital
+#'   beds, icu beds and deaths, and \code{data}: raw data used in calibration
 calibrate_output_parsing <- function(r) {
 
   ## Assertions
@@ -226,9 +228,10 @@ calibrate_output_parsing <- function(r) {
                              replicates = r$parameters$replicates, nt = nt)
 
   # collect into a long data frame
+  vars <- c("mild_cases", "hospital_cases", "deaths", "icu", "hospital_bed")
   df <- data.frame("date" = as.numeric(r$date),
                    "replicate" = as.numeric(mapply(rep, seq_len(r$parameters$replicates), nt)),
-                   "variable" = as.character(mapply(rep, c("mild_cases", "hospital_cases", "deaths", "icu", "hospital_bed"), nt*r$parameters$replicates)),
+                   "variable" = as.character(mapply(rep, vars, nt*r$parameters$replicates)),
                    "value" = c(mild_cases, hospital_cases, deaths, icu, hospital_bed))
 
   return(list(df = df, data = r$data))
