@@ -7,9 +7,10 @@
 init_check_explicit(init, population)
 }
 \arguments{
-\item{init}{Data.frame of initial conditions}
+\item{init}{Data.frame of initial conditions. Default = NULL}
 
-\item{population}{Population vector (for each age group)}
+\item{population}{Population vector (for each age group). Default = NULL,
+which will cause population to be sourced from \code{country}}
 }
 \value{
 Checked initial values data.frame

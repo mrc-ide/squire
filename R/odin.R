@@ -42,14 +42,14 @@ explict_SEIR <- structure(function (beta_set, D_0, dt, E1_0, E2_0, gamma_E, gamm
 }, ir = "odin/explict_SEIR.json", class = "odin_generator")
 class(explict_SEIR) <- "odin_generator"
 attr(explict_SEIR, "ir") <- .explict_SEIR$public_fields$ir
-.SEIR <- odin:::odin_c_class("SEIR", list(get_internal = "SEIR_get_internal", finalise = "SEIR_finalise", create = "SEIR_create", initmod_desolve = "SEIR_initmod_desolve", contents = "SEIR_contents", set_user = "SEIR_set_user", metadata = "SEIR_metadata", initial_conditions = "SEIR_initial_conditions", rhs = "SEIR_rhs", rhs_dde = "SEIR_rhs_dde", rhs_r = "SEIR_rhs_r"), c("beta_set", "dt", "E0", "E02", "gamma_E", "gamma_I", "I0", "mix_mat_set", "N_age", "R0", "S0", "tt_beta", "tt_matrix"), list(discrete = TRUE, has_array = TRUE, has_output = TRUE, has_user = TRUE, has_delay = FALSE, has_interpolate = TRUE, has_stochastic = TRUE, has_include = FALSE, initial_time_dependent = FALSE, safe = FALSE), "squire", "odin/SEIR.json", TRUE)
-SEIR <- structure(function (beta_set, dt, E0, E02, gamma_E, gamma_I,
+.simple_SEIR <- odin:::odin_c_class("simple_SEIR", list(get_internal = "simple_SEIR_get_internal", finalise = "simple_SEIR_finalise", create = "simple_SEIR_create", initmod_desolve = "simple_SEIR_initmod_desolve", contents = "simple_SEIR_contents", set_user = "simple_SEIR_set_user", metadata = "simple_SEIR_metadata", initial_conditions = "simple_SEIR_initial_conditions", rhs = "simple_SEIR_rhs", rhs_dde = "simple_SEIR_rhs_dde", rhs_r = "simple_SEIR_rhs_r"), c("beta_set", "dt", "E0", "E02", "gamma_E", "gamma_I", "I0", "mix_mat_set", "N_age", "R0", "S0", "tt_beta", "tt_matrix"), list(discrete = TRUE, has_array = TRUE, has_output = TRUE, has_user = TRUE, has_delay = FALSE, has_interpolate = TRUE, has_stochastic = TRUE, has_include = FALSE, initial_time_dependent = FALSE, safe = FALSE), "squire", "odin/simple_SEIR.json", TRUE)
+simple_SEIR <- structure(function (beta_set, dt, E0, E02, gamma_E, gamma_I,
     I0, mix_mat_set, N_age, R0, S0, tt_beta, tt_matrix, user = list(beta_set = beta_set,
         dt = dt, E0 = E0, E02 = E02, gamma_E = gamma_E, gamma_I = gamma_I,
         I0 = I0, mix_mat_set = mix_mat_set, N_age = N_age, R0 = R0,
         S0 = S0, tt_beta = tt_beta, tt_matrix = tt_matrix), unused_user_action = NULL)
 {
-    .SEIR$new(user, unused_user_action)
-}, ir = "odin/SEIR.json", class = "odin_generator")
-class(SEIR) <- "odin_generator"
-attr(SEIR, "ir") <- .SEIR$public_fields$ir
+    .simple_SEIR$new(user, unused_user_action)
+}, ir = "odin/simple_SEIR.json", class = "odin_generator")
+class(simple_SEIR) <- "odin_generator"
+attr(simple_SEIR, "ir") <- .simple_SEIR$public_fields$ir

@@ -8,7 +8,6 @@ test_that("matrix manipulation", {
     diag(i_rand) <- 1
     p_rand <- sample(1:100, 16, replace  = TRUE)
     m1 <- process_contact_matrix(i_rand, p_rand)
-    expect_true(all(diag(m1) == 1))
   }
 
 })

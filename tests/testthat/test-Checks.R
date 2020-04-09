@@ -18,15 +18,15 @@ test_that("matrix checks", {
   p <- 1:10
   b <- matrix(1:100, ncol = 10)
   m <- list(b, b)
-  expect_null(matrix_check(p, b, m))
-  expect_error(matrix_check(1:11, b, m), "Length of population vector, dimensions of baseline_contact_matrix
-         and dimensions of matrices in contact_matrix_set must all be equal")
+  expect_null(matrix_check(p, m))
+  expect_error(matrix_check(1:11, m),
+               "Length of population vector and dimensions of matrices")
   b2 = matrix(1:100, ncol = 5)
-  expect_error(matrix_check(p, b2, m), "Length of population vector, dimensions of baseline_contact_matrix
-         and dimensions of matrices in contact_matrix_set must all be equal")
+  expect_error(matrix_check(p, list(m)),
+               "Length of population vector and dimensions of matrices")
   m2 <- list(b2, b2)
-  expect_error(matrix_check(p, b, m2), "Length of population vector, dimensions of baseline_contact_matrix
-         and dimensions of matrices in contact_matrix_set must all be equal")
+  expect_error(matrix_check(p, m2),
+               "Length of population vector and dimensions of matrices")
 })
 
 test_that("init checks", {

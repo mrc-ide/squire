@@ -4,19 +4,23 @@
 \alias{calibrate}
 \title{Calibrate Model}
 \usage{
-calibrate(data, country, replicates = 100, ...)
+calibrate(data, country, parse_output = TRUE, replicates = 10, ...)
 }
 \arguments{
 \item{data}{Data frame with 2 variables: date and deaths}
 
 \item{country}{Character. Country data originates from.}
 
+\item{parse_output}{Logical. Should output be parsed ready for plotting.
+Default = TRUE}
+
 \item{replicates}{Simulation Repetitions. Default = 10}
 
 \item{...}{Other parameters to pass to \code{\link{run_explicit_SEEIR_model}}}
 }
 \value{
-Long data frame of simulation replicates
+List of formatted odin outputs, the data it is calibrated to and
+  the parameter set used in calibration
 }
 \description{
 Calibrate Model

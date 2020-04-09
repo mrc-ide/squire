@@ -7,15 +7,21 @@
 calibrate_output_parsing(r)
 }
 \arguments{
-\item{r}{Output of \code{\link{calibrate_stripped}}}
+\item{r}{Output of \code{\link{calibrate}}}
 }
 \value{
-
+\code{list} with:
+\itemize{
+      \item{df:}{ Data frame of case numbers, hospital beds, icu beds and deaths }
+      \item{data:}{ Raw data used in calibration}
+      \item{parameters:}{ Parameters used in simulation}
+      }
 }
 \description{
 Format output of calibration for plotting
 }
 \details{
 Calibration output is taken to give time series of infections, cases,
-cases requiring hospitilisation, case requiring critical care facilities.
+cases requiring hospitilisation, case requiring critical care facilities. Used
+in plotting for nowcasting reports.
 }

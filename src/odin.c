@@ -418,7 +418,7 @@ typedef struct explict_SEIR_internal {
   double *tt_beta;
   double *tt_matrix;
 } explict_SEIR_internal;
-typedef struct SEIR_internal {
+typedef struct simple_SEIR_internal {
   double *beta_set;
   double *delta_E1;
   double *delta_E2;
@@ -493,7 +493,7 @@ typedef struct SEIR_internal {
   double *temp;
   double *tt_beta;
   double *tt_matrix;
-} SEIR_internal;
+} simple_SEIR_internal;
 explict_SEIR_internal* explict_SEIR_get_internal(SEXP internal_p, int closed_error);
 static void explict_SEIR_finalise(SEXP internal_p);
 SEXP explict_SEIR_create(SEXP user);
@@ -505,17 +505,17 @@ SEXP explict_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
 void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
 void explict_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
 SEXP explict_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
-SEIR_internal* SEIR_get_internal(SEXP internal_p, int closed_error);
-static void SEIR_finalise(SEXP internal_p);
-SEXP SEIR_create(SEXP user);
-void SEIR_initmod_desolve(void(* odeparms) (int *, double *));
-SEXP SEIR_contents(SEXP internal_p);
-SEXP SEIR_set_user(SEXP internal_p, SEXP user);
-SEXP SEIR_metadata(SEXP internal_p);
-SEXP SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
-void SEIR_rhs(SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
-void SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
-SEXP SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
+simple_SEIR_internal* simple_SEIR_get_internal(SEXP internal_p, int closed_error);
+static void simple_SEIR_finalise(SEXP internal_p);
+SEXP simple_SEIR_create(SEXP user);
+void simple_SEIR_initmod_desolve(void(* odeparms) (int *, double *));
+SEXP simple_SEIR_contents(SEXP internal_p);
+SEXP simple_SEIR_set_user(SEXP internal_p, SEXP user);
+SEXP simple_SEIR_metadata(SEXP internal_p);
+SEXP simple_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
+void simple_SEIR_rhs(simple_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
+void simple_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
+SEXP simple_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
 double user_get_scalar_double(SEXP user, const char *name,
                               double default_value, double min, double max);
 int user_get_scalar_int(SEXP user, const char *name,
@@ -2746,67 +2746,71 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
   }
   {
      int i = 1;
-     internal->number_get_IMV[i - 1] = (total_number_get_IMV <= 0 ? 0 : fmin(internal->number_requiring_IMV[0], Rf_rbinom(round(total_number_get_IMV), internal->imv_multinom_prob[0] / (double) odin_sum1(internal->imv_multinom_prob, 0, 16))));
+     internal->number_get_IMV[i - 1] = (total_number_get_IMV <= 0 ? 0 : fmin(internal->number_requiring_IMV[0], Rf_rbinom(round(total_number_get_IMV), internal->imv_multinom_prob[0] / (double) odin_sum1(internal->imv_multinom_prob, 0, 17))));
   }
   {
      int i = 2;
-     internal->number_get_IMV[i - 1] = (total_number_get_IMV - internal->number_get_IMV[0] <= 0 ? 0 : fmin(internal->number_requiring_IMV[1], Rf_rbinom(round(total_number_get_IMV - internal->number_get_IMV[0]), internal->imv_multinom_prob[1] / (double) odin_sum1(internal->imv_multinom_prob, 1, 16))));
+     internal->number_get_IMV[i - 1] = (total_number_get_IMV - internal->number_get_IMV[0] <= 0 ? 0 : fmin(internal->number_requiring_IMV[1], Rf_rbinom(round(total_number_get_IMV - internal->number_get_IMV[0]), internal->imv_multinom_prob[1] / (double) odin_sum1(internal->imv_multinom_prob, 1, 17))));
   }
   {
      int i = 3;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 2)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[2], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 2)), internal->imv_multinom_prob[2] / (double) odin_sum1(internal->imv_multinom_prob, 2, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 2)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[2], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 2)), internal->imv_multinom_prob[2] / (double) odin_sum1(internal->imv_multinom_prob, 2, 17))));
   }
   {
      int i = 4;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 3)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[3], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 3)), internal->imv_multinom_prob[3] / (double) odin_sum1(internal->imv_multinom_prob, 3, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 3)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[3], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 3)), internal->imv_multinom_prob[3] / (double) odin_sum1(internal->imv_multinom_prob, 3, 17))));
   }
   {
      int i = 5;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 4)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[4], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 4)), internal->imv_multinom_prob[4] / (double) odin_sum1(internal->imv_multinom_prob, 4, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 4)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[4], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 4)), internal->imv_multinom_prob[4] / (double) odin_sum1(internal->imv_multinom_prob, 4, 17))));
   }
   {
      int i = 6;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 5)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[5], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 5)), internal->imv_multinom_prob[5] / (double) odin_sum1(internal->imv_multinom_prob, 5, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 5)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[5], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 5)), internal->imv_multinom_prob[5] / (double) odin_sum1(internal->imv_multinom_prob, 5, 17))));
   }
   {
      int i = 7;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 6)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[6], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 6)), internal->imv_multinom_prob[6] / (double) odin_sum1(internal->imv_multinom_prob, 6, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 6)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[6], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 6)), internal->imv_multinom_prob[6] / (double) odin_sum1(internal->imv_multinom_prob, 6, 17))));
   }
   {
      int i = 8;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 7)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[7], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 7)), internal->imv_multinom_prob[7] / (double) odin_sum1(internal->imv_multinom_prob, 7, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 7)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[7], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 7)), internal->imv_multinom_prob[7] / (double) odin_sum1(internal->imv_multinom_prob, 7, 17))));
   }
   {
      int i = 9;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 8)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[8], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 8)), internal->imv_multinom_prob[8] / (double) odin_sum1(internal->imv_multinom_prob, 8, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 8)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[8], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 8)), internal->imv_multinom_prob[8] / (double) odin_sum1(internal->imv_multinom_prob, 8, 17))));
   }
   {
      int i = 10;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 9)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[9], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 9)), internal->imv_multinom_prob[9] / (double) odin_sum1(internal->imv_multinom_prob, 9, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 9)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[9], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 9)), internal->imv_multinom_prob[9] / (double) odin_sum1(internal->imv_multinom_prob, 9, 17))));
   }
   {
      int i = 11;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 10)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[10], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 10)), internal->imv_multinom_prob[10] / (double) odin_sum1(internal->imv_multinom_prob, 10, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 10)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[10], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 10)), internal->imv_multinom_prob[10] / (double) odin_sum1(internal->imv_multinom_prob, 10, 17))));
   }
   {
      int i = 12;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 11)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[11], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 11)), internal->imv_multinom_prob[11] / (double) odin_sum1(internal->imv_multinom_prob, 11, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 11)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[11], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 11)), internal->imv_multinom_prob[11] / (double) odin_sum1(internal->imv_multinom_prob, 11, 17))));
   }
   {
      int i = 13;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 12)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[12], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 12)), internal->imv_multinom_prob[12] / (double) odin_sum1(internal->imv_multinom_prob, 12, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 12)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[12], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 12)), internal->imv_multinom_prob[12] / (double) odin_sum1(internal->imv_multinom_prob, 12, 17))));
   }
   {
      int i = 14;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 13)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[13], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 13)), internal->imv_multinom_prob[13] / (double) odin_sum1(internal->imv_multinom_prob, 13, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 13)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[13], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 13)), internal->imv_multinom_prob[13] / (double) odin_sum1(internal->imv_multinom_prob, 13, 17))));
   }
   {
      int i = 15;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 14)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[14], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 14)), internal->imv_multinom_prob[14] / (double) odin_sum1(internal->imv_multinom_prob, 14, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 14)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[14], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 14)), internal->imv_multinom_prob[14] / (double) odin_sum1(internal->imv_multinom_prob, 14, 17))));
   }
   {
      int i = 16;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 15)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[15], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 15)), internal->imv_multinom_prob[15] / (double) odin_sum1(internal->imv_multinom_prob, 15, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 15)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[15], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 15)), internal->imv_multinom_prob[15] / (double) odin_sum1(internal->imv_multinom_prob, 15, 17))));
+  }
+  {
+     int i = 17;
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 16)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[16], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 16)), internal->imv_multinom_prob[16] / (double) odin_sum1(internal->imv_multinom_prob, 16, 17))));
   }
   for (int i = 1; i <= internal->dim_ox_multinom_prob; ++i) {
     internal->ox_multinom_prob[i - 1] = (total_number_requiring_Ox == 0 ? internal->p_dist[i - 1] / (double) internal->N_age : ((internal->number_requiring_Ox[i - 1] * internal->p_dist[i - 1]) / (double) total_number_requiring_Ox));
@@ -2828,67 +2832,71 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
   }
   {
      int i = 1;
-     internal->number_get_Ox[i - 1] = (total_number_get_hosp <= 0 ? 0 : fmin(internal->number_requiring_Ox[0], Rf_rbinom(round(total_number_get_hosp), internal->ox_multinom_prob[0] / (double) odin_sum1(internal->ox_multinom_prob, 0, 16))));
+     internal->number_get_Ox[i - 1] = (total_number_get_hosp <= 0 ? 0 : fmin(internal->number_requiring_Ox[0], Rf_rbinom(round(total_number_get_hosp), internal->ox_multinom_prob[0] / (double) odin_sum1(internal->ox_multinom_prob, 0, 17))));
   }
   {
      int i = 2;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - internal->number_get_Ox[0]) <= 0 ? 0 : fmin(internal->number_requiring_Ox[1], Rf_rbinom(round(total_number_get_hosp - internal->number_get_Ox[0]), internal->ox_multinom_prob[1] / (double) odin_sum1(internal->ox_multinom_prob, 1, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - internal->number_get_Ox[0]) <= 0 ? 0 : fmin(internal->number_requiring_Ox[1], Rf_rbinom(round(total_number_get_hosp - internal->number_get_Ox[0]), internal->ox_multinom_prob[1] / (double) odin_sum1(internal->ox_multinom_prob, 1, 17))));
   }
   {
      int i = 3;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 2)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[2], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 2)), internal->ox_multinom_prob[2] / (double) odin_sum1(internal->ox_multinom_prob, 2, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 2)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[2], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 2)), internal->ox_multinom_prob[2] / (double) odin_sum1(internal->ox_multinom_prob, 2, 17))));
   }
   {
      int i = 4;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 3)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[3], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 3)), internal->ox_multinom_prob[3] / (double) odin_sum1(internal->ox_multinom_prob, 3, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 3)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[3], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 3)), internal->ox_multinom_prob[3] / (double) odin_sum1(internal->ox_multinom_prob, 3, 17))));
   }
   {
      int i = 5;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 4)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[4], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 4)), internal->ox_multinom_prob[4] / (double) odin_sum1(internal->ox_multinom_prob, 4, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 4)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[4], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 4)), internal->ox_multinom_prob[4] / (double) odin_sum1(internal->ox_multinom_prob, 4, 17))));
   }
   {
      int i = 6;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 5)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[5], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 5)), internal->ox_multinom_prob[5] / (double) odin_sum1(internal->ox_multinom_prob, 5, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 5)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[5], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 5)), internal->ox_multinom_prob[5] / (double) odin_sum1(internal->ox_multinom_prob, 5, 17))));
   }
   {
      int i = 7;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 6)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[6], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 6)), internal->ox_multinom_prob[6] / (double) odin_sum1(internal->ox_multinom_prob, 6, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 6)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[6], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 6)), internal->ox_multinom_prob[6] / (double) odin_sum1(internal->ox_multinom_prob, 6, 17))));
   }
   {
      int i = 8;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 7)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[7], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 7)), internal->ox_multinom_prob[7] / (double) odin_sum1(internal->ox_multinom_prob, 7, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 7)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[7], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 7)), internal->ox_multinom_prob[7] / (double) odin_sum1(internal->ox_multinom_prob, 7, 17))));
   }
   {
      int i = 9;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 8)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[8], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 8)), internal->ox_multinom_prob[8] / (double) odin_sum1(internal->ox_multinom_prob, 8, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 8)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[8], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 8)), internal->ox_multinom_prob[8] / (double) odin_sum1(internal->ox_multinom_prob, 8, 17))));
   }
   {
      int i = 10;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 9)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[9], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 9)), internal->ox_multinom_prob[9] / (double) odin_sum1(internal->ox_multinom_prob, 9, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 9)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[9], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 9)), internal->ox_multinom_prob[9] / (double) odin_sum1(internal->ox_multinom_prob, 9, 17))));
   }
   {
      int i = 11;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 10)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[10], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 10)), internal->ox_multinom_prob[10] / (double) odin_sum1(internal->ox_multinom_prob, 10, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 10)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[10], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 10)), internal->ox_multinom_prob[10] / (double) odin_sum1(internal->ox_multinom_prob, 10, 17))));
   }
   {
      int i = 12;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 11)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[11], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 11)), internal->ox_multinom_prob[11] / (double) odin_sum1(internal->ox_multinom_prob, 11, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 11)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[11], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 11)), internal->ox_multinom_prob[11] / (double) odin_sum1(internal->ox_multinom_prob, 11, 17))));
   }
   {
      int i = 13;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 12)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[12], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 12)), internal->ox_multinom_prob[12] / (double) odin_sum1(internal->ox_multinom_prob, 12, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 12)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[12], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 12)), internal->ox_multinom_prob[12] / (double) odin_sum1(internal->ox_multinom_prob, 12, 17))));
   }
   {
      int i = 14;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 13)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[13], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 13)), internal->ox_multinom_prob[13] / (double) odin_sum1(internal->ox_multinom_prob, 13, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 13)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[13], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 13)), internal->ox_multinom_prob[13] / (double) odin_sum1(internal->ox_multinom_prob, 13, 17))));
   }
   {
      int i = 15;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 14)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[14], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 14)), internal->ox_multinom_prob[14] / (double) odin_sum1(internal->ox_multinom_prob, 14, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 14)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[14], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 14)), internal->ox_multinom_prob[14] / (double) odin_sum1(internal->ox_multinom_prob, 14, 17))));
   }
   {
      int i = 16;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 15)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[15], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 15)), internal->ox_multinom_prob[15] / (double) odin_sum1(internal->ox_multinom_prob, 15, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 15)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[15], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 15)), internal->ox_multinom_prob[15] / (double) odin_sum1(internal->ox_multinom_prob, 15, 17))));
+  }
+  {
+     int i = 17;
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 16)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[16], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 16)), internal->ox_multinom_prob[16] / (double) odin_sum1(internal->ox_multinom_prob, 16, 17))));
   }
   for (int i = 1; i <= internal->dim_number_notget_IMV; ++i) {
     internal->number_notget_IMV[i - 1] = internal->number_requiring_IMV[i - 1] - internal->number_get_IMV[i - 1];
@@ -3002,19 +3010,19 @@ SEXP explict_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
   UNPROTECT(1);
   return state_next;
 }
-SEIR_internal* SEIR_get_internal(SEXP internal_p, int closed_error) {
-  SEIR_internal *internal = NULL;
+simple_SEIR_internal* simple_SEIR_get_internal(SEXP internal_p, int closed_error) {
+  simple_SEIR_internal *internal = NULL;
   if (TYPEOF(internal_p) != EXTPTRSXP) {
     Rf_error("Expected an external pointer");
   }
-  internal = (SEIR_internal*) R_ExternalPtrAddr(internal_p);
+  internal = (simple_SEIR_internal*) R_ExternalPtrAddr(internal_p);
   if (!internal && closed_error) {
     Rf_error("Pointer has been invalidated");
   }
   return internal;
 }
-void SEIR_finalise(SEXP internal_p) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 0);
+void simple_SEIR_finalise(SEXP internal_p) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 0);
   if (internal_p) {
     cinterpolate_free(internal->interpolate_beta);
     cinterpolate_free(internal->interpolate_m);
@@ -3051,8 +3059,8 @@ void SEIR_finalise(SEXP internal_p) {
     R_ClearExternalPtr(internal_p);
   }
 }
-SEXP SEIR_create(SEXP user) {
-  SEIR_internal *internal = (SEIR_internal*) Calloc(1, SEIR_internal);
+SEXP simple_SEIR_create(SEXP user) {
+  simple_SEIR_internal *internal = (simple_SEIR_internal*) Calloc(1, simple_SEIR_internal);
   internal->beta_set = NULL;
   internal->delta_E1 = NULL;
   internal->delta_E2 = NULL;
@@ -3095,21 +3103,21 @@ SEXP SEIR_create(SEXP user) {
   internal->tt_beta = NULL;
   internal->tt_matrix = NULL;
   SEXP ptr = PROTECT(R_MakeExternalPtr(internal, R_NilValue, R_NilValue));
-  R_RegisterCFinalizer(ptr, SEIR_finalise);
+  R_RegisterCFinalizer(ptr, simple_SEIR_finalise);
   UNPROTECT(1);
   return ptr;
 }
-static SEIR_internal *SEIR_internal_ds;
-void SEIR_initmod_desolve(void(* odeparms) (int *, double *)) {
+static simple_SEIR_internal *simple_SEIR_internal_ds;
+void simple_SEIR_initmod_desolve(void(* odeparms) (int *, double *)) {
   static DL_FUNC get_desolve_gparms = NULL;
   if (get_desolve_gparms == NULL) {
     get_desolve_gparms =
       R_GetCCallable("deSolve", "get_deSolve_gparms");
   }
-  SEIR_internal_ds = SEIR_get_internal(get_desolve_gparms(), 1);
+  simple_SEIR_internal_ds = simple_SEIR_get_internal(get_desolve_gparms(), 1);
 }
-SEXP SEIR_contents(SEXP internal_p) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_contents(SEXP internal_p) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP contents = PROTECT(allocVector(VECSXP, 74));
   SEXP beta_set = PROTECT(allocVector(REALSXP, internal->dim_beta_set));
   memcpy(REAL(beta_set), internal->beta_set, internal->dim_beta_set * sizeof(double));
@@ -3319,8 +3327,8 @@ SEXP SEIR_contents(SEXP internal_p) {
   UNPROTECT(29);
   return contents;
 }
-SEXP SEIR_set_user(SEXP internal_p, SEXP user) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_set_user(SEXP internal_p, SEXP user) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   internal->dt = user_get_scalar_double(user, "dt", internal->dt, NA_REAL, NA_REAL);
   internal->gamma_E = user_get_scalar_double(user, "gamma_E", internal->gamma_E, NA_REAL, NA_REAL);
   internal->gamma_I = user_get_scalar_double(user, "gamma_I", internal->gamma_I, NA_REAL, NA_REAL);
@@ -3434,8 +3442,8 @@ SEXP SEIR_set_user(SEXP internal_p, SEXP user) {
   internal->interpolate_m = cinterpolate_alloc("constant", internal->dim_tt_matrix, internal->dim_m, internal->tt_matrix, internal->mix_mat_set, true, false);
   return R_NilValue;
 }
-SEXP SEIR_metadata(SEXP internal_p) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_metadata(SEXP internal_p) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP ret = PROTECT(allocVector(VECSXP, 4));
   SEXP nms = PROTECT(allocVector(STRSXP, 4));
   SET_STRING_ELT(nms, 0, mkChar("variable_order"));
@@ -3480,8 +3488,8 @@ SEXP SEIR_metadata(SEXP internal_p) {
   UNPROTECT(2);
   return ret;
 }
-SEXP SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP r_state = PROTECT(allocVector(REALSXP, internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_I + internal->dim_R));
   double * state = REAL(r_state);
   memcpy(state + 0, internal->initial_S, internal->dim_S * sizeof(double));
@@ -3492,7 +3500,7 @@ SEXP SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr) {
   UNPROTECT(1);
   return r_state;
 }
-void SEIR_rhs(SEIR_internal* internal, size_t step, double * state, double * state_next, double * output) {
+void simple_SEIR_rhs(simple_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output) {
   double * S = state + 0;
   double * E1 = state + internal->dim_S;
   double * E2 = state + internal->offset_variable_E2;
@@ -3558,18 +3566,18 @@ void SEIR_rhs(SEIR_internal* internal, size_t step, double * state, double * sta
   output[0] = time;
   memcpy(output + 1, internal->n_EI, internal->dim_n_EI * sizeof(double));
 }
-void SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal) {
-  SEIR_rhs((SEIR_internal*)internal, step, state, state_next, output);
+void simple_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal) {
+  simple_SEIR_rhs((simple_SEIR_internal*)internal, step, state, state_next, output);
 }
-SEXP SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
+SEXP simple_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
   SEXP state_next = PROTECT(allocVector(REALSXP, LENGTH(state)));
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP output_ptr = PROTECT(allocVector(REALSXP, 1 + internal->dim_n_EI));
   setAttrib(state_next, install("output"), output_ptr);
   UNPROTECT(1);
   double *output = REAL(output_ptr);
   GetRNGstate();
-  SEIR_rhs(internal, INTEGER(step)[0], REAL(state), REAL(state_next), output);
+  simple_SEIR_rhs(internal, INTEGER(step)[0], REAL(state), REAL(state_next), output);
   PutRNGstate();
   UNPROTECT(1);
   return state_next;
