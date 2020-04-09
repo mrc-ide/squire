@@ -1,11 +1,7 @@
-library(odin.js)
-
-x <- odin.js::odin_js("inst/odin/less_basic_model_for_js.R")
-
+# Setting Up Model Parameters
 S0 <- c(100000, 100000)
 mixing_matrix <- matrix(c(5, 2, 2, 5), nrow = 2, byrow = TRUE)
 m <- t(t(mixing_matrix) / S0)
-
 pars <- list(S0 = c(100000, 1000000),
              E0 = c(0, 0),
              I_mild0 = c(100, 100),
@@ -23,6 +19,21 @@ pars <- list(S0 = c(100000, 1000000),
              beta_2 = 0.1,
              m = m)
 
+# Compile and Run Model Using odin.js
+x <- odin.js::odin_js("inst/odin/less_basic_model_for_js.R")
+mod <- x(user = pars)
+t <- seq(from = 1, to = 200)
+output <- mod$run(t)
+t <- output[, "t"]
+S <- output[, "S[1]"] + output[, "S[2]"]
+I <- apply(output[, c(4:11)], 1, sum)
+R <- output[, "R[1]"] + output[, "R[2]"]
+plot(t, S, ylim = c(0, max(S)), type = "l")
+lines(t, I, col = "red")
+lines(t, R, col = "green")
+
+# Compile and Run Model Using odin 
+x <- odin::odin("inst/odin/less_basic_model_for_js.R")
 mod <- x(user = pars)
 t <- seq(from = 1, to = 200)
 output <- mod$run(t)
