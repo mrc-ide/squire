@@ -10,6 +10,6 @@ addons:
       - libv8-dev
 r_github_packages:
   - ropensci/jsonvalidate
-  - mrc-ide/odin.js
+  - mrc-ide/odin.js@mrc-1491
 after_success:
   - Rscript -e 'covr::codecov()'
