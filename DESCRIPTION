@@ -22,6 +22,7 @@ Suggests:
 RoxygenNote: 7.1.0
 Imports: 
     odin,
+    odin.js,
     dde,
     dplyr,
     tidyr,
