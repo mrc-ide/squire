@@ -4,12 +4,19 @@
 \alias{death_data_format}
 \title{Generate death time seris}
 \usage{
-death_data_format(date = NULL, deaths = NULL, reporting_quality = 0.2)
+death_data_format(
+  date = NULL,
+  deaths = NULL,
+  cases = NULL,
+  reporting_quality = 0.2
+)
 }
 \arguments{
 \item{date}{Character or Date vector of time series}
 
 \item{deaths}{Numeric vector of deaths}
+
+\item{cases}{Numeric vector of deaths}
 
 \item{reporting_quality}{When generating synthetic data, what is the
 reporting quality, i.e. probability of reporting a death prior to the current

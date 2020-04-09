@@ -116,6 +116,8 @@ run_SEEIR_model <- function(R0 = 3,
 #' @param time_period Length of simulation. Default = 365
 #' @param dt Time Step. Default = 0.5
 #' @param replicates  Number of replicates. Default = 10
+#' @param output_transform Transport model outputs into useful format.
+#'   Default == FALSE
 #' @param init Data.frame of initial conditions. Default = NULL
 #' @param prob_hosp probability of hospitalisation by age.
 #'   Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
@@ -191,6 +193,7 @@ run_explicit_SEEIR_model <- function(
   dt = 0.5,
   replicates = 10,
   init = NULL,
+  output_transform = TRUE,
 
   # parameters
   # probabilities
@@ -403,14 +406,18 @@ run_explicit_SEEIR_model <- function(
   # Running the Model
   mod <- explict_SEIR(user = pars)
   t <- seq(from = 1, to = time_period/dt)
-  m <- mod$run(t, replicate = replicates)
-  results <- mod$transform_variables(m)
+  results <- mod$run(t, replicate = replicates)
+
+  # collect all the results
+  if (output_transform) {
+  results <- mod$transform_variables(results)
+  }
 
   # Summarise inputs
   parameters <- args
   parameters$beta_set <- beta_set
 
-  out <- list(output = results, parameters = parameters)
+  out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
   return(out)
 }

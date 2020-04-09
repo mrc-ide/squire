@@ -17,6 +17,7 @@ run_explicit_SEEIR_model(
   dt = 0.5,
   replicates = 10,
   init = NULL,
+  output_transform = TRUE,
   prob_hosp = c(0.001127564, 0.000960857, 0.001774408, 0.003628171, 0.008100662,
     0.015590734, 0.024597885, 0.035377529, 0.04385549, 0.058495518, 0.08747709,
     0.109730508, 0.153943118, 0.177242143, 0.221362219, 0.267628264),
@@ -78,6 +79,9 @@ Default = NULL, which causes beta to be estimated from R0}
 \item{replicates}{Number of replicates. Default = 10}
 
 \item{init}{Data.frame of initial conditions. Default = NULL}
+
+\item{output_transform}{Transport model outputs into useful format.
+Default == FALSE}
 
 \item{prob_hosp}{probability of hospitalisation by age.
 Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,

@@ -136,6 +136,7 @@ n_E2_I[] <- rbinom(E2[i], p_E2_I) # Number of new symptom onsets
 output(n_E2_I[]) <- TRUE
 
 n_E2_ICase1[] <- round(n_E2_I[i] * prob_hosp[i]) # Proportion of the new symptom onsets that will require hospitalisation (note: haven't entered hospital yet, delay between onset and hospitalisation)
+output(n_E2_ICase1[]) <- TRUE
 n_E2_IMild[] <- n_E2_I[i] - n_E2_ICase1[i] # 1 - Above, the rest of the infections, which we consider to be mild and not require hospitalisation
 n_IMild_R[] <- rbinom(IMild[i], p_IMild_R) # Number of mild infections recovering
 n_ICase1_ICase2[] <- rbinom(ICase1[i], p_ICase1_ICase2) # Number progressing through the onset but not hospitalised compartment
@@ -151,28 +152,28 @@ total_number_get_IMV <- if(current_free_ICUs <= 0) 0 else(if(current_free_ICUs -
 imv_multinom_prob[] <- if(total_number_requiring_IMV == 0) p_dist[i]/N_age else ((number_requiring_IMV[i]*p_dist[i])/total_number_requiring_IMV)
 #number_get_IMV[] <-  rmultinom(total_number_get_IMV, imv_multinom_prob) # Assigning the new ICU requiring cases to the available ICU beds based numbers needing and probability of being chosen for bed
 
-number_get_IMV[1] <- if (total_number_get_IMV <=0) 0 else min(number_requiring_IMV[1], rbinom(total_number_get_IMV, imv_multinom_prob[1]/sum(imv_multinom_prob[1:16])))
-number_get_IMV[2] <- if (total_number_get_IMV - number_get_IMV[1] <=0) 0 else min(number_requiring_IMV[2], rbinom(total_number_get_IMV - number_get_IMV[1], imv_multinom_prob[2]/sum(imv_multinom_prob[2:16])))
-number_get_IMV[3] <- if ((total_number_get_IMV - sum(number_get_IMV[1:2])) <=0) 0 else min(number_requiring_IMV[3], rbinom(total_number_get_IMV - sum(number_get_IMV[1:2]), imv_multinom_prob[3]/sum(imv_multinom_prob[3:16])))
-number_get_IMV[4] <- if ((total_number_get_IMV - sum(number_get_IMV[1:3])) <=0) 0 else min(number_requiring_IMV[4], rbinom(total_number_get_IMV - sum(number_get_IMV[1:3]), imv_multinom_prob[4]/sum(imv_multinom_prob[4:16])))
-number_get_IMV[5] <- if ((total_number_get_IMV - sum(number_get_IMV[1:4])) <=0) 0 else min(number_requiring_IMV[5], rbinom(total_number_get_IMV - sum(number_get_IMV[1:4]), imv_multinom_prob[5]/sum(imv_multinom_prob[5:16])))
-number_get_IMV[6] <- if ((total_number_get_IMV - sum(number_get_IMV[1:5])) <=0) 0 else min(number_requiring_IMV[6], rbinom(total_number_get_IMV - sum(number_get_IMV[1:5]), imv_multinom_prob[6]/sum(imv_multinom_prob[6:16])))
-number_get_IMV[7] <- if ((total_number_get_IMV - sum(number_get_IMV[1:6])) <=0) 0 else min(number_requiring_IMV[7], rbinom(total_number_get_IMV - sum(number_get_IMV[1:6]), imv_multinom_prob[7]/sum(imv_multinom_prob[7:16])))
-number_get_IMV[8] <- if ((total_number_get_IMV - sum(number_get_IMV[1:7])) <=0) 0 else min(number_requiring_IMV[8], rbinom(total_number_get_IMV - sum(number_get_IMV[1:7]), imv_multinom_prob[8]/sum(imv_multinom_prob[8:16])))
-number_get_IMV[9] <- if ((total_number_get_IMV - sum(number_get_IMV[1:8])) <=0) 0 else min(number_requiring_IMV[9], rbinom(total_number_get_IMV - sum(number_get_IMV[1:8]), imv_multinom_prob[9]/sum(imv_multinom_prob[9:16])))
-number_get_IMV[10] <- if ((total_number_get_IMV - sum(number_get_IMV[1:9])) <=0) 0 else min(number_requiring_IMV[10], rbinom(total_number_get_IMV - sum(number_get_IMV[1:9]), imv_multinom_prob[10]/sum(imv_multinom_prob[10:16])))
-number_get_IMV[11] <- if ((total_number_get_IMV - sum(number_get_IMV[1:10])) <=0) 0 else min(number_requiring_IMV[11], rbinom(total_number_get_IMV - sum(number_get_IMV[1:10]), imv_multinom_prob[11]/sum(imv_multinom_prob[11:16])))
-number_get_IMV[12] <- if ((total_number_get_IMV - sum(number_get_IMV[1:11])) <=0) 0 else min(number_requiring_IMV[12], rbinom(total_number_get_IMV - sum(number_get_IMV[1:11]), imv_multinom_prob[12]/sum(imv_multinom_prob[12:16])))
-number_get_IMV[13] <- if ((total_number_get_IMV - sum(number_get_IMV[1:12])) <=0) 0 else min(number_requiring_IMV[13], rbinom(total_number_get_IMV - sum(number_get_IMV[1:12]), imv_multinom_prob[13]/sum(imv_multinom_prob[13:16])))
-number_get_IMV[14] <- if ((total_number_get_IMV - sum(number_get_IMV[1:13])) <=0) 0 else min(number_requiring_IMV[14], rbinom(total_number_get_IMV - sum(number_get_IMV[1:13]), imv_multinom_prob[14]/sum(imv_multinom_prob[14:16])))
-number_get_IMV[15] <- if ((total_number_get_IMV - sum(number_get_IMV[1:14])) <=0) 0 else min(number_requiring_IMV[15], rbinom(total_number_get_IMV - sum(number_get_IMV[1:14]), imv_multinom_prob[15]/sum(imv_multinom_prob[15:16])))
-number_get_IMV[16] <- if ((total_number_get_IMV - sum(number_get_IMV[1:15])) <=0) 0 else min(number_requiring_IMV[16], rbinom(total_number_get_IMV - sum(number_get_IMV[1:15]), imv_multinom_prob[16]/sum(imv_multinom_prob[16:16])))
+number_get_IMV[1] <- if (total_number_get_IMV <= 0) 0 else min(number_requiring_IMV[1], rbinom(total_number_get_IMV, imv_multinom_prob[1]/sum(imv_multinom_prob[1:16])))
+number_get_IMV[2] <- if (total_number_get_IMV - number_get_IMV[1] <= 0) 0 else min(number_requiring_IMV[2], rbinom(total_number_get_IMV - number_get_IMV[1], imv_multinom_prob[2]/sum(imv_multinom_prob[2:16])))
+number_get_IMV[3] <- if ((total_number_get_IMV - sum(number_get_IMV[1:2])) <= 0) 0 else min(number_requiring_IMV[3], rbinom(total_number_get_IMV - sum(number_get_IMV[1:2]), imv_multinom_prob[3]/sum(imv_multinom_prob[3:16])))
+number_get_IMV[4] <- if ((total_number_get_IMV - sum(number_get_IMV[1:3])) <= 0) 0 else min(number_requiring_IMV[4], rbinom(total_number_get_IMV - sum(number_get_IMV[1:3]), imv_multinom_prob[4]/sum(imv_multinom_prob[4:16])))
+number_get_IMV[5] <- if ((total_number_get_IMV - sum(number_get_IMV[1:4])) <= 0) 0 else min(number_requiring_IMV[5], rbinom(total_number_get_IMV - sum(number_get_IMV[1:4]), imv_multinom_prob[5]/sum(imv_multinom_prob[5:16])))
+number_get_IMV[6] <- if ((total_number_get_IMV - sum(number_get_IMV[1:5])) <= 0) 0 else min(number_requiring_IMV[6], rbinom(total_number_get_IMV - sum(number_get_IMV[1:5]), imv_multinom_prob[6]/sum(imv_multinom_prob[6:16])))
+number_get_IMV[7] <- if ((total_number_get_IMV - sum(number_get_IMV[1:6])) <= 0) 0 else min(number_requiring_IMV[7], rbinom(total_number_get_IMV - sum(number_get_IMV[1:6]), imv_multinom_prob[7]/sum(imv_multinom_prob[7:16])))
+number_get_IMV[8] <- if ((total_number_get_IMV - sum(number_get_IMV[1:7])) <= 0) 0 else min(number_requiring_IMV[8], rbinom(total_number_get_IMV - sum(number_get_IMV[1:7]), imv_multinom_prob[8]/sum(imv_multinom_prob[8:16])))
+number_get_IMV[9] <- if ((total_number_get_IMV - sum(number_get_IMV[1:8])) <= 0) 0 else min(number_requiring_IMV[9], rbinom(total_number_get_IMV - sum(number_get_IMV[1:8]), imv_multinom_prob[9]/sum(imv_multinom_prob[9:16])))
+number_get_IMV[10] <- if ((total_number_get_IMV - sum(number_get_IMV[1:9])) <= 0) 0 else min(number_requiring_IMV[10], rbinom(total_number_get_IMV - sum(number_get_IMV[1:9]), imv_multinom_prob[10]/sum(imv_multinom_prob[10:16])))
+number_get_IMV[11] <- if ((total_number_get_IMV - sum(number_get_IMV[1:10])) <= 0) 0 else min(number_requiring_IMV[11], rbinom(total_number_get_IMV - sum(number_get_IMV[1:10]), imv_multinom_prob[11]/sum(imv_multinom_prob[11:16])))
+number_get_IMV[12] <- if ((total_number_get_IMV - sum(number_get_IMV[1:11])) <= 0) 0 else min(number_requiring_IMV[12], rbinom(total_number_get_IMV - sum(number_get_IMV[1:11]), imv_multinom_prob[12]/sum(imv_multinom_prob[12:16])))
+number_get_IMV[13] <- if ((total_number_get_IMV - sum(number_get_IMV[1:12])) <= 0) 0 else min(number_requiring_IMV[13], rbinom(total_number_get_IMV - sum(number_get_IMV[1:12]), imv_multinom_prob[13]/sum(imv_multinom_prob[13:16])))
+number_get_IMV[14] <- if ((total_number_get_IMV - sum(number_get_IMV[1:13])) <= 0) 0 else min(number_requiring_IMV[14], rbinom(total_number_get_IMV - sum(number_get_IMV[1:13]), imv_multinom_prob[14]/sum(imv_multinom_prob[14:16])))
+number_get_IMV[15] <- if ((total_number_get_IMV - sum(number_get_IMV[1:14])) <= 0) 0 else min(number_requiring_IMV[15], rbinom(total_number_get_IMV - sum(number_get_IMV[1:14]), imv_multinom_prob[15]/sum(imv_multinom_prob[15:16])))
+number_get_IMV[16] <- if ((total_number_get_IMV - sum(number_get_IMV[1:15])) <= 0) 0 else min(number_requiring_IMV[16], rbinom(total_number_get_IMV - sum(number_get_IMV[1:15]), imv_multinom_prob[16]/sum(imv_multinom_prob[16:16])))
 
-output(number_notget_IMV[]) <- TRUE
-output(number_requiring_IMV[]) <- TRUE
-output(number_get_IMV[]) <- TRUE
-output(imv_multinom_prob[]) <- TRUE
-output(total_number_get_IMV) <- TRUE
+# output(number_notget_IMV[]) <- TRUE
+# output(number_requiring_IMV[]) <- TRUE
+# output(number_get_IMV[]) <- TRUE
+# output(imv_multinom_prob[]) <- TRUE
+# output(total_number_get_IMV) <- TRUE
 
 n_IMVGetDie1[] <- round(number_get_IMV[i] * prob_severe_death_treatment[i]) # Number of individuals requiring mechanical ventilation and who recieve it who die
 n_IMVGetDie1_IMVGetDie2[] <- rbinom(IMVGetDie1[i], p_IMVGetDie1_IMVGetDie2) # Progression through the "require and receive mechanical ventilation but still die" compartment
@@ -225,11 +226,11 @@ n_IOxGetLive1_IOxGetLive2[] <- rbinom(IOxGetLive1[i], p_IOxGetLive1_IOxGetLive2)
 n_IOxGetLive2_R[] <- rbinom(IOxGetLive2[i], p_IOxGetLive2_R) # Progression through the "require and receive oxygen and survive" compartment to recovery
 
 number_notget_Ox[] <- number_requiring_Ox[i] - number_get_Ox[i] # Calculating the number of cases requiring a hospital bed and who do not receive it
-output(number_notget_Ox[]) <- TRUE
-output(number_requiring_Ox[]) <- TRUE
-output(number_get_Ox[]) <- TRUE
-output(ox_multinom_prob[]) <- TRUE
-output(total_number_get_hosp) <- TRUE
+# output(number_notget_Ox[]) <- TRUE
+# output(number_requiring_Ox[]) <- TRUE
+# output(number_get_Ox[]) <- TRUE
+# output(ox_multinom_prob[]) <- TRUE
+# output(total_number_get_hosp) <- TRUE
 
 n_IOxNotGetDie1[] <- round(number_notget_Ox[i] * prob_non_severe_death_no_treatment[i]) # Number of individuals requiring oxygen but do not receive it and who die
 n_IOxNotGetDie1_IOxNotGetDie2[] <- rbinom(IOxNotGetDie1[i], p_IOxNotGetDie1_IOxNotGetDie2) # Progression through the "require but do not receive oxygen and die" compartment
@@ -273,6 +274,7 @@ delta_IRec1[] <- n_IMVGetLive2_Rec[i] - n_IRec1_IRec2[i]
 delta_IRec2[] <- n_IRec1_IRec2[i] - n_IRec2_R[i]
 delta_R[] <- n_IOxGetLive2_R[i] + n_IOxNotGetLive2_R[i] + n_IRec2_R[i] + n_IMVNotGetLive2_R[i] + n_IMild_R[i]
 delta_D[] <- n_IOxGetDie2_D[i] + n_IOxNotGetDie2_D[i] + n_IMVGetDie2_D[i] + n_IMVNotGetDie_2_D[i]
+output(delta_D[]) <- TRUE
 
 ##Compute the Force of infection
 
