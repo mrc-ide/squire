@@ -1,53 +1,35 @@
 library(odin.js)
-x <- odin::odin("inst/odin/basic_model_for_js.R")
-pars <- list(S0 = 100000,
-             E0 = 0,
-             I_mild0 = 100,
-             I_hosp0 = 100,
-             I_ICU0 = 100,
-             R0 = 0,
-             D0 = 0,
-             gamma = 0.3,
-             sigma = 0.3,
-             mu = 0.01,
-             p_mild = 0.33,
-             p_hosp = 0.33, 
-             p_ICU = 0.34,
-             beta_1 = 0.5, 
-             beta_2 = 0.5,
-             contact_1 = 1, 
-             contact_2 = 1)
 
-mod <- x(user = pars)
-t <- seq(from = 1, to = 1000)
-m <- mod$run(t)
-results <- mod$transform_variables(m)
-plot(m[, "t"], m[, "S"], ylim = c(0, max(m[, "S"])))
-lines(m[, "t"], m[, "R"], lwd = 2)
+x <- odin.js::odin_js("inst/odin/less_basic_model_for_js.R")
 
+S0 <- c(100000, 100000)
+mixing_matrix <- matrix(c(5, 2, 2, 5), nrow = 2, byrow = TRUE)
+m <- t(t(mixing_matrix) / S0)
 
-x <- odin::odin("inst/odin/less_basic_model_for_js.R")
-pars <- list(S0 = 100000,
+pars <- list(S0 = c(100000, 1000000),
              E0 = c(0, 0),
-             I_mild0 = 100,
-             I_hosp0 = 100,
-             I_ICU0 = 100,
-             R0 = 0,
-             D0 = 0,
+             I_mild0 = c(100, 100),
+             I_hosp0 = c(100, 100),
+             I_ICU0 = c(100, 100),
+             R0 = c(0, 0),
+             D0 = c(0, 0),
              gamma = 0.3,
              sigma = 0.3,
              mu = 0.01,
-             p_mild = 0.33,
-             p_hosp = 0.33, 
-             p_ICU = 0.34,
-             beta_1 = 0.5, 
-             beta_2 = 0.5,
-             contact_1 = 1, 
-             contact_2 = 1)
+             p_mild = c(0.33, 0.33),
+             p_hosp = c(0.33, 0.33), 
+             p_ICU = c(0.34, 0.34),
+             beta_1 = 0.1, 
+             beta_2 = 0.1,
+             m = m)
 
 mod <- x(user = pars)
-t <- seq(from = 1, to = 1000)
-m <- mod$run(t)
-results <- mod$transform_variables(m)
-plot(m[, "t"], m[, "S"], ylim = c(0, max(m[, "S"])))
-lines(m[, "t"], m[, "R"], lwd = 2)
+t <- seq(from = 1, to = 200)
+output <- mod$run(t)
+t <- output[, "t"]
+S <- output[, "S[1]"] + output[, "S[2]"]
+I <- apply(output[, c(4:11)], 1, sum)
+R <- output[, "R[1]"] + output[, "R[2]"]
+plot(t, S, ylim = c(0, max(S)), type = "l")
+lines(t, I, col = "red")
+lines(t, R, col = "green")

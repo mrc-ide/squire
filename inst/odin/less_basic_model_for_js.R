@@ -1,47 +1,75 @@
-## Initial states:
-initial(S) <- S0 # will be user-defined
+## Initial States
+initial(S[]) <- S0[i] 
 initial(E[]) <- E0[i]
-initial(I_mild) <- I_mild0 # will be user-defined
-initial(I_hosp) <- I_hosp0 # will be user-defined
-initial(I_ICU) <- I_ICU0 # will be user-defined
-initial(R) <- R0
-initial(D) <- D0
+initial(I_mild[]) <- I_mild0[i] 
+initial(I_hosp[]) <- I_hosp0[i] 
+initial(I_ICU[]) <- I_ICU0[i] 
+initial(R[]) <- R0[i]
+initial(D[]) <- D0[i]
+
+# Calculating Force of Infection
+temp[] <- I_mild[i] + I_hosp[i] + I_ICU[i]
+s_ij[, ] <- m[i, j] * temp[j]
+lambda[] <- beta * sum(s_ij[i, ])
+
+# Changing Values for Beta and Contact
+beta <- if (t < 50) beta_1 else beta_2
 
 ## Core equations for transitions between compartments:
-deriv(S) <- -beta * S * (I_mild + I_hosp + I_ICU) / N
-deriv(E[1]) <- beta * contact * S * (I_mild + I_hosp + I_ICU) / N - gamma * E[1]
-deriv(E[2]) <- gamma * E[1] - gamma * E[2]
-deriv(I_mild) <- p_mild * (gamma * E[2]) - sigma * I_mild - mu * I_mild
-deriv(I_hosp) <- p_hosp * (gamma * E[2]) - sigma * I_hosp - mu * I_hosp
-deriv(I_ICU) <- p_ICU * (gamma * E[2]) - sigma * I_ICU - mu * I_ICU
-deriv(R) <- sigma * I_mild + sigma * I_hosp + sigma * I_ICU
-deriv(D) <- mu * I_mild + mu * I_hosp + mu * I_ICU
+deriv(S[]) <- -beta * S[i] * lambda[i]
+deriv(E[]) <- beta * S[i] * lambda[i] - gamma * E[i]
+deriv(I_mild[]) <- p_mild[i] * (gamma * E[i]) - sigma * I_mild[i] - mu * I_mild[i]
+deriv(I_hosp[]) <- p_hosp[i] * (gamma * E[i]) - sigma * I_hosp[i] - mu * I_hosp[i]
+deriv(I_ICU[]) <- p_ICU[i] * (gamma * E[i]) - sigma * I_ICU[i] - mu * I_ICU[i]
+deriv(R[]) <- sigma * I_mild[i] + sigma * I_hosp[i] + sigma * I_ICU[i]
+deriv(D[]) <- mu * I_mild[i] + mu * I_hosp[i] + mu * I_ICU[i]
 
-## Total population size (odin will recompute this at each timestep:
-## automatically)
-N <- S + E[1] + E[2] + I_mild + I_hosp + I_ICU + R + D
 
 ## User defined parameters - default in parentheses:
-S0 <- user()
+S0[] <- user()
+dim(S0) <- 2
+dim(S) <- 2
+
 E0[] <- user()
 dim(E0) <- 2
 dim(E) <- 2
-I_mild0 <- user()
-I_hosp0 <- user()
-I_ICU0 <- user()
-R0 <- user()
-D0 <- user()
+
+I_mild0[] <- user()
+dim(I_mild0) <- 2
+dim(I_mild) <- 2
+
+I_hosp0[] <- user()
+dim(I_hosp0) <- 2
+dim(I_hosp) <- 2
+
+I_ICU0[] <- user()
+dim(I_ICU0) <- 2
+dim(I_ICU) <- 2
+
+R0[] <- user()
+dim(R0) <- 2
+dim(R) <- 2
+
+D0[] <- user()
+dim(D0) <- 2
+dim(D) <- 2
+
+# Parameters
 gamma <- user()
 sigma <- user()
 mu <- user()
-p_mild <- user()
-p_hosp <- user()
-p_ICU <- user()
 beta_1 <- user()
 beta_2 <- user()
-contact_1 <- user()
-contact_2 <- user()
 
-# Changing Values for beta
-beta <- if (t < 50) beta_1 else beta_2
-contact <- if (t < 50) contact_1 else contact_2
+p_mild[] <- user()
+dim(p_mild) <- 2
+p_hosp[] <- user()
+dim(p_hosp) <- 2
+p_ICU[] <- user()
+dim(p_ICU) <- 2
+
+m[, ] <- user()
+dim(m) <- c(2, 2)
+dim(temp) <- 2
+dim(s_ij) <- c(2, 2)
+dim(lambda) <- 2
