@@ -1,3 +1,54 @@
+#' Extract All Model Ouputs
+#'
+#' @param model_output squire_simulation object representing the output from running
+#'   run_explicit_SEEIR
+#'
+#' @return output
+#' @export
+#'
+# #' @examples
+
+extract_all_outputs <- function(squire_object) {
+
+  if (is(squire_object) != "squire_simulation") {
+    stop("model_output must be a squire_simulation object")
+  }
+
+  model_output <- squire_object$output
+
+  # Aggregate Model Outputs Over Compartments Referring to Same State
+  t <- model_output$time[, 1]
+  S <- model_output$S
+  E <- model_output$E1 + model_output$E2
+  IMild <- model_output$IMild
+  ICase <- model_output$ICase1 + model_output$ICase2
+  IOx <- model_output$IOxGetLive1 + model_output$IOxGetLive2 + model_output$IOxGetDie1 +
+    model_output$IOxGetDie2 + model_output$IOxNotGetLive1 + model_output$IOxNotGetLive2 +
+    model_output$IOxNotGetDie1 + model_output$IOxNotGetDie2
+  IMV <- model_output$IMVGetLive1 + model_output$IMVGetLive2 + model_output$IMVGetDie1 +
+    model_output$IMVGetDie2 + model_output$IMVNotGetLive1 + model_output$IMVNotGetLive2 +
+    model_output$IMVNotGetDie1 + model_output$IMVNotGetDie2
+  IRec <- model_output$IRec1 + model_output$IRec2
+  R <- model_output$R
+  D <- model_output$D
+
+  # Output Aggregated Model Outputs as List
+  output <- list(t = t,
+                 S = S,
+                 E = E,
+                 IMild = IMild,
+                 ICase = ICase,
+                 IOx = IOx,
+                 IMV = IMV,
+                 IRec = IRec,
+                 R = R,
+                 D = D)
+
+  return(output)
+}
+
+
+
 #' Extract Relevant Model Ouputs
 #'
 #' @param model_output squire_simulation object representing the output from running
@@ -10,15 +61,17 @@
 #'
 # #' @examples
 
-extract_output <- function(model_output, output_required) {
+extract_specific_output <- function(squire_object, output_required) {
+
+  if (is(squire_object) != "squire_simulation") {
+    stop("model_output must be a squire_simulation object")
+  }
+
+  model_output <- squire_object$output
 
   possible_outputs <- c("infections", "deaths", "hospital", "ICU")
   if (!(output_required %in% possible_outputs)) {
     stop("output_required must equal one of infections, deaths, hospital or ICU")
-  }
-
-  if (is(model_output) != "squire_simulation") {
-    stop("model_output must be a squire_simulation object")
   }
 
   if (output_required == "infections") {
