@@ -4,10 +4,12 @@
 \alias{long_output}
 \title{Convert model output to long format}
 \usage{
-long_output(m)
+long_output(m, vars = NULL)
 }
 \arguments{
 \item{m}{Model output}
+
+\item{vars}{Character vector of variable names to select}
 }
 \value{
 Long format model output data.frame
