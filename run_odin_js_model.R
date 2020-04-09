@@ -22,7 +22,7 @@ pars <- list(S0 = c(100000, 1000000),
 # Compile and Run Model Using odin.js
 path <- system.file("odin/less_basic_model_for_js.R",
                     package = "squire", mustWork = TRUE)
-x <- odin.js::odin_js("inst/odin/less_basic_model_for_js.R")
+x <- odin.js::odin_js(path)
 mod <- x(user = pars)
 t <- seq(from = 1, to = 200)
 output <- mod$run(t)
