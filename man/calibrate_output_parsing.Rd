@@ -12,9 +12,9 @@ calibrate_output_parsing(r)
 \value{
 \code{list} with:
 \itemize{
-      \item{"df"}{data frame of case numbers, hospital beds, icu beds and deaths }
-      \item{"data"}{raw data used in calibration}
-      \item{"parameters"}{parameters used in simulation}
+      \item{df:}{ Data frame of case numbers, hospital beds, icu beds and deaths }
+      \item{data:}{ Raw data used in calibration}
+      \item{parameters:}{ Parameters used in simulation}
       }
 }
 \description{
