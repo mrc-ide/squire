@@ -14,7 +14,8 @@ Encoding: UTF-8
 LazyData: true
 Suggests: 
     testthat (>= 2.1.0),
-    covr
+    covr,
+    readxl
 RoxygenNote: 7.0.2
 Imports: 
     odin,

@@ -161,3 +161,4 @@ test_that("run explicit works", {
   expect_true(!identical(r1$output, r5$output))
 
 })
+

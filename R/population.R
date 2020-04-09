@@ -24,7 +24,11 @@ get_mixing_matrix <-  function(country){
   if(!country %in% unique(squire::population$country)){
     stop("Country not found")
   }
+
+  pop <- get_population(country)
+
   mm <- squire::population$matrix[match(country, squire::population$country)]
   mm <- squire::contact_matrices[[mm]]
+
   return(mm)
 }

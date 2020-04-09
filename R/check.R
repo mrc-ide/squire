@@ -3,6 +3,22 @@
 #' @inheritParams run_SEEIR_model
 #'
 #' @return Null if checks pass
+matrix_check_new <- function(population, contact_matrix_set){
+
+  dims <- c(length(population),
+            sapply(contact_matrix_set, dim))
+  if(length(unique(dims)) != 1){
+    stop("Length of population vector and dimensions of matrices
+         in contact_matrix_set must all be equal")
+  }
+  return(NULL)
+}
+
+#' Check dimensions of inputs
+#'
+#' @inheritParams run_SEEIR_model
+#'
+#' @return Null if checks pass
 matrix_check <- function(population,
                          baseline_contact_matrix,
                          contact_matrix_set){

@@ -1,9 +1,33 @@
 # Process raw data
 
-# Contact Matrices
-# TODO: have the full processing of raw data here
-# TODO: COntact matrices[[11]] has dim c(12, 12) - different to all others
+# Contact Matrices sourced from literature used in the global report
+# We will adjust these to have an 75-59 and an 80+ contact matrix row to reflect
+# available UK severity probabilities
 contact_matrices <- readRDS("data-raw/contact_matrices.rds")
+
+for(i in seq_along(contact_matrices)) {
+
+  if(nrow(contact_matrices[[i]]) == 16) {
+    contact_matrices[[i]] <- as.matrix(contact_matrices[[i]])
+    contact_matrices[[i]] <- rbind(contact_matrices[[i]], contact_matrices[[i]][16,])
+    contact_matrices[[i]] <- cbind(contact_matrices[[i]], contact_matrices[[i]][,16])
+
+    mm<-rbind(mm,mm[16,])
+    mm<-cbind(mm,mm[,16]*squire::population$n[which(squire::population$country==country)][17]/sum(squire::population$n[which(squire::population$country==country)][16:17]))
+    mm[,16]<-mm[,16]*squire::population$n[which(squire::population$country==country)][16]/sum(squire::population$n[which(squire::population$country==country)][16:17])
+    return(mm)
+
+
+    rn <- c("[0,5)","[5,10)","[10,15)","[15,20)","[20,25)","[25,30)","[30,35)",
+            "[35,40)","[40,45)","[45,50)","[50,55)","[55,60)","[60,65)","[65,70)",
+            "[70,75)","[75,80)","80+")
+    rownames(contact_matrices[[i]]) <- rn
+    colnames(contact_matrices[[i]]) <- rn
+  }
+
+}
+
+
 usethis::use_data(contact_matrices, overwrite = TRUE)
 
 # Demography
@@ -11,9 +35,9 @@ demog <- read.csv("data-raw/WPP_demog_matrix.csv", stringsAsFactors = FALSE)
 
 population <- demog %>%
   dplyr::rename(country = "Region..subregion..country.or.area..") %>%
-  dplyr::mutate(`X75+` = X75.79 + X80.84 + X85.89 + X90.94 + X95.99 + X100.) %>%
+  dplyr::mutate(`X80+` = X80.84 + X85.89 + X90.94 + X95.99 + X100.) %>%
   dplyr::select(country, X0.4,   X5.9,   X10.14, X15.19, X20.24, X25.29, X30.34, X35.39,
-                  X40.44, X45.49, X50.54, X55.59, X60.64, X65.69, X70.74, `X75+`) %>%
+                  X40.44, X45.49, X50.54, X55.59, X60.64, X65.69, X70.74, X75.79,`X80+`) %>%
   tidyr::pivot_longer(cols = -country, names_to = "age_group", values_to = "n",
                       names_prefix = "X") %>%
   dplyr::mutate(age_group = stringr::str_replace(age_group, "[.]", "-"),
@@ -34,10 +58,9 @@ population$age_group <- factor(population$age_group, levels = c("0-4",
                                                                 "60-64",
                                                                 "65-69",
                                                                 "70-74",
-                                                                "75+"))
+                                                                "75-79",
+                                                                "80+"))
 population$matrix <- demog$Matrix[match(population$country, demog$Region..subregion..country.or.area..)]
-
-population$prop_80_plus<-1-(demog$X75.79/(demog$X75.79+demog$X80.84+demog$X85.89+demog$X90.94+demog$X95.99+demog$X100.))[match(population$country, demog$Region..subregion..country.or.area..)]
 
 # Fix ASCII encoding package error
 Encoding(population$country) <- "latin1"

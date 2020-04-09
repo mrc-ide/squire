@@ -10,12 +10,14 @@ calibrate_output_parsing(r)
 \item{r}{Output of \code{\link{calibrate_stripped}}}
 }
 \value{
-
+\code{list} with \code{df}: data frame of case numbers, hospital
+  beds, icu beds and deaths, and \code{data}: raw data used in calibration
 }
 \description{
 Format output of calibration for plotting
 }
 \details{
 Calibration output is taken to give time series of infections, cases,
-cases requiring hospitilisation, case requiring critical care facilities.
+cases requiring hospitilisation, case requiring critical care facilities. Used
+in plotting for nowcasting reports.
 }

@@ -179,7 +179,6 @@ run_explicit_SEEIR_model <- function(
   # demography
   country = NULL,
   population = NULL,
-  baseline_contact_matrix = NULL,
   tt_contact_matrix = 0,
   contact_matrix_set = NULL,
 
@@ -197,18 +196,27 @@ run_explicit_SEEIR_model <- function(
 
   # parameters
   # probabilities
-  prob_hosp = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
-                0.008100662, 0.015590734, 0.024597885, 0.035377529,
-                0.04385549, 0.058495518, 0.08747709, 0.109730508,
-                0.153943118, 0.177242143, 0.221362219, 0.267628264),
+  # prob_hosp = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
+  #               0.008100662, 0.015590734, 0.024597885, 0.035377529,
+  #               0.04385549, 0.058495518, 0.08747709, 0.109730508,
+  #               0.153943118, 0.177242143, 0.221362219, 0.267628264, 0.272727273),
+  prob_hosp = c(0.000744192, 0.000634166,0.001171109, 0.002394593, 0.005346437 ,
+                0.010289885, 0.016234604, 0.023349169, 0.028944623, 0.038607042 ,
+                0.057734879, 0.072422135, 0.101602458, 0.116979814, 0.146099064,
+                0.176634654 ,0.180000000),
   prob_severe = c(3.73755E-05, 3.18497E-05, 5.88166E-05, 0.000120264,
                   0.000268514, 0.000516788, 0.00081535, 0.001242525,
                   0.001729275, 0.002880196, 0.00598205, 0.010821894,
-                  0.022736324, 0.035911156, 0.056362032, 0.081467057),
-  prob_non_severe_death_treatment = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
-                            0.0125702, 0.0125702, 0.0125702, 0.013361147,
-                            0.015104687, 0.019164124, 0.027477519, 0.041762108,
-                            0.068531658, 0.105302319, 0.149305732, 0.20349534),
+                  0.022736324, 0.035911156, 0.056362032, 0.081467057, 0.1277),
+  # prob_non_severe_death_treatment = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
+  #                                     0.0125702, 0.0125702, 0.0125702, 0.013361147,
+  #                                     0.015104687, 0.019164124, 0.027477519, 0.041762108,
+  #                                     0.068531658, 0.105302319, 0.149305732, 0.20349534, 0.5804312),
+  prob_non_severe_death_treatment = c(0.02576033, 0.02576033, 0.02576033, 0.02576033,
+                                      0.02576033, 0.02576033, 0.02576033, 0.02733770,
+                                      0.03079716, 0.03875886, 0.05466947, 0.08083335,
+                                      0.12622279, 0.18184908, 0.23992878, 0.30123983,
+                                      0.55500337),
   prob_non_severe_death_no_treatment = prob_non_severe_death_treatment * 2,
   prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
   prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
@@ -242,31 +250,34 @@ run_explicit_SEEIR_model <- function(
 
   # Handle country population args
   if (is.null(country) &&
-      (is.null(population) && is.null(baseline_contact_matrix))) {
+      (is.null(population) && is.null(contact_matrix_set))) {
     stop("User must provide either the country being simulated or
-         both the population size and baseline_contact_matrix")
+         both the population size and contact_matrix_set")
   }
 
   # If a country was provided then grab the population and matrices if needed
-  if (!is.null(country) & is.null(population)) {
+  if (is.null(population)) {
     population <- get_population(country)
 
-  if (is.null(baseline_contact_matrix)) {
-      baseline_contact_matrix <- contact_matrices[[population$matrix[1]]]
+  if (is.null(contact_matrix_set)) {
+    contact_matrix_set <- get_mixing_matrix(country)
+  }
+    population <- population$n
   }
 
-    population <- population$n
-
+  # Standardise contact matrix set
+  if(is.matrix(contact_matrix_set)){
+    contact_matrix_set <- list(contact_matrix_set)
   }
 
   # populate contact matrix set if not provided
-  if (is.null(contact_matrix_set)) {
+  if (length(contact_matrix_set) == 1) {
+      baseline <- contact_matrix_set[[1]]
       contact_matrix_set <- vector("list", length(tt_contact_matrix))
       for(i in seq_along(tt_contact_matrix)) {
-        contact_matrix_set[[i]] <- baseline_contact_matrix
+        contact_matrix_set[[i]] <- baseline
       }
   }
-
 
   # Initail state and matrix formatting
   # ----------------------------------------------------------------------------
@@ -274,17 +285,12 @@ run_explicit_SEEIR_model <- function(
   # Initialise initial conditions
   init <- init_check_explicit(init, population)
 
-  # Standardise contact matrix set
-  if(is.matrix(contact_matrix_set)){
-    contact_matrix_set <- list(contact_matrix_set)
-  }
-
   # Convert contact matrices to input matrices
   matrices_set <- matrix_set(contact_matrix_set, population)
 
   # Input checks
   # ----------------------------------------------------------------------------
-  mc <- matrix_check(population, baseline_contact_matrix, contact_matrix_set)
+  mc <- matrix_check_new(population[-1], contact_matrix_set)
   stopifnot(length(R0) == length(tt_R0))
   stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
   tc <- lapply(list(tt_R0, tt_contact_matrix), check_time_change, time_period)
@@ -340,7 +346,7 @@ run_explicit_SEEIR_model <- function(
   beta_set <- beta_est_explicit(dur_R = dur_R,
                                 dur_hosp = dur_hosp,
                                 prob_hosp = prob_hosp,
-                                mixing_matrix = baseline_contact_matrix,
+                                mixing_matrix = process_contact_matrix(contact_matrix_set[[1]], population),
                                 R0 = R0)
   }
 
