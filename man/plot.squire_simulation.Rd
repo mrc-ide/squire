@@ -4,10 +4,25 @@
 \alias{plot.squire_simulation}
 \title{squire simulation plot}
 \usage{
-\method{plot}{squire_simulation}(x, ...)
+\method{plot}{squire_simulation}(
+  x,
+  replicates = FALSE,
+  ci = FALSE,
+  var_select = NULL,
+  summary_f = mean,
+  ...
+)
 }
 \arguments{
 \item{x}{An iccm_simulation object}
+
+\item{replicates}{Plot replicates}
+
+\item{ci}{Plot 2.5 and 97.5 quantiles for each compartment}
+
+\item{var_select}{Vector of variable names to plot (default is all)}
+
+\item{summary_f}{Function to summarise each compartment  passed to the \code{fun} argument of \code{\link[ggplot2]{stat_summary}}}
 
 \item{...}{additional arguments affecting the plot produced.}
 }
