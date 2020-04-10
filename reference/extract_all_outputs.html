@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Estimate beta parameter — beta_est • squire</title>
+<title>Extract All Model Ouputs — extract_all_outputs • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Estimate beta parameter — beta_est" />
-<meta property="og:description" content="Estimate beta parameter" />
+<meta property="og:title" content="Extract All Model Ouputs — extract_all_outputs" />
+<meta property="og:description" content="Extract All Model Ouputs" />
 
 
 
@@ -111,37 +111,30 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Estimate beta parameter</h1>
+    <h1>Extract All Model Ouputs</h1>
     
-    <div class="hidden name"><code>beta_est.Rd</code></div>
+    <div class="hidden name"><code>extract_all_outputs.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Estimate beta parameter</p>
+    <p>Extract All Model Ouputs</p>
     </div>
 
-    <pre class="usage"><span class='fu'>beta_est</span>(<span class='no'>duration_infectiousness</span>, <span class='no'>mixing_matrix</span>, <span class='no'>R0</span>)</pre>
+    <pre class="usage"><span class='fu'>extract_all_outputs</span>(<span class='no'>x</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>duration_infectiousness</th>
-      <td><p>Duration of infectiousness (days)</p></td>
-    </tr>
-    <tr>
-      <th>mixing_matrix</th>
-      <td><p>Mixing matrix</p></td>
-    </tr>
-    <tr>
-      <th>R0</th>
-      <td><p>Basic reproduction number</p></td>
+      <th>x</th>
+      <td><p><code>squire_simulation</code> object representing the output from running
+<code><a href='run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model(output_transform = TRUE)</a></code></p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Beta parameter</p>
+    <p>output</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
