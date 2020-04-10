@@ -9,10 +9,15 @@ test_that("output df works", {
                         replicates = 10,
                         contact_matrix_set=contact_matrices[[1]])
 
+  # test on correct full return
   o1 <- long_output(r1$output)
   expect_type(o1, "list")
   expect_equal(nrow(o1), 100 * 10 * length(pop$n) * 5)
   expect_named(o1, c("t", "age_group", "replicate", "compartment", "y"))
+
+  # test to catch error
+  expect_error(o1 <- long_output(r1$output, c("S","trash")),
+               "Selected variables are not all present in output")
 })
 
 test_that("squire object check and summary", {
