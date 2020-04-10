@@ -59,7 +59,17 @@ hosp_beds_by_country <- bed %>%
 
 income <- readRDS("data-raw/Income_Strata_Predicted_Hospital_and_ICU_Beds.Rds")
 income <- income %>%
-  dplyr::select()
+  dplyr::select(income_group, ICU_median)
 
+country_specific_healthcare_capacity <- hosp_beds_by_country %>%
+  left_join(income, by = "income_group") %>%
+  mutate(ICU_beds = hosp_beds * (ICU_median / 100)) %>%
+  select(-ICU_median) %>%
+  filter(hosp_beds > 0) # remove Mali result which is -ve - need to sort this
+usethis::use_data(country_specific_healthcare_capacity, overwrite = TRUE)
 
+income_strata_healthcare_capacity <- income %>%
+  mutate(hosp_beds = hosp_median_pred, ICU_beds = hosp_beds * (ICU_median / 100)) %>%
+  select(income_group, hosp_beds, ICU_beds)
+usethis::use_data(income_strata_healthcare_capacity, overwrite = TRUE)
 
