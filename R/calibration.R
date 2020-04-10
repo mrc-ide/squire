@@ -55,12 +55,12 @@ death_data_format <- function(date = NULL,
 
   # order by date
   deaths <- deaths[order(date, decreasing = TRUE)]
-  cases <- cases[order(cases, decreasing = TRUE)]
+  cases <- cases[order(date, decreasing = TRUE)]
   date <- sort(date, decreasing = TRUE)
 
   # check that deaths and cases are decreasing
   assert_decreasing(deaths[!is.na(deaths)])
-  if(length(cases[!is.na(cases)])) {
+  if (length(cases[!is.na(cases)]) > 0) {
     assert_decreasing(cases[!is.na(cases)])
   }
 
@@ -73,21 +73,25 @@ death_data_format <- function(date = NULL,
 
 }
 
-
 #' Calibrate Model
 #'
 #' @details Fit the explicit_SEEIR model to time series of deaths
 #'
 #' @param data Data frame with 2 variables: date and deaths
 #' @param country Character. Country data originates from.
+#' @param parse_output Logical. Should output be parsed ready for plotting.
+#'   Default = TRUE
 #' @param replicates Simulation Repetitions. Default = 10
+#' @param dt Time Step. Default = 0.25
 #' @param ... Other parameters to pass to \code{\link{run_explicit_SEEIR_model}}
 #' @importFrom utils tail
 #' @importFrom stats rbinom time
 #'
 #' @export
-#' @return Long data frame of simulation replicates
-calibrate <- function(data, country, replicates = 100, ...) {
+#' @return List of formatted odin outputs, the data it is calibrated to and
+#'   the parameter set used in calibration
+calibrate <- function(data, country, parse_output = TRUE,
+                      replicates = 10, dt = 0.25, ...) {
 
   # assertions
   assert_dataframe(data)
@@ -97,72 +101,17 @@ calibrate <- function(data, country, replicates = 100, ...) {
   }
 
   # get inputs
-  data <- death_data_format(date = data$date, deaths = data$deaths)
+  data <- death_data_format(date = data$date,
+                            deaths = data$deaths,
+                            cases = data$cases)
   pop <- get_population(country)
   contact_matrix <- get_mixing_matrix(country)
 
   # run model with fixed day step (to match up with daily deaths)
   r <- run_explicit_SEEIR_model(population = pop$n,
-                                baseline_contact_matrix = contact_matrix,
                                 contact_matrix_set = contact_matrix,
                                 replicates = replicates,
-                                dt = 1,
-                                ...)
-
-  # wide output and group by Infection classes
-  out <- wide_output(r$output)
-
-  # reset the time
-  l_dths <- data$deaths[1]
-  l_date <- data$date[1]
-
-  # timing of deaths in replicates
-  timings <- dplyr::group_by(out, replicate, t) %>%
-    dplyr::summarise(D_sum = sum(.data$D)) %>%
-    dplyr::summarise(t = .data$t[which.max(.data$D_sum>=l_dths)])
-
-  out <- dplyr::group_by(out, replicate) %>%
-    dplyr::mutate(new_time = .data$t - timings$t[timings$replicate == replicate[1]],
-                  date = l_date + .data$new_time)
-
-  long <- tidyr::pivot_longer(out, .data$S:.data$D)
-
-  return(long)
-}
-
-#' Calibrate Model
-#'
-#' @details Fit the explicit_SEEIR model to time series of deaths
-#'
-#' @param data Data frame with 2 variables: date and deaths
-#' @param country Character. Country data originates from.
-#' @param replicates Simulation Repetitions. Default = 10
-#' @param ... Other parameters to pass to \code{\link{run_explicit_SEEIR_model}}
-#' @importFrom utils tail
-#' @importFrom stats rbinom time
-#'
-#' @export
-#' @return List of unformatted odin outputs with the date
-calibrate_stripped <- function(data, country, replicates = 10, ...) {
-
-  # assertions
-  assert_dataframe(data)
-  assert_string(country)
-  if (!all(c("date", "deaths") %in% names(data))) {
-    stop("data does not contain a date and/or a deaths column")
-  }
-
-  # get inputs
-  data <- death_data_format(date = data$date, deaths = data$deaths)
-  pop <- get_population(country)
-  contact_matrix <- get_mixing_matrix(country)
-
-  # run model with fixed day step (to match up with daily deaths)
-  r <- run_explicit_SEEIR_model(population = pop$n,
-                                baseline_contact_matrix = contact_matrix,
-                                contact_matrix_set = contact_matrix,
-                                replicates = replicates,
-                                dt = 1,
+                                dt = dt,
                                 output_transform = FALSE,
                                 ...)
 
@@ -175,11 +124,16 @@ calibrate_stripped <- function(data, country, replicates = 10, ...) {
   }, FUN.VALUE = numeric(1))
 
   r$date <- vapply(seq_len(replicates), function(x) {
-    data$date[1] + (r$output[,index$t,x] - timings[x])
+    data$date[1] + (r$output[,index$time,x] - (timings[x]*r$parameters$dt))
   }, FUN.VALUE = double(r$parameters$time_period/r$parameters$dt))
 
   # add the real data used
   r$data <- data
+
+  # parse the output ready for plotting
+  if (parse_output) {
+    r <- calibrate_output_parsing(r)
+  }
 
   return(r)
 
@@ -191,17 +145,21 @@ calibrate_stripped <- function(data, country, replicates = 10, ...) {
 #' cases requiring hospitilisation, case requiring critical care facilities. Used
 #' in plotting for nowcasting reports.
 #'
-#' @param r Output of \code{\link{calibrate_stripped}}
+#' @param r Output of \code{\link{calibrate}}
 #'
-#' @export
-#' @return \code{list} with \code{df}: data frame of case numbers, hospital
-#'   beds, icu beds and deaths, and \code{data}: raw data used in calibration
+#' @return \code{list} with:
+#' \itemize{
+#'       \item{df:}{ Data frame of case numbers, hospital beds, icu beds and deaths }
+#'       \item{data:}{ Raw data used in calibration}
+#'       \item{parameters:}{ Parameters used in simulation}
+#'       }
+#'
 calibrate_output_parsing <- function(r) {
 
   ## Assertions
   assert_custom_class(r, "squire_simulation")
   if(!"date" %in% names(r)) {
-    stop("calout needs date element")
+    stop("r needs date element")
   }
 
   # get the index for looking up D
@@ -225,7 +183,7 @@ calibrate_output_parsing <- function(r) {
   hospital_bed <- odin_sv(r$output[,ox,],
                           replicates = r$parameters$replicates, nt = nt)
   deaths <- odin_sv(r$output[,index$delta_D,],
-                             replicates = r$parameters$replicates, nt = nt)
+                    replicates = r$parameters$replicates, nt = nt)
 
   # collect into a long data frame
   vars <- c("mild_cases", "hospital_cases", "deaths", "icu", "hospital_bed")
@@ -234,9 +192,11 @@ calibrate_output_parsing <- function(r) {
                    "variable" = as.character(mapply(rep, vars, nt*r$parameters$replicates)),
                    "value" = c(mild_cases, hospital_cases, deaths, icu, hospital_bed))
 
-  return(list(df = df, data = r$data))
-}
+  ret <- list(df = df, data = r$data, parameters = r$parameters)
+  class(ret) <- "squire_calibration"
 
+  return(ret)
+}
 
 ## Index locations of outputs in odin model
 #' @noRd

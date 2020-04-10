@@ -4,49 +4,63 @@
 \alias{run_explicit_SEEIR_model}
 \title{Run the explicit SEEIR model}
 \usage{
-run_explicit_SEEIR_model(country = NULL, population = NULL,
-  baseline_contact_matrix = NULL, tt_contact_matrix = 0,
-  contact_matrix_set = NULL, R0 = 3, tt_R0 = 0, beta_set = NULL,
-  time_period = 365, dt = 0.5, replicates = 10, init = NULL,
-  output_transform = TRUE, prob_hosp = c(0.001127564, 0.000960857,
-  0.001774408, 0.003628171, 0.008100662, 0.015590734, 0.024597885,
-  0.035377529, 0.04385549, 0.058495518, 0.08747709, 0.109730508,
-  0.153943118, 0.177242143, 0.221362219, 0.267628264),
-  prob_severe = c(3.73755e-05, 3.18497e-05, 5.88166e-05, 0.000120264,
-  0.000268514, 0.000516788, 0.00081535, 0.001242525, 0.001729275,
-  0.002880196, 0.00598205, 0.010821894, 0.022736324, 0.035911156,
-  0.056362032, 0.081467057),
-  prob_non_severe_death_treatment = c(0.0125702, 0.0125702, 0.0125702,
-  0.0125702, 0.0125702, 0.0125702, 0.0125702, 0.013361147, 0.015104687,
-  0.019164124, 0.027477519, 0.041762108, 0.068531658, 0.105302319,
-  0.149305732, 0.20349534),
-  prob_non_severe_death_no_treatment = prob_non_severe_death_treatment *
-  2, prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
+run_explicit_SEEIR_model(
+  country = NULL,
+  population = NULL,
+  tt_contact_matrix = 0,
+  contact_matrix_set = NULL,
+  R0 = 3,
+  tt_R0 = 0,
+  beta_set = NULL,
+  time_period = 365,
+  dt = 0.5,
+  replicates = 10,
+  init = NULL,
+  output_transform = TRUE,
+  seed = stats::runif(1, 0, 1e+08),
+  prob_hosp = c(0.000744192, 0.000634166, 0.001171109, 0.002394593, 0.005346437,
+    0.010289885, 0.016234604, 0.023349169, 0.028944623, 0.038607042, 0.057734879,
+    0.072422135, 0.101602458, 0.116979814, 0.146099064, 0.176634654, 0.18),
+  prob_severe = c(0.05022296, 0.05022296, 0.05022296, 0.05022296, 0.05022296,
+    0.05022296, 0.05022296, 0.053214942, 0.05974426, 0.074602879, 0.103612417,
+    0.149427991, 0.223777304, 0.306985918, 0.385779555, 0.461217861, 0.709444444),
+  prob_non_severe_death_treatment = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
+    0.0125702, 0.0125702, 0.0125702, 0.013361147, 0.015104687, 0.019164124, 0.027477519,
+    0.041762108, 0.068531658, 0.105302319, 0.149305732, 0.20349534, 0.5804312),
+  prob_non_severe_death_no_treatment = vapply(prob_non_severe_death_treatment * 2, min,
+    numeric(1), 1),
+  prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
   prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
-  p_dist = rep(1, length(prob_hosp)), dur_E = 4.58, dur_R = 2.09,
-  dur_hosp = 5, dur_get_ox_survive = 6, dur_get_ox_die = 3.5,
-  dur_not_get_ox_survive = 6 * 1.5, dur_not_get_ox_die = dur_get_ox_die
-  * 0.5, dur_get_mv_survive = 5.5, dur_get_mv_die = 4,
-  dur_not_get_mv_survive = 12, dur_not_get_mv_die = 1, dur_rec = 6,
-  hosp_bed_capacity = NULL, ICU_bed_capacity = NULL)
+  p_dist = rep(1, length(prob_hosp)),
+  dur_E = 4.58,
+  dur_R = 2.09,
+  dur_hosp = 5,
+  dur_get_ox_survive = 6,
+  dur_get_ox_die = 3.5,
+  dur_not_get_ox_survive = 6 * 1.5,
+  dur_not_get_ox_die = dur_get_ox_die * 0.5,
+  dur_get_mv_survive = 5.5,
+  dur_get_mv_die = 4,
+  dur_not_get_mv_survive = 12,
+  dur_not_get_mv_die = 1,
+  dur_rec = 6,
+  hosp_bed_capacity = NULL,
+  ICU_bed_capacity = NULL
+)
 }
 \arguments{
 \item{country}{Character for country beign simulated. WIll be used to
-generate \code{population} and \code{baseline_contact_matrix} if
+generate \code{population} and \code{contact_matrix_set} if
 unprovided. Either \code{country} or \code{population} and
-\code{baseline_contact_matrix} must be provided.}
+\code{contact_matrix_set} must be provided.}
 
 \item{population}{Population vector (for each age group). Default = NULL,
 which will cause population to be sourced from \code{country}}
 
-\item{baseline_contact_matrix}{Contact matrix (in absence of interventions).
-Used in estimation of beta from R0 vector. Default = NULL, which will
-use \code{country} to generate this.}
-
 \item{tt_contact_matrix}{Time change points for matrix change. Default = 0}
 
 \item{contact_matrix_set}{Contact matrices used in simulation. Default =
-NULL, which will generate this using \code{baseline_contact_matrix}}
+NULL, which will generate this based on the \code{country}.}
 
 \item{R0}{Basic Reproduction Number. Default = 3}
 
@@ -65,6 +79,8 @@ Default = NULL, which causes beta to be estimated from R0}
 
 \item{output_transform}{Transport model outputs into useful format.
 Default == FALSE}
+
+\item{seed}{Random seed used for simulations. Deafult = runif(1, 0, 10000)}
 
 \item{prob_hosp}{probability of hospitalisation by age.
 Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
@@ -144,7 +160,6 @@ All durations are in days.
 pop <- get_population("Afghanistan")
 m1 <- run_explicit_SEEIR_model(R0 = 2,
 population = pop$n, dt = 1,
-baseline_contact_matrix = contact_matrices[[1]],
 contact_matrix_set=contact_matrices[[1]])
 }
 }

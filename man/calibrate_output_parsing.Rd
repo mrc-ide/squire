@@ -7,11 +7,15 @@
 calibrate_output_parsing(r)
 }
 \arguments{
-\item{r}{Output of \code{\link{calibrate_stripped}}}
+\item{r}{Output of \code{\link{calibrate}}}
 }
 \value{
-\code{list} with \code{df}: data frame of case numbers, hospital
-  beds, icu beds and deaths, and \code{data}: raw data used in calibration
+\code{list} with:
+\itemize{
+      \item{df:}{ Data frame of case numbers, hospital beds, icu beds and deaths }
+      \item{data:}{ Raw data used in calibration}
+      \item{parameters:}{ Parameters used in simulation}
+      }
 }
 \description{
 Format output of calibration for plotting

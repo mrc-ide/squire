@@ -7,8 +7,6 @@
 #' @param dur_E Mean duration of incubation period (days)
 #' @param dur_I Mean duration of infectious period (days)
 #' @param population Population vector (for each age group)
-#' @param baseline_contact_matrix Contact matrix (in absence of interventions).
-#'   Used in estimation of beta from R0 vector
 #' @param contact_matrix_set Contact matrices used in simulation
 #' @param tt_contact_matrix Time change points for matrix change
 #' @param time_period Length of simulation
@@ -20,18 +18,17 @@
 #' @examples
 #' \dontrun{
 #' pop <- get_population("Afghanistan")
-#' m1 <- run_SEEIR_model(population = pop$n, dt = 1,
-#' R0 = 2, baseline_contact_matrix = contact_matrices[[1]],
+#' m1 <- run_simple_SEEIR_model(population = pop$n, dt = 1,
+#' R0 = 2,
 #' contact_matrix_set=contact_matrices[[1]])
 #' }
-run_SEEIR_model <- function(R0 = 3,
+run_simple_SEEIR_model <- function(R0 = 3,
                             tt_R0 = 0,
                             dt = 0.1,
                             init = NULL,
                             dur_E  = 4.58,
                             dur_I = 2.09,
                             population,
-                            baseline_contact_matrix,
                             contact_matrix_set,
                             tt_contact_matrix = 0,
                             time_period = 365,
@@ -43,8 +40,18 @@ run_SEEIR_model <- function(R0 = 3,
   if(is.matrix(contact_matrix_set)){
     contact_matrix_set <- list(contact_matrix_set)
   }
+
+  # populate contact matrix set if not provided
+  if (length(contact_matrix_set) == 1) {
+    baseline <- contact_matrix_set[[1]]
+    contact_matrix_set <- vector("list", length(tt_contact_matrix))
+    for(i in seq_along(tt_contact_matrix)) {
+      contact_matrix_set[[i]] <- baseline
+    }
+  }
+
   # Input checks
-  mc <- matrix_check(population, baseline_contact_matrix, contact_matrix_set)
+  mc <- matrix_check(population, contact_matrix_set)
   stopifnot(length(R0) == length(tt_R0))
   stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
   tc <- lapply(list(tt_R0, tt_contact_matrix), check_time_change, time_period)
@@ -57,7 +64,7 @@ run_SEEIR_model <- function(R0 = 3,
   # Convert and Generate Parameters As Required
   gamma_E <- 2 * 1 / dur_E
   gamma_I <- 1 / dur_I
-  beta_set <- beta_est(dur_I, baseline_contact_matrix, R0)
+  beta_set <- beta_est(dur_I, contact_matrix_set[[1]], R0)
 
   # Convert contact matrices to input matrices
   matrices_set <- matrix_set(contact_matrix_set, population)
@@ -71,7 +78,7 @@ run_SEEIR_model <- function(R0 = 3,
                dt = dt)
 
   # Running the Model
-  mod <- SEIR(user = pars)
+  mod <- simple_SEIR(user = pars)
   t <- seq(from = 1, to = time_period/dt)
   m <- mod$run(t, replicate = replicates)
   results <- mod$transform_variables(m)
@@ -82,7 +89,6 @@ run_SEEIR_model <- function(R0 = 3,
                 init = init,
                 dur_E  = dur_E, dur_I = dur_I,
                 population = population,
-                baseline_contact_matrix = baseline_contact_matrix,
                 contact_matrix_set = contact_matrix_set,
                 tt_contact_matrix = tt_contact_matrix,
                 time_period = time_period, replicates = replicates)
@@ -100,14 +106,11 @@ run_SEEIR_model <- function(R0 = 3,
 #' @param population Population vector (for each age group). Default = NULL,
 #'   which will cause population to be sourced from \code{country}
 #' @param country Character for country beign simulated. WIll be used to
-#'   generate \code{population} and \code{baseline_contact_matrix} if
+#'   generate \code{population} and \code{contact_matrix_set} if
 #'   unprovided. Either \code{country} or \code{population} and
-#'   \code{baseline_contact_matrix} must be provided.
-#' @param baseline_contact_matrix Contact matrix (in absence of interventions).
-#'   Used in estimation of beta from R0 vector. Default = NULL, which will
-#'   use \code{country} to generate this.
+#'   \code{contact_matrix_set} must be provided.
 #' @param contact_matrix_set Contact matrices used in simulation. Default =
-#'   NULL, which will generate this using \code{baseline_contact_matrix}
+#'   NULL, which will generate this based on the \code{country}.
 #' @param tt_contact_matrix Time change points for matrix change. Default = 0
 #' @param R0 Basic Reproduction Number. Default = 3
 #' @param tt_R0 Change time points for R0. Default = 0
@@ -118,6 +121,7 @@ run_SEEIR_model <- function(R0 = 3,
 #' @param replicates  Number of replicates. Default = 10
 #' @param output_transform Transport model outputs into useful format.
 #'   Default == FALSE
+#' @param seed Random seed used for simulations. Deafult = runif(1, 0, 10000)
 #' @param init Data.frame of initial conditions. Default = NULL
 #' @param prob_hosp probability of hospitalisation by age.
 #'   Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
@@ -171,7 +175,6 @@ run_SEEIR_model <- function(R0 = 3,
 #' pop <- get_population("Afghanistan")
 #' m1 <- run_explicit_SEEIR_model(R0 = 2,
 #' population = pop$n, dt = 1,
-#' baseline_contact_matrix = contact_matrices[[1]],
 #' contact_matrix_set=contact_matrices[[1]])
 #' }
 run_explicit_SEEIR_model <- function(
@@ -179,7 +182,6 @@ run_explicit_SEEIR_model <- function(
   # demography
   country = NULL,
   population = NULL,
-  baseline_contact_matrix = NULL,
   tt_contact_matrix = 0,
   contact_matrix_set = NULL,
 
@@ -194,22 +196,23 @@ run_explicit_SEEIR_model <- function(
   replicates = 10,
   init = NULL,
   output_transform = TRUE,
+  seed = stats::runif(1, 0, 100000000),
 
   # parameters
   # probabilities
-  prob_hosp = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
-                0.008100662, 0.015590734, 0.024597885, 0.035377529,
-                0.04385549, 0.058495518, 0.08747709, 0.109730508,
-                0.153943118, 0.177242143, 0.221362219, 0.267628264),
-  prob_severe = c(3.73755E-05, 3.18497E-05, 5.88166E-05, 0.000120264,
-                  0.000268514, 0.000516788, 0.00081535, 0.001242525,
-                  0.001729275, 0.002880196, 0.00598205, 0.010821894,
-                  0.022736324, 0.035911156, 0.056362032, 0.081467057),
-  prob_non_severe_death_treatment = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
-                            0.0125702, 0.0125702, 0.0125702, 0.013361147,
-                            0.015104687, 0.019164124, 0.027477519, 0.041762108,
-                            0.068531658, 0.105302319, 0.149305732, 0.20349534),
-  prob_non_severe_death_no_treatment = prob_non_severe_death_treatment * 2,
+  prob_hosp = c(0.000744192, 0.000634166,0.001171109, 0.002394593, 0.005346437 ,
+                0.010289885, 0.016234604, 0.023349169, 0.028944623, 0.038607042 ,
+                0.057734879, 0.072422135, 0.101602458, 0.116979814, 0.146099064,
+                0.176634654 ,0.180000000),
+  prob_severe = c(0.05022296,	0.05022296,	0.05022296,	0.05022296,	0.05022296,
+                  0.05022296,	0.05022296,	0.053214942, 0.05974426,	0.074602879,
+                  0.103612417, 0.149427991, 0.223777304,	0.306985918,
+                  0.385779555, 0.461217861, 0.709444444),
+  prob_non_severe_death_treatment = c(0.0125702,	0.0125702,	0.0125702,	0.0125702,
+                                      0.0125702,	0.0125702,	0.0125702,	0.013361147,
+                                      0.015104687,	0.019164124,	0.027477519,	0.041762108,
+                                      0.068531658,	0.105302319,	0.149305732,	0.20349534,	0.5804312),
+  prob_non_severe_death_no_treatment = vapply(prob_non_severe_death_treatment * 2, min, numeric(1), 1),
   prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
   prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
   p_dist = rep(1, length(prob_hosp)),
@@ -239,33 +242,40 @@ run_explicit_SEEIR_model <- function(
 
   # Grab function arguments
   args <- as.list(environment())
+  set.seed(seed)
+
 
   # Handle country population args
   if (is.null(country) &&
-      (is.null(population) && is.null(baseline_contact_matrix))) {
+      (is.null(population) || is.null(contact_matrix_set))) {
     stop("User must provide either the country being simulated or
-         both the population size and baseline_contact_matrix")
+         both the population size and contact_matrix_set")
   }
 
   # If a country was provided then grab the population and matrices if needed
-  if (!is.null(country) & is.null(population)) {
+  if (is.null(population)) {
     population <- get_population(country)
 
-    if (is.null(baseline_contact_matrix)) {
-        baseline_contact_matrix <- contact_matrices[[population$matrix[1]]]
-    }
+  if (is.null(contact_matrix_set)) {
+    contact_matrix_set <- get_mixing_matrix(country)
+  }
+   population <- population$n
+  }
 
-    population <- population$n
-
+  # Standardise contact matrix set
+  if(is.matrix(contact_matrix_set)){
+    contact_matrix_set <- list(contact_matrix_set)
   }
 
   # populate contact matrix set if not provided
-  if (is.null(contact_matrix_set)) {
+  if (length(contact_matrix_set) == 1) {
+      baseline <- contact_matrix_set[[1]]
       contact_matrix_set <- vector("list", length(tt_contact_matrix))
       for(i in seq_along(tt_contact_matrix)) {
-        contact_matrix_set[[i]] <- baseline_contact_matrix
+        contact_matrix_set[[i]] <- baseline
       }
   }
+
 
   # populate hospital and ICU bed capacity if not provided
   if (is.null(hosp_bed_capacity)) {
@@ -281,17 +291,12 @@ run_explicit_SEEIR_model <- function(
   # Initialise initial conditions
   init <- init_check_explicit(init, population)
 
-  # Standardise contact matrix set
-  if(is.matrix(contact_matrix_set)){
-    contact_matrix_set <- list(contact_matrix_set)
-  }
-
   # Convert contact matrices to input matrices
-  matrices_set <- matrix_set(contact_matrix_set, population)
+  matrices_set <- matrix_set_explicit(contact_matrix_set, population)
 
   # Input checks
   # ----------------------------------------------------------------------------
-  mc <- matrix_check(population, baseline_contact_matrix, contact_matrix_set)
+  mc <- matrix_check(population[-1], contact_matrix_set)
   stopifnot(length(R0) == length(tt_R0))
   stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
   tc <- lapply(list(tt_R0, tt_contact_matrix), check_time_change, time_period)
@@ -326,6 +331,23 @@ run_explicit_SEEIR_model <- function(
   assert_numeric(prob_severe_death_no_treatment, length(population))
   assert_numeric(p_dist, length(population))
 
+  assert_leq(prob_hosp, 1)
+  assert_leq(prob_severe, 1)
+  assert_leq(prob_non_severe_death_treatment, 1)
+  assert_leq(prob_non_severe_death_no_treatment, 1)
+  assert_leq(prob_severe_death_treatment, 1)
+  assert_leq(prob_severe_death_no_treatment, 1)
+  assert_leq(p_dist, 1)
+
+  assert_greq(prob_hosp, 0)
+  assert_greq(prob_severe, 0)
+  assert_greq(prob_non_severe_death_treatment, 0)
+  assert_greq(prob_non_severe_death_no_treatment, 0)
+  assert_greq(prob_severe_death_treatment, 0)
+  assert_greq(prob_severe_death_no_treatment, 0)
+  assert_greq(p_dist, 0)
+
+
   # Convert and Generate Parameters As Required
   # ----------------------------------------------------------------------------
 
@@ -347,7 +369,7 @@ run_explicit_SEEIR_model <- function(
   beta_set <- beta_est_explicit(dur_R = dur_R,
                                 dur_hosp = dur_hosp,
                                 prob_hosp = prob_hosp,
-                                mixing_matrix = baseline_contact_matrix,
+                                mixing_matrix = process_contact_matrix_scaled_age(contact_matrix_set[[1]], population),
                                 R0 = R0)
   }
 
@@ -423,7 +445,6 @@ run_explicit_SEEIR_model <- function(
   # Summarise inputs
   parameters <- args
   parameters$population <- population
-  parameters$baseline_contact_matrix <- baseline_contact_matrix
   parameters$hosp_bed_capacity <- hosp_bed_capacity
   parameters$ICU_bed_capacity <- ICU_bed_capacity
   parameters$beta_set <- beta_set

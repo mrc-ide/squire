@@ -2,9 +2,9 @@ test_that("population getter works", {
   expect_error(get_population("moon"))
   out <- get_population("Angola")
   expect_type(out, "list")
-  expect_equal(nrow(out), 16)
-  expect_equal(ncol(out), 5)
-  expect_named(out, c("country", "age_group", "n", "matrix", "prop_80_plus"))
+  expect_equal(nrow(out), 17)
+  expect_equal(ncol(out), 4)
+  expect_named(out, c("country", "age_group", "n", "matrix"))
 })
 
 

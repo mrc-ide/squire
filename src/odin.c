@@ -355,6 +355,7 @@ typedef struct explict_SEIR_internal {
   double *number_requiring_Ox;
   int offset_output_delta_D;
   int offset_output_n_E2_ICase1;
+  int offset_output_n_E2_IMild;
   int offset_variable_D;
   int offset_variable_E2;
   int offset_variable_ICase1;
@@ -418,7 +419,7 @@ typedef struct explict_SEIR_internal {
   double *tt_beta;
   double *tt_matrix;
 } explict_SEIR_internal;
-typedef struct SEIR_internal {
+typedef struct simple_SEIR_internal {
   double *beta_set;
   double *delta_E1;
   double *delta_E2;
@@ -493,7 +494,7 @@ typedef struct SEIR_internal {
   double *temp;
   double *tt_beta;
   double *tt_matrix;
-} SEIR_internal;
+} simple_SEIR_internal;
 explict_SEIR_internal* explict_SEIR_get_internal(SEXP internal_p, int closed_error);
 static void explict_SEIR_finalise(SEXP internal_p);
 SEXP explict_SEIR_create(SEXP user);
@@ -505,17 +506,17 @@ SEXP explict_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
 void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
 void explict_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
 SEXP explict_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
-SEIR_internal* SEIR_get_internal(SEXP internal_p, int closed_error);
-static void SEIR_finalise(SEXP internal_p);
-SEXP SEIR_create(SEXP user);
-void SEIR_initmod_desolve(void(* odeparms) (int *, double *));
-SEXP SEIR_contents(SEXP internal_p);
-SEXP SEIR_set_user(SEXP internal_p, SEXP user);
-SEXP SEIR_metadata(SEXP internal_p);
-SEXP SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
-void SEIR_rhs(SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
-void SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
-SEXP SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
+simple_SEIR_internal* simple_SEIR_get_internal(SEXP internal_p, int closed_error);
+static void simple_SEIR_finalise(SEXP internal_p);
+SEXP simple_SEIR_create(SEXP user);
+void simple_SEIR_initmod_desolve(void(* odeparms) (int *, double *));
+SEXP simple_SEIR_contents(SEXP internal_p);
+SEXP simple_SEIR_set_user(SEXP internal_p, SEXP user);
+SEXP simple_SEIR_metadata(SEXP internal_p);
+SEXP simple_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
+void simple_SEIR_rhs(simple_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
+void simple_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
+SEXP simple_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
 double user_get_scalar_double(SEXP user, const char *name,
                               double default_value, double min, double max);
 int user_get_scalar_int(SEXP user, const char *name,
@@ -906,7 +907,7 @@ void explict_SEIR_initmod_desolve(void(* odeparms) (int *, double *)) {
 }
 SEXP explict_SEIR_contents(SEXP internal_p) {
   explict_SEIR_internal *internal = explict_SEIR_get_internal(internal_p, 1);
-  SEXP contents = PROTECT(allocVector(VECSXP, 345));
+  SEXP contents = PROTECT(allocVector(VECSXP, 346));
   SEXP beta_set = PROTECT(allocVector(REALSXP, internal->dim_beta_set));
   memcpy(REAL(beta_set), internal->beta_set, internal->dim_beta_set * sizeof(double));
   SET_VECTOR_ELT(contents, 0, beta_set);
@@ -1430,100 +1431,101 @@ SEXP explict_SEIR_contents(SEXP internal_p) {
   SET_VECTOR_ELT(contents, 280, number_requiring_Ox);
   SET_VECTOR_ELT(contents, 281, ScalarInteger(internal->offset_output_delta_D));
   SET_VECTOR_ELT(contents, 282, ScalarInteger(internal->offset_output_n_E2_ICase1));
-  SET_VECTOR_ELT(contents, 283, ScalarInteger(internal->offset_variable_D));
-  SET_VECTOR_ELT(contents, 284, ScalarInteger(internal->offset_variable_E2));
-  SET_VECTOR_ELT(contents, 285, ScalarInteger(internal->offset_variable_ICase1));
-  SET_VECTOR_ELT(contents, 286, ScalarInteger(internal->offset_variable_ICase2));
-  SET_VECTOR_ELT(contents, 287, ScalarInteger(internal->offset_variable_IMild));
-  SET_VECTOR_ELT(contents, 288, ScalarInteger(internal->offset_variable_IMVGetDie1));
-  SET_VECTOR_ELT(contents, 289, ScalarInteger(internal->offset_variable_IMVGetDie2));
-  SET_VECTOR_ELT(contents, 290, ScalarInteger(internal->offset_variable_IMVGetLive1));
-  SET_VECTOR_ELT(contents, 291, ScalarInteger(internal->offset_variable_IMVGetLive2));
-  SET_VECTOR_ELT(contents, 292, ScalarInteger(internal->offset_variable_IMVNotGetDie1));
-  SET_VECTOR_ELT(contents, 293, ScalarInteger(internal->offset_variable_IMVNotGetDie2));
-  SET_VECTOR_ELT(contents, 294, ScalarInteger(internal->offset_variable_IMVNotGetLive1));
-  SET_VECTOR_ELT(contents, 295, ScalarInteger(internal->offset_variable_IMVNotGetLive2));
-  SET_VECTOR_ELT(contents, 296, ScalarInteger(internal->offset_variable_IOxGetDie1));
-  SET_VECTOR_ELT(contents, 297, ScalarInteger(internal->offset_variable_IOxGetDie2));
-  SET_VECTOR_ELT(contents, 298, ScalarInteger(internal->offset_variable_IOxGetLive1));
-  SET_VECTOR_ELT(contents, 299, ScalarInteger(internal->offset_variable_IOxGetLive2));
-  SET_VECTOR_ELT(contents, 300, ScalarInteger(internal->offset_variable_IOxNotGetDie1));
-  SET_VECTOR_ELT(contents, 301, ScalarInteger(internal->offset_variable_IOxNotGetDie2));
-  SET_VECTOR_ELT(contents, 302, ScalarInteger(internal->offset_variable_IOxNotGetLive1));
-  SET_VECTOR_ELT(contents, 303, ScalarInteger(internal->offset_variable_IOxNotGetLive2));
-  SET_VECTOR_ELT(contents, 304, ScalarInteger(internal->offset_variable_IRec1));
-  SET_VECTOR_ELT(contents, 305, ScalarInteger(internal->offset_variable_IRec2));
-  SET_VECTOR_ELT(contents, 306, ScalarInteger(internal->offset_variable_R));
+  SET_VECTOR_ELT(contents, 283, ScalarInteger(internal->offset_output_n_E2_IMild));
+  SET_VECTOR_ELT(contents, 284, ScalarInteger(internal->offset_variable_D));
+  SET_VECTOR_ELT(contents, 285, ScalarInteger(internal->offset_variable_E2));
+  SET_VECTOR_ELT(contents, 286, ScalarInteger(internal->offset_variable_ICase1));
+  SET_VECTOR_ELT(contents, 287, ScalarInteger(internal->offset_variable_ICase2));
+  SET_VECTOR_ELT(contents, 288, ScalarInteger(internal->offset_variable_IMild));
+  SET_VECTOR_ELT(contents, 289, ScalarInteger(internal->offset_variable_IMVGetDie1));
+  SET_VECTOR_ELT(contents, 290, ScalarInteger(internal->offset_variable_IMVGetDie2));
+  SET_VECTOR_ELT(contents, 291, ScalarInteger(internal->offset_variable_IMVGetLive1));
+  SET_VECTOR_ELT(contents, 292, ScalarInteger(internal->offset_variable_IMVGetLive2));
+  SET_VECTOR_ELT(contents, 293, ScalarInteger(internal->offset_variable_IMVNotGetDie1));
+  SET_VECTOR_ELT(contents, 294, ScalarInteger(internal->offset_variable_IMVNotGetDie2));
+  SET_VECTOR_ELT(contents, 295, ScalarInteger(internal->offset_variable_IMVNotGetLive1));
+  SET_VECTOR_ELT(contents, 296, ScalarInteger(internal->offset_variable_IMVNotGetLive2));
+  SET_VECTOR_ELT(contents, 297, ScalarInteger(internal->offset_variable_IOxGetDie1));
+  SET_VECTOR_ELT(contents, 298, ScalarInteger(internal->offset_variable_IOxGetDie2));
+  SET_VECTOR_ELT(contents, 299, ScalarInteger(internal->offset_variable_IOxGetLive1));
+  SET_VECTOR_ELT(contents, 300, ScalarInteger(internal->offset_variable_IOxGetLive2));
+  SET_VECTOR_ELT(contents, 301, ScalarInteger(internal->offset_variable_IOxNotGetDie1));
+  SET_VECTOR_ELT(contents, 302, ScalarInteger(internal->offset_variable_IOxNotGetDie2));
+  SET_VECTOR_ELT(contents, 303, ScalarInteger(internal->offset_variable_IOxNotGetLive1));
+  SET_VECTOR_ELT(contents, 304, ScalarInteger(internal->offset_variable_IOxNotGetLive2));
+  SET_VECTOR_ELT(contents, 305, ScalarInteger(internal->offset_variable_IRec1));
+  SET_VECTOR_ELT(contents, 306, ScalarInteger(internal->offset_variable_IRec2));
+  SET_VECTOR_ELT(contents, 307, ScalarInteger(internal->offset_variable_R));
   SEXP ox_multinom_prob = PROTECT(allocVector(REALSXP, internal->dim_ox_multinom_prob));
   memcpy(REAL(ox_multinom_prob), internal->ox_multinom_prob, internal->dim_ox_multinom_prob * sizeof(double));
-  SET_VECTOR_ELT(contents, 307, ox_multinom_prob);
+  SET_VECTOR_ELT(contents, 308, ox_multinom_prob);
   SEXP p_dist = PROTECT(allocVector(REALSXP, internal->dim_p_dist));
   memcpy(REAL(p_dist), internal->p_dist, internal->dim_p_dist * sizeof(double));
-  SET_VECTOR_ELT(contents, 308, p_dist);
-  SET_VECTOR_ELT(contents, 309, ScalarReal(internal->p_E1_E2));
-  SET_VECTOR_ELT(contents, 310, ScalarReal(internal->p_E2_I));
-  SET_VECTOR_ELT(contents, 311, ScalarReal(internal->p_ICase1_ICase2));
-  SET_VECTOR_ELT(contents, 312, ScalarReal(internal->p_ICase2_Hosp));
-  SET_VECTOR_ELT(contents, 313, ScalarReal(internal->p_IMild_R));
-  SET_VECTOR_ELT(contents, 314, ScalarReal(internal->p_IMVGetDie1_IMVGetDie2));
-  SET_VECTOR_ELT(contents, 315, ScalarReal(internal->p_IMVGetDie2_D));
-  SET_VECTOR_ELT(contents, 316, ScalarReal(internal->p_IMVGetLive1_IMVGetLive2));
-  SET_VECTOR_ELT(contents, 317, ScalarReal(internal->p_IMVGetLive2_Rec));
-  SET_VECTOR_ELT(contents, 318, ScalarReal(internal->p_IMVNotGetDie1_IMVNotGetDie2));
-  SET_VECTOR_ELT(contents, 319, ScalarReal(internal->p_IMVNotGetDie2_D));
-  SET_VECTOR_ELT(contents, 320, ScalarReal(internal->p_IMVNotGetLive1_IMVNotGetLive2));
-  SET_VECTOR_ELT(contents, 321, ScalarReal(internal->p_IMVNotGetLive2_R));
-  SET_VECTOR_ELT(contents, 322, ScalarReal(internal->p_IOxGetDie1_IOxGetDie2));
-  SET_VECTOR_ELT(contents, 323, ScalarReal(internal->p_IOxGetDie2_D));
-  SET_VECTOR_ELT(contents, 324, ScalarReal(internal->p_IOxGetLive1_IOxGetLive2));
-  SET_VECTOR_ELT(contents, 325, ScalarReal(internal->p_IOxGetLive2_R));
-  SET_VECTOR_ELT(contents, 326, ScalarReal(internal->p_IOxNotGetDie1_IOxNotGetDie2));
-  SET_VECTOR_ELT(contents, 327, ScalarReal(internal->p_IOxNotGetDie2_D));
-  SET_VECTOR_ELT(contents, 328, ScalarReal(internal->p_IOxNotGetLive1_IOxNotGetLive2));
-  SET_VECTOR_ELT(contents, 329, ScalarReal(internal->p_IOxNotGetLive2_R));
-  SET_VECTOR_ELT(contents, 330, ScalarReal(internal->p_Rec1_Rec2));
-  SET_VECTOR_ELT(contents, 331, ScalarReal(internal->p_Rec2_R));
+  SET_VECTOR_ELT(contents, 309, p_dist);
+  SET_VECTOR_ELT(contents, 310, ScalarReal(internal->p_E1_E2));
+  SET_VECTOR_ELT(contents, 311, ScalarReal(internal->p_E2_I));
+  SET_VECTOR_ELT(contents, 312, ScalarReal(internal->p_ICase1_ICase2));
+  SET_VECTOR_ELT(contents, 313, ScalarReal(internal->p_ICase2_Hosp));
+  SET_VECTOR_ELT(contents, 314, ScalarReal(internal->p_IMild_R));
+  SET_VECTOR_ELT(contents, 315, ScalarReal(internal->p_IMVGetDie1_IMVGetDie2));
+  SET_VECTOR_ELT(contents, 316, ScalarReal(internal->p_IMVGetDie2_D));
+  SET_VECTOR_ELT(contents, 317, ScalarReal(internal->p_IMVGetLive1_IMVGetLive2));
+  SET_VECTOR_ELT(contents, 318, ScalarReal(internal->p_IMVGetLive2_Rec));
+  SET_VECTOR_ELT(contents, 319, ScalarReal(internal->p_IMVNotGetDie1_IMVNotGetDie2));
+  SET_VECTOR_ELT(contents, 320, ScalarReal(internal->p_IMVNotGetDie2_D));
+  SET_VECTOR_ELT(contents, 321, ScalarReal(internal->p_IMVNotGetLive1_IMVNotGetLive2));
+  SET_VECTOR_ELT(contents, 322, ScalarReal(internal->p_IMVNotGetLive2_R));
+  SET_VECTOR_ELT(contents, 323, ScalarReal(internal->p_IOxGetDie1_IOxGetDie2));
+  SET_VECTOR_ELT(contents, 324, ScalarReal(internal->p_IOxGetDie2_D));
+  SET_VECTOR_ELT(contents, 325, ScalarReal(internal->p_IOxGetLive1_IOxGetLive2));
+  SET_VECTOR_ELT(contents, 326, ScalarReal(internal->p_IOxGetLive2_R));
+  SET_VECTOR_ELT(contents, 327, ScalarReal(internal->p_IOxNotGetDie1_IOxNotGetDie2));
+  SET_VECTOR_ELT(contents, 328, ScalarReal(internal->p_IOxNotGetDie2_D));
+  SET_VECTOR_ELT(contents, 329, ScalarReal(internal->p_IOxNotGetLive1_IOxNotGetLive2));
+  SET_VECTOR_ELT(contents, 330, ScalarReal(internal->p_IOxNotGetLive2_R));
+  SET_VECTOR_ELT(contents, 331, ScalarReal(internal->p_Rec1_Rec2));
+  SET_VECTOR_ELT(contents, 332, ScalarReal(internal->p_Rec2_R));
   SEXP p_S_E1 = PROTECT(allocVector(REALSXP, internal->dim_p_S_E1));
   memcpy(REAL(p_S_E1), internal->p_S_E1, internal->dim_p_S_E1 * sizeof(double));
-  SET_VECTOR_ELT(contents, 332, p_S_E1);
+  SET_VECTOR_ELT(contents, 333, p_S_E1);
   SEXP prob_hosp = PROTECT(allocVector(REALSXP, internal->dim_prob_hosp));
   memcpy(REAL(prob_hosp), internal->prob_hosp, internal->dim_prob_hosp * sizeof(double));
-  SET_VECTOR_ELT(contents, 333, prob_hosp);
+  SET_VECTOR_ELT(contents, 334, prob_hosp);
   SEXP prob_non_severe_death_no_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_non_severe_death_no_treatment));
   memcpy(REAL(prob_non_severe_death_no_treatment), internal->prob_non_severe_death_no_treatment, internal->dim_prob_non_severe_death_no_treatment * sizeof(double));
-  SET_VECTOR_ELT(contents, 334, prob_non_severe_death_no_treatment);
+  SET_VECTOR_ELT(contents, 335, prob_non_severe_death_no_treatment);
   SEXP prob_non_severe_death_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_non_severe_death_treatment));
   memcpy(REAL(prob_non_severe_death_treatment), internal->prob_non_severe_death_treatment, internal->dim_prob_non_severe_death_treatment * sizeof(double));
-  SET_VECTOR_ELT(contents, 335, prob_non_severe_death_treatment);
+  SET_VECTOR_ELT(contents, 336, prob_non_severe_death_treatment);
   SEXP prob_severe = PROTECT(allocVector(REALSXP, internal->dim_prob_severe));
   memcpy(REAL(prob_severe), internal->prob_severe, internal->dim_prob_severe * sizeof(double));
-  SET_VECTOR_ELT(contents, 336, prob_severe);
+  SET_VECTOR_ELT(contents, 337, prob_severe);
   SEXP prob_severe_death_no_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_severe_death_no_treatment));
   memcpy(REAL(prob_severe_death_no_treatment), internal->prob_severe_death_no_treatment, internal->dim_prob_severe_death_no_treatment * sizeof(double));
-  SET_VECTOR_ELT(contents, 337, prob_severe_death_no_treatment);
+  SET_VECTOR_ELT(contents, 338, prob_severe_death_no_treatment);
   SEXP prob_severe_death_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_severe_death_treatment));
   memcpy(REAL(prob_severe_death_treatment), internal->prob_severe_death_treatment, internal->dim_prob_severe_death_treatment * sizeof(double));
-  SET_VECTOR_ELT(contents, 338, prob_severe_death_treatment);
+  SET_VECTOR_ELT(contents, 339, prob_severe_death_treatment);
   SEXP R_0 = PROTECT(allocVector(REALSXP, internal->dim_R_0));
   memcpy(REAL(R_0), internal->R_0, internal->dim_R_0 * sizeof(double));
-  SET_VECTOR_ELT(contents, 339, R_0);
+  SET_VECTOR_ELT(contents, 340, R_0);
   SEXP S_0 = PROTECT(allocVector(REALSXP, internal->dim_S_0));
   memcpy(REAL(S_0), internal->S_0, internal->dim_S_0 * sizeof(double));
-  SET_VECTOR_ELT(contents, 340, S_0);
+  SET_VECTOR_ELT(contents, 341, S_0);
   SEXP s_ij = PROTECT(allocVector(REALSXP, internal->dim_s_ij));
   memcpy(REAL(s_ij), internal->s_ij, internal->dim_s_ij * sizeof(double));
   odin_set_dim(s_ij, 2, internal->dim_s_ij_1, internal->dim_s_ij_2);
-  SET_VECTOR_ELT(contents, 341, s_ij);
+  SET_VECTOR_ELT(contents, 342, s_ij);
   SEXP temp = PROTECT(allocVector(REALSXP, internal->dim_temp));
   memcpy(REAL(temp), internal->temp, internal->dim_temp * sizeof(double));
-  SET_VECTOR_ELT(contents, 342, temp);
+  SET_VECTOR_ELT(contents, 343, temp);
   SEXP tt_beta = PROTECT(allocVector(REALSXP, internal->dim_tt_beta));
   memcpy(REAL(tt_beta), internal->tt_beta, internal->dim_tt_beta * sizeof(double));
-  SET_VECTOR_ELT(contents, 343, tt_beta);
+  SET_VECTOR_ELT(contents, 344, tt_beta);
   SEXP tt_matrix = PROTECT(allocVector(REALSXP, internal->dim_tt_matrix));
   memcpy(REAL(tt_matrix), internal->tt_matrix, internal->dim_tt_matrix * sizeof(double));
-  SET_VECTOR_ELT(contents, 344, tt_matrix);
-  SEXP nms = PROTECT(allocVector(STRSXP, 345));
+  SET_VECTOR_ELT(contents, 345, tt_matrix);
+  SEXP nms = PROTECT(allocVector(STRSXP, 346));
   SET_STRING_ELT(nms, 0, mkChar("beta_set"));
   SET_STRING_ELT(nms, 1, mkChar("D_0"));
   SET_STRING_ELT(nms, 2, mkChar("delta_D"));
@@ -1807,68 +1809,69 @@ SEXP explict_SEIR_contents(SEXP internal_p) {
   SET_STRING_ELT(nms, 280, mkChar("number_requiring_Ox"));
   SET_STRING_ELT(nms, 281, mkChar("offset_output_delta_D"));
   SET_STRING_ELT(nms, 282, mkChar("offset_output_n_E2_ICase1"));
-  SET_STRING_ELT(nms, 283, mkChar("offset_variable_D"));
-  SET_STRING_ELT(nms, 284, mkChar("offset_variable_E2"));
-  SET_STRING_ELT(nms, 285, mkChar("offset_variable_ICase1"));
-  SET_STRING_ELT(nms, 286, mkChar("offset_variable_ICase2"));
-  SET_STRING_ELT(nms, 287, mkChar("offset_variable_IMild"));
-  SET_STRING_ELT(nms, 288, mkChar("offset_variable_IMVGetDie1"));
-  SET_STRING_ELT(nms, 289, mkChar("offset_variable_IMVGetDie2"));
-  SET_STRING_ELT(nms, 290, mkChar("offset_variable_IMVGetLive1"));
-  SET_STRING_ELT(nms, 291, mkChar("offset_variable_IMVGetLive2"));
-  SET_STRING_ELT(nms, 292, mkChar("offset_variable_IMVNotGetDie1"));
-  SET_STRING_ELT(nms, 293, mkChar("offset_variable_IMVNotGetDie2"));
-  SET_STRING_ELT(nms, 294, mkChar("offset_variable_IMVNotGetLive1"));
-  SET_STRING_ELT(nms, 295, mkChar("offset_variable_IMVNotGetLive2"));
-  SET_STRING_ELT(nms, 296, mkChar("offset_variable_IOxGetDie1"));
-  SET_STRING_ELT(nms, 297, mkChar("offset_variable_IOxGetDie2"));
-  SET_STRING_ELT(nms, 298, mkChar("offset_variable_IOxGetLive1"));
-  SET_STRING_ELT(nms, 299, mkChar("offset_variable_IOxGetLive2"));
-  SET_STRING_ELT(nms, 300, mkChar("offset_variable_IOxNotGetDie1"));
-  SET_STRING_ELT(nms, 301, mkChar("offset_variable_IOxNotGetDie2"));
-  SET_STRING_ELT(nms, 302, mkChar("offset_variable_IOxNotGetLive1"));
-  SET_STRING_ELT(nms, 303, mkChar("offset_variable_IOxNotGetLive2"));
-  SET_STRING_ELT(nms, 304, mkChar("offset_variable_IRec1"));
-  SET_STRING_ELT(nms, 305, mkChar("offset_variable_IRec2"));
-  SET_STRING_ELT(nms, 306, mkChar("offset_variable_R"));
-  SET_STRING_ELT(nms, 307, mkChar("ox_multinom_prob"));
-  SET_STRING_ELT(nms, 308, mkChar("p_dist"));
-  SET_STRING_ELT(nms, 309, mkChar("p_E1_E2"));
-  SET_STRING_ELT(nms, 310, mkChar("p_E2_I"));
-  SET_STRING_ELT(nms, 311, mkChar("p_ICase1_ICase2"));
-  SET_STRING_ELT(nms, 312, mkChar("p_ICase2_Hosp"));
-  SET_STRING_ELT(nms, 313, mkChar("p_IMild_R"));
-  SET_STRING_ELT(nms, 314, mkChar("p_IMVGetDie1_IMVGetDie2"));
-  SET_STRING_ELT(nms, 315, mkChar("p_IMVGetDie2_D"));
-  SET_STRING_ELT(nms, 316, mkChar("p_IMVGetLive1_IMVGetLive2"));
-  SET_STRING_ELT(nms, 317, mkChar("p_IMVGetLive2_Rec"));
-  SET_STRING_ELT(nms, 318, mkChar("p_IMVNotGetDie1_IMVNotGetDie2"));
-  SET_STRING_ELT(nms, 319, mkChar("p_IMVNotGetDie2_D"));
-  SET_STRING_ELT(nms, 320, mkChar("p_IMVNotGetLive1_IMVNotGetLive2"));
-  SET_STRING_ELT(nms, 321, mkChar("p_IMVNotGetLive2_R"));
-  SET_STRING_ELT(nms, 322, mkChar("p_IOxGetDie1_IOxGetDie2"));
-  SET_STRING_ELT(nms, 323, mkChar("p_IOxGetDie2_D"));
-  SET_STRING_ELT(nms, 324, mkChar("p_IOxGetLive1_IOxGetLive2"));
-  SET_STRING_ELT(nms, 325, mkChar("p_IOxGetLive2_R"));
-  SET_STRING_ELT(nms, 326, mkChar("p_IOxNotGetDie1_IOxNotGetDie2"));
-  SET_STRING_ELT(nms, 327, mkChar("p_IOxNotGetDie2_D"));
-  SET_STRING_ELT(nms, 328, mkChar("p_IOxNotGetLive1_IOxNotGetLive2"));
-  SET_STRING_ELT(nms, 329, mkChar("p_IOxNotGetLive2_R"));
-  SET_STRING_ELT(nms, 330, mkChar("p_Rec1_Rec2"));
-  SET_STRING_ELT(nms, 331, mkChar("p_Rec2_R"));
-  SET_STRING_ELT(nms, 332, mkChar("p_S_E1"));
-  SET_STRING_ELT(nms, 333, mkChar("prob_hosp"));
-  SET_STRING_ELT(nms, 334, mkChar("prob_non_severe_death_no_treatment"));
-  SET_STRING_ELT(nms, 335, mkChar("prob_non_severe_death_treatment"));
-  SET_STRING_ELT(nms, 336, mkChar("prob_severe"));
-  SET_STRING_ELT(nms, 337, mkChar("prob_severe_death_no_treatment"));
-  SET_STRING_ELT(nms, 338, mkChar("prob_severe_death_treatment"));
-  SET_STRING_ELT(nms, 339, mkChar("R_0"));
-  SET_STRING_ELT(nms, 340, mkChar("S_0"));
-  SET_STRING_ELT(nms, 341, mkChar("s_ij"));
-  SET_STRING_ELT(nms, 342, mkChar("temp"));
-  SET_STRING_ELT(nms, 343, mkChar("tt_beta"));
-  SET_STRING_ELT(nms, 344, mkChar("tt_matrix"));
+  SET_STRING_ELT(nms, 283, mkChar("offset_output_n_E2_IMild"));
+  SET_STRING_ELT(nms, 284, mkChar("offset_variable_D"));
+  SET_STRING_ELT(nms, 285, mkChar("offset_variable_E2"));
+  SET_STRING_ELT(nms, 286, mkChar("offset_variable_ICase1"));
+  SET_STRING_ELT(nms, 287, mkChar("offset_variable_ICase2"));
+  SET_STRING_ELT(nms, 288, mkChar("offset_variable_IMild"));
+  SET_STRING_ELT(nms, 289, mkChar("offset_variable_IMVGetDie1"));
+  SET_STRING_ELT(nms, 290, mkChar("offset_variable_IMVGetDie2"));
+  SET_STRING_ELT(nms, 291, mkChar("offset_variable_IMVGetLive1"));
+  SET_STRING_ELT(nms, 292, mkChar("offset_variable_IMVGetLive2"));
+  SET_STRING_ELT(nms, 293, mkChar("offset_variable_IMVNotGetDie1"));
+  SET_STRING_ELT(nms, 294, mkChar("offset_variable_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 295, mkChar("offset_variable_IMVNotGetLive1"));
+  SET_STRING_ELT(nms, 296, mkChar("offset_variable_IMVNotGetLive2"));
+  SET_STRING_ELT(nms, 297, mkChar("offset_variable_IOxGetDie1"));
+  SET_STRING_ELT(nms, 298, mkChar("offset_variable_IOxGetDie2"));
+  SET_STRING_ELT(nms, 299, mkChar("offset_variable_IOxGetLive1"));
+  SET_STRING_ELT(nms, 300, mkChar("offset_variable_IOxGetLive2"));
+  SET_STRING_ELT(nms, 301, mkChar("offset_variable_IOxNotGetDie1"));
+  SET_STRING_ELT(nms, 302, mkChar("offset_variable_IOxNotGetDie2"));
+  SET_STRING_ELT(nms, 303, mkChar("offset_variable_IOxNotGetLive1"));
+  SET_STRING_ELT(nms, 304, mkChar("offset_variable_IOxNotGetLive2"));
+  SET_STRING_ELT(nms, 305, mkChar("offset_variable_IRec1"));
+  SET_STRING_ELT(nms, 306, mkChar("offset_variable_IRec2"));
+  SET_STRING_ELT(nms, 307, mkChar("offset_variable_R"));
+  SET_STRING_ELT(nms, 308, mkChar("ox_multinom_prob"));
+  SET_STRING_ELT(nms, 309, mkChar("p_dist"));
+  SET_STRING_ELT(nms, 310, mkChar("p_E1_E2"));
+  SET_STRING_ELT(nms, 311, mkChar("p_E2_I"));
+  SET_STRING_ELT(nms, 312, mkChar("p_ICase1_ICase2"));
+  SET_STRING_ELT(nms, 313, mkChar("p_ICase2_Hosp"));
+  SET_STRING_ELT(nms, 314, mkChar("p_IMild_R"));
+  SET_STRING_ELT(nms, 315, mkChar("p_IMVGetDie1_IMVGetDie2"));
+  SET_STRING_ELT(nms, 316, mkChar("p_IMVGetDie2_D"));
+  SET_STRING_ELT(nms, 317, mkChar("p_IMVGetLive1_IMVGetLive2"));
+  SET_STRING_ELT(nms, 318, mkChar("p_IMVGetLive2_Rec"));
+  SET_STRING_ELT(nms, 319, mkChar("p_IMVNotGetDie1_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 320, mkChar("p_IMVNotGetDie2_D"));
+  SET_STRING_ELT(nms, 321, mkChar("p_IMVNotGetLive1_IMVNotGetLive2"));
+  SET_STRING_ELT(nms, 322, mkChar("p_IMVNotGetLive2_R"));
+  SET_STRING_ELT(nms, 323, mkChar("p_IOxGetDie1_IOxGetDie2"));
+  SET_STRING_ELT(nms, 324, mkChar("p_IOxGetDie2_D"));
+  SET_STRING_ELT(nms, 325, mkChar("p_IOxGetLive1_IOxGetLive2"));
+  SET_STRING_ELT(nms, 326, mkChar("p_IOxGetLive2_R"));
+  SET_STRING_ELT(nms, 327, mkChar("p_IOxNotGetDie1_IOxNotGetDie2"));
+  SET_STRING_ELT(nms, 328, mkChar("p_IOxNotGetDie2_D"));
+  SET_STRING_ELT(nms, 329, mkChar("p_IOxNotGetLive1_IOxNotGetLive2"));
+  SET_STRING_ELT(nms, 330, mkChar("p_IOxNotGetLive2_R"));
+  SET_STRING_ELT(nms, 331, mkChar("p_Rec1_Rec2"));
+  SET_STRING_ELT(nms, 332, mkChar("p_Rec2_R"));
+  SET_STRING_ELT(nms, 333, mkChar("p_S_E1"));
+  SET_STRING_ELT(nms, 334, mkChar("prob_hosp"));
+  SET_STRING_ELT(nms, 335, mkChar("prob_non_severe_death_no_treatment"));
+  SET_STRING_ELT(nms, 336, mkChar("prob_non_severe_death_treatment"));
+  SET_STRING_ELT(nms, 337, mkChar("prob_severe"));
+  SET_STRING_ELT(nms, 338, mkChar("prob_severe_death_no_treatment"));
+  SET_STRING_ELT(nms, 339, mkChar("prob_severe_death_treatment"));
+  SET_STRING_ELT(nms, 340, mkChar("R_0"));
+  SET_STRING_ELT(nms, 341, mkChar("S_0"));
+  SET_STRING_ELT(nms, 342, mkChar("s_ij"));
+  SET_STRING_ELT(nms, 343, mkChar("temp"));
+  SET_STRING_ELT(nms, 344, mkChar("tt_beta"));
+  SET_STRING_ELT(nms, 345, mkChar("tt_matrix"));
   setAttrib(contents, R_NamesSymbol, nms);
   UNPROTECT(137);
   return contents;
@@ -2271,8 +2274,9 @@ SEXP explict_SEIR_set_user(SEXP internal_p, SEXP user) {
   internal->IOxNotGetLive2_0 = (double*) user_get_array(user, false, internal->IOxNotGetLive2_0, "IOxNotGetLive2_0", NA_REAL, NA_REAL, 1, internal->dim_IOxNotGetLive2_0);
   internal->IRec1_0 = (double*) user_get_array(user, false, internal->IRec1_0, "IRec1_0", NA_REAL, NA_REAL, 1, internal->dim_IRec1_0);
   internal->IRec2_0 = (double*) user_get_array(user, false, internal->IRec2_0, "IRec2_0", NA_REAL, NA_REAL, 1, internal->dim_IRec2_0);
-  internal->offset_output_delta_D = 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1;
+  internal->offset_output_delta_D = 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild;
   internal->offset_output_n_E2_ICase1 = 1 + internal->dim_n_E2_I;
+  internal->offset_output_n_E2_IMild = 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1;
   internal->offset_variable_D = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1 + internal->dim_IMVNotGetLive2 + internal->dim_IMVNotGetDie1 + internal->dim_IMVNotGetDie2 + internal->dim_IRec1 + internal->dim_IRec2 + internal->dim_R;
   internal->offset_variable_E2 = internal->dim_S + internal->dim_E1;
   internal->offset_variable_ICase1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild;
@@ -2468,20 +2472,22 @@ SEXP explict_SEIR_metadata(SEXP internal_p) {
   SET_STRING_ELT(variable_names, 25, mkChar("D"));
   SET_VECTOR_ELT(ret, 0, variable_length);
   UNPROTECT(2);
-  SEXP output_length = PROTECT(allocVector(VECSXP, 4));
-  SEXP output_names = PROTECT(allocVector(STRSXP, 4));
+  SEXP output_length = PROTECT(allocVector(VECSXP, 5));
+  SEXP output_names = PROTECT(allocVector(STRSXP, 5));
   setAttrib(output_length, R_NamesSymbol, output_names);
   SET_VECTOR_ELT(output_length, 0, R_NilValue);
   SET_VECTOR_ELT(output_length, 1, ScalarInteger(internal->dim_n_E2_I));
   SET_VECTOR_ELT(output_length, 2, ScalarInteger(internal->dim_n_E2_ICase1));
-  SET_VECTOR_ELT(output_length, 3, ScalarInteger(internal->dim_delta_D));
+  SET_VECTOR_ELT(output_length, 3, ScalarInteger(internal->dim_n_E2_IMild));
+  SET_VECTOR_ELT(output_length, 4, ScalarInteger(internal->dim_delta_D));
   SET_STRING_ELT(output_names, 0, mkChar("time"));
   SET_STRING_ELT(output_names, 1, mkChar("n_E2_I"));
   SET_STRING_ELT(output_names, 2, mkChar("n_E2_ICase1"));
-  SET_STRING_ELT(output_names, 3, mkChar("delta_D"));
+  SET_STRING_ELT(output_names, 3, mkChar("n_E2_IMild"));
+  SET_STRING_ELT(output_names, 4, mkChar("delta_D"));
   SET_VECTOR_ELT(ret, 1, output_length);
   UNPROTECT(2);
-  SET_VECTOR_ELT(ret, 2, ScalarInteger(1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_delta_D));
+  SET_VECTOR_ELT(ret, 2, ScalarInteger(1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild + internal->dim_delta_D));
   SEXP interpolate_t = PROTECT(allocVector(VECSXP, 3));
   SEXP interpolate_t_nms = PROTECT(allocVector(STRSXP, 3));
   setAttrib(interpolate_t, R_NamesSymbol, interpolate_t_nms);
@@ -2746,67 +2752,71 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
   }
   {
      int i = 1;
-     internal->number_get_IMV[i - 1] = (total_number_get_IMV <= 0 ? 0 : fmin(internal->number_requiring_IMV[0], Rf_rbinom(round(total_number_get_IMV), internal->imv_multinom_prob[0] / (double) odin_sum1(internal->imv_multinom_prob, 0, 16))));
+     internal->number_get_IMV[i - 1] = (total_number_get_IMV <= 0 ? 0 : fmin(internal->number_requiring_IMV[0], Rf_rbinom(round(total_number_get_IMV), internal->imv_multinom_prob[0] / (double) odin_sum1(internal->imv_multinom_prob, 0, 17))));
   }
   {
      int i = 2;
-     internal->number_get_IMV[i - 1] = (total_number_get_IMV - internal->number_get_IMV[0] <= 0 ? 0 : fmin(internal->number_requiring_IMV[1], Rf_rbinom(round(total_number_get_IMV - internal->number_get_IMV[0]), internal->imv_multinom_prob[1] / (double) odin_sum1(internal->imv_multinom_prob, 1, 16))));
+     internal->number_get_IMV[i - 1] = (total_number_get_IMV - internal->number_get_IMV[0] <= 0 ? 0 : fmin(internal->number_requiring_IMV[1], Rf_rbinom(round(total_number_get_IMV - internal->number_get_IMV[0]), internal->imv_multinom_prob[1] / (double) odin_sum1(internal->imv_multinom_prob, 1, 17))));
   }
   {
      int i = 3;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 2)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[2], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 2)), internal->imv_multinom_prob[2] / (double) odin_sum1(internal->imv_multinom_prob, 2, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 2)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[2], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 2)), internal->imv_multinom_prob[2] / (double) odin_sum1(internal->imv_multinom_prob, 2, 17))));
   }
   {
      int i = 4;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 3)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[3], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 3)), internal->imv_multinom_prob[3] / (double) odin_sum1(internal->imv_multinom_prob, 3, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 3)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[3], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 3)), internal->imv_multinom_prob[3] / (double) odin_sum1(internal->imv_multinom_prob, 3, 17))));
   }
   {
      int i = 5;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 4)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[4], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 4)), internal->imv_multinom_prob[4] / (double) odin_sum1(internal->imv_multinom_prob, 4, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 4)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[4], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 4)), internal->imv_multinom_prob[4] / (double) odin_sum1(internal->imv_multinom_prob, 4, 17))));
   }
   {
      int i = 6;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 5)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[5], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 5)), internal->imv_multinom_prob[5] / (double) odin_sum1(internal->imv_multinom_prob, 5, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 5)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[5], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 5)), internal->imv_multinom_prob[5] / (double) odin_sum1(internal->imv_multinom_prob, 5, 17))));
   }
   {
      int i = 7;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 6)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[6], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 6)), internal->imv_multinom_prob[6] / (double) odin_sum1(internal->imv_multinom_prob, 6, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 6)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[6], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 6)), internal->imv_multinom_prob[6] / (double) odin_sum1(internal->imv_multinom_prob, 6, 17))));
   }
   {
      int i = 8;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 7)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[7], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 7)), internal->imv_multinom_prob[7] / (double) odin_sum1(internal->imv_multinom_prob, 7, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 7)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[7], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 7)), internal->imv_multinom_prob[7] / (double) odin_sum1(internal->imv_multinom_prob, 7, 17))));
   }
   {
      int i = 9;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 8)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[8], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 8)), internal->imv_multinom_prob[8] / (double) odin_sum1(internal->imv_multinom_prob, 8, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 8)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[8], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 8)), internal->imv_multinom_prob[8] / (double) odin_sum1(internal->imv_multinom_prob, 8, 17))));
   }
   {
      int i = 10;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 9)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[9], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 9)), internal->imv_multinom_prob[9] / (double) odin_sum1(internal->imv_multinom_prob, 9, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 9)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[9], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 9)), internal->imv_multinom_prob[9] / (double) odin_sum1(internal->imv_multinom_prob, 9, 17))));
   }
   {
      int i = 11;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 10)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[10], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 10)), internal->imv_multinom_prob[10] / (double) odin_sum1(internal->imv_multinom_prob, 10, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 10)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[10], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 10)), internal->imv_multinom_prob[10] / (double) odin_sum1(internal->imv_multinom_prob, 10, 17))));
   }
   {
      int i = 12;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 11)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[11], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 11)), internal->imv_multinom_prob[11] / (double) odin_sum1(internal->imv_multinom_prob, 11, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 11)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[11], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 11)), internal->imv_multinom_prob[11] / (double) odin_sum1(internal->imv_multinom_prob, 11, 17))));
   }
   {
      int i = 13;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 12)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[12], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 12)), internal->imv_multinom_prob[12] / (double) odin_sum1(internal->imv_multinom_prob, 12, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 12)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[12], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 12)), internal->imv_multinom_prob[12] / (double) odin_sum1(internal->imv_multinom_prob, 12, 17))));
   }
   {
      int i = 14;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 13)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[13], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 13)), internal->imv_multinom_prob[13] / (double) odin_sum1(internal->imv_multinom_prob, 13, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 13)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[13], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 13)), internal->imv_multinom_prob[13] / (double) odin_sum1(internal->imv_multinom_prob, 13, 17))));
   }
   {
      int i = 15;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 14)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[14], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 14)), internal->imv_multinom_prob[14] / (double) odin_sum1(internal->imv_multinom_prob, 14, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 14)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[14], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 14)), internal->imv_multinom_prob[14] / (double) odin_sum1(internal->imv_multinom_prob, 14, 17))));
   }
   {
      int i = 16;
-     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 15)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[15], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 15)), internal->imv_multinom_prob[15] / (double) odin_sum1(internal->imv_multinom_prob, 15, 16))));
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 15)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[15], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 15)), internal->imv_multinom_prob[15] / (double) odin_sum1(internal->imv_multinom_prob, 15, 17))));
+  }
+  {
+     int i = 17;
+     internal->number_get_IMV[i - 1] = ((total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 16)) <= 0 ? 0 : fmin(internal->number_requiring_IMV[16], Rf_rbinom(round(total_number_get_IMV - odin_sum1(internal->number_get_IMV, 0, 16)), internal->imv_multinom_prob[16] / (double) odin_sum1(internal->imv_multinom_prob, 16, 17))));
   }
   for (int i = 1; i <= internal->dim_ox_multinom_prob; ++i) {
     internal->ox_multinom_prob[i - 1] = (total_number_requiring_Ox == 0 ? internal->p_dist[i - 1] / (double) internal->N_age : ((internal->number_requiring_Ox[i - 1] * internal->p_dist[i - 1]) / (double) total_number_requiring_Ox));
@@ -2828,67 +2838,71 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
   }
   {
      int i = 1;
-     internal->number_get_Ox[i - 1] = (total_number_get_hosp <= 0 ? 0 : fmin(internal->number_requiring_Ox[0], Rf_rbinom(round(total_number_get_hosp), internal->ox_multinom_prob[0] / (double) odin_sum1(internal->ox_multinom_prob, 0, 16))));
+     internal->number_get_Ox[i - 1] = (total_number_get_hosp <= 0 ? 0 : fmin(internal->number_requiring_Ox[0], Rf_rbinom(round(total_number_get_hosp), internal->ox_multinom_prob[0] / (double) odin_sum1(internal->ox_multinom_prob, 0, 17))));
   }
   {
      int i = 2;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - internal->number_get_Ox[0]) <= 0 ? 0 : fmin(internal->number_requiring_Ox[1], Rf_rbinom(round(total_number_get_hosp - internal->number_get_Ox[0]), internal->ox_multinom_prob[1] / (double) odin_sum1(internal->ox_multinom_prob, 1, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - internal->number_get_Ox[0]) <= 0 ? 0 : fmin(internal->number_requiring_Ox[1], Rf_rbinom(round(total_number_get_hosp - internal->number_get_Ox[0]), internal->ox_multinom_prob[1] / (double) odin_sum1(internal->ox_multinom_prob, 1, 17))));
   }
   {
      int i = 3;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 2)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[2], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 2)), internal->ox_multinom_prob[2] / (double) odin_sum1(internal->ox_multinom_prob, 2, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 2)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[2], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 2)), internal->ox_multinom_prob[2] / (double) odin_sum1(internal->ox_multinom_prob, 2, 17))));
   }
   {
      int i = 4;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 3)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[3], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 3)), internal->ox_multinom_prob[3] / (double) odin_sum1(internal->ox_multinom_prob, 3, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 3)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[3], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 3)), internal->ox_multinom_prob[3] / (double) odin_sum1(internal->ox_multinom_prob, 3, 17))));
   }
   {
      int i = 5;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 4)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[4], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 4)), internal->ox_multinom_prob[4] / (double) odin_sum1(internal->ox_multinom_prob, 4, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 4)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[4], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 4)), internal->ox_multinom_prob[4] / (double) odin_sum1(internal->ox_multinom_prob, 4, 17))));
   }
   {
      int i = 6;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 5)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[5], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 5)), internal->ox_multinom_prob[5] / (double) odin_sum1(internal->ox_multinom_prob, 5, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 5)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[5], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 5)), internal->ox_multinom_prob[5] / (double) odin_sum1(internal->ox_multinom_prob, 5, 17))));
   }
   {
      int i = 7;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 6)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[6], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 6)), internal->ox_multinom_prob[6] / (double) odin_sum1(internal->ox_multinom_prob, 6, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 6)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[6], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 6)), internal->ox_multinom_prob[6] / (double) odin_sum1(internal->ox_multinom_prob, 6, 17))));
   }
   {
      int i = 8;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 7)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[7], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 7)), internal->ox_multinom_prob[7] / (double) odin_sum1(internal->ox_multinom_prob, 7, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 7)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[7], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 7)), internal->ox_multinom_prob[7] / (double) odin_sum1(internal->ox_multinom_prob, 7, 17))));
   }
   {
      int i = 9;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 8)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[8], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 8)), internal->ox_multinom_prob[8] / (double) odin_sum1(internal->ox_multinom_prob, 8, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 8)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[8], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 8)), internal->ox_multinom_prob[8] / (double) odin_sum1(internal->ox_multinom_prob, 8, 17))));
   }
   {
      int i = 10;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 9)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[9], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 9)), internal->ox_multinom_prob[9] / (double) odin_sum1(internal->ox_multinom_prob, 9, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 9)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[9], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 9)), internal->ox_multinom_prob[9] / (double) odin_sum1(internal->ox_multinom_prob, 9, 17))));
   }
   {
      int i = 11;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 10)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[10], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 10)), internal->ox_multinom_prob[10] / (double) odin_sum1(internal->ox_multinom_prob, 10, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 10)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[10], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 10)), internal->ox_multinom_prob[10] / (double) odin_sum1(internal->ox_multinom_prob, 10, 17))));
   }
   {
      int i = 12;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 11)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[11], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 11)), internal->ox_multinom_prob[11] / (double) odin_sum1(internal->ox_multinom_prob, 11, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 11)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[11], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 11)), internal->ox_multinom_prob[11] / (double) odin_sum1(internal->ox_multinom_prob, 11, 17))));
   }
   {
      int i = 13;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 12)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[12], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 12)), internal->ox_multinom_prob[12] / (double) odin_sum1(internal->ox_multinom_prob, 12, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 12)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[12], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 12)), internal->ox_multinom_prob[12] / (double) odin_sum1(internal->ox_multinom_prob, 12, 17))));
   }
   {
      int i = 14;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 13)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[13], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 13)), internal->ox_multinom_prob[13] / (double) odin_sum1(internal->ox_multinom_prob, 13, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 13)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[13], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 13)), internal->ox_multinom_prob[13] / (double) odin_sum1(internal->ox_multinom_prob, 13, 17))));
   }
   {
      int i = 15;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 14)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[14], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 14)), internal->ox_multinom_prob[14] / (double) odin_sum1(internal->ox_multinom_prob, 14, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 14)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[14], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 14)), internal->ox_multinom_prob[14] / (double) odin_sum1(internal->ox_multinom_prob, 14, 17))));
   }
   {
      int i = 16;
-     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 15)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[15], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 15)), internal->ox_multinom_prob[15] / (double) odin_sum1(internal->ox_multinom_prob, 15, 16))));
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 15)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[15], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 15)), internal->ox_multinom_prob[15] / (double) odin_sum1(internal->ox_multinom_prob, 15, 17))));
+  }
+  {
+     int i = 17;
+     internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 16)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[16], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 16)), internal->ox_multinom_prob[16] / (double) odin_sum1(internal->ox_multinom_prob, 16, 17))));
   }
   for (int i = 1; i <= internal->dim_number_notget_IMV; ++i) {
     internal->number_notget_IMV[i - 1] = internal->number_requiring_IMV[i - 1] - internal->number_get_IMV[i - 1];
@@ -2985,6 +2999,7 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
   memcpy(output + 1, internal->n_E2_I, internal->dim_n_E2_I * sizeof(double));
   memcpy(output + internal->offset_output_delta_D, internal->delta_D, internal->dim_delta_D * sizeof(double));
   memcpy(output + internal->offset_output_n_E2_ICase1, internal->n_E2_ICase1, internal->dim_n_E2_ICase1 * sizeof(double));
+  memcpy(output + internal->offset_output_n_E2_IMild, internal->n_E2_IMild, internal->dim_n_E2_IMild * sizeof(double));
 }
 void explict_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal) {
   explict_SEIR_rhs((explict_SEIR_internal*)internal, step, state, state_next, output);
@@ -2992,7 +3007,7 @@ void explict_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * sta
 SEXP explict_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
   SEXP state_next = PROTECT(allocVector(REALSXP, LENGTH(state)));
   explict_SEIR_internal *internal = explict_SEIR_get_internal(internal_p, 1);
-  SEXP output_ptr = PROTECT(allocVector(REALSXP, 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_delta_D));
+  SEXP output_ptr = PROTECT(allocVector(REALSXP, 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild + internal->dim_delta_D));
   setAttrib(state_next, install("output"), output_ptr);
   UNPROTECT(1);
   double *output = REAL(output_ptr);
@@ -3002,19 +3017,19 @@ SEXP explict_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
   UNPROTECT(1);
   return state_next;
 }
-SEIR_internal* SEIR_get_internal(SEXP internal_p, int closed_error) {
-  SEIR_internal *internal = NULL;
+simple_SEIR_internal* simple_SEIR_get_internal(SEXP internal_p, int closed_error) {
+  simple_SEIR_internal *internal = NULL;
   if (TYPEOF(internal_p) != EXTPTRSXP) {
     Rf_error("Expected an external pointer");
   }
-  internal = (SEIR_internal*) R_ExternalPtrAddr(internal_p);
+  internal = (simple_SEIR_internal*) R_ExternalPtrAddr(internal_p);
   if (!internal && closed_error) {
     Rf_error("Pointer has been invalidated");
   }
   return internal;
 }
-void SEIR_finalise(SEXP internal_p) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 0);
+void simple_SEIR_finalise(SEXP internal_p) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 0);
   if (internal_p) {
     cinterpolate_free(internal->interpolate_beta);
     cinterpolate_free(internal->interpolate_m);
@@ -3051,8 +3066,8 @@ void SEIR_finalise(SEXP internal_p) {
     R_ClearExternalPtr(internal_p);
   }
 }
-SEXP SEIR_create(SEXP user) {
-  SEIR_internal *internal = (SEIR_internal*) Calloc(1, SEIR_internal);
+SEXP simple_SEIR_create(SEXP user) {
+  simple_SEIR_internal *internal = (simple_SEIR_internal*) Calloc(1, simple_SEIR_internal);
   internal->beta_set = NULL;
   internal->delta_E1 = NULL;
   internal->delta_E2 = NULL;
@@ -3095,21 +3110,21 @@ SEXP SEIR_create(SEXP user) {
   internal->tt_beta = NULL;
   internal->tt_matrix = NULL;
   SEXP ptr = PROTECT(R_MakeExternalPtr(internal, R_NilValue, R_NilValue));
-  R_RegisterCFinalizer(ptr, SEIR_finalise);
+  R_RegisterCFinalizer(ptr, simple_SEIR_finalise);
   UNPROTECT(1);
   return ptr;
 }
-static SEIR_internal *SEIR_internal_ds;
-void SEIR_initmod_desolve(void(* odeparms) (int *, double *)) {
+static simple_SEIR_internal *simple_SEIR_internal_ds;
+void simple_SEIR_initmod_desolve(void(* odeparms) (int *, double *)) {
   static DL_FUNC get_desolve_gparms = NULL;
   if (get_desolve_gparms == NULL) {
     get_desolve_gparms =
       R_GetCCallable("deSolve", "get_deSolve_gparms");
   }
-  SEIR_internal_ds = SEIR_get_internal(get_desolve_gparms(), 1);
+  simple_SEIR_internal_ds = simple_SEIR_get_internal(get_desolve_gparms(), 1);
 }
-SEXP SEIR_contents(SEXP internal_p) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_contents(SEXP internal_p) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP contents = PROTECT(allocVector(VECSXP, 74));
   SEXP beta_set = PROTECT(allocVector(REALSXP, internal->dim_beta_set));
   memcpy(REAL(beta_set), internal->beta_set, internal->dim_beta_set * sizeof(double));
@@ -3319,8 +3334,8 @@ SEXP SEIR_contents(SEXP internal_p) {
   UNPROTECT(29);
   return contents;
 }
-SEXP SEIR_set_user(SEXP internal_p, SEXP user) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_set_user(SEXP internal_p, SEXP user) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   internal->dt = user_get_scalar_double(user, "dt", internal->dt, NA_REAL, NA_REAL);
   internal->gamma_E = user_get_scalar_double(user, "gamma_E", internal->gamma_E, NA_REAL, NA_REAL);
   internal->gamma_I = user_get_scalar_double(user, "gamma_I", internal->gamma_I, NA_REAL, NA_REAL);
@@ -3434,8 +3449,8 @@ SEXP SEIR_set_user(SEXP internal_p, SEXP user) {
   internal->interpolate_m = cinterpolate_alloc("constant", internal->dim_tt_matrix, internal->dim_m, internal->tt_matrix, internal->mix_mat_set, true, false);
   return R_NilValue;
 }
-SEXP SEIR_metadata(SEXP internal_p) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_metadata(SEXP internal_p) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP ret = PROTECT(allocVector(VECSXP, 4));
   SEXP nms = PROTECT(allocVector(STRSXP, 4));
   SET_STRING_ELT(nms, 0, mkChar("variable_order"));
@@ -3480,8 +3495,8 @@ SEXP SEIR_metadata(SEXP internal_p) {
   UNPROTECT(2);
   return ret;
 }
-SEXP SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr) {
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+SEXP simple_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr) {
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP r_state = PROTECT(allocVector(REALSXP, internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_I + internal->dim_R));
   double * state = REAL(r_state);
   memcpy(state + 0, internal->initial_S, internal->dim_S * sizeof(double));
@@ -3492,7 +3507,7 @@ SEXP SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr) {
   UNPROTECT(1);
   return r_state;
 }
-void SEIR_rhs(SEIR_internal* internal, size_t step, double * state, double * state_next, double * output) {
+void simple_SEIR_rhs(simple_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output) {
   double * S = state + 0;
   double * E1 = state + internal->dim_S;
   double * E2 = state + internal->offset_variable_E2;
@@ -3558,18 +3573,18 @@ void SEIR_rhs(SEIR_internal* internal, size_t step, double * state, double * sta
   output[0] = time;
   memcpy(output + 1, internal->n_EI, internal->dim_n_EI * sizeof(double));
 }
-void SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal) {
-  SEIR_rhs((SEIR_internal*)internal, step, state, state_next, output);
+void simple_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal) {
+  simple_SEIR_rhs((simple_SEIR_internal*)internal, step, state, state_next, output);
 }
-SEXP SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
+SEXP simple_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
   SEXP state_next = PROTECT(allocVector(REALSXP, LENGTH(state)));
-  SEIR_internal *internal = SEIR_get_internal(internal_p, 1);
+  simple_SEIR_internal *internal = simple_SEIR_get_internal(internal_p, 1);
   SEXP output_ptr = PROTECT(allocVector(REALSXP, 1 + internal->dim_n_EI));
   setAttrib(state_next, install("output"), output_ptr);
   UNPROTECT(1);
   double *output = REAL(output_ptr);
   GetRNGstate();
-  SEIR_rhs(internal, INTEGER(step)[0], REAL(state), REAL(state_next), output);
+  simple_SEIR_rhs(internal, INTEGER(step)[0], REAL(state), REAL(state_next), output);
   PutRNGstate();
   UNPROTECT(1);
   return state_next;

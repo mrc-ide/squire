@@ -1,6 +1,6 @@
 on:
   push:
-    branches: healthcare_capacity
+    branches: master
 
 name: pkgdown
 
