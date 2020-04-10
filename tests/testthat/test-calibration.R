@@ -36,6 +36,11 @@ test_that("calibrate works", {
   expect_error(out <- calibrate(df_wrong, "India"),
                "data does not contain a date and/or a deaths column")
 
+  # missing deaths
+  expect_error(df <- death_data_format(date = c(Sys.Date(), Sys.Date() - (1:5)),
+                                       cases = c(6, 7, 0, 0, NA, 1)),
+               "Deaths is NULL. If date is provided, deaths must be provided")
+
 
   # correct format
   expect_error(df <- death_data_format(date = c(Sys.Date(), Sys.Date() - (1:5)),
@@ -57,7 +62,7 @@ test_that("calibrate works", {
   index <- odin_index(out$model)
   deaths <- vapply(seq_len(replicates), function(x) {
     rowSums(out$output[,index$D,x])
-  }, FUN.VALUE = numeric(365))
+  }, FUN.VALUE = numeric(nrow(out$output)))
 
   # are all deaths today greater than the deaths reported
   expect_true(all(deaths[which(out$date == Sys.Date())] >= df$deaths[1]))

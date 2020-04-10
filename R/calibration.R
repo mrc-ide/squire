@@ -82,6 +82,7 @@ death_data_format <- function(date = NULL,
 #' @param parse_output Logical. Should output be parsed ready for plotting.
 #'   Default = TRUE
 #' @param replicates Simulation Repetitions. Default = 10
+#' @param dt Time Step. Default = 0.25
 #' @param ... Other parameters to pass to \code{\link{run_explicit_SEEIR_model}}
 #' @importFrom utils tail
 #' @importFrom stats rbinom time
@@ -89,7 +90,8 @@ death_data_format <- function(date = NULL,
 #' @export
 #' @return List of formatted odin outputs, the data it is calibrated to and
 #'   the parameter set used in calibration
-calibrate <- function(data, country, parse_output = TRUE, replicates = 10, ...) {
+calibrate <- function(data, country, parse_output = TRUE,
+                      replicates = 10, dt = 0.25, ...) {
 
   # assertions
   assert_dataframe(data)
@@ -99,7 +101,9 @@ calibrate <- function(data, country, parse_output = TRUE, replicates = 10, ...) 
   }
 
   # get inputs
-  data <- death_data_format(date = data$date, deaths = data$deaths)
+  data <- death_data_format(date = data$date,
+                            deaths = data$deaths,
+                            cases = data$cases)
   pop <- get_population(country)
   contact_matrix <- get_mixing_matrix(country)
 
@@ -107,7 +111,7 @@ calibrate <- function(data, country, parse_output = TRUE, replicates = 10, ...) 
   r <- run_explicit_SEEIR_model(population = pop$n,
                                 contact_matrix_set = contact_matrix,
                                 replicates = replicates,
-                                dt = 1,
+                                dt = dt,
                                 output_transform = FALSE,
                                 ...)
 
@@ -120,7 +124,7 @@ calibrate <- function(data, country, parse_output = TRUE, replicates = 10, ...) 
   }, FUN.VALUE = numeric(1))
 
   r$date <- vapply(seq_len(replicates), function(x) {
-    data$date[1] + (r$output[,index$t,x] - timings[x])
+    data$date[1] + (r$output[,index$time,x] - (timings[x]*r$parameters$dt))
   }, FUN.VALUE = double(r$parameters$time_period/r$parameters$dt))
 
   # add the real data used
@@ -193,7 +197,6 @@ calibrate_output_parsing <- function(r) {
 
   return(ret)
 }
-
 
 ## Index locations of outputs in odin model
 #' @noRd
