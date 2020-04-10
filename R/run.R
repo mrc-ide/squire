@@ -106,9 +106,9 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' @param population Population vector (for each age group). Default = NULL,
 #'   which will cause population to be sourced from \code{country}
 #' @param country Character for country beign simulated. WIll be used to
-#'   generate \code{population} and \code{baseline_contact_matrix} if
+#'   generate \code{population} and \code{contact_matrix_set} if
 #'   unprovided. Either \code{country} or \code{population} and
-#'   \code{baseline_contact_matrix} must be provided.
+#'   \code{contact_matrix_set} must be provided.
 #' @param contact_matrix_set Contact matrices used in simulation. Default =
 #'   NULL, which will generate this based on the \code{country}.
 #' @param tt_contact_matrix Time change points for matrix change. Default = 0
@@ -121,6 +121,7 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' @param replicates  Number of replicates. Default = 10
 #' @param output_transform Transport model outputs into useful format.
 #'   Default == FALSE
+#' @param seed Random seed used for simulations. Deafult = runif(1, 0, 10000)
 #' @param init Data.frame of initial conditions. Default = NULL
 #' @param prob_hosp probability of hospitalisation by age.
 #'   Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
@@ -195,6 +196,7 @@ run_explicit_SEEIR_model <- function(
   replicates = 10,
   init = NULL,
   output_transform = TRUE,
+  seed = runif(1, 0, 100000000),
 
   # parameters
   # probabilities
@@ -210,7 +212,7 @@ run_explicit_SEEIR_model <- function(
                                       0.0125702,	0.0125702,	0.0125702,	0.013361147,
                                       0.015104687,	0.019164124,	0.027477519,	0.041762108,
                                       0.068531658,	0.105302319,	0.149305732,	0.20349534,	0.5804312),
-  prob_non_severe_death_no_treatment = prob_non_severe_death_treatment * 2,
+  prob_non_severe_death_no_treatment = vapply(prob_non_severe_death_treatment * 2, min, numeric(1), 1),
   prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
   prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
   p_dist = rep(1, length(prob_hosp)),
@@ -233,17 +235,19 @@ run_explicit_SEEIR_model <- function(
   dur_rec = 6,
 
   # health system capacity
-  hosp_bed_capacity = 5*sum(population)/1000,
-  ICU_bed_capacity = 3*hosp_bed_capacity/100
+  hosp_bed_capacity = NULL,
+  ICU_bed_capacity = NULL
 
   ) {
 
   # Grab function arguments
   args <- as.list(environment())
+  set.seed(seed)
+
 
   # Handle country population args
   if (is.null(country) &&
-      (is.null(population) && is.null(contact_matrix_set))) {
+      (is.null(population) || is.null(contact_matrix_set))) {
     stop("User must provide either the country being simulated or
          both the population size and contact_matrix_set")
   }
@@ -255,7 +259,7 @@ run_explicit_SEEIR_model <- function(
   if (is.null(contact_matrix_set)) {
     contact_matrix_set <- get_mixing_matrix(country)
   }
-    population <- population$n
+   population <- population$n
   }
 
   # Standardise contact matrix set
@@ -270,6 +274,15 @@ run_explicit_SEEIR_model <- function(
       for(i in seq_along(tt_contact_matrix)) {
         contact_matrix_set[[i]] <- baseline
       }
+  }
+
+
+  # populate hospital and ICU bed capacity if not provided
+  if (is.null(hosp_bed_capacity)) {
+    hosp_bed_capacity <- round(5*sum(population)/1000)
+  }
+  if (is.null(ICU_bed_capacity)) {
+    ICU_bed_capacity <- round(3*hosp_bed_capacity/100)
   }
 
   # Initail state and matrix formatting
@@ -317,6 +330,23 @@ run_explicit_SEEIR_model <- function(
   assert_numeric(prob_severe_death_treatment, length(population))
   assert_numeric(prob_severe_death_no_treatment, length(population))
   assert_numeric(p_dist, length(population))
+
+  assert_leq(prob_hosp, 1)
+  assert_leq(prob_severe, 1)
+  assert_leq(prob_non_severe_death_treatment, 1)
+  assert_leq(prob_non_severe_death_no_treatment, 1)
+  assert_leq(prob_severe_death_treatment, 1)
+  assert_leq(prob_severe_death_no_treatment, 1)
+  assert_leq(p_dist, 1)
+
+  assert_greq(prob_hosp, 0)
+  assert_greq(prob_severe, 0)
+  assert_greq(prob_non_severe_death_treatment, 0)
+  assert_greq(prob_non_severe_death_no_treatment, 0)
+  assert_greq(prob_severe_death_treatment, 0)
+  assert_greq(prob_severe_death_no_treatment, 0)
+  assert_greq(p_dist, 0)
+
 
   # Convert and Generate Parameters As Required
   # ----------------------------------------------------------------------------
@@ -414,6 +444,9 @@ run_explicit_SEEIR_model <- function(
 
   # Summarise inputs
   parameters <- args
+  parameters$population <- population
+  parameters$hosp_bed_capacity <- hosp_bed_capacity
+  parameters$ICU_bed_capacity <- ICU_bed_capacity
   parameters$beta_set <- beta_set
 
   out <- list(output = results, parameters = parameters, model = mod)
