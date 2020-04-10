@@ -1,3 +1,5 @@
+devtools::install_github("mrc-ide/odin.js@mrc-1493")
+
 # Probs
 prob_hosp <- c(0.000744192, 0.000634166,0.001171109, 0.002394593, 0.005346437 ,
               0.010289885, 0.016234604, 0.023349169, 0.028944623, 0.038607042 ,
@@ -76,9 +78,19 @@ pars <- list(N_age = length(population),
 pars$beta <- beta
 pars$m <- t(t(m) / population)
 
+y <- odin.js::odin_js("inst/odin/explicit_SEIR_deterministic.R")
+pars$hosp_bed_capacity <- 10000000000
+pars$ICU_bed_capacity <- 10000000000
+mod <- y(user = pars)
+t <- seq(from = 1, to = 250)
+output <- mod$run(t)
+S_js <- apply(output[, grepl("S", colnames(output))], 1, sum)
+D_js <- apply(output[, 427:443], 1, sum)
+R_js <- apply(output[, 410:426], 1, sum)
+
 x <- odin::odin("inst/odin/explicit_SEIR_deterministic.R")
-pars$hosp_bed_capacity <- 1000
-pars$ICU_bed_capacity <- 1000
+pars$hosp_bed_capacity <- 10000000000
+pars$ICU_bed_capacity <- 10000000000
 mod <- x(user = pars)
 t <- seq(from = 1, to = 250)
 output <- mod$run(t)
@@ -87,7 +99,16 @@ t <- output$t
 S <- apply(output$S, 1, sum)
 R <- apply(output$R, 1, sum)
 D <- apply(output$D, 1, sum)
+
 plot(t, S, ylim = c(0, max(S)), type = "l")
+lines(t, S_js, col = "red")
+
+plot(t, D, type = "l")
+lines(t, D_js, col = "red")
+
+plot(t, R, type = "l")
+lines(t, R_js, col = "green")
+
 lines(t, R, col = "green")
 max(R)/max(S)
 plot(t, D, type = "l")
