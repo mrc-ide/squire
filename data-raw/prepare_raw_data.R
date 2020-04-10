@@ -49,6 +49,13 @@ population$country <- iconv(
 population <- as.data.frame(population)
 usethis::use_data(population, overwrite = TRUE)
 
+# Income Group
+# ------------------------------------------------------------------------------
+income_group <- demog %>%
+  select(Region..subregion..country.or.area.., income_group) %>%
+  rename(country = Region..subregion..country.or.area..)
+usethis::use_data(income_group, overwrite = TRUE)
+
 # Bed Capacity
 # ------------------------------------------------------------------------------
 

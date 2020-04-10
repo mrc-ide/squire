@@ -4,14 +4,8 @@
 \alias{plot.squire_simulation}
 \title{squire simulation plot}
 \usage{
-\method{plot}{squire_simulation}(
-  x,
-  replicates = FALSE,
-  ci = FALSE,
-  var_select = NULL,
-  summary_f = mean,
-  ...
-)
+\method{plot}{squire_simulation}(x, replicates = FALSE, ci = FALSE,
+  var_select = NULL, summary_f = mean, ...)
 }
 \arguments{
 \item{x}{An iccm_simulation object}
