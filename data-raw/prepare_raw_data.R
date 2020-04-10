@@ -52,17 +52,17 @@ usethis::use_data(population, overwrite = TRUE)
 # Bed Capacity
 # ------------------------------------------------------------------------------
 
-bed <- readRDS("data-raw/Hospital_Bed_Capacity_Predictions.Rds")
+bed <- read.csv("data-raw/hospital_bed_capacity.csv")
 hosp_beds_by_country <- bed %>%
   dplyr::select(country_name, income_group, beds_to_use) %>%
   dplyr::rename(country = country_name, hosp_beds = beds_to_use)
 
 income <- readRDS("data-raw/Income_Strata_Predicted_Hospital_and_ICU_Beds.Rds")
-income <- income %>%
+income_for_join <- income %>%
   dplyr::select(income_group, ICU_median)
 
 country_specific_healthcare_capacity <- hosp_beds_by_country %>%
-  left_join(income, by = "income_group") %>%
+  left_join(income_for_join, by = "income_group") %>%
   mutate(ICU_beds = hosp_beds * (ICU_median / 100)) %>%
   select(-ICU_median) %>%
   filter(hosp_beds > 0) # remove Mali result which is -ve - need to sort this
@@ -72,4 +72,3 @@ income_strata_healthcare_capacity <- income %>%
   mutate(hosp_beds = hosp_median_pred, ICU_beds = hosp_beds * (ICU_median / 100)) %>%
   select(income_group, hosp_beds, ICU_beds)
 usethis::use_data(income_strata_healthcare_capacity, overwrite = TRUE)
-

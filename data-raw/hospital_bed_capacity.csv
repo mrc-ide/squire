@@ -1,0 +1,154 @@
+country_name,year,income_group,region,hospital_beds,pred_beds,beds_to_use
+Afghanistan,2015,Low income,South Asia,0.5,0.667767334,0.5
+Albania,2016,Upper middle income,Europe & Central Asia,NA,5.226680541,5.226680541
+Angola,2011,Lower middle income,Sub-Saharan Africa,NA,0.91921016,0.91921016
+Antigua and Barbuda,2015,High income,Latin America & Caribbean,NA,3.627857776,3.627857776
+Argentina,2008,Upper middle income,Latin America & Caribbean,NA,2.706176279,2.706176279
+Austria,2016,High income,Europe & Central Asia,NA,7.094084256,7.094084256
+Bahamas,2016,High income,Latin America & Caribbean,NA,3.334477454,3.334477454
+Bahrain,2016,High income,Middle East & North Africa,NA,3.605374254,3.605374254
+Bangladesh,2010,Lower middle income,South Asia,NA,1.792190019,1.792190019
+Barbados,2016,High income,Latin America & Caribbean,NA,7.092706307,7.092706307
+Belarus,2016,Upper middle income,Europe & Central Asia,NA,6.445866786,6.445866786
+Belgium,2016,High income,Europe & Central Asia,NA,5.227973953,5.227973953
+Belize,2016,Upper middle income,Latin America & Caribbean,NA,1.51488923,1.51488923
+Benin,2016,Low income,Sub-Saharan Africa,NA,1.257592328,1.257592328
+Bhutan,2016,Lower middle income,South Asia,NA,2.472514992,2.472514992
+Bolivia,2016,Lower middle income,Latin America & Caribbean,NA,1.224848965,1.224848965
+Botswana,2007,Upper middle income,Sub-Saharan Africa,2.4,2.545022486,2.4
+Brazil,2016,Upper middle income,Latin America & Caribbean,NA,2.42346711,2.42346711
+Brunei Darussalam,2016,High income,East Asia & Pacific,NA,2.686327997,2.686327997
+Bulgaria,2016,Upper middle income,Europe & Central Asia,NA,6.59524654,6.59524654
+Burkina Faso,2016,Low income,Sub-Saharan Africa,NA,1.296836767,1.296836767
+Burundi,2016,Low income,Sub-Saharan Africa,NA,1.405254262,1.405254262
+Cabo Verde,2016,Lower middle income,Sub-Saharan Africa,NA,2.218710128,2.218710128
+Cambodia,2007,Lower middle income,East Asia & Pacific,NA,1.708706085,1.708706085
+Cameroon,2016,Lower middle income,Sub-Saharan Africa,NA,1.354560419,1.354560419
+Central African Republic,2016,Low income,Sub-Saharan Africa,NA,0.644838173,0.644838173
+Chad,2016,Low income,Sub-Saharan Africa,NA,0.364916345,0.364916345
+Chile,2015,High income,Latin America & Caribbean,NA,3.506149199,3.506149199
+China,2016,Upper middle income,East Asia & Pacific,NA,6.186642526,6.186642526
+Colombia,2016,Upper middle income,Latin America & Caribbean,NA,1.821092731,1.821092731
+Comoros,2014,Lower middle income,Sub-Saharan Africa,NA,0.84988754,0.84988754
+"Congo, Dem. Rep.",2015,Low income,Sub-Saharan Africa,NA,0.788912917,0.788912917
+"Congo, Rep.",2012,Lower middle income,Sub-Saharan Africa,NA,1.248477614,1.248477614
+Costa Rica,2016,Upper middle income,Latin America & Caribbean,NA,1.559340604,1.559340604
+Cote d'Ivoire,2016,Lower middle income,Sub-Saharan Africa,NA,0.28648099,0.28648099
+Croatia,2016,High income,Europe & Central Asia,NA,5.143248823,5.143248823
+Cuba,2016,Upper middle income,Latin America & Caribbean,NA,5.473516607,5.473516607
+Cyprus,2015,High income,Europe & Central Asia,NA,5.161807982,5.161807982
+Czechia,2013,High income,Europe & Central Asia,6.5,6.15925661,6.5
+Denmark,2014,High income,Europe & Central Asia,NA,5.284465916,5.284465916
+Djibouti,2016,Lower middle income,Middle East & North Africa,NA,2.538749945,2.538749945
+Dominican Republic,2015,Upper middle income,Latin America & Caribbean,NA,2.16457942,2.16457942
+Ecuador,2016,Upper middle income,Latin America & Caribbean,NA,2.063826883,2.063826883
+Egypt,2016,Lower middle income,Middle East & North Africa,NA,1.877623914,1.877623914
+El Salvador,2016,Lower middle income,Latin America & Caribbean,NA,1.753282654,1.753282654
+Eritrea,2011,Low income,Sub-Saharan Africa,0.7,0.863166779,0.7
+Estonia,2016,High income,Europe & Central Asia,NA,4.318250391,4.318250391
+Eswatini,2016,Lower middle income,Sub-Saharan Africa,NA,1.744872577,1.744872577
+Ethiopia,2012,Low income,Sub-Saharan Africa,NA,2.703270422,2.703270422
+Fiji,2012,Upper middle income,East Asia & Pacific,NA,2.252614698,2.252614698
+Finland,2016,High income,Europe & Central Asia,NA,3.229363929,3.229363929
+France,2013,High income,Europe & Central Asia,6.5,6.256906909,6.5
+Georgia,2016,Upper middle income,Europe & Central Asia,NA,5.679025412,5.679025412
+Germany,2016,High income,Europe & Central Asia,NA,7.445763899,7.445763899
+Ghana,2016,Lower middle income,Sub-Saharan Africa,NA,1.438636203,1.438636203
+Greece,2016,High income,Europe & Central Asia,NA,4.026643062,4.026643062
+Grenada,2016,Upper middle income,Latin America & Caribbean,NA,3.47900391,3.47900391
+Guatemala,2016,Upper middle income,Latin America & Caribbean,NA,1.119215959,1.119215959
+Guinea,2011,Low income,Sub-Saharan Africa,0.3,0.199775614,0.3
+Guyana,2012,Upper middle income,Latin America & Caribbean,NA,2.369623428,2.369623428
+Honduras,2016,Lower middle income,Latin America & Caribbean,NA,2.70659793,2.70659793
+Hungary,2016,High income,Europe & Central Asia,NA,6.244579728,6.244579728
+India,2016,Lower middle income,South Asia,NA,2.485648376,2.485648376
+Indonesia,2016,Lower middle income,East Asia & Pacific,NA,1.928936009,1.928936009
+Iran (Islamic Republic of),2016,Upper middle income,Middle East & North Africa,NA,2.014088907,2.014088907
+Iraq,2007,Upper middle income,Middle East & North Africa,1.3,1.391618318,1.3
+Israel,2009,High income,Middle East & North Africa,3.2,3.327266766,3.2
+Italy,2016,High income,Europe & Central Asia,NA,4.55942937,4.55942937
+Jamaica,2016,Upper middle income,Latin America & Caribbean,NA,2.335042355,2.335042355
+Jordan,2014,Upper middle income,Middle East & North Africa,1.9,1.903775008,1.9
+Kazakhstan,2016,Upper middle income,Europe & Central Asia,NA,3.01878302,3.01878302
+Kenya,2009,Lower middle income,Sub-Saharan Africa,NA,2.421628143,2.421628143
+Kiribati,2008,Lower middle income,East Asia & Pacific,NA,2.282534361,2.282534361
+"Korea, Rep.",2016,High income,East Asia & Pacific,NA,8.645077257,8.645077257
+Kuwait,2015,High income,Middle East & North Africa,NA,2.971570878,2.971570878
+Kyrgyz Republic,2016,Lower middle income,Europe & Central Asia,NA,4.991958657,4.991958657
+Lao PDR,2016,Lower middle income,East Asia & Pacific,NA,1.452780905,1.452780905
+Latvia,2016,High income,Europe & Central Asia,NA,6.830058416,6.830058416
+Lesotho,2016,Lower middle income,Sub-Saharan Africa,NA,1.558034093,1.558034093
+Liberia,2015,Low income,Sub-Saharan Africa,NA,0.777291752,0.777291752
+Lithuania,2016,High income,Europe & Central Asia,NA,5.922786626,5.922786626
+Luxembourg,2016,High income,Europe & Central Asia,NA,4.901513098,4.901513098
+Madagascar,2014,Low income,Sub-Saharan Africa,NA,1.986048414,1.986048414
+Malawi,2015,Low income,Sub-Saharan Africa,NA,1.902050101,1.902050101
+Malaysia,2016,Upper middle income,East Asia & Pacific,NA,2.477654487,2.477654487
+Maldives,2003,Upper middle income,South Asia,2.3,2.255726449,2.3
+Mali,2016,Low income,Sub-Saharan Africa,NA,-0.039666834,-0.039666834
+Malta,2016,High income,Middle East & North Africa,NA,4.676732432,4.676732432
+Mauritania,2016,Lower middle income,Sub-Saharan Africa,NA,0.882860178,0.882860178
+Mauritius,2015,Upper middle income,Sub-Saharan Africa,NA,4.821544281,4.821544281
+Mexico,2016,Upper middle income,Latin America & Caribbean,NA,1.606594651,1.606594651
+Moldova,2016,Lower middle income,Europe & Central Asia,NA,6.254677681,6.254677681
+Mongolia,2010,Lower middle income,East Asia & Pacific,5.8,5.486716484,5.8
+Morocco,2004,Lower middle income,Middle East & North Africa,0.9,0.817468118,0.9
+Mozambique,2015,Low income,Sub-Saharan Africa,NA,1.512993719,1.512993719
+Myanmar,2016,Lower middle income,East Asia & Pacific,NA,2.21028933,2.21028933
+Nepal,2016,Low income,South Asia,NA,1.21689807,1.21689807
+Netherlands,2016,High income,Europe & Central Asia,NA,5.187759934,5.187759934
+New Zealand,2016,High income,East Asia & Pacific,NA,3.295165886,3.295165886
+Nicaragua,2010,Lower middle income,Latin America & Caribbean,0.8,0.895859477,0.8
+Niger,2016,Low income,Sub-Saharan Africa,NA,0.330167858,0.330167858
+Nigeria,2010,Lower middle income,Sub-Saharan Africa,NA,1.360240841,1.360240841
+North Macedonia,2015,Upper middle income,Europe & Central Asia,NA,5.667245229,5.667245229
+Norway,2016,High income,Europe & Central Asia,NA,4.765157381,4.765157381
+Pakistan,2016,Lower middle income,South Asia,NA,0.670552174,0.670552174
+Panama,2016,High income,Latin America & Caribbean,NA,2.764899136,2.764899136
+Papua New Guinea,2016,Lower middle income,East Asia & Pacific,NA,1.435754162,1.435754162
+Paraguay,2012,Upper middle income,Latin America & Caribbean,NA,1.268179628,1.268179628
+Peru,2016,Upper middle income,Latin America & Caribbean,NA,2.177067523,2.177067523
+Philippines,2016,Lower middle income,East Asia & Pacific,NA,0.930192276,0.930192276
+Poland,2014,High income,Europe & Central Asia,NA,5.708307585,5.708307585
+Portugal,2016,High income,Europe & Central Asia,NA,4.985901815,4.985901815
+Qatar,2010,High income,Middle East & North Africa,1.2,1.665279046,1.2
+Romania,2016,Upper middle income,Europe & Central Asia,NA,6.098447144,6.098447144
+Russian Federation,2012,Upper middle income,Europe & Central Asia,8.4,8.478887733,8.4
+Rwanda,2016,Low income,Sub-Saharan Africa,NA,1.785558942,1.785558942
+Samoa,2010,Upper middle income,East Asia & Pacific,NA,2.887324776,2.887324776
+Sao Tome and Principe,2016,Lower middle income,Sub-Saharan Africa,NA,1.712460745,1.712460745
+Saudi Arabia,2014,High income,Middle East & North Africa,2.7,2.628799332,2.7
+Senegal,2014,Lower middle income,Sub-Saharan Africa,NA,2.911502423,2.911502423
+Serbia,2016,Upper middle income,Europe & Central Asia,NA,5.308052378,5.308052378
+Seychelles,2016,High income,Sub-Saharan Africa,NA,4.044358342,4.044358342
+Sierra Leone,2016,Low income,Sub-Saharan Africa,NA,1.50264474,1.50264474
+Singapore,2016,High income,East Asia & Pacific,NA,6.078070514,6.078070514
+Slovakia,2016,High income,Europe & Central Asia,NA,5.763087474,5.763087474
+Slovenia,2016,High income,Europe & Central Asia,NA,3.884800851,3.884800851
+Solomon Islands,2012,Lower middle income,East Asia & Pacific,1.4,1.455227953,1.4
+South Africa,2016,Upper middle income,Sub-Saharan Africa,NA,2.505605066,2.505605066
+Spain,2016,High income,Europe & Central Asia,NA,3.656613051,3.656613051
+Sri Lanka,2016,Upper middle income,South Asia,NA,3.302388419,3.302388419
+St. Lucia,2016,Upper middle income,Latin America & Caribbean,NA,4.186793411,4.186793411
+St. Vincent and the Grenadines,2016,Upper middle income,Latin America & Caribbean,NA,2.943265986,2.943265986
+Suriname,2015,Upper middle income,Latin America & Caribbean,NA,3.102932666,3.102932666
+Sweden,2016,High income,Europe & Central Asia,NA,3.191751847,3.191751847
+Switzerland,2016,High income,Europe & Central Asia,NA,6.645437748,6.645437748
+Syrian Arab Republic,2002,Low income,Middle East & North Africa,1.4,1.334979234,1.4
+Tajikistan,2011,Low income,Europe & Central Asia,4.9,4.963975826,4.9
+Tanzania,2016,Low income,Sub-Saharan Africa,NA,2.304532482,2.304532482
+Thailand,2016,Upper middle income,East Asia & Pacific,NA,6.934787076,6.934787076
+Timor-Leste,2011,Lower middle income,East Asia & Pacific,NA,2.15451506,2.15451506
+Togo,2007,Low income,Sub-Saharan Africa,NA,1.265585318,1.265585318
+Tonga,2015,Upper middle income,East Asia & Pacific,NA,2.484937295,2.484937295
+Tunisia,2011,Lower middle income,Middle East & North Africa,2.1,2.279250815,2.1
+Turkey,2015,Upper middle income,Europe & Central Asia,NA,3.208919562,3.208919562
+Uganda,2007,Low income,Sub-Saharan Africa,NA,1.609655949,1.609655949
+Ukraine,2000,Lower middle income,Europe & Central Asia,8.8,8.134016063,8.8
+United Arab Emirates,2016,High income,Middle East & North Africa,NA,3.574387101,3.574387101
+United Kingdom,2015,High income,Europe & Central Asia,NA,4.628494871,4.628494871
+United States,2015,High income,North America,NA,5.864760159,5.864760159
+Uruguay,2010,High income,Latin America & Caribbean,1.2,1.551550537,1.2
+Uzbekistan,2016,Lower middle income,Europe & Central Asia,NA,4.233892869,4.233892869
+Vanuatu,2015,Lower middle income,East Asia & Pacific,NA,3.115015113,3.115015113
+Zimbabwe,2013,Lower middle income,Sub-Saharan Africa,NA,1.951837759,1.951837759
