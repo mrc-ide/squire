@@ -164,8 +164,8 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' @param dur_not_get_mv_die Mean duration without ventilation given
 #'   death. Default = 12
 #' @param dur_rec Duration of recovery after coming off ventilation. Default = 6
-#' @param hosp_bed_capacity General bed capacity. Default = 5 * sum(population)/1000
-#' @param ICU_bed_capacity ICU bed capacity. Default = 3 * hosp_bed_capacity/100
+#' @param hosp_bed_capacity General bed capacity.
+#' @param ICU_bed_capacity ICU bed capacity.
 #'
 #' @return Simulation output
 #' @export
@@ -279,10 +279,14 @@ run_explicit_SEEIR_model <- function(
 
   # populate hospital and ICU bed capacity if not provided
   if (is.null(hosp_bed_capacity)) {
-    hosp_bed_capacity <- round(5*sum(population)/1000)
+    beds <- get_healthcare_capacity(country)
+    hosp_beds <- beds$hosp_beds
+    hosp_bed_capacity <- round(hosp_beds * sum(population)/1000)
   }
   if (is.null(ICU_bed_capacity)) {
-    ICU_bed_capacity <- round(3*hosp_bed_capacity/100)
+    beds <- get_healthcare_capacity(country)
+    ICU_beds <- beds$ICU_beds
+    ICU_bed_capacity <- round(ICU_beds * sum(population)/1000)
   }
 
   # Initail state and matrix formatting
