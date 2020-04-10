@@ -138,6 +138,7 @@ output(n_E2_I[]) <- TRUE
 n_E2_ICase1[] <- round(n_E2_I[i] * prob_hosp[i]) # Proportion of the new symptom onsets that will require hospitalisation (note: haven't entered hospital yet, delay between onset and hospitalisation)
 output(n_E2_ICase1[]) <- TRUE
 n_E2_IMild[] <- n_E2_I[i] - n_E2_ICase1[i] # 1 - Above, the rest of the infections, which we consider to be mild and not require hospitalisation
+output(n_E2_IMild[]) <- TRUE
 n_IMild_R[] <- rbinom(IMild[i], p_IMild_R) # Number of mild infections recovering
 n_ICase1_ICase2[] <- rbinom(ICase1[i], p_ICase1_ICase2) # Number progressing through the onset but not hospitalised compartment
 n_ICase2_Hosp[] <- rbinom(ICase2[i], p_ICase2_Hosp) # Number progressing to requiring hospitalisation
@@ -233,6 +234,7 @@ number_notget_Ox[] <- number_requiring_Ox[i] - number_get_Ox[i] # Calculating th
 # output(number_get_Ox[]) <- TRUE
 # output(ox_multinom_prob[]) <- TRUE
 # output(total_number_get_hosp) <- TRUE
+# output(n_IOxNotGetDie1[]) <- TRUE
 
 n_IOxNotGetDie1[] <- round(number_notget_Ox[i] * prob_non_severe_death_no_treatment[i]) # Number of individuals requiring oxygen but do not receive it and who die
 n_IOxNotGetDie1_IOxNotGetDie2[] <- rbinom(IOxNotGetDie1[i], p_IOxNotGetDie1_IOxNotGetDie2) # Progression through the "require but do not receive oxygen and die" compartment

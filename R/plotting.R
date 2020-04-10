@@ -1,4 +1,4 @@
-#' Calibrate Model
+#' Calibrated Model PPlotting
 #'
 #' @details Fit the explicit_SEEIR model to time series of deaths
 #'
@@ -6,15 +6,19 @@
 #'   from \code{\link{calibrate_output_parsing}}
 #' @param what What plotting type are we plotting. Options are \code{cases}
 #'   (default) or \code{healthcare}.
+#' @param forecast How many days forward should forecast plots be provided.
+#'   Default = 0 days
+#' @param ... Other parameters to be passed to internal plotting functions.
 #'
 #' @importFrom utils tail
 #' @importFrom stats rbinom time quantile
 #'
+#' @export
 #' @return List of unformatted odin outputs with the date
-plot.squire_calibration <- function(squire_calibration, what = "cases") {
+plot.squire_calibration <- function(squire_calibration, what = "cases",
+                                    forecast = 0, ...) {
 
   # assert checks
-  assert_custom_class(squire_calibration, "squire_calibration")
   assert_string(what)
 
   # get the object for plotting
@@ -23,9 +27,9 @@ plot.squire_calibration <- function(squire_calibration, what = "cases") {
 
   # what are we plotting
   if(what == "cases") {
-    gg <- plot_calibration_cases(df, data)
+    gg <- plot_calibration_cases(df = df, data = data, forecast = forecast, ...)
   } else if (what == "healthcare") {
-    gg <- plot_calibration_healthcare(df, data)
+    gg <- plot_calibration_healthcare(df = df, data = data, forecast = forecast, ...)
   } else {
     stop("what must be one of cases or healthcare")
   }
@@ -35,17 +39,17 @@ plot.squire_calibration <- function(squire_calibration, what = "cases") {
 
 
 #' @noRd
-plot_calibration_cases <- function(df, data, forward = 0) {
+plot_calibration_cases <- function(df, data, forecast = 0) {
 
   # split to correct dates
   sub <- df[df$variable %in% c("mild_cases", "hospital_cases") &
-              df$date <=  Sys.Date() + forward,]
+              df$date <=  Sys.Date() + forecast,]
 
   pd_group <- dplyr::group_by(sub, .data$date, .data$variable) %>%
     dplyr::summarise(quants = list(quantile(.data$value, c(0.025, 0.5, 0.975))),
                      ymin = .data$quants[[1]][1],
                      ymax = .data$quants[[1]][3],
-                     value = mean(.data$value))
+                     value = median(.data$value))
 
   # format cases
   data$cases <- rev(c(tail(data$cases,1), diff(rev(data$cases))))
@@ -56,7 +60,7 @@ plot_calibration_cases <- function(df, data, forward = 0) {
                       y = .data$value, col = .data$variable,
                       group = interaction(.data$variable, .data$replicate))) +
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
-    ggplot2::geom_line(alpha = max(0.4, 1 / max(sub$replicate))) +
+    ggplot2::geom_line(alpha = max(0.1, 1 / max(sub$replicate))) +
     ggplot2::geom_line(data = pd_group,
                        mapping = ggplot2::aes(group = .data$variable),
                        size = 0.8) +
@@ -64,16 +68,20 @@ plot_calibration_cases <- function(df, data, forward = 0) {
                          mapping = ggplot2::aes(group = .data$variable,
                                                 ymin = .data$ymin,
                                                 ymax = .data$ymax,
-                                                fill = .data$variable),
+                                                color = .data$variable),
                          alpha = 0.2,
-                         size = 0.8) +
+                         fill = NA,
+                         linetype = "dashed",
+                         size = 0.8,
+                         show.legend = FALSE) +
     ggplot2::geom_point(data = data,
-                        mapping = ggplot2::aes(x = .data$date, y = .data$cases),
+                        mapping = ggplot2::aes(x = .data$date, y = .data$cases, shape = "Cases"),
                         inherit.aes = FALSE) +
     ggplot2::xlab("Date") +
-    ggplot2::ylab("Cumulative Cases") +
+    ggplot2::ylab("Daily Cases") +
     ggplot2::scale_color_discrete(name = "", labels = c("Hospital Cases","Mild Cases")) +
     ggplot2::scale_fill_discrete(name = "", labels = c("Hospital Cases","Mild Cases")) +
+    ggplot2::scale_shape_discrete(name = "Observed") +
     ggplot2::theme_bw()
 
   invisible(gg_cases)
@@ -82,17 +90,20 @@ plot_calibration_cases <- function(df, data, forward = 0) {
 
 
 #' @noRd
-plot_calibration_healthcare <- function(df, data, forward = 14) {
+plot_calibration_healthcare <- function(df, data, forecast = 14) {
 
   # split to correct dates
   sub <- df[df$variable %in% c("icu", "hospital_bed", "deaths") &
-              df$date <=  Sys.Date() + forward,]
+              df$date <=  Sys.Date() + forecast,]
 
   pd_group <- dplyr::group_by(sub, .data$date, .data$variable) %>%
     dplyr::summarise(quants = list(quantile(.data$value, c(0.025, 0.5, 0.975))),
                      ymin = .data$quants[[1]][1],
-                     value = mean(.data$value),
+                     value = median(.data$value),
                      ymax = .data$quants[[1]][3])
+
+  # format cases
+  data$deaths <- rev(c(tail(data$deaths,1), diff(rev(data$deaths))))
 
   # Plot
   gg_healthcare <- ggplot2::ggplot(
@@ -100,7 +111,7 @@ plot_calibration_healthcare <- function(df, data, forward = 14) {
                       y = .data$value, col = .data$variable,
                       group = interaction(.data$variable, .data$replicate))) +
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
-    ggplot2::geom_line(alpha = max(0.4, 1 / max(sub$replicate))) +
+    ggplot2::geom_line(alpha = max(0.1, 1 / max(sub$replicate))) +
     ggplot2::geom_line(data = pd_group,
                        mapping = ggplot2::aes(group = .data$variable),
                        size = 0.8) +
@@ -108,18 +119,22 @@ plot_calibration_healthcare <- function(df, data, forward = 14) {
                          mapping = ggplot2::aes(group = .data$variable,
                                                 ymin = .data$ymin,
                                                 ymax = .data$ymax,
-                                                fill = .data$variable),
+                                                color = .data$variable),
+                         fill = NA,
                          alpha = 0.2,
-                         size = 0.8) +
+                         linetype = "dashed",
+                         size = 0.8,
+                         show.legend = FALSE) +
     ggplot2::geom_point(data = data,
-               mapping = ggplot2::aes(x = .data$date, y = c(.data$deaths[1],diff(.data$deaths))),
+               mapping = ggplot2::aes(x = .data$date, y = .data$deaths, shape = "Deaths"),
                inherit.aes = FALSE) +
     ggplot2::xlab("Date") +
-    ggplot2::ylab("Cumulative Deaths") +
-    ggplot2::scale_color_discrete(name = "", labels = c("Deaths", "Hospital Beds", "ICU Beds")) +
-    ggplot2::scale_fill_discrete(name = "", labels = c("Deaths", "Hospital Beds", "ICU Beds")) +
+    ggplot2::ylab("Daily Deaths / Healthcare Demands") +
+    ggplot2::scale_color_discrete(name = "Predicted", labels = c("Deaths", "Hospital Beds", "ICU Beds")) +
+    ggplot2::scale_fill_discrete(name = "Predicted", labels = c("Deaths", "Hospital Beds", "ICU Beds")) +
+    ggplot2::scale_shape_discrete(name = "Observed") +
     ggplot2::theme_bw() +
-    ggplot2::xlim(c(Sys.Date()-7, Sys.Date()+forward))
+    ggplot2::xlim(c(Sys.Date()-7, Sys.Date()+forecast))
 
   invisible(gg_healthcare)
 

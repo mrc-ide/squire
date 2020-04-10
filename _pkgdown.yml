@@ -25,6 +25,7 @@ reference:
   - title: "Model output summaries"
     desc: "Functions for summarising the model components"
     contents:
+      - untransformed_output
       - wide_output
       - long_output
 

@@ -1,3 +1,5 @@
+context("objects")
+
 test_that("object methods ", {
   # Get a population
   pop <- get_population("Afghanistan", simple_SEIR = TRUE)
@@ -13,4 +15,30 @@ test_that("object methods ", {
   expect_s3_class(plot(m1), "gg")
   expect_null(check_squire(m1))
   expect_error(check_squire(1), "Object must be a squire_simulation")
+})
+
+
+test_that("squire_untransform ", {
+
+# run the model
+r <- run_explicit_SEEIR_model(country = "Afghanistan",
+                              output_transform = FALSE)
+
+# check it works
+gcu <- untransformed_output(r)
+gg <- plot(gcu)
+expect_is(gg, "ggplot")
+
+# error catching
+r2 <- run_explicit_SEEIR_model(country = "Afghanistan",
+                              output_transform = TRUE)
+expect_error(gcu <- untransformed_output(r2),
+             "r must be created with")
+
+expect_error(gcu <- untransformed_output(r,deaths = FALSE, cases = FALSE, beds = FALSE),
+             "Must provide compartment or")
+
+gcu <- untransformed_output(r,compartments = c("S","R"),
+                                      deaths = FALSE, cases = FALSE, beds = FALSE)
+
 })

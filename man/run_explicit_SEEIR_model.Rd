@@ -17,6 +17,7 @@ run_explicit_SEEIR_model(
   replicates = 10,
   init = NULL,
   output_transform = TRUE,
+  seed = runif(1, 0, 1e+08),
   prob_hosp = c(0.000744192, 0.000634166, 0.001171109, 0.002394593, 0.005346437,
     0.010289885, 0.016234604, 0.023349169, 0.028944623, 0.038607042, 0.057734879,
     0.072422135, 0.101602458, 0.116979814, 0.146099064, 0.176634654, 0.18),
@@ -26,7 +27,8 @@ run_explicit_SEEIR_model(
   prob_non_severe_death_treatment = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
     0.0125702, 0.0125702, 0.0125702, 0.013361147, 0.015104687, 0.019164124, 0.027477519,
     0.041762108, 0.068531658, 0.105302319, 0.149305732, 0.20349534, 0.5804312),
-  prob_non_severe_death_no_treatment = prob_non_severe_death_treatment * 2,
+  prob_non_severe_death_no_treatment = vapply(prob_non_severe_death_treatment * 2, min,
+    numeric(1), 1),
   prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
   prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
   p_dist = rep(1, length(prob_hosp)),
@@ -42,15 +44,15 @@ run_explicit_SEEIR_model(
   dur_not_get_mv_survive = 12,
   dur_not_get_mv_die = 1,
   dur_rec = 6,
-  hosp_bed_capacity = 5 * sum(population)/1000,
-  ICU_bed_capacity = 3 * hosp_bed_capacity/100
+  hosp_bed_capacity = NULL,
+  ICU_bed_capacity = NULL
 )
 }
 \arguments{
 \item{country}{Character for country beign simulated. WIll be used to
-generate \code{population} and \code{baseline_contact_matrix} if
+generate \code{population} and \code{contact_matrix_set} if
 unprovided. Either \code{country} or \code{population} and
-\code{baseline_contact_matrix} must be provided.}
+\code{contact_matrix_set} must be provided.}
 
 \item{population}{Population vector (for each age group). Default = NULL,
 which will cause population to be sourced from \code{country}}
@@ -77,6 +79,8 @@ Default = NULL, which causes beta to be estimated from R0}
 
 \item{output_transform}{Transport model outputs into useful format.
 Default == FALSE}
+
+\item{seed}{Random seed used for simulations. Deafult = runif(1, 0, 10000)}
 
 \item{prob_hosp}{probability of hospitalisation by age.
 Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,

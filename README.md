@@ -7,6 +7,8 @@
 
 [![Travis build
 status](https://travis-ci.org/mrc-ide/squire.svg?branch=master)](https://travis-ci.org/mrc-ide/squire)
+[![AppVeyor build
+status](https://ci.appveyor.com/api/projects/status/github/mrc-ide/squire?branch=master&svg=true)](https://ci.appveyor.com/project/pwinskill/squire)
 [![Codecov test
 coverage](https://codecov.io/gh/mrc-ide/squire/branch/master/graph/badge.svg)](https://codecov.io/gh/mrc-ide/squire?branch=master)
 <!-- badges: end -->
@@ -110,7 +112,8 @@ devtools::install_github("mrc-ide/squire")
 If you have any problems installing then please raise an issue on the
 <i>squire</i> [`GitHub`](https://github.com/mrc-ide/squire/issues).
 
-If everything has installed correctly, we then need to load the package:
+If everything has installed correctly, we then need to load the
+package:
 
 ``` r
 library(squire)
@@ -120,8 +123,7 @@ library(squire)
 
 ### Running the Model (Unmitigated)
 
-1.  Running the model using baseline parameters and no control
-    interventions
+### 1\. Running the model using baseline parameters and no control interventions
 
 The full model is referred to as the **explicit\_SEEIR** model, with
 hospital pathways explicltly exploring whether individuals will require
@@ -132,11 +134,11 @@ To run the model we need to provide at least one of the following
 arguments:
 
   - `country`
-  - `population` and `baseline_contact_matrix`
+  - `population` and `contact_matrix_set`
 
-If the `country` is provided, the `population` and
-`baseline_contact_matrix` will be generated (if not also specified)
-using the demographics and matrices specified in the [global
+If the `country` is provided, the `population` and `contact_matrix_set`
+will be generated (if not also specified) using the demographics and
+matrices specified in the [global
 report](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-12-global-impact-covid-19/).
 
 To run the model by providing the `country` we use
@@ -161,7 +163,7 @@ plot(r)
 <img src="man/figures/README-base plot-1.png" width="100%" /> This plot
 will plot each of the compartments of the model output.
 
-2.  Changing parameters in the model.
+### 2\. Changing parameters in the model.
 
 The model has a number of parameters for setting the R0, demography,
 contact matrices, the durations of each compartment and the health care
@@ -187,7 +189,7 @@ contact_matrix <- get_mixing_matrix("United Kingdom")
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
-                              baseline_contact_matrix = contact_matrix,
+                              contact_matrix_set = contact_matrix,
                               R0 = 2.5, 
                               time_period = 200,
                               dt = 1,
@@ -205,7 +207,6 @@ set a 80% reduction in the contact matrix after 50 days :
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
-                              baseline_contact_matrix = contact_matrix,
                               tt_contact_matrix = c(0, 50),
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2),
@@ -224,7 +225,6 @@ To show an 80% reduction after 50 days but only maintained for 30 days :
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
-                              baseline_contact_matrix = contact_matrix,
                               tt_contact_matrix = c(0, 50, 80),
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2,
@@ -245,7 +245,7 @@ days:
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
-                              baseline_contact_matrix = contact_matrix,
+                              contact_matrix_set = contact_matrix,
                               tt_R0 = c(0, 50),
                               R0 = c(2.5, 0.9),
                               time_period = 200,
@@ -256,28 +256,48 @@ plot(r)
 
 <img src="man/figures/README-set R0 decrease-1.png" width="100%" />
 
-3.  Extracting and Plotting Relevant Outputs
+### 3\. Extracting and Plotting Relevant Outputs
 
 Alternative summaries of the models can be created, which give commonly
 reported measures, such as deaths, number of ICU beds and general
 hospital beds required.
 
-``` r
+These could be created by using the outputs seen in the previous
+section, e.g. `r$output$ICase1 + r$output$ICase2` to get the total
+symptomatic cases.
 
-# Still to do
-```
-
-The number of deaths over time will depend heavily on the available
-healthcare capacity of a country, with excess mortality occurring when
-critical care patients, who require mechanical ventilation, are unable
-to access one due to shortages:
+However, accessing outputs this waus is much slower. A quicker way is to
+change the simulation output with `output_transform = FALSE`, which will
+not transform the outputs produced by odin.
 
 ``` r
-
-# Still to do
+# run the model
+r <- run_explicit_SEEIR_model(country = "Afghanistan",
+                              output_transform = FALSE)
 ```
 
-4.  Calibrating the Model to Observed Deaths Data
+To access the outputs we can use `untransformed_output`, specifying  
+which compartments are to be returned, and which specific summary
+outputs related to case incidence, death incidence and hospital bed
+demands are needed:
+
+``` r
+
+gcu <- untransformed_output(r, compartments = c("S", "R"),
+                               deaths = TRUE, 
+                               cases = TRUE, 
+                               beds = TRUE)
+```
+
+This object can then be easily plotted:
+
+``` r
+plot(gcu)
+```
+
+<img src="man/figures/README-plot gcu-1.png" width="100%" />
+
+### 4\. Calibrating the Model to Observed Deaths Data
 
 The model can be simply calibrated to time series of deaths reported in
 settings. This can be conducted using the `calibrate` function, by
@@ -287,54 +307,54 @@ providing a data frame of date and deaths. For example:
 
 # create dummy data
 df <- data.frame("date" = Sys.Date() - 0:6,
-                 "deaths" = c(6, 2, 1, 1, 0, 0, 0))
+                 "deaths" = c(6, 2, 1, 1, 0, 0, 0),
+                 "cases" = c(394, 101, 89, 4, 0, 0, 0))
 df
-#>         date deaths
-#> 1 2020-04-09      6
-#> 2 2020-04-08      2
-#> 3 2020-04-07      1
-#> 4 2020-04-06      1
-#> 5 2020-04-05      0
-#> 6 2020-04-04      0
-#> 7 2020-04-03      0
+#>         date deaths cases
+#> 1 2020-04-10      6   394
+#> 2 2020-04-09      2   101
+#> 3 2020-04-08      1    89
+#> 4 2020-04-07      1     4
+#> 5 2020-04-06      0     0
+#> 6 2020-04-05      0     0
+#> 7 2020-04-04      0     0
 ```
 
 ``` r
-
-# run caliibrate
+# run calibrate
 out <- calibrate(data = df, country = "Senegal", replicates = 10)
-
-head(out)
-#> # A tibble: 6 x 7
-#> # Groups:   replicate [1]
-#>       t age_group replicate new_time date       name     value
-#>   <dbl>     <dbl>     <dbl>    <dbl> <date>     <chr>    <dbl>
-#> 1     1         1         1      -36 2020-03-04 S      2615338
-#> 2     1         1         1      -36 2020-03-04 E1           0
-#> 3     1         1         1      -36 2020-03-04 E2           0
-#> 4     1         1         1      -36 2020-03-04 IMild        1
-#> 5     1         1         1      -36 2020-03-04 ICase1       1
-#> 6     1         1         1      -36 2020-03-04 ICase2       1
 ```
 
 Simulation replicates are aligned to the current death total and the
-outputs of each simulation replicate are returned in long format. To
-plot the deaths over time up until the next week:
+outputs are returned as a `squire_calibration` object, which has
+dedicated plotting functions.
+
+These allow the predicted cumulative cases based from the observed
+deaths to be plotted:
 
 ``` r
-
-# summarise deaths
-deaths <- dplyr::group_by(out[out$name == "D", ],date, replicate)
-deaths <- dplyr::summarise(deaths, value = sum(value))
-deaths <- deaths[deaths$date < Sys.Date() + 7,]
-
-# plot the deaths
-ggplot2::ggplot(deaths, ggplot2::aes(x = date, y = value, group = replicate)) + 
-  ggplot2::geom_line() + 
-  ggplot2::geom_vline(xintercept = Sys.Date()) +
-  ggplot2::geom_hline(yintercept = df$deaths[1]) +
-  ggplot2::xlab("Date") + 
-  ggplot2::ylab("Cumulative Deaths")
+plot(out, what = "cases")
 ```
 
-<img src="man/figures/README-deaths over time-1.png" width="100%" />
+<img src="man/figures/README-cases over time-1.png" width="100%" />
+
+Additionally, we can plot the incidence of deaths as well as the
+healthcare demands:
+
+``` r
+plot(out, what = "healthcare")
+#> Warning: Removed 3315 row(s) containing missing values (geom_path).
+#> Warning: Removed 351 row(s) containing missing values (geom_path).
+```
+
+<img src="man/figures/README-healthcare over time-1.png" width="100%" />
+
+We can also control how far we forecast. To forecast for 14 days:
+
+``` r
+plot(out, what = "healthcare", forecast = 14)
+#> Warning: Removed 3315 row(s) containing missing values (geom_path).
+#> Warning: Removed 351 row(s) containing missing values (geom_path).
+```
+
+<img src="man/figures/README-healthcare forecast over time-1.png" width="100%" />

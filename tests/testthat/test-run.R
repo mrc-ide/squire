@@ -211,7 +211,7 @@ test_that("run explicit works when healthsystem capacity is swamped", {
                                 output_transform = TRUE,
                                 replicates = 1)
 
-  vars <- names(r1$output)[grepl("^[[:upper:]]+$", substr(names(r1$output), 1, 1))]
+  vars <- names(r$output)[grepl("^[[:upper:]]+$", substr(names(r$output), 1, 1))]
   for(i in vars) {
   expect_equal(sum(is.na(colSums(r$output[[i]][,,1]))), 0)
   }

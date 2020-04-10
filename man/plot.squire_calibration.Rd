@@ -2,9 +2,9 @@
 % Please edit documentation in R/plotting.R
 \name{plot.squire_calibration}
 \alias{plot.squire_calibration}
-\title{Calibrate Model}
+\title{Calibrated Model PPlotting}
 \usage{
-\method{plot}{squire_calibration}(squire_calibration, what = "cases")
+\method{plot}{squire_calibration}(squire_calibration, what = "cases", forecast = 0, ...)
 }
 \arguments{
 \item{squire_calibration}{\code{squire_calibration} object produced from
@@ -12,12 +12,17 @@ from \code{\link{calibrate_output_parsing}}}
 
 \item{what}{What plotting type are we plotting. Options are \code{cases}
 (default) or \code{healthcare}.}
+
+\item{forecast}{How many days forward should forecast plots be provided.
+Default = 0 days}
+
+\item{...}{Other parameters to be passed to internal plotting functions.}
 }
 \value{
 List of unformatted odin outputs with the date
 }
 \description{
-Calibrate Model
+Calibrated Model PPlotting
 }
 \details{
 Fit the explicit_SEEIR model to time series of deaths
