@@ -53,4 +53,13 @@ usethis::use_data(population, overwrite = TRUE)
 # ------------------------------------------------------------------------------
 
 bed <- readRDS("data-raw/Hospital_Bed_Capacity_Predictions.Rds")
+hosp_beds_by_country <- bed %>%
+  dplyr::select(country_name, income_group, beds_to_use) %>%
+  dplyr::rename(country = country_name, hosp_beds = beds_to_use)
+
 income <- readRDS("data-raw/Income_Strata_Predicted_Hospital_and_ICU_Beds.Rds")
+income <- income %>%
+  dplyr::select()
+
+
+
