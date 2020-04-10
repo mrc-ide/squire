@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     <p>Calibrate Model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>calibrate</span>(<span class='no'>data</span>, <span class='no'>country</span>, <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>calibrate</span>(<span class='no'>data</span>, <span class='no'>country</span>, <span class='kw'>parse_output</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.25</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -134,8 +134,17 @@
       <td><p>Character. Country data originates from.</p></td>
     </tr>
     <tr>
+      <th>parse_output</th>
+      <td><p>Logical. Should output be parsed ready for plotting.
+Default = TRUE</p></td>
+    </tr>
+    <tr>
       <th>replicates</th>
       <td><p>Simulation Repetitions. Default = 10</p></td>
+    </tr>
+    <tr>
+      <th>dt</th>
+      <td><p>Time Step. Default = 0.25</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -145,7 +154,8 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Long data frame of simulation replicates</p>
+    <p>List of formatted odin outputs, the data it is calibrated to and
+  the parameter set used in calibration</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Fit the explicit_SEEIR model to time series of deaths</p>
@@ -161,11 +171,11 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Patrick Walker, Charlie Whittaker, Peter Winskill.</p>
+  <p>Developed by Patrick Walker, OJ Watson, Charlie Whittaker, Peter Winskill.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
 </div>
 
       </footer>

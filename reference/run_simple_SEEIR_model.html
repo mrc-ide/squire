@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Check and set up initial values — init_check • squire</title>
+<title>Run the SEEIR model — run_simple_SEEIR_model • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Check and set up initial values — init_check" />
-<meta property="og:description" content="Check and set up initial values" />
+<meta property="og:title" content="Run the SEEIR model — run_simple_SEEIR_model" />
+<meta property="og:description" content="Run the SEEIR model" />
 
 
 
@@ -111,34 +111,89 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Check and set up initial values</h1>
+    <h1>Run the SEEIR model</h1>
     
-    <div class="hidden name"><code>init_check.Rd</code></div>
+    <div class="hidden name"><code>run_simple_SEEIR_model.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Check and set up initial values</p>
+    <p>Run the SEEIR model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>init_check</span>(<span class='no'>init</span>, <span class='no'>population</span>)</pre>
+    <pre class="usage"><span class='fu'>run_simple_SEEIR_model</span>(
+  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>tt_R0</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='kw'>init</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>dur_E</span> <span class='kw'>=</span> <span class='fl'>4.58</span>,
+  <span class='kw'>dur_I</span> <span class='kw'>=</span> <span class='fl'>2.09</span>,
+  <span class='no'>population</span>,
+  <span class='no'>contact_matrix_set</span>,
+  <span class='kw'>tt_contact_matrix</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>time_period</span> <span class='kw'>=</span> <span class='fl'>365</span>,
+  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>R0</th>
+      <td><p>Basic reproduction number</p></td>
+    </tr>
+    <tr>
+      <th>tt_R0</th>
+      <td><p>Change time points for R0</p></td>
+    </tr>
+    <tr>
+      <th>dt</th>
+      <td><p>Time step</p></td>
+    </tr>
+    <tr>
       <th>init</th>
       <td><p>Data.frame of initial conditions</p></td>
+    </tr>
+    <tr>
+      <th>dur_E</th>
+      <td><p>Mean duration of incubation period (days)</p></td>
+    </tr>
+    <tr>
+      <th>dur_I</th>
+      <td><p>Mean duration of infectious period (days)</p></td>
     </tr>
     <tr>
       <th>population</th>
       <td><p>Population vector (for each age group)</p></td>
     </tr>
+    <tr>
+      <th>contact_matrix_set</th>
+      <td><p>Contact matrices used in simulation</p></td>
+    </tr>
+    <tr>
+      <th>tt_contact_matrix</th>
+      <td><p>Time change points for matrix change</p></td>
+    </tr>
+    <tr>
+      <th>time_period</th>
+      <td><p>Length of simulation</p></td>
+    </tr>
+    <tr>
+      <th>replicates</th>
+      <td><p>Number of replicates</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Checked initial values data.frame</p>
+    <p>Simulation output</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>pop</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_population.html'>get_population</a></span>(<span class='st'>"Afghanistan"</span>)
+<span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'>run_simple_SEEIR_model</span>(<span class='kw'>population</span> <span class='kw'>=</span> <span class='no'>pop</span>$<span class='no'>n</span>, <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+<span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+<span class='kw'>contact_matrix_set</span><span class='kw'>=</span><span class='no'>contact_matrices</span><span class='kw'>[[</span><span class='fl'>1</span>]])
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -127,19 +127,23 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>r</th>
-      <td><p>Output of <code><a href='calibrate_stripped.html'>calibrate_stripped</a></code></p></td>
+      <td><p>Output of <code><a href='calibrate.html'>calibrate</a></code></p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
-
+    <p><code>list</code> with:</p><ul>
+<li><p>df: Data frame of case numbers, hospital beds, icu beds and deaths</p></li>
+<li><p>data: Raw data used in calibration</p></li>
+<li><p>parameters: Parameters used in simulation</p></li>
+</ul>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Calibration output is taken to give time series of infections, cases,
-cases requiring hospitilisation, case requiring critical care facilities.</p>
+cases requiring hospitilisation, case requiring critical care facilities. Used
+in plotting for nowcasting reports.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -152,11 +156,11 @@ cases requiring hospitilisation, case requiring critical care facilities.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Patrick Walker, Charlie Whittaker, Peter Winskill.</p>
+  <p>Developed by Patrick Walker, OJ Watson, Charlie Whittaker, Peter Winskill.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
 </div>
 
       </footer>

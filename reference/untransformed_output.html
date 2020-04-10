@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Check and set up initial values — init_check • squire</title>
+<title>Explicit Output from non transformed run — untransformed_output • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Check and set up initial values — init_check" />
-<meta property="og:description" content="Check and set up initial values" />
+<meta property="og:title" content="Explicit Output from non transformed run — untransformed_output" />
+<meta property="og:description" content="Explicit Output from non transformed run" />
 
 
 
@@ -111,33 +111,56 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Check and set up initial values</h1>
+    <h1>Explicit Output from non transformed run</h1>
     
-    <div class="hidden name"><code>init_check.Rd</code></div>
+    <div class="hidden name"><code>untransformed_output.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Check and set up initial values</p>
+    <p>Explicit Output from non transformed run</p>
     </div>
 
-    <pre class="usage"><span class='fu'>init_check</span>(<span class='no'>init</span>, <span class='no'>population</span>)</pre>
+    <pre class="usage"><span class='fu'>untransformed_output</span>(
+  <span class='no'>r</span>,
+  <span class='kw'>compartments</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>deaths</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>cases</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>beds</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>init</th>
-      <td><p>Data.frame of initial conditions</p></td>
+      <th>r</th>
+      <td><p>Output of <code><a href='run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model</a></code> with
+<code>output_transform</code> is FALSE</p></td>
     </tr>
     <tr>
-      <th>population</th>
-      <td><p>Population vector (for each age group)</p></td>
+      <th>compartments</th>
+      <td><p>Specific compartments to extract. Default = NULL</p></td>
+    </tr>
+    <tr>
+      <th>deaths</th>
+      <td><p>Should incident deaths be include. Default = TRUE</p></td>
+    </tr>
+    <tr>
+      <th>cases</th>
+      <td><p>Should incident cases be include. Default = TRUE</p></td>
+    </tr>
+    <tr>
+      <th>beds</th>
+      <td><p>Should ICU bed and hospital bed demand be include. Default = TRUE</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Checked initial values data.frame</p>
+    <p>Data frame of case numbers, hospital beds, icu beds and deaths</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Parse output of <code><a href='run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model</a></code> when
+<code>output_transform</code> is FALSE</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

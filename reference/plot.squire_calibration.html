@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Check and set up initial values — init_check • squire</title>
+<title>Calibrated Model PPlotting — plot.squire_calibration • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Check and set up initial values — init_check" />
-<meta property="og:description" content="Check and set up initial values" />
+<meta property="og:title" content="Calibrated Model PPlotting — plot.squire_calibration" />
+<meta property="og:description" content="Calibrated Model PPlotting" />
 
 
 
@@ -111,33 +111,48 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Check and set up initial values</h1>
+    <h1>Calibrated Model PPlotting</h1>
     
-    <div class="hidden name"><code>init_check.Rd</code></div>
+    <div class="hidden name"><code>plot.squire_calibration.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Check and set up initial values</p>
+    <p>Calibrated Model PPlotting</p>
     </div>
 
-    <pre class="usage"><span class='fu'>init_check</span>(<span class='no'>init</span>, <span class='no'>population</span>)</pre>
+    <pre class="usage"><span class='co'># S3 method for squire_calibration</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>what</span> <span class='kw'>=</span> <span class='st'>"cases"</span>, <span class='kw'>forecast</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>init</th>
-      <td><p>Data.frame of initial conditions</p></td>
+      <th>x</th>
+      <td><p><code>squire_calibration</code> object produced from
+from <code><a href='calibrate_output_parsing.html'>calibrate_output_parsing</a></code></p></td>
     </tr>
     <tr>
-      <th>population</th>
-      <td><p>Population vector (for each age group)</p></td>
+      <th>...</th>
+      <td><p>Other parameters to be passed to internal plotting functions.</p></td>
+    </tr>
+    <tr>
+      <th>what</th>
+      <td><p>What plotting type are we plotting. Options are <code>cases</code>
+(default) or <code>healthcare</code>.</p></td>
+    </tr>
+    <tr>
+      <th>forecast</th>
+      <td><p>How many days forward should forecast plots be provided.
+Default = 0 days</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Checked initial values data.frame</p>
+    <p>List of unformatted odin outputs with the date</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Fit the explicit_SEEIR model to time series of deaths</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
