@@ -39,6 +39,7 @@ test_that("object methods ", {
   expect_s3_class(plot(m1, var_select = "S"), "gg")
   expect_s3_class(plot(m2), "gg")
   expect_s3_class(plot(m2, replicates = TRUE), "gg")
+  expect_s3_class(plot(m3, replicates = FALSE), "gg")
   expect_warning(plot(m4), "Summary statistic estimated from <10 replicates")
   expect_warning(plot(m4, ci = TRUE), "Confidence bounds estimated from <10 replicates")
   expect_null(check_squire(m1))

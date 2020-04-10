@@ -35,23 +35,6 @@ print.squire_simulation <- function(x, ...){
   invisible(x)
 }
 
-#' Upper CI plot helper
-#'
-#' @param y Vector of values
-#'
-#' @return Upper quantile
-uci <- function(y){
-  quantile(y, 0.975)
-}
-#' Lower CI plot helper
-#'
-#' @param y Vector of values
-#'
-#' @return Lower quantile
-lci <- function(y){
-  quantile(y, 0.025)
-}
-
 #' squire simulation plot
 #'
 #' @param x An iccm_simulation object
