@@ -58,7 +58,8 @@ lci <- function(y){
 #' @param replicates Plot replicates
 #' @param ci Plot 2.5 and 97.5 quantiles for each compartment
 #' @param var_select Vector of variable names to plot (default is all)
-#' @param summary_f Function to summarise each compartment  passed to the \code{fun} argument of \code{\link[ggplot2]{stat_summary}}
+#' @param summary_f Function to summarise each compartment
+#'   passed to the \code{fun} argument of \code{\link[ggplot2]{stat_summary}}
 #' @param ... additional arguments affecting the plot produced.
 #'
 #' @export

@@ -22,7 +22,8 @@
 
 \item{var_select}{Vector of variable names to plot (default is all)}
 
-\item{summary_f}{Function to summarise each compartment  passed to the \code{fun} argument of \code{\link[ggplot2]{stat_summary}}}
+\item{summary_f}{Function to summarise each compartment
+passed to the \code{fun} argument of \code{\link[ggplot2]{stat_summary}}}
 
 \item{...}{additional arguments affecting the plot produced.}
 }

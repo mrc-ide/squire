@@ -1,10 +1,12 @@
 # Process raw data
 
 # Contact Matrices sourced from literature used in the global report
+# ------------------------------------------------------------------------------
 contact_matrices <- readRDS("data-raw/contact_matrices.rds")
 usethis::use_data(contact_matrices, overwrite = TRUE)
 
 # Demography
+# ------------------------------------------------------------------------------
 demog <- read.csv("data-raw/WPP_demog_matrix.csv", stringsAsFactors = FALSE)
 
 population <- demog %>%
@@ -46,3 +48,9 @@ population$country <- iconv(
 
 population <- as.data.frame(population)
 usethis::use_data(population, overwrite = TRUE)
+
+# Bed Capacity
+# ------------------------------------------------------------------------------
+
+bed <- readRDS("data-raw/Hospital_Bed_Capacity_Predictions.Rds")
+income <- readRDS("data-raw/Income_Strata_Predicted_Hospital_and_ICU_Beds.Rds")
