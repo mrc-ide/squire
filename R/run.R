@@ -192,7 +192,7 @@ run_explicit_SEEIR_model <- function(
 
   # initial state, duration, reps
   time_period = 365,
-  dt = 0.5,
+  dt = 0.1,
   replicates = 10,
   init = NULL,
   output_transform = TRUE,
