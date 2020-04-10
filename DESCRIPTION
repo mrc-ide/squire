@@ -1,7 +1,7 @@
 Package: squire
 Type: Package
 Title: SEIR transmission model of COVID-19
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
   person("Patrick", "Walker", email = "patrick.walker06@imperial.ac.uk", role = c("aut")),
   person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut", "cre")),
