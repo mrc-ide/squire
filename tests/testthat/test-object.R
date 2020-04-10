@@ -34,17 +34,16 @@ test_that("object methods ", {
   expect_s3_class(plot(m1, summary_f = median), "gg")
   expect_s3_class(plot(m1, ci = FALSE), "gg")
   expect_s3_class(plot(m1, ci = TRUE), "gg")
+  expect_s3_class(plot(m1, summarise = FALSE), "gg")
+  expect_s3_class(plot(m1, q = c(0.25, 0.6)), "gg")
   expect_s3_class(plot(m1, var_select = "S"), "gg")
   expect_s3_class(plot(m2), "gg")
   expect_s3_class(plot(m2, replicates = TRUE), "gg")
   expect_warning(plot(m4), "Summary statistic estimated from <10 replicates")
   expect_warning(plot(m4, ci = TRUE), "Confidence bounds estimated from <10 replicates")
-  expect_error(plot(m3), "Plotting does not work with untransformed output, please run
-           the model with output_transform = TRUE")
   expect_null(check_squire(m1))
   expect_error(check_squire(1), "Object must be a squire_simulation")
-
-
+  expect_error(plot(m1, var_select = c("S", "bad")), "Selected variable are not all present in output")
 })
 
 
