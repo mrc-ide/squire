@@ -20,12 +20,18 @@ df_output <- function(m, compartment){
 #' Convert model output to long format
 #'
 #' @param m Model output
+#' @param vars Character vector of variable names to select
 #'
 #' @return Long format model output data.frame
 #' @export
-long_output <- function(m){
-
-  vars <- names(m)[grepl("^[[:upper:]]+$", substr(names(m), 1, 1))]
+long_output <- function(m, vars = NULL){
+  if(is.null(vars)){
+    vars <- names(m)[grepl("^[[:upper:]]+$", substr(names(m), 1, 1))]
+  } else {
+    if(!all(vars %in% names(m))){
+      stop("Selected variables are not all present in output")
+    }
+  }
   o1 <- dplyr::bind_rows(lapply(vars, df_output, m = m))
   o1$t <- m$time[o1$t,1]
   o1$compartment <- factor(o1$compartment, levels = vars)
