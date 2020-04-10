@@ -4,19 +4,19 @@
 \alias{plot.squire_calibration}
 \title{Calibrated Model PPlotting}
 \usage{
-\method{plot}{squire_calibration}(squire_calibration, what = "cases", forecast = 0, ...)
+\method{plot}{squire_calibration}(x, ..., what = "cases", forecast = 0)
 }
 \arguments{
-\item{squire_calibration}{\code{squire_calibration} object produced from
+\item{x}{\code{squire_calibration} object produced from
 from \code{\link{calibrate_output_parsing}}}
+
+\item{...}{Other parameters to be passed to internal plotting functions.}
 
 \item{what}{What plotting type are we plotting. Options are \code{cases}
 (default) or \code{healthcare}.}
 
 \item{forecast}{How many days forward should forecast plots be provided.
 Default = 0 days}
-
-\item{...}{Other parameters to be passed to internal plotting functions.}
 }
 \value{
 List of unformatted odin outputs with the date

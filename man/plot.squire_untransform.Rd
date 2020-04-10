@@ -4,11 +4,13 @@
 \alias{plot.squire_untransform}
 \title{squire simulation plot}
 \usage{
-\method{plot}{squire_untransform}(gcu)
+\method{plot}{squire_untransform}(x, ...)
 }
 \arguments{
 \item{x}{A \code{squire_untransform} object from
 \code{\link{untransformed_output}}}
+
+\item{...}{additional arguments affecting the plot produced.}
 }
 \description{
 squire simulation plot

@@ -2,8 +2,9 @@
 #'
 #' @details Fit the explicit_SEEIR model to time series of deaths
 #'
-#' @param squire_calibration \code{squire_calibration} object produced from
+#' @param x \code{squire_calibration} object produced from
 #'   from \code{\link{calibrate_output_parsing}}
+#' @param ... additional arguments affecting the plot produced.
 #' @param what What plotting type are we plotting. Options are \code{cases}
 #'   (default) or \code{healthcare}.
 #' @param forecast How many days forward should forecast plots be provided.
@@ -15,15 +16,15 @@
 #'
 #' @export
 #' @return List of unformatted odin outputs with the date
-plot.squire_calibration <- function(squire_calibration, what = "cases",
-                                    forecast = 0, ...) {
+plot.squire_calibration <- function(x, ...,
+                                    what = "cases", forecast = 0) {
 
   # assert checks
   assert_string(what)
 
   # get the object for plotting
-  df <- squire_calibration$df
-  data <- squire_calibration$data
+  df <- x$df
+  data <- x$data
 
   # what are we plotting
   if(what == "cases") {
@@ -39,6 +40,7 @@ plot.squire_calibration <- function(squire_calibration, what = "cases",
 
 
 #' @noRd
+#' @importFrom stats median runif
 plot_calibration_cases <- function(df, data, forecast = 0) {
 
   # split to correct dates

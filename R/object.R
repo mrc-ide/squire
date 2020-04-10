@@ -71,11 +71,12 @@ plot.squire_simulation <- function (x, ...){
 #'
 #' @param x A \code{squire_untransform} object from
 #'    \code{\link{untransformed_output}}
+#' @param ... additional arguments affecting the plot produced.
 #'
 #' @export
-plot.squire_untransform <- function (gcu){
+plot.squire_untransform <- function (x, ...){
 
-  pd_group <- dplyr::group_by(gcu$df, .data$time, .data$variable) %>%
+  pd_group <- dplyr::group_by(x$df, .data$time, .data$variable) %>%
     dplyr::summarise(quants = list(quantile(.data$value, c(0.025, 0.5, 0.975))),
                      ymin = .data$quants[[1]][1],
                      ymax = .data$quants[[1]][3],
@@ -83,9 +84,9 @@ plot.squire_untransform <- function (gcu){
 
   # Plot
   ggplot2::ggplot(
-    gcu$df, ggplot2::aes(x = .data$time, y = .data$value, col = .data$variable,
+    x$df, ggplot2::aes(x = .data$time, y = .data$value, col = .data$variable,
                       group = interaction(.data$variable, .data$replicate))) +
-    ggplot2::geom_line(alpha = max(0.1, 1 / gcu$r$parameters$replicates)) +
+    ggplot2::geom_line(alpha = max(0.1, 1 / x$r$parameters$replicates)) +
     ggplot2::geom_line(data = pd_group,
                        mapping = ggplot2::aes(group = .data$variable),
                        size = 0.8) +

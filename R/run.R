@@ -196,7 +196,7 @@ run_explicit_SEEIR_model <- function(
   replicates = 10,
   init = NULL,
   output_transform = TRUE,
-  seed = runif(1, 0, 100000000),
+  seed = stats::runif(1, 0, 100000000),
 
   # parameters
   # probabilities
