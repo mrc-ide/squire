@@ -5,10 +5,27 @@
 N_age <- user()
 
 # Generating Force of Infection
-beta <- user()
+m[, ] <- interpolate(tt_matrix, mix_mat_set, "constant")
+dim(m) <- c(N_age, N_age)
+tt_matrix[] <- user()
+mix_mat_set[, ,] <- user()
+dim(tt_matrix) <- user()
+dim(mix_mat_set) <- c(length(tt_matrix), N_age, N_age)
+
+# Interpolation for beta
+beta <- interpolate(tt_beta, beta_set, "constant")
+tt_beta[] <- user()
+beta_set[] <- user()
+dim(tt_beta) <- user()
+dim(beta_set) <- length(tt_beta)
+
+# Generating Force of Infection
 temp[] <- IMild[i] + ICase1[i] + ICase2[i]
 s_ij[,] <- m[i, j] * temp[j]
 lambda[] <- beta * sum(s_ij[i, ])
+dim(lambda) <- N_age
+dim(s_ij) <- c(N_age,N_age)
+dim(temp) <- N_age
 
 # Rates of Progression
 gamma_E <- user() # rate of progression through latent infection
@@ -220,13 +237,6 @@ dim(IRec1_0) <- N_age
 dim(IRec2_0) <- N_age
 dim(R_0) <- N_age
 dim(D_0) <- N_age
-
-# Related to Calculating Age-Structured Force of Infection
-dim(lambda) <- N_age
-m[, ] <- user()
-dim(m) <- c(N_age, N_age)
-dim(s_ij) <- c(N_age,N_age)
-dim(temp) <- N_age
 
 # Severity Parameters
 dim(prob_hosp) <- N_age
