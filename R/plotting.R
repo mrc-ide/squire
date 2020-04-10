@@ -81,8 +81,8 @@ plot_calibration_cases <- function(df, data, forecast = 0) {
                         inherit.aes = FALSE) +
     ggplot2::xlab("Date") +
     ggplot2::ylab("Daily Cases") +
-    ggplot2::scale_color_discrete(name = "", labels = c("Hospital Cases","Mild Cases")) +
-    ggplot2::scale_fill_discrete(name = "", labels = c("Hospital Cases","Mild Cases")) +
+    ggplot2::scale_color_discrete(name = "Predicted", labels = c("Hospital Cases","Mild Cases")) +
+    ggplot2::scale_fill_discrete(name = "Predicted", labels = c("Hospital Cases","Mild Cases")) +
     ggplot2::scale_shape_discrete(name = "Observed") +
     ggplot2::theme_bw()
 
