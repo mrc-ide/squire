@@ -41,7 +41,7 @@ interventions.
 
 ### Overall Structure
 
-<img src="https://raw.githubusercontent.com/mrc-ide/squire/healthcare_capacity/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style = "border: none; float: center;" width = "600px">
+<img src="https://raw.githubusercontent.com/mrc-ide/squire/master/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style = "border: none; float: center;" width = "600px">
 
 squire uses an age-structured SEIR model, with the infectious class
 divided into different stages reflecting progression through different
@@ -59,7 +59,7 @@ Dead
 
 ### Decision Trees for Healthcare Capacity
 
-<img src="https://raw.githubusercontent.com/mrc-ide/squire/healthcare_capacity/images/Explicit_Healthcare_Oxygen_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "400px">
+<img src="https://raw.githubusercontent.com/mrc-ide/squire/master/images/Explicit_Healthcare_Oxygen_Decision_Tree.JPG" align="center" style = "border: none; float: center;" width = "400px">
 
 Given initial inputs of hospital/ICU bed capacity and the average time
 cases spend in hospital, the model dynamically tracks available hospital
