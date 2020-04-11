@@ -79,6 +79,7 @@ death_data_format <- function(date = NULL,
 #'
 #' @param data Data frame with 2 variables: date and deaths
 #' @param country Character. Country data originates from.
+#' @param reporting_fraction Numberic. Fraction of deaths expected to have been reported. DEFAULT = 1
 #' @param parse_output Logical. Should output be parsed ready for plotting.
 #'   Default = TRUE
 #' @param replicates Simulation Repetitions. Default = 10
@@ -90,8 +91,8 @@ death_data_format <- function(date = NULL,
 #' @export
 #' @return List of formatted odin outputs, the data it is calibrated to and
 #'   the parameter set used in calibration
-calibrate <- function(data, country, parse_output = TRUE,
-                      replicates = 10, dt = 0.25, ...) {
+calibrate <- function(data, country, reporting_fraction = 1,
+                      parse_output = TRUE, replicates = 10, dt = 0.25, ...) {
 
   # assertions
   assert_dataframe(data)
@@ -104,6 +105,11 @@ calibrate <- function(data, country, parse_output = TRUE,
   data <- death_data_format(date = data$date,
                             deaths = data$deaths,
                             cases = data$cases)
+
+  # adjust for reporting fraction
+  data$true_deaths <- data$deaths / reporting_fraction
+
+  # get population and mixing matrix for specific country
   pop <- get_population(country)
   contact_matrix <- get_mixing_matrix(country)
 
@@ -120,7 +126,7 @@ calibrate <- function(data, country, parse_output = TRUE,
 
   # create the shifted date
   timings <- vapply(seq_len(replicates), function(x) {
-    which.max(rowSums(r$output[,index$D,x]) >= data$deaths[1])
+    which.max(rowSums(r$output[,index$D,x]) >= data$true_deaths[1])
   }, FUN.VALUE = numeric(1))
 
   r$date <- vapply(seq_len(replicates), function(x) {

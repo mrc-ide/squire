@@ -4,12 +4,22 @@
 \alias{calibrate}
 \title{Calibrate Model}
 \usage{
-calibrate(data, country, parse_output = TRUE, replicates = 10, dt = 0.25, ...)
+calibrate(
+  data,
+  country,
+  reporting_fraction = 1,
+  parse_output = TRUE,
+  replicates = 10,
+  dt = 0.25,
+  ...
+)
 }
 \arguments{
 \item{data}{Data frame with 2 variables: date and deaths}
 
 \item{country}{Character. Country data originates from.}
+
+\item{reporting_fraction}{Numberic. Fraction of deaths expected to have been reported. DEFAULT = 1}
 
 \item{parse_output}{Logical. Should output be parsed ready for plotting.
 Default = TRUE}
