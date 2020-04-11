@@ -4,7 +4,9 @@
 \name{population}
 \alias{population}
 \title{Population}
-\format{A data.frame}
+\format{
+A data.frame
+}
 \usage{
 population
 }
