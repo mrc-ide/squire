@@ -4,8 +4,13 @@
 \alias{untransformed_output}
 \title{Explicit Output from non transformed run}
 \usage{
-untransformed_output(r, compartments = NULL, deaths = TRUE,
-  cases = TRUE, beds = TRUE)
+untransformed_output(
+  r,
+  compartments = NULL,
+  deaths = TRUE,
+  cases = TRUE,
+  beds = TRUE
+)
 }
 \arguments{
 \item{r}{Output of \code{\link{run_explicit_SEEIR_model}} with
