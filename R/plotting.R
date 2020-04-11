@@ -9,7 +9,6 @@
 #'   (default) or \code{healthcare}.
 #' @param forecast How many days forward should forecast plots be provided.
 #'   Default = 0 days
-#' @param ... Other parameters to be passed to internal plotting functions.
 #'
 #' @importFrom utils tail
 #' @importFrom stats rbinom time quantile
