@@ -54,11 +54,11 @@ init_check_explicit <- function(init, population, seeding_cases){
   age_group_indices <- c(8, 9, 10, 11) # age_group indices corresponding to middle-aged travellers
 
   if(is.null(init) & is.null(seeding_cases)){
-    seeding_cases <- rep(0, length(population))
-    seeding_cases[age_group_indices] <- as.vector(rmultinom(1, size = 20, prob = rep(0.25, 4)))
+    raw_seeding_cases <- rep(0, length(population))
+    raw_seeding_cases[age_group_indices] <- as.vector(rmultinom(1, size = 20, prob = rep(0.25, 4)))
     init = data.frame(
-      S = population - 20,
-      E1 = seeding_cases,
+      S = population - raw_seeding_cases,
+      E1 = raw_seeding_cases,
       E2 = 0,
       IMild = 0,
       ICase1 = 0,
@@ -85,11 +85,11 @@ init_check_explicit <- function(init, population, seeding_cases){
       D = 0
     )
   } else if (is.null(init) & !is.null(seeding_cases)) {
-    seeding_cases <- rep(0, length(population))
-    seeding_cases[age_group_indices] <- as.vector(rmultinom(1, size = seeding_cases, prob = rep(0.25, 4)))
+    raw_seeding_cases <- rep(0, length(population))
+    raw_seeding_cases[age_group_indices] <- as.vector(rmultinom(1, size = seeding_cases, prob = rep(0.25, 4)))
     init = data.frame(
-      S = population - 20,
-      E1 = seeding_cases,
+      S = population - raw_seeding_cases,
+      E1 = raw_seeding_cases,
       E2 = 0,
       IMild = 0,
       ICase1 = 0,
@@ -139,7 +139,10 @@ init_check_explicit <- function(init, population, seeding_cases){
       IMVNotGetDie1, IMVNotGetDie2, IRec1, IRec2, R, D")
     }
   }
-  if(!all(rowSums(init) == population)){
+  # cases randomly distributed across 4 age groups so can't check
+  # whole population is equal by row. Instead do it for first 7 age
+  # groups
+  if(!all(rowSums(init[1:7, ]) == population[1:7])){
     stop("Row sums of init should be identical to population")
   }
   if(!all(init >= 0)) {
