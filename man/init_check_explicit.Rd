@@ -4,7 +4,7 @@
 \alias{init_check_explicit}
 \title{Check and set up initial values for explict model}
 \usage{
-init_check_explicit(init, population, seeding_cases)
+init_check_explicit(init, population, seeding_cases = 20)
 }
 \arguments{
 \item{init}{Data.frame of initial conditions. Default = NULL}
