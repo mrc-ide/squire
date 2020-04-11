@@ -17,8 +17,6 @@ from \code{\link{calibrate_output_parsing}}}
 
 \item{forecast}{How many days forward should forecast plots be provided.
 Default = 0 days}
-
-\item{...}{Other parameters to be passed to internal plotting functions.}
 }
 \value{
 List of unformatted odin outputs with the date
