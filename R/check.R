@@ -49,42 +49,15 @@ init_check <- function(init, population){
 #' @inheritParams run_explicit_SEEIR_model
 #'
 #' @return Checked initial values data.frame
-init_check_explicit <- function(init, population, seeding_cases){
+init_check_explicit <- function(init, population, seeding_cases = 20){
 
+  if (length(population) != 17) {
+    stop("population must be divided up into 17x 5-year age bands spanning 0 to 80+")
+  }
+  assert_int(seeding_cases)
   age_group_indices <- c(8, 9, 10, 11) # age_group indices corresponding to middle-aged travellers
 
-  if(is.null(init) & is.null(seeding_cases)){
-    raw_seeding_cases <- rep(0, length(population))
-    raw_seeding_cases[age_group_indices] <- as.vector(rmultinom(1, size = 20, prob = rep(0.25, 4)))
-    init = data.frame(
-      S = population - raw_seeding_cases,
-      E1 = raw_seeding_cases,
-      E2 = 0,
-      IMild = 0,
-      ICase1 = 0,
-      ICase2 = 0,
-      IOxGetLive1 = 0,
-      IOxGetLive2 = 0,
-      IOxGetDie1 = 0,
-      IOxGetDie2 = 0,
-      IOxNotGetLive1 = 0,
-      IOxNotGetLive2 = 0,
-      IOxNotGetDie1 = 0,
-      IOxNotGetDie2 = 0,
-      IMVGetLive1 = 0,
-      IMVGetLive2 = 0,
-      IMVGetDie1 = 0,
-      IMVGetDie2 = 0,
-      IMVNotGetLive1 = 0,
-      IMVNotGetLive2 = 0,
-      IMVNotGetDie1 = 0,
-      IMVNotGetDie2 = 0,
-      IRec1 = 0,
-      IRec2 = 0,
-      R = 0,
-      D = 0
-    )
-  } else if (is.null(init) & !is.null(seeding_cases)) {
+  if(is.null(init)){
     raw_seeding_cases <- rep(0, length(population))
     raw_seeding_cases[age_group_indices] <- as.vector(rmultinom(1, size = seeding_cases, prob = rep(0.25, 4)))
     init = data.frame(
