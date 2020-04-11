@@ -4,8 +4,7 @@
 \alias{calibrate}
 \title{Calibrate Model}
 \usage{
-calibrate(data, country, parse_output = TRUE, replicates = 10,
-  dt = 0.25, ...)
+calibrate(data, country, parse_output = TRUE, replicates = 10, dt = 0.25, ...)
 }
 \arguments{
 \item{data}{Data frame with 2 variables: date and deaths}
