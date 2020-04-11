@@ -43,3 +43,38 @@ get_mixing_matrix <-  function(country){
 
   return(mm)
 }
+
+#'
+#' Get healthcare capacity data
+#'
+#' @param country Country name
+#' @param simple_SEIR Logical. Is the population for the \code{simple_SEIR}.
+#'   Default = FALSE
+#'
+#' @return Healthcare capacity data
+#' @importFrom utils head tail
+#' @export
+get_healthcare_capacity <-  function(country, simple_SEIR = FALSE){
+  if(!country %in% unique(squire::population$country)){
+    stop("Country not found")
+  }
+
+  if(country %in% unique(squire::country_specific_healthcare_capacity$country)) {
+    beds <- squire::country_specific_healthcare_capacity[match(country, squire::country_specific_healthcare_capacity$country), ]
+    hosp_beds <- beds$hosp_beds
+    ICU_beds <- beds$ICU_beds
+    hc <- list(hosp_beds = hosp_beds, ICU_beds = ICU_beds)
+  } else {
+    income_group <- squire::income_group$income_group[match(country, squire::income_group$country)]
+    if (is.na(income_group)) {
+      stop("healthcare capacity data not available for this country - specify hospital and ICU beds in the run_explicit_SEEIR call manually")
+    }
+    beds <- squire::income_strata_healthcare_capacity[squire::income_strata_healthcare_capacity$income_group == income_group, ]
+    hosp_beds <- as.vector(beds$hosp_beds)
+    ICU_beds <- as.vector(beds$ICU_beds)
+    hc <- list(hosp_beds = hosp_beds, ICU_beds = ICU_beds)
+  }
+
+  return(hc)
+}
+

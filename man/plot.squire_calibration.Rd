@@ -10,7 +10,7 @@
 \item{x}{\code{squire_calibration} object produced from
 from \code{\link{calibrate_output_parsing}}}
 
-\item{...}{Other parameters to be passed to internal plotting functions.}
+\item{...}{additional arguments affecting the plot produced.}
 
 \item{what}{What plotting type are we plotting. Options are \code{cases}
 (default) or \code{healthcare}.}

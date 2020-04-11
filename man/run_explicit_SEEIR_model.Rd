@@ -142,9 +142,9 @@ death. Default = 12}
 
 \item{dur_rec}{Duration of recovery after coming off ventilation. Default = 6}
 
-\item{hosp_bed_capacity}{General bed capacity. Default = 5 * sum(population)/1000}
+\item{hosp_bed_capacity}{General bed capacity.}
 
-\item{ICU_bed_capacity}{ICU bed capacity. Default = 3 * hosp_bed_capacity/100}
+\item{ICU_bed_capacity}{ICU bed capacity.}
 }
 \value{
 Simulation output

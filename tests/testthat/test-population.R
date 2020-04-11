@@ -8,10 +8,25 @@ test_that("population getter works", {
 })
 
 
-test_that("population getter works", {
+test_that("mixing matrix getter works", {
   expect_error(get_mixing_matrix("moon"))
   out <- get_mixing_matrix("Angola")
   expect_is(out, "matrix")
   expect_equal(nrow(out), 16)
   expect_equal(ncol(out), 16)
+})
+
+test_that("healthcare capacity getter getter works", {
+  expect_error(get_healthcare_capacity("moon"))
+  out <- get_healthcare_capacity("Angola")
+  expect_is(out, "list")
+  expect_named(out, c("hosp_beds", "ICU_beds"))
+  expect_is(out$hosp_beds, "numeric")
+  expect_is(out$ICU_beds, "numeric")
+
+  out <- get_healthcare_capacity("Mali")
+  expect_is(out, "list")
+  expect_named(out, c("hosp_beds", "ICU_beds"))
+  expect_is(out$hosp_beds, "numeric")
+  expect_is(out$ICU_beds, "numeric")
 })
