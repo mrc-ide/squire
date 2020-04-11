@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calibrated Model PPlotting — plot.squire_calibration • squire</title>
+<title>Get healthcare capacity data — get_healthcare_capacity • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Calibrated Model PPlotting — plot.squire_calibration" />
-<meta property="og:description" content="Calibrated Model PPlotting" />
+<meta property="og:title" content="Get healthcare capacity data — get_healthcare_capacity" />
+<meta property="og:description" content="Get healthcare capacity data" />
 
 
 
@@ -111,48 +111,34 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Calibrated Model PPlotting</h1>
+    <h1>Get healthcare capacity data</h1>
     
-    <div class="hidden name"><code>plot.squire_calibration.Rd</code></div>
+    <div class="hidden name"><code>get_healthcare_capacity.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Calibrated Model PPlotting</p>
+    <p>Get healthcare capacity data</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for squire_calibration</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>what</span> <span class='kw'>=</span> <span class='st'>"cases"</span>, <span class='kw'>forecast</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+    <pre class="usage"><span class='fu'>get_healthcare_capacity</span>(<span class='no'>country</span>, <span class='kw'>simple_SEIR</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p><code>squire_calibration</code> object produced from
-from <code><a href='calibrate_output_parsing.html'>calibrate_output_parsing</a></code></p></td>
+      <th>country</th>
+      <td><p>Country name</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>additional arguments affecting the plot produced.</p></td>
-    </tr>
-    <tr>
-      <th>what</th>
-      <td><p>What plotting type are we plotting. Options are <code>cases</code>
-(default) or <code>healthcare</code>.</p></td>
-    </tr>
-    <tr>
-      <th>forecast</th>
-      <td><p>How many days forward should forecast plots be provided.
-Default = 0 days</p></td>
+      <th>simple_SEIR</th>
+      <td><p>Logical. Is the population for the <code>simple_SEIR</code>.
+Default = FALSE</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List of unformatted odin outputs with the date</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Fit the explicit_SEEIR model to time series of deaths</p>
+    <p>Healthcare capacity data</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
