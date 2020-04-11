@@ -3,6 +3,7 @@
 # Contact Matrices sourced from literature used in the global report
 # ------------------------------------------------------------------------------
 contact_matrices <- readRDS("data-raw/contact_matrices.rds")
+contact_matrices[[12]] <- as.matrix(contact_matrices[[12]])
 usethis::use_data(contact_matrices, overwrite = TRUE)
 
 # Demography
