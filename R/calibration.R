@@ -156,6 +156,7 @@ calibrate <- function(data, country, reporting_fraction = 1,
     r$mod$set_user(E1_0 = E1_0[[i]])
     r$output[, , i] <- r$mod$run(t, replicate = 1)
   }
+  r$parameters$replicates <- replicates
 
   # get the index for looking up D
   index <- odin_index(r$model)
