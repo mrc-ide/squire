@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>squire simulation plot — plot.squire_simulation • squire</title>
+<title>Summarise over time and replicates — vec_o • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="squire simulation plot — plot.squire_simulation" />
-<meta property="og:description" content="squire simulation plot" />
+<meta property="og:title" content="Summarise over time and replicates — vec_o" />
+<meta property="og:description" content="Summarise over time and replicates" />
 
 
 
@@ -111,65 +111,29 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>squire simulation plot</h1>
+    <h1>Summarise over time and replicates</h1>
     
-    <div class="hidden name"><code>plot.squire_simulation.Rd</code></div>
+    <div class="hidden name"><code>vec_o.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>squire simulation plot</p>
+    <p>Summarise over time and replicates</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for squire_simulation</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(
-  <span class='no'>x</span>,
-  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>summarise</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>ci</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>q</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.025</span>, <span class='fl'>0.975</span>),
-  <span class='kw'>var_select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>summary_f</span> <span class='kw'>=</span> <span class='no'>mean</span>,
-  <span class='no'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>vec_o</span>(<span class='no'>x</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>An iccm_simulation object</p></td>
-    </tr>
-    <tr>
-      <th>replicates</th>
-      <td><p>Plot replicates</p></td>
-    </tr>
-    <tr>
-      <th>summarise</th>
-      <td><p>Logical, add summary line</p></td>
-    </tr>
-    <tr>
-      <th>ci</th>
-      <td><p>logical add confidence interval ribbon</p></td>
-    </tr>
-    <tr>
-      <th>q</th>
-      <td><p>Quantiles for upper and lower of interval ribbon</p></td>
-    </tr>
-    <tr>
-      <th>var_select</th>
-      <td><p>Vector of variable names to plot (default is all)</p></td>
-    </tr>
-    <tr>
-      <th>summary_f</th>
-      <td><p>Function to summarise each compartment
-passed to the <code>fun</code> argument of <code><a href='https://ggplot2.tidyverse.org/reference/stat_summary.html'>stat_summary</a></code></p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>additional arguments affecting the plot produced.</p></td>
+      <td><p>output element</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Summary output element</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
