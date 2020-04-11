@@ -3,8 +3,8 @@ test_that("population getter works", {
   out <- get_population("Angola")
   expect_type(out, "list")
   expect_equal(nrow(out), 17)
-  expect_equal(ncol(out), 4)
-  expect_named(out, c("country", "age_group", "n", "matrix"))
+  expect_equal(ncol(out), 5)
+  expect_named(out, c("country", "age_group", "n", "matrix", "iso3c"))
 })
 
 

@@ -39,6 +39,11 @@ population$age_group <- factor(population$age_group, levels = c("0-4",
                                                                 "80+"))
 population$matrix <- demog$Matrix[match(population$country, demog$Region..subregion..country.or.area..)]
 
+population$iso3c <- countrycode::countrycode(population$country, "country.name","iso3c")
+population$iso3c[population$country == "Channel Islands"] <- "CHI"
+population$iso3c[population$country == "Eswatini"] <- "SWZ"
+population$iso3c[population$country == "Micronesia"] <- "FSM"
+
 # Fix ASCII encoding package error
 Encoding(population$country) <- "latin1"
 population$country <- iconv(

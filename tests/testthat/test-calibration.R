@@ -58,7 +58,8 @@ test_that("calibrate works", {
   # run caliibrate
   replicates <- 10
   set.seed(123)
-  out <- calibrate(df, "India", parse_output = FALSE, replicates = replicates)
+  out <- calibrate(df, "India", parse_output = FALSE,
+                   replicates = replicates, dt = 1)
   index <- odin_index(out$model)
   deaths <- vapply(seq_len(replicates), function(x) {
     rowSums(out$output[,index$D,x])
@@ -85,7 +86,8 @@ test_that("calibrate works", {
 
   # check its the same if we parse directly
   set.seed(123)
-  get2 <- calibrate(df, "India", parse_output = TRUE, replicates = replicates)
+  get2 <- calibrate(df, "India", parse_output = TRUE,
+                    replicates = replicates, dt = 1)
   identical(get, get2)
 
 })
