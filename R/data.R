@@ -29,7 +29,7 @@
 #'
 #' @format A data.frame
 # #' @source \url{https://data.worldbank.org/indicator/sh.med.beds.zs}
-"incoem_strata_healthcare_capacity"
+"income_strata_healthcare_capacity"
 
 #' Income group
 #'
