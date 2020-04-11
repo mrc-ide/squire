@@ -10,15 +10,13 @@
 \item{x}{\code{squire_calibration} object produced from
 from \code{\link{calibrate_output_parsing}}}
 
-\item{...}{additional arguments affecting the plot produced.}
+\item{...}{Other parameters to be passed to internal plotting functions.}
 
 \item{what}{What plotting type are we plotting. Options are \code{cases}
 (default) or \code{healthcare}.}
 
 \item{forecast}{How many days forward should forecast plots be provided.
 Default = 0 days}
-
-\item{...}{Other parameters to be passed to internal plotting functions.}
 }
 \value{
 List of unformatted odin outputs with the date
