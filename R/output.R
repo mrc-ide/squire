@@ -1,71 +1,34 @@
-#' Create data.frame from odin output element
-#'
-#' @param m Model
-#' @param compartment Output name (from odin output)
-#'
-#' @return Data.frame for variable
-df_output <- function(m, compartment){
 
-  as.data.frame.table(m[[compartment]], responseName = "y") %>%
-    dplyr::mutate(t = as.numeric(.data$Var1),
-                  age_group = as.numeric(.data$Var2),
-                  replicate = as.numeric(.data$Var3),
-                  compartment = compartment) %>%
-    dplyr::select(.data$t, .data$age_group, .data$replicate,
-                  .data$compartment, .data$y)
-
+#' Summarise over time and replicates
+#'
+#' @param x output element
+#'
+#' @return Summary output element
+vec_o <- function(x){
+  as.vector(apply(x, 3, rowSums))
 }
 
 
-#' Convert model output to long format
+#' Convert squire_simulation object output to lond data.frame
 #'
-#' @param m Model output
-#' @param vars Character vector of variable names to select
+#' @param sim squire_simulation object
 #'
-#' @return Long format model output data.frame
-#' @export
-long_output <- function(m, vars = NULL){
-  if(is.null(vars)){
-    vars <- names(m)[grepl("^[[:upper:]]+$", substr(names(m), 1, 1))]
-  } else {
-    if(!all(vars %in% names(m))){
-      stop("Selected variables are not all present in output")
+#' @return Long data.frame of output
+quick_long <- function(sim){
+  # Transform if needed
+  if(!is.null(sim$parameters$output_transform)){
+    if(!sim$parameters$output_transform){
+      sim$output <- sim$model$transform_variables(sim$output)
     }
   }
-  o1 <- dplyr::bind_rows(lapply(vars, df_output, m = m))
-  o1$t <- m$time[o1$t,1]
-  o1$compartment <- factor(o1$compartment, levels = vars)
-  return(o1)
-
-}
-
-
-#' Create wide data.frame from odin output element
-#'
-#' @param m Model
-#' @param compartment Output name (from odin output)
-#'
-#' @return Data.frame for variable
-df_output_wide <- function(m, compartment){
-  as.data.frame.table(m[[compartment]], responseName = compartment) %>%
-    dplyr::mutate(t = as.numeric(.data$Var1),
-                  age_group = as.numeric(.data$Var2),
-                  replicate = as.numeric(.data$Var3)) %>%
-    dplyr::select(.data$t, .data$age_group, .data$replicate, .data[[compartment]])
-}
-
-
-#' Convert model output to long format
-#'
-#' @param m Model output
-#'
-#' @return Long format model output data.frame
-#' @export
-wide_output <- function(m){
-
-  vars <- names(m)[grepl("^[[:upper:]]+$", substr(names(m), 1, 1))]
-  o1 <- lapply(vars, df_output_wide, m = m) %>%
-    purrr::reduce(dplyr::left_join, by = c("t", "age_group", "replicate"))
-  o1$t <- m$time[o1$t,1]
-  return(o1)
+  o <- sim$output
+  vars <- o[!names(o) %in% c("t", "time")]
+  t <- o$time[,1]
+  for(i in 1:length(vars)){
+    vars[[i]] <- data.frame(compartment = names(vars)[i], t = t,
+                            replicate = rep(1:sim$parameters$replicates, each = length(t)),
+                            y = vec_o(vars[[i]]), stringsAsFactors = FALSE)
+  }
+  vars <- dplyr::bind_rows(vars)
+  return(vars)
 }

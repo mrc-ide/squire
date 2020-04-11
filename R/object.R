@@ -35,77 +35,69 @@ print.squire_simulation <- function(x, ...){
   invisible(x)
 }
 
-#' Upper CI plot helper
-#'
-#' @param y Vector of values
-#'
-#' @return Upper quantile
-uci <- function(y){
-  quantile(y, 0.975)
-}
-#' Lower CI plot helper
-#'
-#' @param y Vector of values
-#'
-#' @return Lower quantile
-lci <- function(y){
-  quantile(y, 0.025)
-}
-
 #' squire simulation plot
 #'
 #' @param x An iccm_simulation object
 #' @param replicates Plot replicates
-#' @param ci Plot 2.5 and 97.5 quantiles for each compartment
+#' @param summarise Logical, add summary line
+#' @param ci logical add confidence interval ribbon
+#' @param q Quantiles for upper and lower of interval ribbon
 #' @param var_select Vector of variable names to plot (default is all)
 #' @param summary_f Function to summarise each compartment
 #'   passed to the \code{fun} argument of \code{\link[ggplot2]{stat_summary}}
 #' @param ... additional arguments affecting the plot produced.
 #'
 #' @export
-plot.squire_simulation <- function(x, replicates = FALSE, ci = FALSE,
+plot.squire_simulation <- function(x, replicates = FALSE,
+                                   summarise = TRUE,
+                                   ci = TRUE,
+                                   q = c(0.025, 0.975),
                                    var_select = NULL,
                                    summary_f = mean, ...){
 
-  # Check output is transformed
-  if(!is.null(x$parameters$output_transform)){
-    if(!x$parameters$output_transform) {
-      stop("Plotting does not work with untransformed output, please run
-           the model with output_transform = TRUE")
-    }
-  }
 
-  # Convert output to long format
-  pd <- long_output(x$output, var_select) %>%
-    dplyr::group_by(.data$t, .data$compartment, .data$replicate) %>%
-    dplyr::summarise(y = sum(.data$y))
+  # Select variables
+  if(!is.null(var_select)){
+    if(!all(var_select %in% names(x$output))){
+      stop("Selected variable are not all present in output")
+    }
+    x$output <- x$output[c("time", var_select)]
+  }
+  # Format data
+  pd <- quick_long(x)
+
+  # Format summary data
+  pds <- pd %>%
+    dplyr::group_by(t, compartment) %>%
+    dplyr::summarise(ymin = quantile(y, q[1]),
+              ymax = quantile(y, q[2]),
+              y = summary_f(y))
 
   # Plot
-  p <- ggplot2::ggplot(pd, ggplot2::aes(x = .data$t, y = .data$y, col = .data$compartment,
-                                        fill = .data$compartment,
-                                        group = interaction(.data$compartment, .data$replicate)))
+  p <- ggplot2::ggplot()
+
   # Add lines for individual draws
   if(replicates){
-    p <- p + ggplot2::geom_line(alpha = max(0.2, 1 / x$parameters$replicates))
+    p <- p + ggplot2::geom_line(data = pd, ggplot2::aes(x = .data$t, y = .data$y, col = .data$compartment,
+                                                        group = interaction(.data$compartment, .data$replicate)),
+                                alpha = max(0.2, 1 / x$parameters$replicates))
   }
 
-  # Add summary across groups
-  if(!is.null(summary_f)){
+  if(summarise){
     if(x$parameters$replicates < 10){
       warning("Summary statistic estimated from <10 replicates")
     }
-    p <- p + ggplot2::stat_summary(fun = summary_f, geom = "line",
-                                   ggplot2::aes(group = .data$compartment))
+    p <- p +
+      ggplot2::geom_line(data = pds, ggplot2::aes(x = .data$t, y = .data$y, col = .data$compartment))
   }
 
-  # Add 2.5%, 97.5% quantile ribbon
   if(ci){
     if(x$parameters$replicates < 10){
       warning("Confidence bounds estimated from <10 replicates")
     }
-    p <- p + ggplot2::stat_summary(ggplot2::aes(group = .data$compartment),
-                                   col = NA, geom = 'ribbon', fun.max = uci,
-                                   fun.min = lci, alpha = 0.3)
+    p <- p +
+      ggplot2::geom_ribbon(data = pds, ggplot2::aes(x = .data$t, ymin = .data$ymin, ymax = .data$ymax,
+                                                    fill = .data$compartment), alpha = 0.25, col = NA)
   }
 
   # Add remaining formatting

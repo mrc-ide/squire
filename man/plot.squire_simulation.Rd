@@ -7,7 +7,9 @@
 \method{plot}{squire_simulation}(
   x,
   replicates = FALSE,
-  ci = FALSE,
+  summarise = TRUE,
+  ci = TRUE,
+  q = c(0.025, 0.975),
   var_select = NULL,
   summary_f = mean,
   ...
@@ -18,7 +20,11 @@
 
 \item{replicates}{Plot replicates}
 
-\item{ci}{Plot 2.5 and 97.5 quantiles for each compartment}
+\item{summarise}{Logical, add summary line}
+
+\item{ci}{logical add confidence interval ribbon}
+
+\item{q}{Quantiles for upper and lower of interval ribbon}
 
 \item{var_select}{Vector of variable names to plot (default is all)}
 
