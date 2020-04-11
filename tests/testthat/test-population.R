@@ -23,4 +23,10 @@ test_that("healthcare capacity getter getter works", {
   expect_named(out, c("hosp_beds", "ICU_beds"))
   expect_is(out$hosp_beds, "numeric")
   expect_is(out$ICU_beds, "numeric")
+
+  out <- get_healthcare_capacity("Mali")
+  expect_is(out, "list")
+  expect_named(out, c("hosp_beds", "ICU_beds"))
+  expect_is(out$hosp_beds, "numeric")
+  expect_is(out$ICU_beds, "numeric")
 })
