@@ -231,3 +231,39 @@ test_that("run explicit works when healthsystem capacity is swamped", {
                "prob_non_severe_death_no_treatment must be less than or equal to 1")
 
 })
+
+
+
+test_that("health system capacite", {
+
+  set.seed(123)
+  icu_cap <- 1000
+  bed_cap <- 1e5
+  r <- run_explicit_SEEIR_model(country = "United Kingdom",
+                                R0 = 2.5,
+                                time_period = 200,
+                                dt = 1,
+                                output_transform = FALSE,
+                                hosp_bed_capacity = bed_cap,
+                                ICU_bed_capacity = icu_cap,
+                                replicates = 1)
+
+  index <- odin_index(r$model)
+  mv_get <- unlist(index[c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2")])
+  ox_get <- unlist(index[c("IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2", "IRec1", "IRec2")])
+  nt <- nrow(r$output)
+
+  # collet outputs as vectors
+  icu <- odin_sv(r$output[,mv_get,,drop=FALSE],
+                 replicates = 1,
+                 nt = nt)
+
+  ox <- odin_sv(r$output[,ox_get,,drop=FALSE],
+                replicates = 1,
+                nt = nt)
+
+  expect_equal(max(icu), icu_cap)
+  expect_equal(max(ox), bed_cap)
+
+
+})

@@ -196,9 +196,9 @@ typedef struct explict_SEIR_internal {
   int dim_n_IMVGetLive1;
   int dim_n_IMVGetLive1_IMVGetLive2;
   int dim_n_IMVGetLive2_Rec;
-  int dim_n_IMVNotGetDie_2_D;
   int dim_n_IMVNotGetDie1;
   int dim_n_IMVNotGetDie1_IMVNotGetDie2;
+  int dim_n_IMVNotGetDie2_D;
   int dim_n_IMVNotGetLive1;
   int dim_n_IMVNotGetLive1_IMVNotGetLive2;
   int dim_n_IMVNotGetLive2_R;
@@ -326,9 +326,9 @@ typedef struct explict_SEIR_internal {
   double *n_IMVGetLive1;
   double *n_IMVGetLive1_IMVGetLive2;
   double *n_IMVGetLive2_Rec;
-  double *n_IMVNotGetDie_2_D;
   double *n_IMVNotGetDie1;
   double *n_IMVNotGetDie1_IMVNotGetDie2;
+  double *n_IMVNotGetDie2_D;
   double *n_IMVNotGetLive1;
   double *n_IMVNotGetLive1_IMVNotGetLive2;
   double *n_IMVNotGetLive2_R;
@@ -654,9 +654,9 @@ void explict_SEIR_finalise(SEXP internal_p) {
     Free(internal->n_IMVGetLive1);
     Free(internal->n_IMVGetLive1_IMVGetLive2);
     Free(internal->n_IMVGetLive2_Rec);
-    Free(internal->n_IMVNotGetDie_2_D);
     Free(internal->n_IMVNotGetDie1);
     Free(internal->n_IMVNotGetDie1_IMVNotGetDie2);
+    Free(internal->n_IMVNotGetDie2_D);
     Free(internal->n_IMVNotGetLive1);
     Free(internal->n_IMVNotGetLive1_IMVNotGetLive2);
     Free(internal->n_IMVNotGetLive2_R);
@@ -796,9 +796,9 @@ SEXP explict_SEIR_create(SEXP user) {
   internal->n_IMVGetLive1 = NULL;
   internal->n_IMVGetLive1_IMVGetLive2 = NULL;
   internal->n_IMVGetLive2_Rec = NULL;
-  internal->n_IMVNotGetDie_2_D = NULL;
   internal->n_IMVNotGetDie1 = NULL;
   internal->n_IMVNotGetDie1_IMVNotGetDie2 = NULL;
+  internal->n_IMVNotGetDie2_D = NULL;
   internal->n_IMVNotGetLive1 = NULL;
   internal->n_IMVNotGetLive1_IMVNotGetLive2 = NULL;
   internal->n_IMVNotGetLive2_R = NULL;
@@ -1086,9 +1086,9 @@ SEXP explict_SEIR_contents(SEXP internal_p) {
   SET_VECTOR_ELT(contents, 121, ScalarInteger(internal->dim_n_IMVGetLive1));
   SET_VECTOR_ELT(contents, 122, ScalarInteger(internal->dim_n_IMVGetLive1_IMVGetLive2));
   SET_VECTOR_ELT(contents, 123, ScalarInteger(internal->dim_n_IMVGetLive2_Rec));
-  SET_VECTOR_ELT(contents, 124, ScalarInteger(internal->dim_n_IMVNotGetDie_2_D));
-  SET_VECTOR_ELT(contents, 125, ScalarInteger(internal->dim_n_IMVNotGetDie1));
-  SET_VECTOR_ELT(contents, 126, ScalarInteger(internal->dim_n_IMVNotGetDie1_IMVNotGetDie2));
+  SET_VECTOR_ELT(contents, 124, ScalarInteger(internal->dim_n_IMVNotGetDie1));
+  SET_VECTOR_ELT(contents, 125, ScalarInteger(internal->dim_n_IMVNotGetDie1_IMVNotGetDie2));
+  SET_VECTOR_ELT(contents, 126, ScalarInteger(internal->dim_n_IMVNotGetDie2_D));
   SET_VECTOR_ELT(contents, 127, ScalarInteger(internal->dim_n_IMVNotGetLive1));
   SET_VECTOR_ELT(contents, 128, ScalarInteger(internal->dim_n_IMVNotGetLive1_IMVNotGetLive2));
   SET_VECTOR_ELT(contents, 129, ScalarInteger(internal->dim_n_IMVNotGetLive2_R));
@@ -1348,15 +1348,15 @@ SEXP explict_SEIR_contents(SEXP internal_p) {
   SEXP n_IMVGetLive2_Rec = PROTECT(allocVector(REALSXP, internal->dim_n_IMVGetLive2_Rec));
   memcpy(REAL(n_IMVGetLive2_Rec), internal->n_IMVGetLive2_Rec, internal->dim_n_IMVGetLive2_Rec * sizeof(double));
   SET_VECTOR_ELT(contents, 253, n_IMVGetLive2_Rec);
-  SEXP n_IMVNotGetDie_2_D = PROTECT(allocVector(REALSXP, internal->dim_n_IMVNotGetDie_2_D));
-  memcpy(REAL(n_IMVNotGetDie_2_D), internal->n_IMVNotGetDie_2_D, internal->dim_n_IMVNotGetDie_2_D * sizeof(double));
-  SET_VECTOR_ELT(contents, 254, n_IMVNotGetDie_2_D);
   SEXP n_IMVNotGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_n_IMVNotGetDie1));
   memcpy(REAL(n_IMVNotGetDie1), internal->n_IMVNotGetDie1, internal->dim_n_IMVNotGetDie1 * sizeof(double));
-  SET_VECTOR_ELT(contents, 255, n_IMVNotGetDie1);
+  SET_VECTOR_ELT(contents, 254, n_IMVNotGetDie1);
   SEXP n_IMVNotGetDie1_IMVNotGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_n_IMVNotGetDie1_IMVNotGetDie2));
   memcpy(REAL(n_IMVNotGetDie1_IMVNotGetDie2), internal->n_IMVNotGetDie1_IMVNotGetDie2, internal->dim_n_IMVNotGetDie1_IMVNotGetDie2 * sizeof(double));
-  SET_VECTOR_ELT(contents, 256, n_IMVNotGetDie1_IMVNotGetDie2);
+  SET_VECTOR_ELT(contents, 255, n_IMVNotGetDie1_IMVNotGetDie2);
+  SEXP n_IMVNotGetDie2_D = PROTECT(allocVector(REALSXP, internal->dim_n_IMVNotGetDie2_D));
+  memcpy(REAL(n_IMVNotGetDie2_D), internal->n_IMVNotGetDie2_D, internal->dim_n_IMVNotGetDie2_D * sizeof(double));
+  SET_VECTOR_ELT(contents, 256, n_IMVNotGetDie2_D);
   SEXP n_IMVNotGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_n_IMVNotGetLive1));
   memcpy(REAL(n_IMVNotGetLive1), internal->n_IMVNotGetLive1, internal->dim_n_IMVNotGetLive1 * sizeof(double));
   SET_VECTOR_ELT(contents, 257, n_IMVNotGetLive1);
@@ -1650,9 +1650,9 @@ SEXP explict_SEIR_contents(SEXP internal_p) {
   SET_STRING_ELT(nms, 121, mkChar("dim_n_IMVGetLive1"));
   SET_STRING_ELT(nms, 122, mkChar("dim_n_IMVGetLive1_IMVGetLive2"));
   SET_STRING_ELT(nms, 123, mkChar("dim_n_IMVGetLive2_Rec"));
-  SET_STRING_ELT(nms, 124, mkChar("dim_n_IMVNotGetDie_2_D"));
-  SET_STRING_ELT(nms, 125, mkChar("dim_n_IMVNotGetDie1"));
-  SET_STRING_ELT(nms, 126, mkChar("dim_n_IMVNotGetDie1_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 124, mkChar("dim_n_IMVNotGetDie1"));
+  SET_STRING_ELT(nms, 125, mkChar("dim_n_IMVNotGetDie1_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 126, mkChar("dim_n_IMVNotGetDie2_D"));
   SET_STRING_ELT(nms, 127, mkChar("dim_n_IMVNotGetLive1"));
   SET_STRING_ELT(nms, 128, mkChar("dim_n_IMVNotGetLive1_IMVNotGetLive2"));
   SET_STRING_ELT(nms, 129, mkChar("dim_n_IMVNotGetLive2_R"));
@@ -1780,9 +1780,9 @@ SEXP explict_SEIR_contents(SEXP internal_p) {
   SET_STRING_ELT(nms, 251, mkChar("n_IMVGetLive1"));
   SET_STRING_ELT(nms, 252, mkChar("n_IMVGetLive1_IMVGetLive2"));
   SET_STRING_ELT(nms, 253, mkChar("n_IMVGetLive2_Rec"));
-  SET_STRING_ELT(nms, 254, mkChar("n_IMVNotGetDie_2_D"));
-  SET_STRING_ELT(nms, 255, mkChar("n_IMVNotGetDie1"));
-  SET_STRING_ELT(nms, 256, mkChar("n_IMVNotGetDie1_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 254, mkChar("n_IMVNotGetDie1"));
+  SET_STRING_ELT(nms, 255, mkChar("n_IMVNotGetDie1_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 256, mkChar("n_IMVNotGetDie2_D"));
   SET_STRING_ELT(nms, 257, mkChar("n_IMVNotGetLive1"));
   SET_STRING_ELT(nms, 258, mkChar("n_IMVNotGetLive1_IMVNotGetLive2"));
   SET_STRING_ELT(nms, 259, mkChar("n_IMVNotGetLive2_R"));
@@ -1986,9 +1986,9 @@ SEXP explict_SEIR_set_user(SEXP internal_p, SEXP user) {
   internal->dim_n_IMVGetLive1 = internal->N_age;
   internal->dim_n_IMVGetLive1_IMVGetLive2 = internal->N_age;
   internal->dim_n_IMVGetLive2_Rec = internal->N_age;
-  internal->dim_n_IMVNotGetDie_2_D = internal->N_age;
   internal->dim_n_IMVNotGetDie1 = internal->N_age;
   internal->dim_n_IMVNotGetDie1_IMVNotGetDie2 = internal->N_age;
+  internal->dim_n_IMVNotGetDie2_D = internal->N_age;
   internal->dim_n_IMVNotGetLive1 = internal->N_age;
   internal->dim_n_IMVNotGetLive1_IMVNotGetLive2 = internal->N_age;
   internal->dim_n_IMVNotGetLive2_R = internal->N_age;
@@ -2184,12 +2184,12 @@ SEXP explict_SEIR_set_user(SEXP internal_p, SEXP user) {
   internal->n_IMVGetLive1_IMVGetLive2 = (double*) Calloc(internal->dim_n_IMVGetLive1_IMVGetLive2, double);
   Free(internal->n_IMVGetLive2_Rec);
   internal->n_IMVGetLive2_Rec = (double*) Calloc(internal->dim_n_IMVGetLive2_Rec, double);
-  Free(internal->n_IMVNotGetDie_2_D);
-  internal->n_IMVNotGetDie_2_D = (double*) Calloc(internal->dim_n_IMVNotGetDie_2_D, double);
   Free(internal->n_IMVNotGetDie1);
   internal->n_IMVNotGetDie1 = (double*) Calloc(internal->dim_n_IMVNotGetDie1, double);
   Free(internal->n_IMVNotGetDie1_IMVNotGetDie2);
   internal->n_IMVNotGetDie1_IMVNotGetDie2 = (double*) Calloc(internal->dim_n_IMVNotGetDie1_IMVNotGetDie2, double);
+  Free(internal->n_IMVNotGetDie2_D);
+  internal->n_IMVNotGetDie2_D = (double*) Calloc(internal->dim_n_IMVNotGetDie2_D, double);
   Free(internal->n_IMVNotGetLive1);
   internal->n_IMVNotGetLive1 = (double*) Calloc(internal->dim_n_IMVNotGetLive1, double);
   Free(internal->n_IMVNotGetLive1_IMVNotGetLive2);
@@ -2562,8 +2562,6 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
   double * D = state + internal->offset_variable_D;
   double hosp_occ = odin_sum1(IOxGetLive1, 0, internal->dim_IOxGetLive1) + odin_sum1(IOxGetLive2, 0, internal->dim_IOxGetLive2) + odin_sum1(IOxGetDie1, 0, internal->dim_IOxGetDie1) + odin_sum1(IOxGetDie2, 0, internal->dim_IOxGetDie2) + odin_sum1(IRec1, 0, internal->dim_IRec1) + odin_sum1(IRec2, 0, internal->dim_IRec2);
   double ICU_occ = odin_sum1(IMVGetLive1, 0, internal->dim_IMVGetLive1) + odin_sum1(IMVGetLive2, 0, internal->dim_IMVGetLive2) + odin_sum1(IMVGetDie1, 0, internal->dim_IMVGetDie1) + odin_sum1(IMVGetDie2, 0, internal->dim_IMVGetDie2);
-  double current_free_hosp = internal->hosp_bed_capacity - hosp_occ;
-  double current_free_ICUs = internal->ICU_bed_capacity - ICU_occ;
   for (int i = 1; i <= internal->dim_n_E1_E2; ++i) {
     internal->n_E1_E2[i - 1] = Rf_rbinom(round(E1[i - 1]), internal->p_E1_E2);
   }
@@ -2591,11 +2589,11 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
   for (int i = 1; i <= internal->dim_n_IMVGetLive2_Rec; ++i) {
     internal->n_IMVGetLive2_Rec[i - 1] = Rf_rbinom(round(IMVGetLive2[i - 1]), internal->p_IMVGetLive2_Rec);
   }
-  for (int i = 1; i <= internal->dim_n_IMVNotGetDie_2_D; ++i) {
-    internal->n_IMVNotGetDie_2_D[i - 1] = Rf_rbinom(round(IMVNotGetDie2[i - 1]), internal->p_IMVNotGetDie2_D);
-  }
   for (int i = 1; i <= internal->dim_n_IMVNotGetDie1_IMVNotGetDie2; ++i) {
     internal->n_IMVNotGetDie1_IMVNotGetDie2[i - 1] = Rf_rbinom(round(IMVNotGetDie1[i - 1]), internal->p_IMVNotGetDie1_IMVNotGetDie2);
+  }
+  for (int i = 1; i <= internal->dim_n_IMVNotGetDie2_D; ++i) {
+    internal->n_IMVNotGetDie2_D[i - 1] = Rf_rbinom(round(IMVNotGetDie2[i - 1]), internal->p_IMVNotGetDie2_D);
   }
   for (int i = 1; i <= internal->dim_n_IMVNotGetLive1_IMVNotGetLive2; ++i) {
     internal->n_IMVNotGetLive1_IMVNotGetLive2[i - 1] = Rf_rbinom(round(IMVNotGetLive1[i - 1]), internal->p_IMVNotGetLive1_IMVNotGetLive2);
@@ -2636,8 +2634,10 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
   for (int i = 1; i <= internal->dim_temp; ++i) {
     internal->temp[i - 1] = IMild[i - 1] + ICase1[i - 1] + ICase2[i - 1];
   }
+  double current_free_hosp = internal->hosp_bed_capacity + odin_sum1(internal->n_IOxGetDie2_D, 0, internal->dim_n_IOxGetDie2_D) + odin_sum1(internal->n_IOxGetLive2_R, 0, internal->dim_n_IOxGetLive2_R) + odin_sum1(internal->n_IRec2_R, 0, internal->dim_n_IRec2_R) - odin_sum1(internal->n_IMVGetLive2_Rec, 0, internal->dim_n_IMVGetLive2_Rec) - hosp_occ;
+  double current_free_ICUs = internal->ICU_bed_capacity + odin_sum1(internal->n_IMVGetLive2_Rec, 0, internal->dim_n_IMVGetLive2_Rec) + odin_sum1(internal->n_IMVGetDie2_D, 0, internal->dim_n_IMVGetDie2_D) - ICU_occ;
   for (int i = 1; i <= internal->dim_delta_D; ++i) {
-    internal->delta_D[i - 1] = internal->n_IOxGetDie2_D[i - 1] + internal->n_IOxNotGetDie2_D[i - 1] + internal->n_IMVGetDie2_D[i - 1] + internal->n_IMVNotGetDie_2_D[i - 1];
+    internal->delta_D[i - 1] = internal->n_IOxGetDie2_D[i - 1] + internal->n_IOxNotGetDie2_D[i - 1] + internal->n_IMVGetDie2_D[i - 1] + internal->n_IMVNotGetDie2_D[i - 1];
   }
   for (int i = 1; i <= internal->dim_delta_E2; ++i) {
     internal->delta_E2[i - 1] = internal->n_E1_E2[i - 1] - internal->n_E2_I[i - 1];
@@ -2652,7 +2652,7 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
     internal->delta_IMVGetLive2[i - 1] = internal->n_IMVGetLive1_IMVGetLive2[i - 1] - internal->n_IMVGetLive2_Rec[i - 1];
   }
   for (int i = 1; i <= internal->dim_delta_IMVNotGetDie2; ++i) {
-    internal->delta_IMVNotGetDie2[i - 1] = internal->n_IMVNotGetDie1_IMVNotGetDie2[i - 1] - internal->n_IMVNotGetDie_2_D[i - 1];
+    internal->delta_IMVNotGetDie2[i - 1] = internal->n_IMVNotGetDie1_IMVNotGetDie2[i - 1] - internal->n_IMVNotGetDie2_D[i - 1];
   }
   for (int i = 1; i <= internal->dim_delta_IMVNotGetLive2; ++i) {
     internal->delta_IMVNotGetLive2[i - 1] = internal->n_IMVNotGetLive1_IMVNotGetLive2[i - 1] - internal->n_IMVNotGetLive2_R[i - 1];
