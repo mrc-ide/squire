@@ -304,7 +304,12 @@ run_explicit_SEEIR_model <- function(
   # ----------------------------------------------------------------------------
 
   # Initialise initial conditions
-  mod_init <- init_check_explicit(init, population, seeding_cases)
+  if (!is.null(seeding_cases)) {
+    assert_int(seeding_cases)
+    mod_init <- init_check_explicit(init, population, seeding_cases)
+  } else {
+    mod_init <- init_check_explicit(init, population)
+  }
 
   # Convert contact matrices to input matrices
   matrices_set <- matrix_set_explicit(contact_matrix_set, population)
