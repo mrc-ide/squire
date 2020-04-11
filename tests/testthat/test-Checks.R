@@ -61,4 +61,5 @@ test_that("init explicit checks", {
   bad2 <- t1
   bad2[1,1] <- 10
   expect_error(init_check_explicit(bad2, 0:16, 20), "Row sums of init should be identical to population")
+  expect_error(init_check_explicit(NULL, rep(0, 17), 20))
 })
