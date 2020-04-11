@@ -44,20 +44,21 @@ test_that("init checks", {
 })
 
 test_that("init explicit checks", {
-  t1 <- init_check_explicit(NULL, 20:30)
+  expect_error(init_check_explicit(NULL, 1:10, 20), "population must")
+  expect_error(init_check_explicit(NULL, 20:36, 20.5))
+  t1 <- init_check_explicit(NULL, 20:36, 20)
   expect_type(t1, "list")
-  expect_equal(nrow(t1), 11)
+  expect_equal(nrow(t1), 17)
   expect_named(t1, c("S","E1","E2","IMild","ICase1","ICase2","IOxGetLive1",
                      "IOxGetLive2","IOxGetDie1","IOxGetDie2","IOxNotGetLive1",
                      "IOxNotGetLive2","IOxNotGetDie1","IOxNotGetDie2","IMVGetLive1",
                      "IMVGetLive2","IMVGetDie1","IMVGetDie2","IMVNotGetLive1",
                      "IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2","IRec1",
                      "IRec2","R","D"))
-  expect_error(init_check_explicit(1:2, 1:10), "init should be a data.frame with columns:")
+  expect_error(init_check_explicit(1:2, 1:17, 20), "init should be a data.frame with columns:")
   bad <- data.frame(x = 1:10)
-  expect_error(init_check_explicit(bad, 1:10), "S, E1, E2, ICase1, ICase2, IOxGetLive1, IOxGetLive2")
+  expect_error(init_check_explicit(bad, 1:17, 20), "S, E1, E2, ICase1, ICase2, IOxGetLive1, IOxGetLive2")
   bad2 <- t1
   bad2[1,1] <- 10
-  expect_error(init_check_explicit(bad2, 0:10), "Row sums of init should be identical to population")
-  expect_error(init_check_explicit(NULL, 1:10), "population size")
+  expect_error(init_check_explicit(bad2, 0:16, 20), "Row sums of init should be identical to population")
 })
