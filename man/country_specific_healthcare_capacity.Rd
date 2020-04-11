@@ -7,13 +7,8 @@
 \format{A data.frame}
 \usage{
 country_specific_healthcare_capacity
-
-country_specific_healthcare_capacity
 }
 \description{
 Hospital and ICU beds per 1000 pop for various countries
-
-Average Hospital and ICU beds per 1000 pop for different
-World Bank income groups
 }
 \keyword{datasets}
