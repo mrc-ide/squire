@@ -166,6 +166,7 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' @param dur_rec Duration of recovery after coming off ventilation. Default = 6
 #' @param hosp_bed_capacity General bed capacity.
 #' @param ICU_bed_capacity ICU bed capacity.
+#' @param seeding_cases Initial number of cases seeding the epidemic
 #'
 #' @return Simulation output
 #' @export
@@ -236,7 +237,9 @@ run_explicit_SEEIR_model <- function(
 
   # health system capacity
   hosp_bed_capacity = NULL,
-  ICU_bed_capacity = NULL
+  ICU_bed_capacity = NULL,
+
+  seeding_cases = NULL
 
   ) {
 
@@ -293,15 +296,15 @@ run_explicit_SEEIR_model <- function(
       ICU_beds <- beds$ICU_beds
       ICU_bed_capacity <- round(ICU_beds * sum(population)/1000)
     } else {
-      ICU_bed_capacity <- 3 * hosp_bed_capacity/100  
+      ICU_bed_capacity <- 3 * hosp_bed_capacity/100
     }
   }
 
-  # Initail state and matrix formatting
+  # Initial state and matrix formatting
   # ----------------------------------------------------------------------------
 
   # Initialise initial conditions
-  init <- init_check_explicit(init, population)
+  mod_init <- init_check_explicit(init, population, seeding_cases)
 
   # Convert contact matrices to input matrices
   matrices_set <- matrix_set_explicit(contact_matrix_set, population)
@@ -390,32 +393,32 @@ run_explicit_SEEIR_model <- function(
 
   # Collate Parameters Into List
   pars <- list(N_age = length(population),
-               S_0 = init$S,
-               E1_0 = init$E1,
-               E2_0 = init$E2,
-               IMild_0 = init$IMild,
-               ICase1_0 = init$ICase1,
-               ICase2_0 = init$ICase2,
-               IOxGetLive1_0 = init$IOxGetLive1,
-               IOxGetLive2_0 = init$IOxGetLive2,
-               IOxGetDie1_0 = init$IOxGetDie1,
-               IOxGetDie2_0 = init$IOxGetDie2,
-               IOxNotGetLive1_0 = init$IOxNotGetLive1,
-               IOxNotGetLive2_0 = init$IOxNotGetLive2,
-               IOxNotGetDie1_0 = init$IOxNotGetDie1,
-               IOxNotGetDie2_0 = init$IOxNotGetDie2,
-               IMVGetLive1_0 = init$IMVGetLive1,
-               IMVGetLive2_0 = init$IMVGetLive2,
-               IMVGetDie1_0 = init$IMVGetDie1,
-               IMVGetDie2_0 = init$IMVGetDie2,
-               IMVNotGetLive1_0 = init$IMVNotGetLive1,
-               IMVNotGetLive2_0 = init$IMVNotGetLive2,
-               IMVNotGetDie1_0 = init$IMVNotGetDie1,
-               IMVNotGetDie2_0 = init$IMVNotGetDie2,
-               IRec1_0 = init$IRec1,
-               IRec2_0 = init$IRec2,
-               R_0 = init$R,
-               D_0 = init$D,
+               S_0 = mod_init$S,
+               E1_0 = mod_init$E1,
+               E2_0 = mod_init$E2,
+               IMild_0 = mod_init$IMild,
+               ICase1_0 = mod_init$ICase1,
+               ICase2_0 = mod_init$ICase2,
+               IOxGetLive1_0 = mod_init$IOxGetLive1,
+               IOxGetLive2_0 = mod_init$IOxGetLive2,
+               IOxGetDie1_0 = mod_init$IOxGetDie1,
+               IOxGetDie2_0 = mod_init$IOxGetDie2,
+               IOxNotGetLive1_0 = mod_init$IOxNotGetLive1,
+               IOxNotGetLive2_0 = mod_init$IOxNotGetLive2,
+               IOxNotGetDie1_0 = mod_init$IOxNotGetDie1,
+               IOxNotGetDie2_0 = mod_init$IOxNotGetDie2,
+               IMVGetLive1_0 = mod_init$IMVGetLive1,
+               IMVGetLive2_0 = mod_init$IMVGetLive2,
+               IMVGetDie1_0 = mod_init$IMVGetDie1,
+               IMVGetDie2_0 = mod_init$IMVGetDie2,
+               IMVNotGetLive1_0 = mod_init$IMVNotGetLive1,
+               IMVNotGetLive2_0 = mod_init$IMVNotGetLive2,
+               IMVNotGetDie1_0 = mod_init$IMVNotGetDie1,
+               IMVNotGetDie2_0 = mod_init$IMVNotGetDie2,
+               IRec1_0 = mod_init$IRec1,
+               IRec2_0 = mod_init$IRec2,
+               R_0 = mod_init$R,
+               D_0 = mod_init$D,
                gamma_E = gamma_E,
                gamma_R = gamma_R,
                gamma_hosp = gamma_hosp,
@@ -443,7 +446,6 @@ run_explicit_SEEIR_model <- function(
                beta_set = beta_set,
                dt = dt)
 
-
   # Running the Model
   mod <- explict_SEIR(user = pars)
   t <- seq(from = 1, to = time_period/dt)
@@ -460,6 +462,7 @@ run_explicit_SEEIR_model <- function(
   parameters$hosp_bed_capacity <- hosp_bed_capacity
   parameters$ICU_bed_capacity <- ICU_bed_capacity
   parameters$beta_set <- beta_set
+  parameters$seeding_cases <- mod_init$E1
 
   out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
