@@ -279,14 +279,22 @@ run_explicit_SEEIR_model <- function(
 
   # populate hospital and ICU bed capacity if not provided
   if (is.null(hosp_bed_capacity)) {
-    beds <- get_healthcare_capacity(country)
-    hosp_beds <- beds$hosp_beds
-    hosp_bed_capacity <- round(hosp_beds * sum(population)/1000)
+    if (!is.null(country)) {
+      beds <- get_healthcare_capacity(country)
+      hosp_beds <- beds$hosp_beds
+      hosp_bed_capacity <- round(hosp_beds * sum(population)/1000)
+    } else {
+      hosp_bed_capacity <- 5 * sum(population)/1000
+    }
   }
   if (is.null(ICU_bed_capacity)) {
-    beds <- get_healthcare_capacity(country)
-    ICU_beds <- beds$ICU_beds
-    ICU_bed_capacity <- round(ICU_beds * sum(population)/1000)
+    if (!is.null(country)) {
+      beds <- get_healthcare_capacity(country)
+      ICU_beds <- beds$ICU_beds
+      ICU_bed_capacity <- round(ICU_beds * sum(population)/1000)
+    } else {
+      ICU_bed_capacity <- 3 * hosp_bed_capacity/100  
+    }
   }
 
   # Initail state and matrix formatting
