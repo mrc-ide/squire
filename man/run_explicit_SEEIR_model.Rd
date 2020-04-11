@@ -13,7 +13,7 @@ run_explicit_SEEIR_model(
   tt_R0 = 0,
   beta_set = NULL,
   time_period = 365,
-  dt = 0.5,
+  dt = 0.1,
   replicates = 10,
   init = NULL,
   output_transform = TRUE,

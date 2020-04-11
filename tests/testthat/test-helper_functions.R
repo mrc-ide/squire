@@ -5,14 +5,14 @@ context("objects")
 test_that("object methods ", {
 
   # default run
-  r <- run_explicit_SEEIR_model("India")
+  r <- run_explicit_SEEIR_model("India", dt = 0.5)
   out <- extract_all_outputs(r)
 
   expect_is(out, "list")
   expect_equal(names(out), c("t", "S", "E", "IMild", "ICase", "IOx", "IMV",
                              "IRec", "R", "D"))
 
-  r2 <- run_explicit_SEEIR_model("India", output_transform = FALSE)
+  r2 <- run_explicit_SEEIR_model("India", output_transform = FALSE, dt = 0.5)
   expect_error(out <- extract_all_outputs(r2),
                "Plotting does not work with untransformed output")
 
