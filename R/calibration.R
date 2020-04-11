@@ -79,7 +79,10 @@ death_data_format <- function(date = NULL,
 #'
 #' @param data Data frame with 2 variables: date and deaths
 #' @param country Character. Country data originates from.
-#' @param reporting_fraction Numberic. Fraction of deaths expected to have been reported. DEFAULT = 1
+#' @param reporting_fraction Numbeic. Fraction of deaths expected to have been reported. DEFAULT = 1
+#' @param seeding_age_groups Character vector. Age groups seeding cases should be distributed into.
+#' @param min_seeding_cases Numeric. Minimum number of seeding cases. DEFAULT = 5.
+#' @param max_seeding_cases Numeric. Maximum number of seeding cases. DEFAULT = 50.
 #' @param parse_output Logical. Should output be parsed ready for plotting.
 #'   Default = TRUE
 #' @param replicates Simulation Repetitions. Default = 10

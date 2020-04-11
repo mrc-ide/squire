@@ -22,7 +22,13 @@ calibrate(
 
 \item{country}{Character. Country data originates from.}
 
-\item{reporting_fraction}{Numberic. Fraction of deaths expected to have been reported. DEFAULT = 1}
+\item{reporting_fraction}{Numbeic. Fraction of deaths expected to have been reported. DEFAULT = 1}
+
+\item{seeding_age_groups}{Character vector. Age groups seeding cases should be distributed into.}
+
+\item{min_seeding_cases}{Numeric. Minimum number of seeding cases. DEFAULT = 5.}
+
+\item{max_seeding_cases}{Numeric. Maximum number of seeding cases. DEFAULT = 50.}
 
 \item{parse_output}{Logical. Should output be parsed ready for plotting.
 Default = TRUE}
