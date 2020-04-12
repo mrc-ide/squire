@@ -97,7 +97,7 @@ death_data_format <- function(date = NULL,
 calibrate <- function(data, country, reporting_fraction = 1,
                       seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
                       min_seeding_cases = 5, max_seeding_cases = 50,
-                      parse_output = TRUE, replicates = 100, dt = 0.25, ...) {
+                      parse_output = TRUE, replicates = 100, dt = 0.5, ...) {
 
   # getting indices for relevant age groups where seeding cases occurred
   age_groups <- c("0-5", "5-10", "10-15", "15-20", "20-25", "25-30", "30-35",
@@ -144,7 +144,7 @@ calibrate <- function(data, country, reporting_fraction = 1,
   r <- run_explicit_SEEIR_model(population = pop$n,
                                 contact_matrix_set = contact_matrix,
                                 replicates = 1,
-                                dt = 0.5,
+                                dt = dt,
                                 output_transform = FALSE,
                                 ...)
 
