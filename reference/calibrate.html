@@ -120,7 +120,18 @@
     <p>Calibrate Model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>calibrate</span>(<span class='no'>data</span>, <span class='no'>country</span>, <span class='kw'>parse_output</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.25</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>calibrate</span>(
+  <span class='no'>data</span>,
+  <span class='no'>country</span>,
+  <span class='kw'>reporting_fraction</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>seeding_age_groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"35-40"</span>, <span class='st'>"40-45"</span>, <span class='st'>"45-50"</span>, <span class='st'>"50-55"</span>),
+  <span class='kw'>min_seeding_cases</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>max_seeding_cases</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>parse_output</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.25</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -132,6 +143,22 @@
     <tr>
       <th>country</th>
       <td><p>Character. Country data originates from.</p></td>
+    </tr>
+    <tr>
+      <th>reporting_fraction</th>
+      <td><p>Numbeic. Fraction of deaths expected to have been reported. DEFAULT = 1</p></td>
+    </tr>
+    <tr>
+      <th>seeding_age_groups</th>
+      <td><p>Character vector. Age groups seeding cases should be distributed into.</p></td>
+    </tr>
+    <tr>
+      <th>min_seeding_cases</th>
+      <td><p>Numeric. Minimum number of seeding cases. DEFAULT = 5.</p></td>
+    </tr>
+    <tr>
+      <th>max_seeding_cases</th>
+      <td><p>Numeric. Maximum number of seeding cases. DEFAULT = 50.</p></td>
     </tr>
     <tr>
       <th>parse_output</th>

@@ -120,7 +120,7 @@
     <p>Check and set up initial values for explict model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>init_check_explicit</span>(<span class='no'>init</span>, <span class='no'>population</span>)</pre>
+    <pre class="usage"><span class='fu'>init_check_explicit</span>(<span class='no'>init</span>, <span class='no'>population</span>, <span class='kw'>seeding_cases</span> <span class='kw'>=</span> <span class='fl'>20</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -133,6 +133,10 @@
       <th>population</th>
       <td><p>Population vector (for each age group). Default = NULL,
 which will cause population to be sourced from <code>country</code></p></td>
+    </tr>
+    <tr>
+      <th>seeding_cases</th>
+      <td><p>Initial number of cases seeding the epidemic</p></td>
     </tr>
     </table>
 
