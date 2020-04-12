@@ -4,12 +4,31 @@
 \alias{calibrate}
 \title{Calibrate Model}
 \usage{
-calibrate(data, country, parse_output = TRUE, replicates = 10, dt = 0.25, ...)
+calibrate(
+  data,
+  country,
+  reporting_fraction = 1,
+  seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
+  min_seeding_cases = 5,
+  max_seeding_cases = 50,
+  parse_output = TRUE,
+  replicates = 100,
+  dt = 0.25,
+  ...
+)
 }
 \arguments{
 \item{data}{Data frame with 2 variables: date and deaths}
 
 \item{country}{Character. Country data originates from.}
+
+\item{reporting_fraction}{Numbeic. Fraction of deaths expected to have been reported. DEFAULT = 1}
+
+\item{seeding_age_groups}{Character vector. Age groups seeding cases should be distributed into.}
+
+\item{min_seeding_cases}{Numeric. Minimum number of seeding cases. DEFAULT = 5.}
+
+\item{max_seeding_cases}{Numeric. Maximum number of seeding cases. DEFAULT = 50.}
 
 \item{parse_output}{Logical. Should output be parsed ready for plotting.
 Default = TRUE}

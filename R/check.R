@@ -49,15 +49,24 @@ init_check <- function(init, population){
 #' @inheritParams run_explicit_SEEIR_model
 #'
 #' @return Checked initial values data.frame
-init_check_explicit <- function(init, population){
+init_check_explicit <- function(init, population, seeding_cases = 20){
+
+  if (length(population) != 17) {
+    stop("population must be divided up into 17x 5-year age bands spanning 0 to 80+")
+  }
+  assert_int(seeding_cases)
+  age_group_indices <- c(8, 9, 10, 11) # age_group indices corresponding to middle-aged travellers
+
   if(is.null(init)){
+    raw_seeding_cases <- rep(0, length(population))
+    raw_seeding_cases[age_group_indices] <- as.vector(rmultinom(1, size = seeding_cases, prob = rep(0.25, 4)))
     init = data.frame(
-      S = population - 3,
-      E1 = 0,
+      S = population - raw_seeding_cases,
+      E1 = raw_seeding_cases,
       E2 = 0,
-      IMild = 1,
-      ICase1 = 1,
-      ICase2 = 1,
+      IMild = 0,
+      ICase1 = 0,
+      ICase2 = 0,
       IOxGetLive1 = 0,
       IOxGetLive2 = 0,
       IOxGetDie1 = 0,
@@ -103,7 +112,10 @@ init_check_explicit <- function(init, population){
       IMVNotGetDie1, IMVNotGetDie2, IRec1, IRec2, R, D")
     }
   }
-  if(!all(rowSums(init) == population)){
+  # cases randomly distributed across 4 age groups so can't check
+  # whole population is equal by row. Instead do it for first 7 age
+  # groups
+  if(!all(rowSums(init[1:7, ]) == population[1:7])){
     stop("Row sums of init should be identical to population")
   }
   if(!all(init >= 0)) {

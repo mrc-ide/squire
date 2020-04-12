@@ -79,6 +79,10 @@ death_data_format <- function(date = NULL,
 #'
 #' @param data Data frame with 2 variables: date and deaths
 #' @param country Character. Country data originates from.
+#' @param reporting_fraction Numbeic. Fraction of deaths expected to have been reported. DEFAULT = 1
+#' @param seeding_age_groups Character vector. Age groups seeding cases should be distributed into.
+#' @param min_seeding_cases Numeric. Minimum number of seeding cases. DEFAULT = 5.
+#' @param max_seeding_cases Numeric. Maximum number of seeding cases. DEFAULT = 50.
 #' @param parse_output Logical. Should output be parsed ready for plotting.
 #'   Default = TRUE
 #' @param replicates Simulation Repetitions. Default = 10
@@ -90,8 +94,20 @@ death_data_format <- function(date = NULL,
 #' @export
 #' @return List of formatted odin outputs, the data it is calibrated to and
 #'   the parameter set used in calibration
-calibrate <- function(data, country, parse_output = TRUE,
-                      replicates = 10, dt = 0.25, ...) {
+calibrate <- function(data, country, reporting_fraction = 1,
+                      seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
+                      min_seeding_cases = 5, max_seeding_cases = 50,
+                      parse_output = TRUE, replicates = 100, dt = 0.5, ...) {
+
+  # getting indices for relevant age groups where seeding cases occurred
+  age_groups <- c("0-5", "5-10", "10-15", "15-20", "20-25", "25-30", "30-35",
+                  "35-40", "40-45", "45-50", "50-55", "55-60", "60-65", "65-70",
+                  "70-75", "75-80", "80+")
+  if (sum(!(seeding_age_groups %in% age_groups)) > 0) {
+    stop("inputted age groups not valid")
+  }
+  age_group_indices <- which(age_groups %in% seeding_age_groups)
+  num_age_groups <- length(age_group_indices)
 
   # assertions
   assert_dataframe(data)
@@ -104,23 +120,53 @@ calibrate <- function(data, country, parse_output = TRUE,
   data <- death_data_format(date = data$date,
                             deaths = data$deaths,
                             cases = data$cases)
+
+  # adjust for reporting fraction
+  data$true_deaths <- data$deaths / reporting_fraction
+
+  # get population and mixing matrix for specific country
   pop <- get_population(country)
   contact_matrix <- get_mixing_matrix(country)
+
+  # age_group indices corresponding to middle-aged travellers
+
+  # generating the seeding cases for each of the replicates
+  E1_0 <- lapply(seq_len(replicates), function(x) {
+    seeding_cases <- rep(0, length = length(pop$n))
+    raw_seeding_cases <- round(runif(n = 1, min = min_seeding_cases, max = max_seeding_cases))
+    seeding_cases[age_group_indices] <- as.vector(rmultinom(1,
+                                                            size = raw_seeding_cases,
+                                                            prob = rep(1/num_age_groups, num_age_groups)))
+    seeding_cases
+  })
 
   # run model with fixed day step (to match up with daily deaths)
   r <- run_explicit_SEEIR_model(population = pop$n,
                                 contact_matrix_set = contact_matrix,
-                                replicates = replicates,
+                                replicates = 1,
                                 dt = dt,
                                 output_transform = FALSE,
                                 ...)
+
+  # create array for multiple model runs (with different seeds) to be stored
+  r$output <- array(r$output, dim = c(nrow(r$output[,,1]), ncol(r$output[,,1]), replicates))
+
+  # creating the vector of times to run the model over (matching the initial run)
+  t <-  seq(from = 1, to = r$parameters$time_period/r$parameters$dt)
+
+  # running and storing the model output for each of the different initial seeding cases
+  for(i in 2:replicates) {
+    r$mod$set_user(E1_0 = E1_0[[i]])
+    r$output[, , i] <- r$mod$run(t, replicate = 1)
+  }
+  r$parameters$replicates <- replicates
 
   # get the index for looking up D
   index <- odin_index(r$model)
 
   # create the shifted date
   timings <- vapply(seq_len(replicates), function(x) {
-    which.max(rowSums(r$output[,index$D,x]) >= data$deaths[1])
+    which.max(rowSums(r$output[,index$D,x]) >= data$true_deaths[1])
   }, FUN.VALUE = numeric(1))
 
   r$date <- vapply(seq_len(replicates), function(x) {
