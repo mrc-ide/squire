@@ -267,3 +267,25 @@ test_that("health system capacity", {
 
 
 })
+
+
+
+
+test_that("seeding", {
+
+  set.seed(123)
+  icu_cap <- 1000
+  bed_cap <- 1e5
+  r <- run_explicit_SEEIR_model(country = "United Kingdom",
+                                R0 = 2.5,
+                                time_period =
+                                  200, seeding_cases = 3,
+                                dt = 1,
+                                output_transform = TRUE,
+                                hosp_bed_capacity = bed_cap,
+                                ICU_bed_capacity = icu_cap,
+                                replicates = 1)
+
+  expect_equal(sum(r$output$E1[1,,1]), 3)
+
+})

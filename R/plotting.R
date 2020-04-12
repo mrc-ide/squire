@@ -83,7 +83,15 @@ plot_calibration_cases <- function(df, data, forecast = 0) {
     ggplot2::scale_color_discrete(name = "Predicted", labels = c("Hospital Cases","Mild Cases")) +
     ggplot2::scale_fill_discrete(name = "Predicted", labels = c("Hospital Cases","Mild Cases")) +
     ggplot2::scale_shape_discrete(name = "Observed") +
-    ggplot2::theme_bw()
+    ggplot2::scale_x_date(date_breaks = "1 week", date_labels = "%b %d") +
+    ggplot2::theme_bw() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
+                   axis.title.x = ggplot2::element_blank(),
+                   panel.grid.major.x = ggplot2::element_blank(),
+                   panel.grid.minor.x = ggplot2::element_blank(),
+                   panel.border = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_blank(),
+                   axis.line = ggplot2::element_line(colour = "black"))
 
   invisible(gg_cases)
 
@@ -97,7 +105,7 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
   sub <- df[df$variable %in% c("mild_cases", "hospital_cases") &
               df$date <=  Sys.Date() + forecast,] %>%
     dplyr::group_by(.data$date, .data$replicate) %>%
-    dplyr::summarise(value = sum(value))
+    dplyr::summarise(value = sum(.data$value))
 
   pd_group <- dplyr::group_by(sub, .data$date) %>%
     dplyr::summarise(quants = list(quantile(.data$value, c(0.025, 0.25, 0.5, 0.75, 0.975))),
@@ -136,9 +144,6 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
                       inherit.aes = FALSE) +
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
     ggplot2::ylab("Daily Number of Infections") +
-    ggplot2::scale_color_discrete(name = "Predicted", labels = c("Hospital Cases","Mild Cases")) +
-    ggplot2::scale_fill_discrete(name = "Predicted", labels = c("Hospital Cases","Mild Cases")) +
-    ggplot2::scale_shape_discrete(name = "Observed") +
     ggplot2::theme_bw()  +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
     ggplot2::scale_x_date(date_breaks = "1 week", date_labels = "%b %d") +
@@ -148,7 +153,7 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
           panel.grid.minor.x = ggplot2::element_blank(),
           panel.border = ggplot2::element_blank(),
           panel.background = ggplot2::element_blank(),
-          axis.line = ggplot2::element_line(colour = "black"),
+          axis.line = ggplot2::element_line(colour = "black")
     )
 
   invisible(gg_cases)
@@ -172,8 +177,7 @@ plot_calibration_healthcare <- function(df, data, forecast = 14) {
   data$deaths <- rev(c(tail(data$deaths,1), diff(rev(data$deaths))))
 
   # Plot
-  gg_healthcare <- ggplot2::ggplot(
-    sub, ggplot2::aes(x = as.Date(.data$date, origin = "1970-01-01 UTC"),
+  gg_healthcare <- ggplot2::ggplot(sub, ggplot2::aes(x = as.Date(.data$date, origin = "1970-01-01 UTC"),
                       y = .data$value, col = .data$variable,
                       group = interaction(.data$variable, .data$replicate))) +
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
@@ -200,7 +204,14 @@ plot_calibration_healthcare <- function(df, data, forecast = 14) {
     ggplot2::scale_fill_discrete(name = "Predicted", labels = c("Deaths", "Hospital Beds", "ICU Beds")) +
     ggplot2::scale_shape_discrete(name = "Observed") +
     ggplot2::theme_bw() +
-    ggplot2::xlim(c(Sys.Date()-7, Sys.Date()+forecast))
+    ggplot2::scale_x_date(date_breaks = "1 week", date_labels = "%b %d", limits = c(Sys.Date()-7, Sys.Date() + forecast)) +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
+                   axis.title.x = ggplot2::element_blank(),
+                   panel.grid.major.x = ggplot2::element_blank(),
+                   panel.grid.minor.x = ggplot2::element_blank(),
+                   panel.border = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_blank(),
+                   axis.line = ggplot2::element_line(colour = "black"))
 
   invisible(gg_healthcare)
 

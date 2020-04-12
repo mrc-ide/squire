@@ -58,6 +58,12 @@ test_that("calibrate works", {
   # run caliibrate
   replicates <- 10
   set.seed(123)
+
+  # wrong_ages
+  expect_error(out <- calibrate(df, "India", parse_output = FALSE,
+                   seeding_age_groups = c("10-20"),
+                   replicates = replicates, dt = 1))
+
   out <- calibrate(df, "India", parse_output = FALSE,
                    replicates = replicates, dt = 1)
   index <- odin_index(out$model)
@@ -70,7 +76,6 @@ test_that("calibrate works", {
 
   # are all deaths yesteday less than the deaths today
   expect_true(all(deaths[which(out$date == (Sys.Date()-1))] < df$deaths[1]))
-
 
   # test the parsing
   date <- out$date

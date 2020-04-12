@@ -34,4 +34,6 @@ test_that("healthcare capacity getter getter works", {
   expect_named(out, c("hosp_beds", "ICU_beds"))
   expect_is(out$hosp_beds, "numeric")
   expect_is(out$ICU_beds, "numeric")
+
+  expect_error(get_healthcare_capacity("Reunion"))
 })

@@ -13,7 +13,7 @@ calibrate(
   max_seeding_cases = 50,
   parse_output = TRUE,
   replicates = 100,
-  dt = 0.25,
+  dt = 0.5,
   ...
 )
 }
