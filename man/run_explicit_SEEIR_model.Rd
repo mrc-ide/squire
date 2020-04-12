@@ -45,7 +45,8 @@ run_explicit_SEEIR_model(
   dur_not_get_mv_die = 1,
   dur_rec = 6,
   hosp_bed_capacity = NULL,
-  ICU_bed_capacity = NULL
+  ICU_bed_capacity = NULL,
+  seeding_cases = NULL
 )
 }
 \arguments{
@@ -145,6 +146,8 @@ death. Default = 12}
 \item{hosp_bed_capacity}{General bed capacity.}
 
 \item{ICU_bed_capacity}{ICU bed capacity.}
+
+\item{seeding_cases}{Initial number of cases seeding the epidemic}
 }
 \value{
 Simulation output
