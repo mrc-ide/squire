@@ -68,18 +68,21 @@ plot.squire_simulation <- function(x, replicates = FALSE,
 
   # Format summary data
   pds <- pd %>%
-    dplyr::group_by(t, compartment) %>%
-    dplyr::summarise(ymin = quantile(y, q[1]),
-              ymax = quantile(y, q[2]),
-              y = summary_f(y))
+    dplyr::group_by(.data$t, .data$compartment) %>%
+    dplyr::summarise(ymin = quantile(.data$y, q[1]),
+              ymax = quantile(.data$y, q[2]),
+              y = summary_f(.data$y))
 
   # Plot
   p <- ggplot2::ggplot()
 
   # Add lines for individual draws
   if(replicates){
-    p <- p + ggplot2::geom_line(data = pd, ggplot2::aes(x = .data$t, y = .data$y, col = .data$compartment,
-                                                        group = interaction(.data$compartment, .data$replicate)),
+    p <- p + ggplot2::geom_line(data = pd,
+                                ggplot2::aes(x = .data$t,
+                                             y = .data$y,
+                                             col = .data$compartment,
+                                             group = interaction(.data$compartment, .data$replicate)),
                                 alpha = max(0.2, 1 / x$parameters$replicates))
   }
 
@@ -87,17 +90,21 @@ plot.squire_simulation <- function(x, replicates = FALSE,
     if(x$parameters$replicates < 10){
       warning("Summary statistic estimated from <10 replicates")
     }
-    p <- p +
-      ggplot2::geom_line(data = pds, ggplot2::aes(x = .data$t, y = .data$y, col = .data$compartment))
+    p <- p + ggplot2::geom_line(data = pds,
+                                ggplot2::aes(x = .data$t, y = .data$y,
+                                             col = .data$compartment))
   }
 
   if(ci){
     if(x$parameters$replicates < 10){
       warning("Confidence bounds estimated from <10 replicates")
     }
-    p <- p +
-      ggplot2::geom_ribbon(data = pds, ggplot2::aes(x = .data$t, ymin = .data$ymin, ymax = .data$ymax,
-                                                    fill = .data$compartment), alpha = 0.25, col = NA)
+    p <- p + ggplot2::geom_ribbon(data = pds,
+                                  ggplot2::aes(x = .data$t,
+                                               ymin = .data$ymin,
+                                               ymax = .data$ymax,
+                                                    fill = .data$compartment),
+                                  alpha = 0.25, col = NA)
   }
 
   # Add remaining formatting

@@ -1,18 +1,34 @@
 #' Get population data
 #'
 #' @param country Country name
+#' @param iso3c ISO 3C Country Code
 #' @param simple_SEIR Logical. Is the population for the \code{simple_SEIR}.
 #'   Default = FALSE
 #'
 #' @return Population data.frame
 #' @importFrom utils head tail
 #' @export
-get_population <-  function(country, simple_SEIR = FALSE){
-  if(!country %in% unique(squire::population$country)){
-    stop("Country not found")
+get_population <-  function(country = NULL, iso3c = NULL, simple_SEIR = FALSE){
+
+  ## country route
+  if(!is.null(country)) {
+    assert_string(country)
+    if(!country %in% unique(squire::population$country)){
+      stop("Country not found")
+    }
+    pc <- squire::population[squire::population$country == country, ] %>%
+      dplyr::arrange(.data$age_group)
   }
-  pc <- squire::population[squire::population$country == country, ] %>%
-    dplyr::arrange(.data$age_group)
+
+  # iso3c route
+  if(!is.null(iso3c)) {
+    assert_string(iso3c)
+    if(!iso3c %in% unique(squire::population$iso3c)){
+      stop("iso3c not found")
+    }
+    pc <- squire::population[squire::population$iso3c == iso3c, ] %>%
+      dplyr::arrange(.data$age_group)
+  }
 
   if (simple_SEIR) {
     pc$n <- c(head(pc$n, -2), sum(tail(pc$n, 2)), 0)

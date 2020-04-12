@@ -1,7 +1,5 @@
 context("helper-functions")
 
-context("objects")
-
 test_that("object methods ", {
 
   # default run

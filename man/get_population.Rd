@@ -4,10 +4,12 @@
 \alias{get_population}
 \title{Get population data}
 \usage{
-get_population(country, simple_SEIR = FALSE)
+get_population(country = NULL, iso3c = NULL, simple_SEIR = FALSE)
 }
 \arguments{
 \item{country}{Country name}
+
+\item{iso3c}{ISO 3C Country Code}
 
 \item{simple_SEIR}{Logical. Is the population for the \code{simple_SEIR}.
 Default = FALSE}

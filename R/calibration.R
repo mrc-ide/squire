@@ -89,7 +89,7 @@ death_data_format <- function(date = NULL,
 #' @param dt Time Step. Default = 0.25
 #' @param ... Other parameters to pass to \code{\link{run_explicit_SEEIR_model}}
 #' @importFrom utils tail
-#' @importFrom stats rbinom time
+#' @importFrom stats rbinom time rmultinom
 #'
 #' @export
 #' @return List of formatted odin outputs, the data it is calibrated to and

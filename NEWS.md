@@ -1,8 +1,14 @@
-# sircovid 0.2.1
+# squire 0.2.2
+
+* `calibrate` now allows different seeding events (#50) and undereporting (#11)
+* New plotting functions for `plot.squire_calibration`
+* iso3c country codes in (#52)
+
+# squire 0.2.1
 
 * `extract_all_outputs` and `extract_specific_output` (#37)
 
-# sircovid 0.2.0
+# squire 0.2.0
 
 * New minor version for iterative PR development cycle from now
 

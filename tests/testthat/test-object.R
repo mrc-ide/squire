@@ -52,7 +52,8 @@ test_that("squire_untransform ", {
 
 # run the model
 r <- run_explicit_SEEIR_model(country = "Afghanistan",
-                              output_transform = FALSE)
+                              output_transform = FALSE,
+                              dt = 1)
 
 # check it works
 gcu <- untransformed_output(r)
@@ -61,7 +62,8 @@ expect_is(gg, "ggplot")
 
 # error catching
 r2 <- run_explicit_SEEIR_model(country = "Afghanistan",
-                              output_transform = TRUE)
+                              output_transform = TRUE,
+                              dt = 1)
 expect_error(gcu <- untransformed_output(r2),
              "r must be created with")
 
