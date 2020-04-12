@@ -24,4 +24,7 @@ test_that("cases and healthcare plotting works", {
   # and does it fail if we put gibberish in
   expect_error(plot(get2, what = "trash"), "must be one of")
 
-})
+  expect_is(plot_calibration_cases(get2$df, get2$data), "ggplot")
+  expect_is(plot_calibration_healthcare(get2$df, get2$data), "ggplot")
+
+  })

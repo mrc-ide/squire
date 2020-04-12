@@ -234,7 +234,7 @@ test_that("run explicit works when healthsystem capacity is swamped", {
 
 
 
-test_that("health system capacite", {
+test_that("health system capacity", {
 
   set.seed(123)
   icu_cap <- 1000

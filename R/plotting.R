@@ -27,9 +27,9 @@ plot.squire_calibration <- function(x, ...,
 
   # what are we plotting
   if(what == "cases") {
-    gg <- plot_calibration_cases(df = df, data = data, forecast = forecast, ...)
+    gg <- plot_calibration_cases_barplot(df = df, data = data, forecast = forecast, ...)
   } else if (what == "healthcare") {
-    gg <- plot_calibration_healthcare(df = df, data = data, forecast = forecast, ...)
+    gg <- plot_calibration_healthcare_barplot(df = df, data = data, forecast = forecast, ...)
   } else {
     stop("what must be one of cases or healthcare")
   }
@@ -89,6 +89,71 @@ plot_calibration_cases <- function(df, data, forecast = 0) {
 
 }
 
+#' @noRd
+#' @importFrom stats median runif
+plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
+
+  # split to correct dates
+  sub <- df[df$variable %in% c("mild_cases", "hospital_cases") &
+              df$date <=  Sys.Date() + forecast,] %>%
+    dplyr::group_by(.data$date, .data$replicate) %>%
+    dplyr::summarise(value = sum(value))
+
+  pd_group <- dplyr::group_by(sub, .data$date) %>%
+    dplyr::summarise(quants = list(quantile(.data$value, c(0.025, 0.25, 0.5, 0.75, 0.975))),
+                     ymin = .data$quants[[1]][1],
+                     ymax = .data$quants[[1]][5],
+                     yinner_min = .data$quants[[1]][2],
+                     yinner_max = .data$quants[[1]][4],
+                     value = median(.data$value))
+
+  # format cases
+  data$cases <- rev(c(tail(data$cases,1), diff(rev(data$cases))))
+
+  # Plot
+  gg_cases <- ggplot2::ggplot(sub, ggplot2::aes(x = as.Date(.data$date, origin = "1970-01-01 UTC"),
+                                    y = .data$value, col = .data$variable)) +
+    ggplot2::geom_ribbon(data = pd_group,
+                         mapping = ggplot2::aes(ymin = .data$ymin,
+                                                ymax = .data$ymax),
+                         color = "white",
+                         fill = "#8cbbca",
+                         alpha = 0.2,
+                         size = 0,
+                         show.legend = FALSE) +
+    ggplot2::geom_ribbon(data = pd_group,
+                         mapping = ggplot2::aes(ymin = .data$yinner_min,
+                                                ymax = .data$yinner_max),
+                         color = "white",
+                         fill = "#3f8ea7",
+                         alpha = 0.8,
+                         size = 0,
+                         show.legend = FALSE) +
+    ggplot2::geom_bar(data = data,
+                      mapping = ggplot2::aes(x = .data$date, y = .data$cases),
+                      stat = "identity",
+                      fill = "#c59e96",
+                      inherit.aes = FALSE) +
+    ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
+    ggplot2::ylab("Daily Number of Infections") +
+    ggplot2::scale_color_discrete(name = "Predicted", labels = c("Hospital Cases","Mild Cases")) +
+    ggplot2::scale_fill_discrete(name = "Predicted", labels = c("Hospital Cases","Mild Cases")) +
+    ggplot2::scale_shape_discrete(name = "Observed") +
+    ggplot2::theme_bw()  +
+    ggplot2::scale_y_continuous(expand = c(0,0)) +
+    ggplot2::scale_x_date(date_breaks = "1 week", date_labels = "%b %d") +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
+          axis.title.x = ggplot2::element_blank(),
+          panel.grid.major.x = ggplot2::element_blank(),
+          panel.grid.minor.x = ggplot2::element_blank(),
+          panel.border = ggplot2::element_blank(),
+          panel.background = ggplot2::element_blank(),
+          axis.line = ggplot2::element_line(colour = "black"),
+    )
+
+  invisible(gg_cases)
+
+}
 
 #' @noRd
 plot_calibration_healthcare <- function(df, data, forecast = 14) {
@@ -136,6 +201,68 @@ plot_calibration_healthcare <- function(df, data, forecast = 14) {
     ggplot2::scale_shape_discrete(name = "Observed") +
     ggplot2::theme_bw() +
     ggplot2::xlim(c(Sys.Date()-7, Sys.Date()+forecast))
+
+  invisible(gg_healthcare)
+
+}
+
+
+#' @noRd
+plot_calibration_healthcare_barplot <- function(df, data, forecast = 14) {
+
+  # split to correct dates
+  sub <- df[df$variable %in% c("deaths") &
+              df$date <=  Sys.Date() + forecast,]
+
+  pd_group <- dplyr::group_by(sub, .data$date, .data$variable) %>%
+    dplyr::summarise(quants = list(quantile(.data$value, c(0.025, 0.25, 0.5, 0.75, 0.975))),
+                     ymin = round(.data$quants[[1]][1]),
+                     ymax = round(.data$quants[[1]][5]),
+                     yinner_min = round(.data$quants[[1]][2]),
+                     yinner_max = round(.data$quants[[1]][4]),
+                     value = median(.data$value))
+
+  # format cases
+  data$deaths <- rev(c(tail(data$deaths,1), diff(rev(data$deaths))))
+
+  # Plot
+  gg_healthcare <- ggplot2::ggplot(sub,
+                                   ggplot2::aes(x = as.Date(.data$date, origin = "1970-01-01 UTC"),
+                                                y = .data$value, fill = .data$variable,
+                                                group = .data$variable)) +
+    ggplot2::geom_ribbon(data = pd_group,
+                         mapping = ggplot2::aes(ymin = .data$ymin,
+                                                ymax = .data$ymax),
+                         color = "white",
+                         fill = "#8cbbca",
+                         alpha = 0.2,
+                         size = 0,
+                         show.legend = FALSE) +
+    ggplot2::geom_ribbon(data = pd_group,
+                         mapping = ggplot2::aes(ymin = .data$yinner_min,
+                                                ymax = .data$yinner_max),
+                         color = "white",
+                         fill = "#3f8ea7",
+                         alpha = 0.8,
+                         size = 0,
+                         show.legend = FALSE) +
+    ggplot2::geom_bar(data = data,
+                      mapping = ggplot2::aes(x = .data$date, y = .data$deaths),
+                      stat = "identity",
+                      fill = "#c59e96",
+                      inherit.aes = FALSE) +
+    ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
+    ggplot2::theme_bw()  +
+    ggplot2::ylab("Daily Deaths") +
+    ggplot2::scale_y_continuous(expand = c(0,0)) +
+    ggplot2::scale_x_date(date_breaks = "1 week", date_labels = "%b %d", limits = c(Sys.Date()-7, Sys.Date() + forecast)) +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
+                   axis.title.x = ggplot2::element_blank(),
+                   panel.grid.major.x = ggplot2::element_blank(),
+                   panel.grid.minor.x = ggplot2::element_blank(),
+                   panel.border = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_blank(),
+                   axis.line = ggplot2::element_line(colour = "black"))
 
   invisible(gg_healthcare)
 
