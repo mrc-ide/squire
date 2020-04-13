@@ -122,9 +122,9 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   # E1 and E2 together
   if (combine_compartments == TRUE) {
     out <- out %>%
-      dplyr::mutate(compartment = gsub("[1-2]$", "", compartment)) %>%
-      dplyr::group_by(replicate, age_group, compartment, t) %>%
-      dplyr::summarise(y = sum(y))
+      dplyr::mutate(compartment = gsub("[1-2]$", "", .data$compartment)) %>%
+      dplyr::group_by(.data$replicate, .data$age_group, .data$compartment, .data$t) %>%
+      dplyr::summarise(y = sum(.data$y))
   }
 
   # Collapse ages
@@ -149,7 +149,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
 #'
 #' @return Formatted long data.frame
 #' @export
-extract_deaths <- function(x, reduce_age = TRUE, date0 = NULL){
+extract_deaths <- function(x, reduce_age = TRUE, data_0 = NULL){
   output <- format_output(x, var_select = "delta_D", reduce_age = reduce_age,
                           date_0 = data_0)
   output$replicate <- factor(output$replicate)
@@ -164,7 +164,7 @@ extract_deaths <- function(x, reduce_age = TRUE, date0 = NULL){
 #'
 #' @return Formatted long data.frame
 #' @export
-extract_infection_incidence <- function(x, reduce_age = TRUE, date0 = NULL){
+extract_infection_incidence <- function(x, reduce_age = TRUE, data_0 = NULL){
   output <- format_output(x, var_select = "n_E2_I", reduce_age = reduce_age,
                           date_0 = data_0)
   output$replicate <- factor(output$replicate)
@@ -179,12 +179,12 @@ extract_infection_incidence <- function(x, reduce_age = TRUE, date0 = NULL){
 #'
 #' @return Formatted long data.frame
 #' @export
-extract_hospital_occ <- function(x, reduce_age = TRUE, date0 = NULL){
+extract_hospital_occ <- function(x, reduce_age = TRUE, data_0 = NULL){
   output <- format_output(x, var_select = c("IOxGetLive", "IOxGetDie", "IRec"),
                           date_0 = data_0)
   output <- output %>%
-    dplyr::group_by(t, replicate) %>%
-    dplyr::summarise(y = sum(y))
+    dplyr::group_by(.data$t, .data$replicate) %>%
+    dplyr::summarise(y = sum(.data$y))
   output$replicate <- factor(output$replicate)
 
   return(output)
@@ -198,12 +198,12 @@ extract_hospital_occ <- function(x, reduce_age = TRUE, date0 = NULL){
 #'
 #' @return Formatted long data.frame
 #' @export
-extract_ICU_occ <- function(x, reduce_age = TRUE, date0 = NULL){
+extract_ICU_occ <- function(x, reduce_age = TRUE, data_0 = NULL){
   output <- format_output(x, var_select = c("IMVGetLive", "IMVGetDie"),
                           date_0 = data_0)
   output <- output %>%
-    dplyr::group_by(t, replicate) %>%
-    dplyr::summarise(y = sum(y))
+    dplyr::group_by(.data$t, .data$replicate) %>%
+    dplyr::summarise(y = sum(.data$y))
   output$replicate <- factor(output$replicate)
 
   return(output)
@@ -216,9 +216,9 @@ extract_ICU_occ <- function(x, reduce_age = TRUE, date0 = NULL){
 #'
 #' @return Formatted long data.frame
 #' @export
-extract_report_summaries <- function(x, date0 = NULL){
+extract_report_summaries <- function(x, data_0 = NULL){
   output <- format_output(x, reduce_age = TRUE, combine_compartments = FALSE,
-                          date_0 = date0)
+                          date_0 = data_0)
   output <- collapse_for_report(output)
 
   return(output)
