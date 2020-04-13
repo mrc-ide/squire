@@ -9,9 +9,9 @@
 #' @return Output data.frame
 collapse_age <- function(d){
   d %>%
-    group_by(compartment, t, replicate) %>%
-    summarise(y =  sum(y)) %>%
-    ungroup()
+    dplyr::group_by(compartment, t, replicate) %>%
+    dplyr::summarise(y =  sum(y)) %>%
+    dplyr::ungroup()
 }
 
 #' Collapse compartments in output
@@ -23,13 +23,16 @@ collapse_age <- function(d){
 #' @return Output data.frame
 collapse_compartment <- function(d){
   d %>%
-    mutate(group = case_when(grepl("IMV", compartment) ~ "ICU",
-                             grepl("IOx", compartment) ~ "Beds",
-                             TRUE ~ compartment)) %>%
-    group_by(group, t, replicate) %>%
-    summarise(y = sum(y)) %>%
-    ungroup() %>%
-    rename(compartment = group)
+    dplyr::mutate(group = dplyr::case_when(
+      grepl("IMVGet", compartment) ~ "ICU",
+      grepl("IOxGet", compartment) ~ "hospital",
+      compartment == "n_E2_I" ~ "infections",
+      compartment == "delta_D" ~ "deaths",
+      TRUE ~ compartment)) %>%
+    dplyr::group_by(group, t, replicate) %>%
+    dplyr::summarise(y = sum(y)) %>%
+    dplyr::ungroup() %>%
+    dplyr::rename(compartment = group)
 }
 
 #' Format model output as data.frame
@@ -54,7 +57,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   if(!all(var_select %in% all_names_simp)){
     stop("Selected variable are not all present in output")
   }
-  vars <- vars[,all_names_simp %in% var_select ,]
+  vars <- vars[,all_names_simp %in% var_select , ,drop = FALSE]
   # If reducing compartments, we must collapse ages
   if(reduce_compartment){
     reduce_age = TRUE
@@ -65,7 +68,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   compartments <- unique(raw_names)
   time <- x$output[,"time",1]
   # Output
-  out <- tidyr::expand_grid(replicate = 1:r1$parameters$replicates,
+  out <- tidyr::expand_grid(replicate = 1:x$parameters$replicates,
                             compartment = compartments,
                             age_group = age_groups,
                             t = time)

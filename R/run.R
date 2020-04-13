@@ -193,7 +193,6 @@ run_explicit_SEEIR_model <- function(
   dt = 0.1,
   replicates = 10,
   init = NULL,
-  output_transform = TRUE,
   seed = stats::runif(1, 0, 100000000),
 
   # parameters

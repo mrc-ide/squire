@@ -18,11 +18,6 @@ test_that("object methods ", {
                                  dt = 1,
                                  contact_matrix_set=contact_matrices[[1]])
   m3 <- run_explicit_SEEIR_model(R0 = 2,
-                                 output_transform = FALSE,
-                                 population = pop$n, dt = 1,
-                                 contact_matrix_set=contact_matrices[[1]])
-  m4 <- run_explicit_SEEIR_model(R0 = 2,
-                                 output_transform = TRUE,
                                  population = pop$n, dt = 1,
                                  replicates = 5,
                                  contact_matrix_set=contact_matrices[[1]])
@@ -39,38 +34,10 @@ test_that("object methods ", {
   expect_s3_class(plot(m1, var_select = "S"), "gg")
   expect_s3_class(plot(m2), "gg")
   expect_s3_class(plot(m2, replicates = TRUE), "gg")
-  expect_s3_class(plot(m3, replicates = FALSE), "gg")
-  expect_warning(plot(m4), "Summary statistic estimated from <10 replicates")
-  expect_warning(plot(m4, ci = TRUE), "Confidence bounds estimated from <10 replicates")
+  expect_s3_class(plot(m2, replicates = FALSE), "gg")
+  expect_warning(plot(m3), "Summary statistic estimated from <10 replicates")
+  expect_warning(plot(m3, ci = TRUE), "Confidence bounds estimated from <10 replicates")
   expect_null(check_squire(m1))
   expect_error(check_squire(1), "Object must be a squire_simulation")
   expect_error(plot(m1, var_select = c("S", "bad")), "Selected variable are not all present in output")
-})
-
-
-test_that("squire_untransform ", {
-
-# run the model
-r <- run_explicit_SEEIR_model(country = "Afghanistan",
-                              output_transform = FALSE,
-                              dt = 1)
-
-# check it works
-gcu <- untransformed_output(r)
-gg <- plot(gcu)
-expect_is(gg, "ggplot")
-
-# error catching
-r2 <- run_explicit_SEEIR_model(country = "Afghanistan",
-                              output_transform = TRUE,
-                              dt = 1)
-expect_error(gcu <- untransformed_output(r2),
-             "r must be created with")
-
-expect_error(gcu <- untransformed_output(r,deaths = FALSE, cases = FALSE, beds = FALSE),
-             "Must provide compartment or")
-
-gcu <- untransformed_output(r,compartments = c("S","R"),
-                                      deaths = FALSE, cases = FALSE, beds = FALSE)
-
 })

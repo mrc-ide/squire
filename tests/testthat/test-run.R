@@ -3,63 +3,66 @@ test_that("run works", {
 
   set.seed(123)
   r1 <- run_simple_SEEIR_model(population = pop$n,
-                        dt = 1,
-                        R0 = 2,
-                        time_period = 100,
-                        replicates = 10,
-                        contact_matrix_set=contact_matrices[[1]])
-  expect_type(r1$output, "list")
-  n <- apply(r1$output$S[,,1], 1, sum) + apply(r1$output$E1[,,1], 1, sum) +
-    apply(r1$output$E2[,,1], 1, sum) + apply(r1$output$I[,,1], 1, sum) +
-    apply(r1$output$R[,,1], 1, sum)
-  expect_true(all(n == sum(pop$n)))
-  expect_equal(dim(r1$output$S), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$E1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$E2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$I), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$R), c(100 / 1, length(pop$n), 10))
+                               dt = 1,
+                               R0 = 2,
+                               time_period = 100,
+                               replicates = 10,
+                               contact_matrix_set=contact_matrices[[1]])
+  expect_type(r1$output, "double")
+
+  o1 <- format_output(r1)
+  expect_true(sum(dplyr::filter(o1, t == min(t), replicate == 1)$y) == sum(pop$n))
+
+  expect_equal(sum(o1$compartment == "S"), 100 * 10)
+  expect_equal(sum(o1$compartment == "E1"), 100 * 10)
+  expect_equal(sum(o1$compartment == "E2"), 100 * 10)
+  expect_equal(sum(o1$compartment == "I"), 100 * 10)
+  expect_equal(sum(o1$compartment == "R"), 100 * 10)
 
   # Multiple R0
   set.seed(123)
   r2 <- run_simple_SEEIR_model(population = pop$n,
-                        dt = 1,
-                        R0 = c(2,2),
-                        tt_R0 = c(0, 10),
-                        time_period = 100,
-                        replicates = 10,
-                        contact_matrix_set=contact_matrices[[1]])
+                               dt = 1,
+                               R0 = c(2,2),
+                               tt_R0 = c(0, 10),
+                               time_period = 100,
+                               replicates = 10,
+                               contact_matrix_set=contact_matrices[[1]])
   expect_identical(r1$output, r2$output)
   set.seed(123)
   r3 <- run_simple_SEEIR_model(population = pop$n,
-                        dt = 1,
-                        R0 = c(2,5),
-                        tt_R0 = c(0, 10),
-                        time_period = 100,
-                        replicates = 10,
-                        contact_matrix_set=contact_matrices[[1]])
-  expect_gt(sum(r3$output$I), sum(r2$output$I))
+                               dt = 1,
+                               R0 = c(2,5),
+                               tt_R0 = c(0, 10),
+                               time_period = 100,
+                               replicates = 10,
+                               contact_matrix_set=contact_matrices[[1]])
+  o2 <- format_output(r2)
+  o3 <- format_output(r3)
+  expect_gt(sum(dplyr::filter(o3, compartment == "I")$y),
+            sum(dplyr::filter(o2, compartment == "I")$y))
 
   # Multiple contact matrices
   set.seed(123)
   r4 <- run_simple_SEEIR_model(population = pop$n,
-                        dt = 1,
-                        R0 = 2,
-                        time_period = 100,
-                        replicates = 10,
-                        contact_matrix_set = list(contact_matrices[[1]],
-                                                  contact_matrices[[1]]),
-                        tt_contact_matrix = c(0, 50))
+                               dt = 1,
+                               R0 = 2,
+                               time_period = 100,
+                               replicates = 10,
+                               contact_matrix_set = list(contact_matrices[[1]],
+                                                         contact_matrices[[1]]),
+                               tt_contact_matrix = c(0, 50))
   expect_identical(r1$output, r4$output)
 
   set.seed(123)
   r5 <- run_simple_SEEIR_model(population = pop$n,
-                        dt = 1,
-                        R0 = 2,
-                        time_period = 100,
-                        replicates = 10,
-                        contact_matrix_set = list(contact_matrices[[1]],
-                                                  contact_matrices[[2]]),
-                        tt_contact_matrix = c(0, 50))
+                               dt = 1,
+                               R0 = 2,
+                               time_period = 100,
+                               replicates = 10,
+                               contact_matrix_set = list(contact_matrices[[1]],
+                                                         contact_matrices[[2]]),
+                               tt_contact_matrix = c(0, 50))
   expect_true(!identical(r1$output, r5$output))
 
   set.seed(123)
@@ -74,119 +77,79 @@ test_that("run works", {
 
 })
 
-
 test_that("run explicit works", {
-
-  pop = get_population("Afghanistan")
-
-  set.seed(123)
-  expect_error(r1 <- run_explicit_SEEIR_model(dt = 1,
-                                 R0 = 2,
-                                 time_period = 100,
-                                 replicates = 10,
-                                 contact_matrix_set=contact_matrices[[1]]),
-               "User must provide either the country being simulated ")
-
-  r0 <- run_explicit_SEEIR_model(country = "Afghanistan",
-                                              dt = 1,
-                                              R0 = 2,
-                                              time_period = 100,
-                                              replicates = 10)
-  expect_type(r0$output, "list")
-
+  pop = get_population("Afghanistan", simple_SEIR = FALSE)
 
   set.seed(123)
   r1 <- run_explicit_SEEIR_model(population = pop$n,
-                        dt = 1,
-                        R0 = 2,
-                        time_period = 100,
-                        replicates = 10,
-                        contact_matrix_set=contact_matrices[[1]])
-  expect_type(r1$output, "list")
+                                 dt = 1,
+                                 R0 = 2,
+                                 time_period = 100,
+                                 replicates = 10,
+                                 contact_matrix_set=contact_matrices[[1]])
+  expect_type(r1$output, "double")
 
-  vars <- names(r1$output)[grepl("^[[:upper:]]+$", substr(names(r1$output), 1, 1))]
-  n <- rowSums(do.call(cbind, lapply(r1$output[vars], function(x) {apply(x[,,1],1,sum)})))
+  o1 <- format_output(r1)
+  expect_true(sum(dplyr::filter(o1, t == min(t), replicate == 1)$y) == sum(pop$n))
 
-  # dim and pop size checks
-  expect_true(all(n == sum(pop$n)))
-  expect_equal(dim(r1$output$S), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$E1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$E2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IMild), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$ICase1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$ICase2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IOxGetLive1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IOxGetLive2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IOxGetDie1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IOxGetDie2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IOxNotGetLive1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IOxNotGetLive2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IOxNotGetDie1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IOxNotGetDie2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IMVGetLive1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IMVGetLive2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IMVGetDie1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IMVGetDie2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IMVNotGetLive1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IMVNotGetLive2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IMVNotGetDie1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IMVNotGetDie2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IRec1), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$IRec2), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$R), c(100 / 1, length(pop$n), 10))
-  expect_equal(dim(r1$output$D), c(100 / 1, length(pop$n), 10))
-
+  uc <- unique(o1$compartment)
+  for(i in seq_along(uc)){
+    expect_equal(sum(o1$compartment == uc[i]), 100 * 10)
+  }
   # Multiple R0
   set.seed(123)
   r2 <- run_explicit_SEEIR_model(population = pop$n,
-                        dt = 1,
-                        R0 = c(2,2),
-                        tt_R0 = c(0, 10),
-                        time_period = 100,
-                        replicates = 10,
-                        contact_matrix_set=contact_matrices[[1]])
+                                 dt = 1,
+                                 R0 = c(2,2),
+                                 tt_R0 = c(0, 10),
+                                 time_period = 100,
+                                 replicates = 10,
+                                 contact_matrix_set=contact_matrices[[1]])
   expect_identical(r1$output, r2$output)
   set.seed(123)
   r3 <- run_explicit_SEEIR_model(population = pop$n,
-                        dt = 1,
-                        R0 = c(2,5),
-                        tt_R0 = c(0, 10),
-                        time_period = 100,
-                        replicates = 10,
-                        contact_matrix_set=contact_matrices[[1]])
-  expect_gt(sum(r3$output$IMild), sum(r2$output$Imild))
+                                 dt = 1,
+                                 R0 = c(2,5),
+                                 tt_R0 = c(0, 10),
+                                 time_period = 100,
+                                 replicates = 10,
+                                 contact_matrix_set=contact_matrices[[1]])
+  o2 <- format_output(r2)
+  o3 <- format_output(r3)
+  expect_gt(sum(dplyr::filter(o3, compartment == "infections")$y),
+            sum(dplyr::filter(o2, compartment == "infections")$y))
 
   # Multiple contact matrices
   set.seed(123)
   r4 <- run_explicit_SEEIR_model(population = pop$n,
-                        dt = 1,
-                        R0 = 2,
-                        time_period = 100,
-                        replicates = 10,
-                        contact_matrix_set = list(contact_matrices[[1]],
-                                                  contact_matrices[[1]]),
-                        tt_contact_matrix = c(0, 50))
+                                 dt = 1,
+                                 R0 = 2,
+                                 time_period = 100,
+                                 replicates = 10,
+                                 contact_matrix_set = list(contact_matrices[[1]],
+                                                           contact_matrices[[1]]),
+                                 tt_contact_matrix = c(0, 50))
   expect_identical(r1$output, r4$output)
 
   set.seed(123)
   r5 <- run_explicit_SEEIR_model(population = pop$n,
-                        dt = 1,
-                        R0 = 2,
-                        time_period = 100,
-                        replicates = 10,
-                        contact_matrix_set = list(contact_matrices[[1]],
-                                                  contact_matrices[[2]]),
-                        tt_contact_matrix = c(0, 50))
+                                 dt = 1,
+                                 R0 = 2,
+                                 time_period = 100,
+                                 replicates = 10,
+                                 contact_matrix_set = list(contact_matrices[[1]],
+                                                           contact_matrices[[2]]),
+                                 tt_contact_matrix = c(0, 50))
   expect_true(!identical(r1$output, r5$output))
 
   set.seed(123)
   r6 <- run_explicit_SEEIR_model(population = pop$n,
-                               dt = 1,
-                               R0 = 2,
-                               time_period = 100,
-                               replicates = 10,
-                               contact_matrix_set = list(contact_matrices[[1]]),
-                               tt_contact_matrix = c(0, 50))
+                                 dt = 1,
+                                 R0 = 2,
+                                 time_period = 100,
+                                 replicates = 10,
+                                 contact_matrix_set = list(contact_matrices[[1]]),
+                                 tt_contact_matrix = c(0, 50))
   expect_true(!identical(r5$output, r6$output))
 
 })
@@ -208,26 +171,19 @@ test_that("run explicit works when healthsystem capacity is swamped", {
                                 R0 = 2.5,
                                 time_period = 730,
                                 dt = 1,
-                                output_transform = TRUE,
                                 replicates = 1)
 
-  vars <- names(r$output)[grepl("^[[:upper:]]+$", substr(names(r$output), 1, 1))]
-  for(i in vars) {
-  expect_equal(sum(is.na(colSums(r$output[[i]][,,1]))), 0)
-  }
-
-  for(i in vars) {
-    expect_equal(sum(r$output[[i]][,,1] < 0), 0)
-  }
+  o1 <- format_output(r)
+  expect_equal(sum(is.na(o1$y)), 0)
+  expect_equal(sum(o1$y < 0), 0)
 
   expect_error(r <- run_explicit_SEEIR_model(population = population,
-                                contact_matrix_set = contact_matrix,
-                                R0 = 2.5,
-                                time_period = 730,
-                                dt = 1,
-                                output_transform = TRUE,
-                                prob_non_severe_death_no_treatment = rep(1.1,17),
-                                replicates = 1),
+                                             contact_matrix_set = contact_matrix,
+                                             R0 = 2.5,
+                                             time_period = 730,
+                                             dt = 1,
+                                             prob_non_severe_death_no_treatment = rep(1.1,17),
+                                             replicates = 1),
                "prob_non_severe_death_no_treatment must be less than or equal to 1")
 
 })
@@ -243,29 +199,18 @@ test_that("health system capacity", {
                                 R0 = 2.5,
                                 time_period = 200,
                                 dt = 1,
-                                output_transform = FALSE,
                                 hosp_bed_capacity = bed_cap,
                                 ICU_bed_capacity = icu_cap,
                                 replicates = 1)
 
-  index <- odin_index(r$model)
-  mv_get <- unlist(index[c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2")])
-  ox_get <- unlist(index[c("IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2", "IRec1", "IRec2")])
-  nt <- nrow(r$output)
+  o1 <- format_output(r, reduce_compartment = TRUE)
+  icu_out <- dplyr::filter(o1, compartment == "ICU")
+  hosp_out <- dplyr::filter(o1, compartment %in% c("hospital", "IRec1", "IRec2")) %>%
+    dplyr::group_by(t, replicate) %>%
+    dplyr::summarise(y = sum(y))
 
-  # collet outputs as vectors
-  icu <- odin_sv(r$output[,mv_get,,drop=FALSE],
-                 replicates = 1,
-                 nt = nt)
-
-  ox <- odin_sv(r$output[,ox_get,,drop=FALSE],
-                replicates = 1,
-                nt = nt)
-
-  expect_equal(max(icu), icu_cap)
-  expect_equal(max(ox), bed_cap)
-
-
+  expect_equal(max(icu_out$y), icu_cap)
+  expect_equal(max(hosp_out$y), bed_cap)
 })
 
 
@@ -278,14 +223,12 @@ test_that("seeding", {
   bed_cap <- 1e5
   r <- run_explicit_SEEIR_model(country = "United Kingdom",
                                 R0 = 2.5,
-                                time_period =
-                                  200, seeding_cases = 3,
+                                time_period =200,
+                                seeding_cases = 3,
                                 dt = 1,
-                                output_transform = TRUE,
                                 hosp_bed_capacity = bed_cap,
                                 ICU_bed_capacity = icu_cap,
                                 replicates = 1)
-
-  expect_equal(sum(r$output$E1[1,,1]), 3)
-
+  o <- format_output(r)
+  expect_equal(sum(dplyr::filter(o, compartment == "E1", t == 1, replicate == 1)$y), 3)
 })

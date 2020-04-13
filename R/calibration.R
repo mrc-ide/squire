@@ -145,7 +145,6 @@ calibrate <- function(data, country, reporting_fraction = 1,
                                 contact_matrix_set = contact_matrix,
                                 replicates = 1,
                                 dt = dt,
-                                output_transform = FALSE,
                                 ...)
 
   # create array for multiple model runs (with different seeds) to be stored
