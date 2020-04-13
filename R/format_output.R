@@ -81,10 +81,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   if(reduce_age){
     out <- collapse_age(out)
   }
-  # Combine compartments
-  if(reduce_compartment){
-    out <- collapse_compartment(out)
-  }
+
   # Add date
   if(!is.null(date_0)){
     stopifnot(inherits(date_0, "Date"))
