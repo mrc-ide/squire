@@ -40,7 +40,7 @@ collapse_compartment <- function(d){
 #' @param x squire_simulation object
 #' @param var_select Vector of compartment names, e.g. \code{c("S", "R")}
 #' @param reduce_age Collapse age-dimension
-#' @param combine_compartments Collapse compartments of same type
+#' @param combine_compartments Collapse compartments of same type together (e.g. E1 and E2 -> E)
 #' @param date_0 Date of time 0, if specified a date column will be added
 #'
 #' @return Formatted long data.frame
