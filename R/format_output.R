@@ -14,14 +14,15 @@ collapse_age <- function(d){
     dplyr::ungroup()
 }
 
-#' Collapse compartments in output
+#' Collapse compartments for reporting major reporters of epidemic
 #'
-#' Sums over simplified groups across compartments
+#' Sums over simplified groups (ICU demand, ICU occupance, hospital demand,
+#' hospital occupancy, infections, deaths)
 #'
 #' @param d output data.frame
 #'
 #' @return Output data.frame
-collapse_compartment <- function(d){
+collapse_for_report <- function(d){
   d %>%
     dplyr::mutate(group = dplyr::case_when(
       grepl("IMVGet", .data$compartment) ~ "ICU",
@@ -57,6 +58,10 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   # Variable names
   all_names <- names(vars[1,,1])
   all_names_simp <- gsub("\\[.*?]", "", all_names)
+
+  if(!all(var_select %in% c(all_names_simp, unique(gsub("[1-2]$", "", all_names_simp))))){
+    stop("Selected variable are not all present in output")
+  }
 
   # Select relevant column names for subsetting
   #   if - if no variables are selected, use all for subsetting
@@ -101,12 +106,16 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
     rep(x$output[,"time",y],length(compartments) * length(age_groups))
   }, FUN.VALUE = numeric(length(compartments) * length(age_groups) * nrow(x$output[,,1])))
 
+  # time <- as.vector(apply(x$output[,"time",, drop = FALSE], 2, function(x){
+  #   rep(x, length(compartments) * length(age_groups))
+  # }))
+
   # Generating and filling output
   out <- tidyr::expand_grid(replicate = 1:x$parameters$replicates,
                             compartment = compartments,
                             age_group = age_groups,
                             t = x$output[,"time", 1])
-  out$t <- time
+  out$t <- as.vector(time)
   out$y <- as.vector(vars)
 
   # If combine_compartments is TRUE, sum compartments of same type e.g.
@@ -141,7 +150,8 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
 #' @return Formatted long data.frame
 #' @export
 extract_deaths <- function(x, reduce_age = TRUE, date0 = NULL){
-  output <- format_output(x, var_select = "delta_D", reduce_age = reduce_age)
+  output <- format_output(x, var_select = "delta_D", reduce_age = reduce_age,
+                          date_0 = data_0)
   output$replicate <- factor(output$replicate)
   return(output)
 }
@@ -155,7 +165,8 @@ extract_deaths <- function(x, reduce_age = TRUE, date0 = NULL){
 #' @return Formatted long data.frame
 #' @export
 extract_infection_incidence <- function(x, reduce_age = TRUE, date0 = NULL){
-  output <- format_output(x, var_select = "n_E2_I", reduce_age = reduce_age)
+  output <- format_output(x, var_select = "n_E2_I", reduce_age = reduce_age,
+                          date_0 = data_0)
   output$replicate <- factor(output$replicate)
   return(output)
 }
@@ -169,7 +180,8 @@ extract_infection_incidence <- function(x, reduce_age = TRUE, date0 = NULL){
 #' @return Formatted long data.frame
 #' @export
 extract_hospital_occ <- function(x, reduce_age = TRUE, date0 = NULL){
-  output <- format_output(x, var_select = c("IOxGetLive", "IOxGetDie", "IRec"))
+  output <- format_output(x, var_select = c("IOxGetLive", "IOxGetDie", "IRec"),
+                          date_0 = data_0)
   output <- output %>%
     dplyr::group_by(t, replicate) %>%
     dplyr::summarise(y = sum(y))
@@ -187,7 +199,8 @@ extract_hospital_occ <- function(x, reduce_age = TRUE, date0 = NULL){
 #' @return Formatted long data.frame
 #' @export
 extract_ICU_occ <- function(x, reduce_age = TRUE, date0 = NULL){
-  output <- format_output(x, var_select = c("IMVGetLive", "IMVGetDie"))
+  output <- format_output(x, var_select = c("IMVGetLive", "IMVGetDie"),
+                          date_0 = data_0)
   output <- output %>%
     dplyr::group_by(t, replicate) %>%
     dplyr::summarise(y = sum(y))
@@ -196,5 +209,17 @@ extract_ICU_occ <- function(x, reduce_age = TRUE, date0 = NULL){
   return(output)
 }
 
+#' Extract report summaries
+#'
+#' @param x squire_simulation object
+#' @param date_0 Date of time 0, if specified a date column will be added
+#'
+#' @return Formatted long data.frame
+#' @export
+extract_report_summaries <- function(x, date0 = NULL){
+  output <- format_output(x, reduce_age = TRUE, combine_compartments = FALSE,
+                          date_0 = date0)
+  output <- collapse_for_report(output)
 
-
+  return(output)
+}

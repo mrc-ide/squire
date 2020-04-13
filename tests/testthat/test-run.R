@@ -14,8 +14,7 @@ test_that("run works", {
   expect_true(sum(dplyr::filter(o1, t == min(t), replicate == 1)$y) == sum(pop$n))
 
   expect_equal(sum(o1$compartment == "S"), 100 * 10)
-  expect_equal(sum(o1$compartment == "E1"), 100 * 10)
-  expect_equal(sum(o1$compartment == "E2"), 100 * 10)
+  expect_equal(sum(o1$compartment == "E"), 100 * 10)
   expect_equal(sum(o1$compartment == "I"), 100 * 10)
   expect_equal(sum(o1$compartment == "R"), 100 * 10)
 
@@ -116,8 +115,8 @@ test_that("run explicit works", {
                                  contact_matrix_set=contact_matrices[[1]])
   o2 <- format_output(r2)
   o3 <- format_output(r3)
-  expect_gt(sum(dplyr::filter(o3, compartment == "infections")$y),
-            sum(dplyr::filter(o2, compartment == "infections")$y))
+  expect_gt(sum(dplyr::filter(o3, compartment == "n_E2_I")$y),
+            sum(dplyr::filter(o2, compartment == "n_E2_I")$y))
 
   # Multiple contact matrices
   set.seed(123)
@@ -208,7 +207,7 @@ test_that("health system capacity", {
                                 ICU_bed_capacity = icu_cap,
                                 replicates = 1)
 
-  o1 <- format_output(r, reduce_compartment = TRUE)
+  o1 <- extract_report_summaries(r)
   icu_out <- dplyr::filter(o1, compartment == "ICU")
   hosp_out <- dplyr::filter(o1, compartment %in% c("hospital", "IRec1", "IRec2")) %>%
     dplyr::group_by(t, replicate) %>%
@@ -235,5 +234,5 @@ test_that("seeding", {
                                 ICU_bed_capacity = icu_cap,
                                 replicates = 1)
   o <- format_output(r)
-  expect_equal(sum(dplyr::filter(o, compartment == "E1", t == 1, replicate == 1)$y), 3)
+  expect_equal(sum(dplyr::filter(o, compartment == "E", t == 1, replicate == 1)$y), 3)
 })
