@@ -59,7 +59,7 @@ init_check_explicit <- function(init, population, seeding_cases = 20){
 
   if(is.null(init)){
     raw_seeding_cases <- rep(0, length(population))
-    raw_seeding_cases[age_group_indices] <- as.vector(rmultinom(1, size = seeding_cases, prob = rep(0.25, 4)))
+    raw_seeding_cases[age_group_indices] <- as.vector(stats::rmultinom(1, size = seeding_cases, prob = rep(0.25, 4)))
     init = data.frame(
       S = population - raw_seeding_cases,
       E1 = raw_seeding_cases,

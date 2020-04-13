@@ -29,14 +29,17 @@ test_that("output format works", {
   o1 <- format_output(m1)
   o2 <- format_output(m1, reduce_age = FALSE)
   o3 <- format_output(m1, reduce_age = FALSE, reduce_compartment = FALSE)
-
+  o4 <- format_output(m1, reduce_age = FALSE, reduce_compartment = FALSE, date_0 = Sys.Date())
   expect_type(o1, "list")
   expect_type(o2, "list")
   expect_type(o3, "list")
+  expect_type(o4, "list")
   expect_named(o1, c("compartment", "t", "replicate", "y"))
   expect_named(o2, c("compartment", "t", "replicate", "y"))
   expect_named(o3, c("replicate", "compartment", "age_group", "t", "y"))
-
+  expect_named(o4, c("replicate", "compartment", "age_group", "t", "y", "date"))
+  expect_error(format_output(m1, reduce_age = FALSE, reduce_compartment = FALSE,
+                             date_0 = "wrong"))
 })
 
 test_that("squire object check and summary", {

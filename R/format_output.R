@@ -24,7 +24,7 @@ collapse_age <- function(d){
 collapse_compartment <- function(d){
   d %>%
     dplyr::mutate(group = dplyr::case_when(
-      grepl("IMV", .data$compartment) ~ "ICU",
+      grepl("IMVGet", .data$compartment) ~ "ICU",
       grepl("IOxGet", .data$compartment) ~ "hospital",
       .data$compartment == "n_E2_I" ~ "infections",
       .data$compartment == "delta_D" ~ "deaths",

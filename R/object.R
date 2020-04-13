@@ -45,6 +45,7 @@ print.squire_simulation <- function(x, ...){
 #' @param var_select Vector of variable names to plot (default is all)
 #' @param summary_f Function to summarise each compartment
 #'   passed to the \code{fun} argument of \code{\link[ggplot2]{stat_summary}}
+#' @param x_var X variable to use for plotting (default is \code{"t"}, but can be set to, \code{"date"}, if \code{date_0} provided)
 #' @param ... additional arguments affecting the plot produced.
 #'
 #' @export
@@ -65,8 +66,8 @@ plot.squire_simulation <- function(x, replicates = FALSE,
   # Format summary data
   pds <- pd %>%
     dplyr::group_by(.data$x, .data$compartment) %>%
-    dplyr::summarise(ymin = quantile(.data$y, q[1]),
-              ymax = quantile(.data$y, q[2]),
+    dplyr::summarise(ymin = stats::quantile(.data$y, q[1]),
+              ymax = stats::quantile(.data$y, q[2]),
               y = summary_f(.data$y))
   # Plot
   p <- ggplot2::ggplot()

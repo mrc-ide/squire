@@ -8,17 +8,20 @@ format_output(
   x,
   var_select = NULL,
   reduce_age = TRUE,
-  reduce_compartment = TRUE
+  reduce_compartment = TRUE,
+  date_0 = NULL
 )
 }
 \arguments{
 \item{x}{squire_simulation object}
 
-\item{var_select}{Vector of variable names}
+\item{var_select}{Vector of compartment names, e.g. \code{c("S", "R")}}
 
 \item{reduce_age}{Collapse age-dimension}
 
 \item{reduce_compartment}{Collapse compartments}
+
+\item{date_0}{Date of time 0, if specified a date column will be added}
 }
 \value{
 Formatted long data.frame
