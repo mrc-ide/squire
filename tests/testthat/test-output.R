@@ -68,3 +68,17 @@ test_that("squire object check and summary", {
 
 
 })
+
+
+test_that("t correct in format_outputs",{
+
+  r <- calibrate(country = "Afghanistan", deaths = 6,
+                 reporting_fraction = 1, dt=1, replicates = 10,
+                 time_period = 365)
+  get <- format_output(r, reduce_age = FALSE, combine_compartments = FALSE,
+                       date_0 = Sys.Date())
+
+  expect_true(table(table(get[get$replicate==1 & get$compartment == "D",]$t)) == 365)
+  expect_true(table(table(get[get$replicate==1 & get$compartment == "D",]$date)) == 365)
+
+})
