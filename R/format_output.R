@@ -93,11 +93,6 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   # Subsetting relevant columns
   vars <- vars[,all_names_simp %in% var_select , ,drop = FALSE]
 
-  # If reducing compartments, we must collapse ages
-  if(reduce_compartment){
-    reduce_age = TRUE
-  }
-
   # Select components of data.frame
   raw_names <- gsub("\\[.*?]", "", names(vars[1,,1]))
   age_groups <- 1:table(raw_names)[1]
@@ -118,9 +113,9 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   # E1 and E2 together
   if (combine_compartments == TRUE) {
     out <- out %>%
-      mutate(compartment = gsub("[1-2]$", "", compartment)) %>%
-      group_by(replicate, age_group, compartment, t) %>%
-      summarise(y = sum(y))
+      dplyr::mutate(compartment = gsub("[1-2]$", "", compartment)) %>%
+      dplyr::group_by(replicate, age_group, compartment, t) %>%
+      dplyr::summarise(y = sum(y))
   }
 
   # Collapse ages
@@ -136,3 +131,70 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   }
   return(out)
 }
+
+#' Extract deaths from model output
+#'
+#' @param x squire_simulation object
+#' @param reduce_age Collapse age-dimension
+#' @param date_0 Date of time 0, if specified a date column will be added
+#'
+#' @return Formatted long data.frame
+#' @export
+extract_deaths <- function(x, reduce_age = TRUE, date0 = NULL){
+  output <- format_output(x, var_select = "delta_D", reduce_age = reduce_age)
+  output$replicate <- factor(output$replicate)
+  return(output)
+}
+
+#' Extract infection incidence from model output
+#'
+#' @param x squire_simulation object
+#' @param reduce_age Collapse age-dimension
+#' @param date_0 Date of time 0, if specified a date column will be added
+#'
+#' @return Formatted long data.frame
+#' @export
+extract_infection_incidence <- function(x, reduce_age = TRUE, date0 = NULL){
+  output <- format_output(x, var_select = "n_E2_I", reduce_age = reduce_age)
+  output$replicate <- factor(output$replicate)
+  return(output)
+}
+
+#' Extract hospital bed occupancy from model output
+#'
+#' @param x squire_simulation object
+#' @param reduce_age Collapse age-dimension
+#' @param date_0 Date of time 0, if specified a date column will be added
+#'
+#' @return Formatted long data.frame
+#' @export
+extract_hospital_occ <- function(x, reduce_age = TRUE, date0 = NULL){
+  output <- format_output(x, var_select = c("IOxGetLive", "IOxGetDie", "IRec"))
+  output <- output %>%
+    dplyr::group_by(t, replicate) %>%
+    dplyr::summarise(y = sum(y))
+  output$replicate <- factor(output$replicate)
+
+  return(output)
+}
+
+#' Extract ICU bed occupancy from model output
+#'
+#' @param x squire_simulation object
+#' @param reduce_age Collapse age-dimension
+#' @param date_0 Date of time 0, if specified a date column will be added
+#'
+#' @return Formatted long data.frame
+#' @export
+extract_ICU_occ <- function(x, reduce_age = TRUE, date0 = NULL){
+  output <- format_output(x, var_select = c("IMVGetLive", "IMVGetDie"))
+  output <- output %>%
+    dplyr::group_by(t, replicate) %>%
+    dplyr::summarise(y = sum(y))
+  output$replicate <- factor(output$replicate)
+
+  return(output)
+}
+
+
+

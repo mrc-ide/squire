@@ -131,7 +131,7 @@ plot(r)
 This plot will plot each of the compartments of the model output. We can also plot specific compartments using the `var_select` argument that can be passed to `plot()`. Arguments passed to `var_select` must be one of the variables in the plot above.
 
 ```{r subset variables plot}
-plot(r, var_select = c("E", "ICase", "IMild"))
+plot(r, var_select = c("E", "IMild"))
 ```
 
 All of the plotting above makes uses of the `squire` function `format_output` which provides you with a means of manipulating and managing the output from a `run_explicit_SEEIR_model` call. Using it you can specify the model outputs (e.g. compartments) you want, as well as whether you want that output aggregated over age or not. Here we extract the latent compartment (E). The data columns correspond to the compartment name (`compartment`), timestep (`t`), model run number (`replicate`) and the model output (`y`). 
@@ -141,11 +141,16 @@ All of the plotting above makes uses of the `squire` function `format_output` wh
 output <- format_output(r, var_select = "E")
 head(output)
 
-format_output <- function(x, var_select = NULL, reduce_age = TRUE,
-                          combine_compartments = TRUE, date_0 = NULL)
-
 ```
 
+If we wanted age-disaggregated data, we could set `reduce_age` to `FALSE` which will generate the same dataframe as before, but with an additional column indicating the age-group. 
+
+``` {r format output age disagg}
+
+output <- format_output(r, var_select = "E", reduce_age = FALSE)
+head(output)
+
+```
 
 ### 2. Changing parameters in the model. 
 
@@ -174,28 +179,29 @@ r <- run_explicit_SEEIR_model(population = population,
                               contact_matrix_set = contact_matrix,
                               R0 = 2.5, 
                               time_period = 200,
-                              dt = 1,
+                              dt = 0.1,
                               replicates = 5)
 plot(r)
 ```
 
 We can also change the R0 and contact matrix at set time points, to reflect 
 changing behaviour resulting from interventions. For example to set a 80%
-reduction in the contact matrix after 50 days :
+reduction in the contact matrix after 100 days :
 
 ```{r set contact matrix decrease}
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
-                              tt_contact_matrix = c(0, 50),
+                              tt_contact_matrix = c(0, 100),
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2),
                               R0 = 2.5, 
                               time_period = 200,
-                              dt = 1,
+                              dt = 0.1,
                               replicates = 5)
-plot(r)
+plot(r, var_select = "n_E2_I")
 ```
+where `n_E2_I` is the daily number of new infections.
 
 To show an 80% reduction after 50 days but only maintained for 30 days :
 
@@ -203,15 +209,15 @@ To show an 80% reduction after 50 days but only maintained for 30 days :
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
-                              tt_contact_matrix = c(0, 50, 80),
+                              tt_contact_matrix = c(0, 80, 120),
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2,
                                                         contact_matrix),
                               R0 = 2.5, 
-                              time_period = 200,
-                              dt = 1,
+                              time_period = 220,
+                              dt = 0.1,
                               replicates = 5)
-plot(r)
+plot(r, var_select = "n_E2_I")
 ```
 
 Alternatively, we could set a changing R0, which falls below 1 after 50 days:
@@ -221,12 +227,12 @@ Alternatively, we could set a changing R0, which falls below 1 after 50 days:
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               contact_matrix_set = contact_matrix,
-                              tt_R0 = c(0, 50),
+                              tt_R0 = c(0, 80),
                               R0 = c(2.5, 0.9),
                               time_period = 200,
-                              dt = 1,
+                              dt = 0.1,
                               replicates = 5)
-plot(r)
+plot(r, var_select = "n_E2_I")
 ```
 
 ### 3. Extracting and Plotting Relevant Outputs  
@@ -234,56 +240,49 @@ plot(r)
 Alternative summaries of the models can be created, which give commonly reported
 measures, such as deaths, number of ICU beds and general hospital beds required. 
 
-These could be created by using the outputs seen in the previous section, e.g. 
-`r$output$ICase1 + r$output$ICase2` to get the total symptomatic cases. 
+These could be created by using the `format_output` on the output and selecting relevant 
+compartments but this is quite slow to do, so we provide some helper functions. These include:
 
-However, accessing outputs this waus is much slower. A quicker way is to change the
-simulation output with `output_transform = FALSE`, which will not transform the 
-outputs produced by odin. 
 
 ```{r untransformed}
-# run the model
-r <- run_explicit_SEEIR_model(country = "Afghanistan",
-                              output_transform = FALSE)
+library(patchwork)
 
-```
+x <- run_explicit_SEEIR_model(country = "Afghanistan", hosp_bed_capacity = 500, ICU_bed_capacity = 1000)
 
-To access the outputs we can use `untransformed_output`, specifying  
-which compartments are to be returned, and which specific summary outputs related
-to case incidence, death incidence and hospital bed demands are needed:
+deaths <- extract_deaths(r)
+a <- ggplot(deaths, aes(x = t, y = y, col = replicate)) +
+  geom_line()
 
-```{r untransformed get}
+infection_incidence <- extract_infection_incidence(r)
+b <- ggplot(infection_incidence, aes(x = t, y = y, col = replicate)) +
+  geom_line()
 
-gcu <- untransformed_output(r, compartments = c("S", "R"),
-                               deaths = TRUE, 
-                               cases = TRUE, 
-                               beds = TRUE)
-```
+hosp_occ <- extract_hospital_occ(r)
+c <- ggplot(hosp_occ, aes(x = t, y = y, col = replicate)) +
+  geom_line()
 
-This object can then be easily plotted:
+ICU_occ <- extract_ICU_occ(r)
+d <- ggplot(ICU_occ, aes(x = t, y = y, col = replicate)) +
+  geom_line()
 
-```{r plot gcu}
-plot(gcu)
+z <- a + b + c + d +
+  plot_layout(guides = 'collect')
+z
+
 ```
 
 ### 4.  Calibrating the Model to Observed Deaths Data
 
-The model can be simply calibrated to time series of deaths reported in settings. 
-This can be conducted using the `calibrate` function, by providing a data frame
-of date and deaths. For example:
+The model can be simply calibrated to the cumulative time series of deaths reported in settings. 
+This can be conducted using the `calibrate` function. For example:
 
 ```{r example data}
 
-# create dummy data
-df <- data.frame("date" = Sys.Date() - 0:6,
-                 "deaths" = c(6, 2, 1, 1, 0, 0, 0),
-                 "cases" = c(394, 101, 89, 4, 0, 0, 0))
-df
-```
+calibration <- calibrate(country = "Afghanistan", deaths = 25, reporting_fraction = 1,
+                         seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
+                         min_seeding_cases = 5, max_seeding_cases = 50,
+                         replicates = 100, dt = 0.1)
 
-```{r calibrate run}
-# run calibrate
-out <- calibrate(data = df, country = "Senegal", replicates = 10)
 ```
 
 Simulation replicates are aligned to the current death total and the outputs are 
