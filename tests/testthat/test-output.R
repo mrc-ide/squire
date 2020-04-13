@@ -30,18 +30,48 @@ test_that("output format works", {
   o2 <- format_output(m1, reduce_age = FALSE)
   o3 <- collapse_for_report(format_output(m1, reduce_age = FALSE))
   o4 <- format_output(m1, reduce_age = FALSE, date_0 = Sys.Date())
+  o5 <- format_output(m1, var_select = c("E", "ICase"))
+  o6 <- format_output(m1, var_select = c("E", "IMild"))
+
   expect_type(o1, "list")
   expect_type(o2, "list")
   expect_type(o3, "list")
   expect_type(o4, "list")
+  expect_type(o5, "list")
+  expect_type(o6, "list")
+
   expect_named(o1, c("compartment", "t", "replicate", "y"))
   expect_named(o2, c("replicate", "age_group", "compartment","t", "y"))
   expect_named(o3, c("compartment", "t", "replicate", "y"))
   expect_true(all(c("hospital","ICU","IMild","deaths") %in% unique(o3$compartment)))
   expect_named(o4, c("replicate", "age_group", "compartment", "t", "y", "date"))
-  expect_error(format_output(m1, reduce_age = FALSE,
-                             date_0 = "wrong"))
+  expect_named(o5, c("compartment", "t", "replicate", "y"))
+  expect_named(o6, c("compartment", "t", "replicate", "y"))
+
+  expect_error(format_output(m1, reduce_age = FALSE, date_0 = "wrong"))
+  expect_error(format_output(m1, var_select = "moon"))
 })
+
+test_that("new helper functions to extract relevant outputs", {
+
+  pop <- get_population("Afghanistan", simple_SEIR = FALSE)
+  m1 <- run_explicit_SEEIR_model(R0 = 2,
+                                 population = pop$n,
+                                 dt = 1,
+                                 time_period = 10,
+                                 replicates = 10,
+                                 contact_matrix_set=contact_matrices[[1]])
+  deaths <- extract_deaths(m1)
+  expect_named(deaths, c("compartment", "t", "replicate", "y"))
+  infection_incidence <- extract_infection_incidence(m1)
+  expect_named(infection_incidence, c("compartment", "t", "replicate", "y"))
+  hospital_occ <- extract_hospital_occ(m1)
+  expect_named(hospital_occ, c("t", "replicate", "y"))
+  ICU_occ <- extract_ICU_occ(m1)
+  expect_named(ICU_occ, c("t", "replicate", "y"))
+
+})
+
 
 test_that("squire object check and summary", {
 
