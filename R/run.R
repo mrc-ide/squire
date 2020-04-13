@@ -319,7 +319,7 @@ run_explicit_SEEIR_model <- function(
   mc <- matrix_check(population[-1], contact_matrix_set)
   stopifnot(length(R0) == length(tt_R0))
   stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
-  tc <- lapply(list(tt_R0, tt_contact_matrix), check_time_change, time_period)
+  tc <- lapply(list(tt_R0/dt, tt_contact_matrix/dt), check_time_change, time_period/dt)
 
   assert_pos(dt)
   assert_pos(dur_E)
@@ -445,9 +445,9 @@ run_explicit_SEEIR_model <- function(
                p_dist = p_dist,
                hosp_bed_capacity = hosp_bed_capacity,
                ICU_bed_capacity = ICU_bed_capacity,
-               tt_matrix = tt_contact_matrix,
+               tt_matrix = round(tt_contact_matrix/dt),
                mix_mat_set = matrices_set,
-               tt_beta = tt_R0,
+               tt_beta = round(tt_R0/dt),
                beta_set = beta_set,
                dt = dt)
 
