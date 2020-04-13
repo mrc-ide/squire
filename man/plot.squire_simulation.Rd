@@ -12,6 +12,7 @@
   q = c(0.025, 0.975),
   var_select = NULL,
   summary_f = mean,
+  x_var = "t",
   ...
 )
 }
@@ -30,6 +31,8 @@
 
 \item{summary_f}{Function to summarise each compartment
 passed to the \code{fun} argument of \code{\link[ggplot2]{stat_summary}}}
+
+\item{x_var}{X variable to use for plotting (default is \code{"t"}, but can be set to, \code{"date"}, if \code{date_0} provided)}
 
 \item{...}{additional arguments affecting the plot produced.}
 }

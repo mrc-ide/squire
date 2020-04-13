@@ -16,7 +16,6 @@ run_explicit_SEEIR_model(
   dt = 0.1,
   replicates = 10,
   init = NULL,
-  output_transform = TRUE,
   seed = stats::runif(1, 0, 1e+08),
   prob_hosp = c(0.000744192, 0.000634166, 0.001171109, 0.002394593, 0.005346437,
     0.010289885, 0.016234604, 0.023349169, 0.028944623, 0.038607042, 0.057734879,
@@ -77,9 +76,6 @@ Default = NULL, which causes beta to be estimated from R0}
 \item{replicates}{Number of replicates. Default = 10}
 
 \item{init}{Data.frame of initial conditions. Default = NULL}
-
-\item{output_transform}{Transport model outputs into useful format.
-Default == FALSE}
 
 \item{seed}{Random seed used for simulations. Deafult = runif(1, 0, 10000)}
 

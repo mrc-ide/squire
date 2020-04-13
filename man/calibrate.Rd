@@ -2,50 +2,42 @@
 % Please edit documentation in R/calibration.R
 \name{calibrate}
 \alias{calibrate}
-\title{Calibrate Model}
+\title{Calibrate deaths}
 \usage{
 calibrate(
-  data,
   country,
+  deaths,
   reporting_fraction = 1,
   seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
   min_seeding_cases = 5,
   max_seeding_cases = 50,
-  parse_output = TRUE,
   replicates = 100,
   dt = 0.5,
   ...
 )
 }
 \arguments{
-\item{data}{Data frame with 2 variables: date and deaths}
+\item{country}{Country name}
 
-\item{country}{Character. Country data originates from.}
+\item{deaths}{Number of observed deaths}
 
-\item{reporting_fraction}{Numbeic. Fraction of deaths expected to have been reported. DEFAULT = 1}
+\item{reporting_fraction}{REporting fraction}
 
-\item{seeding_age_groups}{Character vector. Age groups seeding cases should be distributed into.}
+\item{seeding_age_groups}{Age groups for seeding}
 
-\item{min_seeding_cases}{Numeric. Minimum number of seeding cases. DEFAULT = 5.}
+\item{min_seeding_cases}{Minimum seeding cases}
 
-\item{max_seeding_cases}{Numeric. Maximum number of seeding cases. DEFAULT = 50.}
+\item{max_seeding_cases}{Maximum seeding cases}
 
-\item{parse_output}{Logical. Should output be parsed ready for plotting.
-Default = TRUE}
+\item{replicates}{Replicates}
 
-\item{replicates}{Simulation Repetitions. Default = 10}
+\item{dt}{dt}
 
-\item{dt}{Time Step. Default = 0.25}
-
-\item{...}{Other parameters to pass to \code{\link{run_explicit_SEEIR_model}}}
+\item{...}{Further aguments for \code{run_explicit_SEEIR_model()}}
 }
 \value{
-List of formatted odin outputs, the data it is calibrated to and
-  the parameter set used in calibration
+List of time adjusted squire_simulations
 }
 \description{
-Calibrate Model
-}
-\details{
-Fit the explicit_SEEIR model to time series of deaths
+Calibrate deaths
 }
