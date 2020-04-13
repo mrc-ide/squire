@@ -151,7 +151,12 @@ test_that("run explicit works", {
                                  contact_matrix_set = list(contact_matrices[[1]]),
                                  tt_contact_matrix = c(0, 50))
   expect_true(!identical(r5$output, r6$output))
+  expect_error(run_explicit_SEEIR_model(R0 = 2), "User must provide either the country being simulated or
+         both the population size and contact_matrix_set")
 
+  r7 <- run_explicit_SEEIR_model(R0 = 2, country = "Afghanistan")
+  expect_type(r7$output, "double")
+  expect_null(check_squire(r7))
 })
 
 
