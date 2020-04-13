@@ -56,14 +56,23 @@ calibrate <- function(country, deaths, reporting_fraction = 1,
                                 contact_matrix_set = contact_matrix,
                                 replicates = 1,
                                 dt = dt, ...)
+
+  # get the index for looking up D and R
+  index <- odin_index(r$model)
+
+  # run our replicates
   t <- seq(from = 1, to = r$parameters$time_period / dt)
+  nt <- length(t)
   out <- list()
   out[[1]] <- r
   # running and storing the model output for each of the different initial seeding cases
   for(i in 2:replicates) {
     r$mod$set_user(E1_0 = E1_0[[i]])
     r$output <- r$mod$run(t, replicate = 1)
-    out[[i]] = r
+    while (sum(r$output[nt, index$R, 1]) < (sum(pop$n)/10)) {
+      r$output <- r$mod$run(t, replicate = 1)
+    }
+    out[[i]] <- r
   }
 
   # Get deaths timepoint
@@ -87,3 +96,13 @@ calibrate <- function(country, deaths, reporting_fraction = 1,
 
   return(r)
 }
+
+
+## Index locations of outputs in odin model
+#' @noRd
+odin_index <- function(model) {
+  n_out <- environment(model$initialize)$private$n_out %||% 0
+  n_state <- length(model$initial())
+  model$transform_variables(seq_len(1L + n_state + n_out))
+}
+

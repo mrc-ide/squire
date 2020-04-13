@@ -12,3 +12,12 @@ test_that("calibrate works", {
   expect_error(calibrate("Angola", 5, -0.1))
   expect_error(calibrate("Angola", 5, 1.1))
 })
+
+
+#------------------------------------------------
+test_that("calibrate works", {
+  t1 <- calibrate("Angola", 2, 0.5, time_period = 120, max_seeding_cases = 5, min_seeding_cases = 1)
+  o1 <- format_output(t1, reduce_age = TRUE, reduce_compartment = TRUE, date_0 = Sys.Date())
+
+
+})
