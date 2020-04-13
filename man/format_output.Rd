@@ -8,7 +8,7 @@ format_output(
   x,
   var_select = NULL,
   reduce_age = TRUE,
-  reduce_compartment = TRUE,
+  combine_compartments = TRUE,
   date_0 = NULL
 )
 }
@@ -19,7 +19,7 @@ format_output(
 
 \item{reduce_age}{Collapse age-dimension}
 
-\item{reduce_compartment}{Collapse compartments}
+\item{combine_compartments}{Collapse compartments of same type together (e.g. E1 and E2 -> E)}
 
 \item{date_0}{Date of time 0, if specified a date column will be added}
 }

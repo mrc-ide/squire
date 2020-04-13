@@ -127,7 +127,25 @@ ojects:
 ```{r base plot}
 plot(r)
 ```
-This plot will plot each of the compartments of the model output. 
+
+This plot will plot each of the compartments of the model output. We can also plot specific compartments using the `var_select` argument that can be passed to `plot()`. Arguments passed to `var_select` must be one of the variables in the plot above.
+
+```{r subset variables plot}
+plot(r, var_select = c("E", "ICase", "IMild"))
+```
+
+All of the plotting above makes uses of the `squire` function `format_output` which provides you with a means of manipulating and managing the output from a `run_explicit_SEEIR_model` call. Using it you can specify the model outputs (e.g. compartments) you want, as well as whether you want that output aggregated over age or not. Here we extract the latent compartment (E). The data columns correspond to the compartment name (`compartment`), timestep (`t`), model run number (`replicate`) and the model output (`y`). 
+
+``` {r format output}
+
+output <- format_output(r, var_select = "E")
+head(output)
+
+format_output <- function(x, var_select = NULL, reduce_age = TRUE,
+                          combine_compartments = TRUE, date_0 = NULL)
+
+```
+
 
 ### 2. Changing parameters in the model. 
 

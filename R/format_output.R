@@ -64,12 +64,17 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   #             extract all compartments with compartment_name1 or compartment_name2
   #   else - if some of the variables are single-compartment variables, work through
   #          each individually, treating single and double compartment variables differently
+  number_variables <- length(var_select)
   if(is.null(var_select)){
     var_select <- unique(all_names_simp[!all_names_simp %in% c("step", "time")])
   } else if (!is.null(var_select) & sum(var_select %in% single_variables) == 0)  {
-    var_select <- unique(all_names_simp[grepl(paste0("^", var_select, "[1-2]"), all_names_simp)])
+    new_var_select <- c()
+    for (i in 1:number_variables) {
+      temp <- unique(all_names_simp[grepl(paste0("^", var_select[i], "[1-2]"), all_names_simp)])
+      new_var_select <- c(new_var_select, temp)
+    }
+    var_select <- new_var_select
   } else {
-    number_variables <- length(var_select)
     new_var_select <- c()
     for (i in 1:number_variables) {
       if (var_select[i] %in% single_variables) {
