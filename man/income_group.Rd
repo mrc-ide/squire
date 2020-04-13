@@ -4,7 +4,9 @@
 \name{income_group}
 \alias{income_group}
 \title{Income group}
-\format{A data.frame}
+\format{
+A data.frame
+}
 \usage{
 income_group
 }
