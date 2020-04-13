@@ -80,8 +80,7 @@ run_simple_SEEIR_model <- function(R0 = 3,
   # Running the Model
   mod <- simple_SEIR(user = pars)
   t <- seq(from = 1, to = time_period/dt)
-  m <- mod$run(t, replicate = replicates)
-  results <- mod$transform_variables(m)
+  results <- mod$run(t, replicate = replicates)
 
   # Summarise inputs
   parameters = list(R0 = R0, tt_R0 = tt_R0,
@@ -119,8 +118,6 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' @param time_period Length of simulation. Default = 365
 #' @param dt Time Step. Default = 0.5
 #' @param replicates  Number of replicates. Default = 10
-#' @param output_transform Transport model outputs into useful format.
-#'   Default == FALSE
 #' @param seed Random seed used for simulations. Deafult = runif(1, 0, 10000)
 #' @param init Data.frame of initial conditions. Default = NULL
 #' @param prob_hosp probability of hospitalisation by age.
@@ -455,11 +452,6 @@ run_explicit_SEEIR_model <- function(
   mod <- explict_SEIR(user = pars)
   t <- seq(from = 1, to = time_period/dt)
   results <- mod$run(t, replicate = replicates)
-
-  # collect all the results
-  if (output_transform) {
-  results <- mod$transform_variables(results)
-  }
 
   # Summarise inputs
   parameters <- args

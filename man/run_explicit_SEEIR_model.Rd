@@ -78,9 +78,6 @@ Default = NULL, which causes beta to be estimated from R0}
 
 \item{init}{Data.frame of initial conditions. Default = NULL}
 
-\item{output_transform}{Transport model outputs into useful format.
-Default == FALSE}
-
 \item{seed}{Random seed used for simulations. Deafult = runif(1, 0, 10000)}
 
 \item{prob_hosp}{probability of hospitalisation by age.
