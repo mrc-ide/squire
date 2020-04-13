@@ -24,7 +24,7 @@ collapse_age <- function(d){
 collapse_compartment <- function(d){
   d %>%
     dplyr::mutate(group = dplyr::case_when(
-      grepl("IMVGet", .data$compartment) ~ "ICU",
+      grepl("IMV", .data$compartment) ~ "ICU",
       grepl("IOxGet", .data$compartment) ~ "hospital",
       .data$compartment == "n_E2_I" ~ "infections",
       .data$compartment == "delta_D" ~ "deaths",
@@ -38,7 +38,7 @@ collapse_compartment <- function(d){
 #' Format model output as data.frame
 #'
 #' @param x squire_simulation object
-#' @param var_select Vector of variable names
+#' @param var_select Vector of compartment names, e.g. \code{c("S", "R")}
 #' @param reduce_age Collapse age-dimension
 #' @param reduce_compartment Collapse compartments
 #' @param date_0 Date of time 0, if specified a date column will be added
@@ -67,12 +67,15 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   raw_names <- gsub("\\[.*?]", "", names(vars[1,,1]))
   age_groups <- 1:table(raw_names)[1]
   compartments <- unique(raw_names)
-  time <- x$output[,"time",1]
+  time <- as.vector(apply(x$output[,"time",, drop = FALSE], 2, function(x){
+    rep(x, length(compartments) * length(age_groups))
+  }))
   # Output
   out <- tidyr::expand_grid(replicate = 1:x$parameters$replicates,
                             compartment = compartments,
                             age_group = age_groups,
-                            t = time)
+                            t = x$output[,"time", 1])
+  out$t <- time
   out$y <- as.vector(vars)
   # Collapse ages
   if(reduce_age){
