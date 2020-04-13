@@ -97,9 +97,9 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   raw_names <- gsub("\\[.*?]", "", names(vars[1,,1]))
   age_groups <- 1:table(raw_names)[1]
   compartments <- unique(raw_names)
-  time <- as.vector(apply(x$output[,"time",, drop = FALSE], 2, function(x){
-    rep(x, length(compartments) * length(age_groups))
-  }))
+  time <- vapply(seq_len(dim(x$output)[3]), function(y) {
+    rep(x$output[,"time",y],length(compartments) * length(age_groups))
+  }, FUN.VALUE = numeric(length(compartments) * length(age_groups) * nrow(x$output[,,1])))
 
   # Generating and filling output
   out <- tidyr::expand_grid(replicate = 1:x$parameters$replicates,
