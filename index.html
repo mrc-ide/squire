@@ -236,7 +236,7 @@
 <p>To access the outputs we can use <code>untransformed_output</code>, specifying<br>
 which compartments are to be returned, and which specific summary outputs related to case incidence, death incidence and hospital bed demands are needed:</p>
 <div class="sourceCode" id="cb12"><pre class="r">
-<span class="no">gcu</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/untransformed_output.html">untransformed_output</a></span>(<span class="no">r</span>, <span class="kw">compartments</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"S"</span>, <span class="st">"R"</span>),
+<span class="no">gcu</span> <span class="kw">&lt;-</span> <span class="fu">untransformed_output</span>(<span class="no">r</span>, <span class="kw">compartments</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"S"</span>, <span class="st">"R"</span>),
                                <span class="kw">deaths</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
                                <span class="kw">cases</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
                                <span class="kw">beds</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>

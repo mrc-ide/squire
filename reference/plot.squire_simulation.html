@@ -129,6 +129,7 @@
   <span class='kw'>q</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.025</span>, <span class='fl'>0.975</span>),
   <span class='kw'>var_select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>summary_f</span> <span class='kw'>=</span> <span class='no'>mean</span>,
+  <span class='kw'>x_var</span> <span class='kw'>=</span> <span class='st'>"t"</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -163,6 +164,10 @@
       <th>summary_f</th>
       <td><p>Function to summarise each compartment
 passed to the <code>fun</code> argument of <code><a href='https://ggplot2.tidyverse.org/reference/stat_summary.html'>stat_summary</a></code></p></td>
+    </tr>
+    <tr>
+      <th>x_var</th>
+      <td><p>X variable to use for plotting (default is <code>"t"</code>, but can be set to, <code>"date"</code>, if <code>date_0</code> provided)</p></td>
     </tr>
     <tr>
       <th>...</th>

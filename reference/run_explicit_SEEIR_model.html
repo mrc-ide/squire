@@ -132,7 +132,6 @@
   <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
   <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>,
   <span class='kw'>init</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>output_transform</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>1e+08</span>),
   <span class='kw'>prob_hosp</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.000744192</span>, <span class='fl'>0.000634166</span>, <span class='fl'>0.001171109</span>, <span class='fl'>0.002394593</span>, <span class='fl'>0.005346437</span>,
     <span class='fl'>0.010289885</span>, <span class='fl'>0.016234604</span>, <span class='fl'>0.023349169</span>, <span class='fl'>0.028944623</span>, <span class='fl'>0.038607042</span>, <span class='fl'>0.057734879</span>,
@@ -217,11 +216,6 @@ Default = NULL, which causes beta to be estimated from R0</p></td>
     <tr>
       <th>init</th>
       <td><p>Data.frame of initial conditions. Default = NULL</p></td>
-    </tr>
-    <tr>
-      <th>output_transform</th>
-      <td><p>Transport model outputs into useful format.
-Default == FALSE</p></td>
     </tr>
     <tr>
       <th>seed</th>
