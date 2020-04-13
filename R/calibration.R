@@ -78,7 +78,7 @@ calibrate <- function(country, deaths, reporting_fraction = 1,
   # Get deaths timepoint
   deaths_sim <- lapply(out, format_output, var_select = "D")
   times <- sapply(deaths_sim, function(x){
-    x$t[x$y > true_deaths][1]
+    x$t[x$y >= true_deaths][1]
   })
 
   # Adjust time
