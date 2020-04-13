@@ -53,25 +53,28 @@ plot.squire_simulation <- function(x, replicates = FALSE,
                                    ci = TRUE,
                                    q = c(0.025, 0.975),
                                    var_select = NULL,
-                                   summary_f = mean, ...){
+                                   summary_f = mean,
+                                   x_var = "t", ...){
 
 
-  pd <- format_output(x, var_select = var_select)
+  pd <- format_output(x, var_select = var_select, ...)
+  pd <- pd %>%
+    dplyr::mutate(x = .data[[x_var]])
+
 
   # Format summary data
   pds <- pd %>%
-    dplyr::group_by(.data$t, .data$compartment) %>%
+    dplyr::group_by(.data$x, .data$compartment) %>%
     dplyr::summarise(ymin = quantile(.data$y, q[1]),
               ymax = quantile(.data$y, q[2]),
               y = summary_f(.data$y))
-
   # Plot
   p <- ggplot2::ggplot()
 
   # Add lines for individual draws
   if(replicates){
     p <- p + ggplot2::geom_line(data = pd,
-                                ggplot2::aes(x = .data$t,
+                                ggplot2::aes(x = .data$x,
                                              y = .data$y,
                                              col = .data$compartment,
                                              group = interaction(.data$compartment, .data$replicate)),
@@ -83,7 +86,7 @@ plot.squire_simulation <- function(x, replicates = FALSE,
       warning("Summary statistic estimated from <10 replicates")
     }
     p <- p + ggplot2::geom_line(data = pds,
-                                ggplot2::aes(x = .data$t, y = .data$y,
+                                ggplot2::aes(x = .data$x, y = .data$y,
                                              col = .data$compartment))
   }
 
@@ -92,7 +95,7 @@ plot.squire_simulation <- function(x, replicates = FALSE,
       warning("Confidence bounds estimated from <10 replicates")
     }
     p <- p + ggplot2::geom_ribbon(data = pds,
-                                  ggplot2::aes(x = .data$t,
+                                  ggplot2::aes(x = .data$x,
                                                ymin = .data$ymin,
                                                ymax = .data$ymax,
                                                     fill = .data$compartment),
