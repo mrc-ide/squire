@@ -41,11 +41,12 @@ collapse_compartment <- function(d){
 #' @param var_select Vector of variable names
 #' @param reduce_age Collapse age-dimension
 #' @param reduce_compartment Collapse compartments
+#' @param date_0 Date of time 0, if specified a date column will be added
 #'
 #' @return Formatted long data.frame
 #' @export
 format_output <- function(x, var_select = NULL, reduce_age = TRUE,
-                          reduce_compartment = TRUE){
+                          reduce_compartment = TRUE, date_0 = NULL){
   # Select variables
   vars <- x$output
   # Variable names
@@ -64,7 +65,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   }
   # Select components of data.frame
   raw_names <- gsub("\\[.*?]", "", names(vars[1,,1]))
-  age_groups <- 1:sum(raw_names == ("S"))
+  age_groups <- 1:table(raw_names)[1]
   compartments <- unique(raw_names)
   time <- x$output[,"time",1]
   # Output
@@ -80,6 +81,12 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   # Combine compartments
   if(reduce_compartment){
     out <- collapse_compartment(out)
+  }
+  # Add date
+  if(!is.null(date_0)){
+    stopifnot(inherits(date_0, "Date"))
+    out$date <- as.Date(out$t + date_0,
+                        format = "%d/%m/%y")
   }
   return(out)
 }
