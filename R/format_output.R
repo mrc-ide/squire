@@ -9,8 +9,8 @@
 #' @return Output data.frame
 collapse_age <- function(d){
   d %>%
-    dplyr::group_by(compartment, t, replicate) %>%
-    dplyr::summarise(y =  sum(y)) %>%
+    dplyr::group_by(.data$compartment, .data$t, .data$replicate) %>%
+    dplyr::summarise(y =  sum(.data$y)) %>%
     dplyr::ungroup()
 }
 
@@ -24,15 +24,15 @@ collapse_age <- function(d){
 collapse_compartment <- function(d){
   d %>%
     dplyr::mutate(group = dplyr::case_when(
-      grepl("IMVGet", compartment) ~ "ICU",
-      grepl("IOxGet", compartment) ~ "hospital",
-      compartment == "n_E2_I" ~ "infections",
-      compartment == "delta_D" ~ "deaths",
-      TRUE ~ compartment)) %>%
-    dplyr::group_by(group, t, replicate) %>%
-    dplyr::summarise(y = sum(y)) %>%
+      grepl("IMVGet", .data$compartment) ~ "ICU",
+      grepl("IOxGet", .data$compartment) ~ "hospital",
+      .data$compartment == "n_E2_I" ~ "infections",
+      .data$compartment == "delta_D" ~ "deaths",
+      TRUE ~ .data$compartment)) %>%
+    dplyr::group_by(.data$group, .data$t, .data$replicate) %>%
+    dplyr::summarise(y = sum(.data$y)) %>%
     dplyr::ungroup() %>%
-    dplyr::rename(compartment = group)
+    dplyr::rename(compartment = .data$group)
 }
 
 #' Format model output as data.frame
