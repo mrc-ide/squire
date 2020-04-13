@@ -2679,10 +2679,10 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
     internal->delta_R[i - 1] = internal->n_IOxGetLive2_R[i - 1] + internal->n_IOxNotGetLive2_R[i - 1] + internal->n_IRec2_R[i - 1] + internal->n_IMVNotGetLive2_R[i - 1] + internal->n_IMild_R[i - 1];
   }
   for (int i = 1; i <= internal->dim_n_E2_ICase1; ++i) {
-    internal->n_E2_ICase1[i - 1] = fround(internal->n_E2_I[i - 1] * internal->prob_hosp[i - 1], 0);
+    internal->n_E2_ICase1[i - 1] = round(internal->n_E2_I[i - 1] * internal->prob_hosp[i - 1]);
   }
   for (int i = 1; i <= internal->dim_number_requiring_IMV; ++i) {
-    internal->number_requiring_IMV[i - 1] = fround(internal->n_ICase2_Hosp[i - 1] * internal->prob_severe[i - 1], 0);
+    internal->number_requiring_IMV[i - 1] = round(internal->n_ICase2_Hosp[i - 1] * internal->prob_severe[i - 1]);
   }
   double beta = 0.0;
   cinterpolate_eval(step, internal->interpolate_beta, &beta);
@@ -2834,7 +2834,7 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
     internal->lambda[i - 1] = beta * odin_sum2(internal->s_ij, i - 1, i, 0, internal->dim_s_ij_2, internal->dim_s_ij_1);
   }
   for (int i = 1; i <= internal->dim_n_IMVGetDie1; ++i) {
-    internal->n_IMVGetDie1[i - 1] = fround(internal->number_get_IMV[i - 1] * internal->prob_severe_death_treatment[i - 1], 0);
+    internal->n_IMVGetDie1[i - 1] = round(internal->number_get_IMV[i - 1] * internal->prob_severe_death_treatment[i - 1]);
   }
   {
      int i = 1;
@@ -2914,10 +2914,10 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
     internal->n_IMVGetLive1[i - 1] = internal->number_get_IMV[i - 1] - internal->n_IMVGetDie1[i - 1];
   }
   for (int i = 1; i <= internal->dim_n_IMVNotGetDie1; ++i) {
-    internal->n_IMVNotGetDie1[i - 1] = fround(internal->number_notget_IMV[i - 1] * internal->prob_severe_death_no_treatment[i - 1], 0);
+    internal->n_IMVNotGetDie1[i - 1] = round(internal->number_notget_IMV[i - 1] * internal->prob_severe_death_no_treatment[i - 1]);
   }
   for (int i = 1; i <= internal->dim_n_IOxGetDie1; ++i) {
-    internal->n_IOxGetDie1[i - 1] = fround(internal->number_get_Ox[i - 1] * internal->prob_non_severe_death_treatment[i - 1], 0);
+    internal->n_IOxGetDie1[i - 1] = round(internal->number_get_Ox[i - 1] * internal->prob_non_severe_death_treatment[i - 1]);
   }
   for (int i = 1; i <= internal->dim_number_notget_Ox; ++i) {
     internal->number_notget_Ox[i - 1] = internal->number_requiring_Ox[i - 1] - internal->number_get_Ox[i - 1];
@@ -2941,7 +2941,7 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
     internal->n_IOxGetLive1[i - 1] = internal->number_get_Ox[i - 1] - internal->n_IOxGetDie1[i - 1];
   }
   for (int i = 1; i <= internal->dim_n_IOxNotGetDie1; ++i) {
-    internal->n_IOxNotGetDie1[i - 1] = fround(internal->number_notget_Ox[i - 1] * internal->prob_non_severe_death_no_treatment[i - 1], 0);
+    internal->n_IOxNotGetDie1[i - 1] = round(internal->number_notget_Ox[i - 1] * internal->prob_non_severe_death_no_treatment[i - 1]);
   }
   for (int i = 1; i <= internal->dim_n_S_E1; ++i) {
     internal->n_S_E1[i - 1] = Rf_rbinom(round(S[i - 1]), internal->p_S_E1[i - 1]);

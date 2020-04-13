@@ -9,14 +9,14 @@ test_that("output format works", {
                         contact_matrix_set=contact_matrices[[1]])
   o1 <- format_output(r1)
   o2 <- format_output(r1, reduce_age = FALSE)
-  o3 <- format_output(r1, reduce_age = FALSE, reduce_compartment = FALSE)
+  o3 <- collapse_for_report(format_output(r1, reduce_age = FALSE))
+
 
   expect_type(o1, "list")
   expect_type(o2, "list")
   expect_type(o3, "list")
-  expect_named(o1, c("compartment", "t", "replicate", "y"))
-  expect_named(o2, c("compartment", "t", "replicate", "y"))
-  expect_named(o3, c("replicate", "compartment", "age_group", "t", "y"))
+  expect_named(o1, c("compartment", "t",  "replicate", "y"))
+  expect_named(o2, c("replicate", "age_group", "compartment", "t",  "y"))
 
   pop <- get_population("Afghanistan", simple_SEIR = FALSE)
   m1 <- run_explicit_SEEIR_model(R0 = 2,
@@ -28,17 +28,18 @@ test_that("output format works", {
 
   o1 <- format_output(m1)
   o2 <- format_output(m1, reduce_age = FALSE)
-  o3 <- format_output(m1, reduce_age = FALSE, reduce_compartment = FALSE)
-  o4 <- format_output(m1, reduce_age = FALSE, reduce_compartment = FALSE, date_0 = Sys.Date())
+  o3 <- collapse_for_report(format_output(m1, reduce_age = FALSE))
+  o4 <- format_output(m1, reduce_age = FALSE, date_0 = Sys.Date())
   expect_type(o1, "list")
   expect_type(o2, "list")
   expect_type(o3, "list")
   expect_type(o4, "list")
   expect_named(o1, c("compartment", "t", "replicate", "y"))
-  expect_named(o2, c("compartment", "t", "replicate", "y"))
-  expect_named(o3, c("replicate", "compartment", "age_group", "t", "y"))
-  expect_named(o4, c("replicate", "compartment", "age_group", "t", "y", "date"))
-  expect_error(format_output(m1, reduce_age = FALSE, reduce_compartment = FALSE,
+  expect_named(o2, c("replicate", "age_group", "compartment","t", "y"))
+  expect_named(o3, c("compartment", "t", "replicate", "y"))
+  expect_true(all(c("hospital","ICU","IMild","deaths") %in% unique(o3$compartment)))
+  expect_named(o4, c("replicate", "age_group", "compartment", "t", "y", "date"))
+  expect_error(format_output(m1, reduce_age = FALSE,
                              date_0 = "wrong"))
 })
 
@@ -65,5 +66,19 @@ test_that("squire object check and summary", {
   expect_output(print(r1), regexp = "1.1 years")
 
 
+
+})
+
+
+test_that("t correct in format_outputs",{
+
+  r <- calibrate(country = "Afghanistan", deaths = 6,
+                 reporting_fraction = 1, dt=1, replicates = 10,
+                 time_period = 365)
+  get <- format_output(r, reduce_age = FALSE, combine_compartments = FALSE,
+                       date_0 = Sys.Date())
+
+  expect_true(table(table(get[get$replicate==1 & get$compartment == "D",]$t)) == 365)
+  expect_true(table(table(get[get$replicate==1 & get$compartment == "D",]$date)) == 365)
 
 })

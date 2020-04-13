@@ -4,7 +4,9 @@
 \name{country_specific_healthcare_capacity}
 \alias{country_specific_healthcare_capacity}
 \title{Country specific healthcare capacity}
-\format{A data.frame}
+\format{
+A data.frame
+}
 \usage{
 country_specific_healthcare_capacity
 }
