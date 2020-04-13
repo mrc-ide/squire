@@ -149,9 +149,9 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
 #'
 #' @return Formatted long data.frame
 #' @export
-extract_deaths <- function(x, reduce_age = TRUE, data_0 = NULL){
+extract_deaths <- function(x, reduce_age = TRUE, date_0 = NULL){
   output <- format_output(x, var_select = "delta_D", reduce_age = reduce_age,
-                          date_0 = data_0)
+                          date_0 = date_0)
   output$replicate <- factor(output$replicate)
   return(output)
 }
@@ -164,9 +164,9 @@ extract_deaths <- function(x, reduce_age = TRUE, data_0 = NULL){
 #'
 #' @return Formatted long data.frame
 #' @export
-extract_infection_incidence <- function(x, reduce_age = TRUE, data_0 = NULL){
+extract_infection_incidence <- function(x, reduce_age = TRUE, date_0 = NULL){
   output <- format_output(x, var_select = "n_E2_I", reduce_age = reduce_age,
-                          date_0 = data_0)
+                          date_0 = date_0)
   output$replicate <- factor(output$replicate)
   return(output)
 }
@@ -179,9 +179,9 @@ extract_infection_incidence <- function(x, reduce_age = TRUE, data_0 = NULL){
 #'
 #' @return Formatted long data.frame
 #' @export
-extract_hospital_occ <- function(x, reduce_age = TRUE, data_0 = NULL){
+extract_hospital_occ <- function(x, reduce_age = TRUE, date_0 = NULL){
   output <- format_output(x, var_select = c("IOxGetLive", "IOxGetDie", "IRec"),
-                          date_0 = data_0)
+                          date_0 = date_0)
   output <- output %>%
     dplyr::group_by(.data$t, .data$replicate) %>%
     dplyr::summarise(y = sum(.data$y))
@@ -198,9 +198,9 @@ extract_hospital_occ <- function(x, reduce_age = TRUE, data_0 = NULL){
 #'
 #' @return Formatted long data.frame
 #' @export
-extract_ICU_occ <- function(x, reduce_age = TRUE, data_0 = NULL){
+extract_ICU_occ <- function(x, reduce_age = TRUE, date_0 = NULL){
   output <- format_output(x, var_select = c("IMVGetLive", "IMVGetDie"),
-                          date_0 = data_0)
+                          date_0 = date_0)
   output <- output %>%
     dplyr::group_by(.data$t, .data$replicate) %>%
     dplyr::summarise(y = sum(.data$y))
@@ -216,9 +216,9 @@ extract_ICU_occ <- function(x, reduce_age = TRUE, data_0 = NULL){
 #'
 #' @return Formatted long data.frame
 #' @export
-extract_report_summaries <- function(x, data_0 = NULL){
+extract_report_summaries <- function(x, date_0 = NULL){
   output <- format_output(x, reduce_age = TRUE, combine_compartments = FALSE,
-                          date_0 = data_0)
+                          date_0 = date_0)
   output <- collapse_for_report(output)
 
   return(output)

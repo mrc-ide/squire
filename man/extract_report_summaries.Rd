@@ -4,7 +4,7 @@
 \alias{extract_report_summaries}
 \title{Extract report summaries}
 \usage{
-extract_report_summaries(x, data_0 = NULL)
+extract_report_summaries(x, date_0 = NULL)
 }
 \arguments{
 \item{x}{squire_simulation object}

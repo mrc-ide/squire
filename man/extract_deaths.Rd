@@ -4,7 +4,7 @@
 \alias{extract_deaths}
 \title{Extract deaths from model output}
 \usage{
-extract_deaths(x, reduce_age = TRUE, data_0 = NULL)
+extract_deaths(x, reduce_age = TRUE, date_0 = NULL)
 }
 \arguments{
 \item{x}{squire_simulation object}

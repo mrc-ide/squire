@@ -4,7 +4,7 @@
 \alias{extract_infection_incidence}
 \title{Extract infection incidence from model output}
 \usage{
-extract_infection_incidence(x, reduce_age = TRUE, data_0 = NULL)
+extract_infection_incidence(x, reduce_age = TRUE, date_0 = NULL)
 }
 \arguments{
 \item{x}{squire_simulation object}

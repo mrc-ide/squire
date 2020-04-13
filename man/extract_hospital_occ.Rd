@@ -4,7 +4,7 @@
 \alias{extract_hospital_occ}
 \title{Extract hospital bed occupancy from model output}
 \usage{
-extract_hospital_occ(x, reduce_age = TRUE, data_0 = NULL)
+extract_hospital_occ(x, reduce_age = TRUE, date_0 = NULL)
 }
 \arguments{
 \item{x}{squire_simulation object}
