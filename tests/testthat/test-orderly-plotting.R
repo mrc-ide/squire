@@ -18,10 +18,10 @@ test_that("cases and healthcare plotting works", {
   set.seed(123)
 
   # do we get ggplots from both
-  plot_calibration_healthcare(df = o1, data = df)
-  plot_calibration_healthcare_barplot(df = o1, data = df)
-  plot_calibration_cases(df = o1, data = df)
-  plot_calibration_cases_barplot(df = o1, data = df)
+  expect_s3_class(plot_calibration_healthcare(df = o1, data = df), "gg")
+  expect_s3_class(plot_calibration_healthcare_barplot(df = o1, data = df), "gg")
+  expect_s3_class(plot_calibration_cases(df = o1, data = df), "gg")
+  expect_s3_class(plot_calibration_cases_barplot(df = o1, data = df), "gg")
 
 
 })
