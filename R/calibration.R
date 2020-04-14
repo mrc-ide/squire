@@ -109,8 +109,29 @@ odin_index <- function(model) {
 
 ## Take odin state and calculate sum across ages in a replicate and vectorise
 #' @noRd
-odin_sv <- function(state, replicates, nt) {
-  as.numeric(vapply(seq_len(replicates), function(x) {
-    rowSums(state[,,x])
-  }, FUN.VALUE = double(nt)))
+odin_sv <- function(state, replicates, nt, reduce_age = TRUE) {
+  if (reduce_age) {
+    as.numeric(vapply(seq_len(replicates), function(x) {
+      rowSums(state[,,x])
+    }, FUN.VALUE = double(nt)))
+  } else { # note: whole age-group results for single replicate produced, then next age-group etc
+    as.numeric(vapply(seq_len(replicates), function(x) {
+      state[, , x]
+    }, FUN.VALUE = rep(double(nt), dim(state)[2])))
+  }
 }
+
+y <- as.numeric(vapply(seq_len(replicates), function(x) {
+  rowSums(state[,,x])
+}, FUN.VALUE = double(nt)))
+
+z <- as.numeric(vapply(seq_len(replicates), function(x) {
+  state[, , x]
+}, FUN.VALUE = rep(double(nt), dim(state)[2])))
+
+3650 * 17 * 2
+
+y <- odin_sv(state, replicates, nt, reduce_age = TRUE)
+z <- odin_sv(state, replicates, nt, reduce_age = FALSE)
+
+sum(state[, 1, 1] == z[1:3650])
