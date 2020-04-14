@@ -144,4 +144,11 @@ test_that("calibrate_output_parsing vs format_output",{
   expect_identical(o1$y[o1$replicate == 1 & o1$compartment == "ICU_demand"],
                    g2$y[g2$replicate == 1 & g2$compartment == "ICU"])
 
+
+  index <- odin_index(m1$model)
+  mv <- unlist(index[c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2",
+                           "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2")])
+  expect_true(identical(rowSums(m1$output[,mv,1]),
+                        o1$y[o1$replicate == 1 & o1$compartment == "ICU_demand"]))
+
 })
