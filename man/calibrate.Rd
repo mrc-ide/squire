@@ -12,7 +12,7 @@ calibrate(
   min_seeding_cases = 5,
   max_seeding_cases = 50,
   replicates = 100,
-  dt = 0.5,
+  dt = 0.1,
   ...
 )
 }

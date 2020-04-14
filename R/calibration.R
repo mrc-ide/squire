@@ -14,7 +14,7 @@
 calibrate <- function(country, deaths, reporting_fraction = 1,
                       seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
                       min_seeding_cases = 5, max_seeding_cases = 50,
-                      replicates = 100, dt = 0.5, ...) {
+                      replicates = 100, dt = 0.1, ...) {
 
   assert_numeric(deaths)
   assert_numeric(reporting_fraction)
@@ -106,3 +106,10 @@ odin_index <- function(model) {
   model$transform_variables(seq_len(1L + n_state + n_out))
 }
 
+## Take odin state and calculate sum across ages in a replicate and vectorise
+#' @noRd
+odin_sv <- function(state, replicates, nt) {
+  as.numeric(vapply(seq_len(replicates), function(x) {
+    rowSums(state[,,x])
+  }, FUN.VALUE = double(nt)))
+}

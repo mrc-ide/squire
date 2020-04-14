@@ -21,8 +21,7 @@
 death_data_format <- function(date = NULL,
                               deaths = NULL,
                               cases = NULL,
-                              reporting_quality = 0.2
-){
+                              reporting_quality = 0.2){
 
   # If no dates are provided make up some data
   if (is.null(date)) {
@@ -74,12 +73,75 @@ death_data_format <- function(date = NULL,
 
 }
 
+#' Format output of calibration for plotting
+#'
+#' @details Calibration output is taken to give time series of infections, cases,
+#' cases requiring hospitilisation, case requiring critical care facilities. Used
+#' in plotting for nowcasting reports.
+#'
+#' @param r Output of \code{\link{calibrate}}
+#' @param date_0 Date of time 0, if specified a date column will be added
+#'
+#' @return \code{list} with:
+#' \itemize{
+#'       \item{df:}{ Data frame of case numbers, hospital beds, ICU beds and deaths }
+#'       \item{data:}{ Raw data used in calibration}
+#'       \item{parameters:}{ Parameters used in simulation}
+#'       }
+#'
+calibrate_output_parsing <- function(r, date_0 = Sys.Date()) {
+
+  ## Assertions
+  assert_custom_class(r, "squire_simulation")
+
+  # get the index for looking up D
+  index <- odin_index(r$model)
+  nt <- nrow(r$output)
+
+  mv <- unlist(index[c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2",
+                       "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2")])
+
+  ox <- unlist(index[c("IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2",
+                       "IOxNotGetLive1","IOxNotGetLive2","IOxNotGetDie1","IOxNotGetDie2")])
+
+
+  # collet outputs as vectors
+  mild_cases <- odin_sv(r$output[,index$n_E2_I,] - r$output[,index$n_E2_ICase1,],
+                        replicates = r$parameters$replicates, nt = nt)
+  hospital_cases <- odin_sv(r$output[,index$n_E2_ICase1,],
+                            replicates = r$parameters$replicates, nt = nt)
+  ICU <- odin_sv(r$output[,mv,],
+                 replicates = r$parameters$replicates, nt = nt)
+  hospital <- odin_sv(r$output[,ox,],
+                          replicates = r$parameters$replicates, nt = nt)
+  deaths <- odin_sv(r$output[,index$delta_D,],
+                    replicates = r$parameters$replicates, nt = nt)
+
+  # collect into a long data frame
+  vars <- c("mild_cases", "hospital_cases", "deaths", "ICU", "hospital")
+  df <- data.frame("date" = as.numeric(r$output[,index$time,]),
+                   "replicate" = as.numeric(mapply(rep, seq_len(r$parameters$replicates), nt)),
+                   "compartment" = as.character(mapply(rep, vars, nt*r$parameters$replicates)),
+                   "y" = c(mild_cases, hospital_cases, deaths, ICU, hospital))
+
+  # Add date
+  if(!is.null(date_0)){
+    stopifnot(inherits(date_0, "Date"))
+    df$date <- as.Date(df$date + date_0,
+                        format = "%Y/%m/%d")
+  }
+
+  return(df)
+}
+
+
+
 #' @noRd
-#' @importFrom stats median runif
+#' @importFrom stats median runif quantile
 plot_calibration_cases <- function(df, data, forecast = 0) {
 
   # split to correct dates
-  sub <- df[df$compartment %in% c("n_E2_IMild", "n_E2_ICase1") &
+  sub <- df[df$compartment %in% c("mild_cases", "hospital_cases") &
               df$date <=  Sys.Date() + forecast,]
 
   pd_group <- dplyr::group_by(sub, .data$date, .data$compartment) %>%
@@ -93,7 +155,7 @@ plot_calibration_cases <- function(df, data, forecast = 0) {
 
   # Plot
   gg_cases <- ggplot2::ggplot(
-    sub, ggplot2::aes(x = as.Date(.data$date, origin = origin),
+    sub, ggplot2::aes(x = .data$date,
                       y = .data$y, col = .data$compartment,
                       group = interaction(.data$compartment, .data$replicate))) +
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
@@ -138,8 +200,11 @@ plot_calibration_cases <- function(df, data, forecast = 0) {
 plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
 
   # split to correct dates
-  sub <- df[df$compartment %in% c("infections") &
-              df$date <=  Sys.Date() + forecast,]
+  sub <- df[df$compartment %in% c("mild_cases", "hospital_cases") &
+              df$date <=  Sys.Date() + forecast,] %>%
+    dplyr::group_by(.data$date, .data$replicate) %>%
+    dplyr::summarise(y = sum(y))
+
 
   pd_group <- dplyr::group_by(sub, .data$date) %>%
     dplyr::summarise(quants = list(quantile(.data$y, c(0.025, 0.25, 0.5, 0.75, 0.975))),
@@ -191,8 +256,7 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
                    panel.grid.minor.x = ggplot2::element_blank(),
                    panel.border = ggplot2::element_blank(),
                    panel.background = ggplot2::element_blank(),
-                   axis.line = ggplot2::element_line(colour = "black"),
-                   legend.position = "top"
+                   axis.line = ggplot2::element_line(colour = "black")
     )
 
   gg_cases
@@ -217,7 +281,7 @@ plot_calibration_healthcare <- function(df, data, forecast = 14) {
 
 
   # Plot
-  gg_healthcare <- ggplot2::ggplot(sub, ggplot2::aes(x = as.Date(.data$date, origin = origin),
+  gg_healthcare <- ggplot2::ggplot(sub, ggplot2::aes(x = .data$date,
                                                      y = .data$y, col = .data$compartment,
                                                      group = interaction(.data$compartment, .data$replicate))) +
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
@@ -278,7 +342,7 @@ plot_calibration_healthcare_barplot <- function(df, data, forecast = 14) {
 
   # Plot
   gg_healthcare <- ggplot2::ggplot(sub,
-                                   ggplot2::aes(x = as.Date(.data$date, origin = origin),
+                                   ggplot2::aes(x = .data$date,
                                                 y = .data$y, fill = .data$compartment,
                                                 group = .data$compartment)) +
     ggplot2::geom_ribbon(data = pd_group,
@@ -304,7 +368,7 @@ plot_calibration_healthcare_barplot <- function(df, data, forecast = 14) {
                       show.legend = TRUE,
                       inherit.aes = FALSE) +
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
-    ggplot2::geom_vline(xintercept = data$date[which(data$deaths != 0)], linetype = "dotted") +
+    ggplot2::geom_vline(xintercept = max(data$date[which(data$deaths != 0)]), linetype = "dotted") +
     ggplot2::theme_bw()  +
     ggplot2::ylab("Daily Deaths") +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
