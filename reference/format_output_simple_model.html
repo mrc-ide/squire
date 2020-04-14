@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Format model output as data.frame — format_output • squire</title>
+<title>Format model output from simple as data.frame — format_output_simple_model • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Format model output as data.frame — format_output" />
-<meta property="og:description" content="Format model output as data.frame" />
+<meta property="og:title" content="Format model output from simple as data.frame — format_output_simple_model" />
+<meta property="og:description" content="Format model output from simple as data.frame" />
 
 
 
@@ -111,16 +111,16 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Format model output as data.frame</h1>
+    <h1>Format model output from simple as data.frame</h1>
     
-    <div class="hidden name"><code>format_output.Rd</code></div>
+    <div class="hidden name"><code>format_output_simple_model.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Format model output as data.frame</p>
+    <p>Format model output from simple as data.frame</p>
     </div>
 
-    <pre class="usage"><span class='fu'>format_output</span>(
+    <pre class="usage"><span class='fu'>format_output_simple_model</span>(
   <span class='no'>x</span>,
   <span class='kw'>var_select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>reduce_age</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -137,25 +137,15 @@
     </tr>
     <tr>
       <th>var_select</th>
-      <td><p>Vector of compartment names, e.g. <code><a href='https://rdrr.io/r/base/c.html'>c("S", "R")</a></code>. In
-  addition a number of summary compartment can be requested. These include:</p><ul>
-<li><p>"deaths" Daily Deaths</p></li>
-<li><p>"infections" Daily Infections</p></li>
-<li><p>"hospital_occupancy" Occupied Hospital Beds</p></li>
-<li><p>"ICU_occupancy" Occupied ICU Beds</p></li>
-<li><p>"hospital_demand Required Hospital Beds</p></li>
-<li><p>"ICU_demand Required ICU Beds</p></li>
-</ul></td>
+      <td><p>Vector of compartment names, e.g. <code><a href='https://rdrr.io/r/base/c.html'>c("S", "R")</a></code></p></td>
     </tr>
     <tr>
       <th>reduce_age</th>
-      <td><p>Collapse age-dimension, calculating the total in the
-compartment.</p></td>
+      <td><p>Collapse age-dimension</p></td>
     </tr>
     <tr>
       <th>combine_compartments</th>
-      <td><p>Collapse compartments of same type together
-(e.g. E1 and E2 -&gt; E)</p></td>
+      <td><p>Collapse compartments of same type together (e.g. E1 and E2 -&gt; E)</p></td>
     </tr>
     <tr>
       <th>date_0</th>
