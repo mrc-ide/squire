@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
       </span>
     </div>
 
@@ -147,18 +147,18 @@
   <span class='kw'>prob_severe_death_treatment</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>0.5</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>prob_hosp</span>)),
   <span class='kw'>prob_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>0.95</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>prob_hosp</span>)),
   <span class='kw'>p_dist</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>prob_hosp</span>)),
-  <span class='kw'>dur_E</span> <span class='kw'>=</span> <span class='fl'>4.58</span>,
-  <span class='kw'>dur_R</span> <span class='kw'>=</span> <span class='fl'>2.09</span>,
-  <span class='kw'>dur_hosp</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>dur_get_ox_survive</span> <span class='kw'>=</span> <span class='fl'>6</span>,
-  <span class='kw'>dur_get_ox_die</span> <span class='kw'>=</span> <span class='fl'>3.5</span>,
-  <span class='kw'>dur_not_get_ox_survive</span> <span class='kw'>=</span> <span class='fl'>6</span> * <span class='fl'>1.5</span>,
-  <span class='kw'>dur_not_get_ox_die</span> <span class='kw'>=</span> <span class='no'>dur_get_ox_die</span> * <span class='fl'>0.5</span>,
-  <span class='kw'>dur_get_mv_survive</span> <span class='kw'>=</span> <span class='fl'>5.5</span>,
-  <span class='kw'>dur_get_mv_die</span> <span class='kw'>=</span> <span class='fl'>4</span>,
-  <span class='kw'>dur_not_get_mv_survive</span> <span class='kw'>=</span> <span class='fl'>12</span>,
+  <span class='kw'>dur_E</span> <span class='kw'>=</span> <span class='fl'>4.6</span>,
+  <span class='kw'>dur_IMild</span> <span class='kw'>=</span> <span class='fl'>2.1</span>,
+  <span class='kw'>dur_ICase</span> <span class='kw'>=</span> <span class='fl'>4.5</span>,
+  <span class='kw'>dur_get_ox_survive</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>dur_get_ox_die</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>dur_not_get_ox_survive</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>dur_not_get_ox_die</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>dur_get_mv_survive</span> <span class='kw'>=</span> <span class='fl'>7.3</span>,
+  <span class='kw'>dur_get_mv_die</span> <span class='kw'>=</span> <span class='fl'>6</span>,
+  <span class='kw'>dur_not_get_mv_survive</span> <span class='kw'>=</span> <span class='fl'>7.3</span>,
   <span class='kw'>dur_not_get_mv_die</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>dur_rec</span> <span class='kw'>=</span> <span class='fl'>6</span>,
+  <span class='kw'>dur_rec</span> <span class='kw'>=</span> <span class='fl'>2</span>,
   <span class='kw'>hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>seeding_cases</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
@@ -268,56 +268,57 @@ other age groups when demand exceeds healthcare capacity.</p></td>
     </tr>
     <tr>
       <th>dur_E</th>
-      <td><p>Mean duration of incubation period (days). Default = 4.58</p></td>
+      <td><p>Mean duration of incubation period (days). Default = 4.6</p></td>
     </tr>
     <tr>
-      <th>dur_R</th>
-      <td><p>Mean duration of mild infection (days). Default = 2.09</p></td>
+      <th>dur_IMild</th>
+      <td><p>Mean duration of mild infection (days). Default = 2.1</p></td>
     </tr>
     <tr>
-      <th>dur_hosp</th>
-      <td><p>Mean duration of hospitilsation (days). Default = 5</p></td>
+      <th>dur_ICase</th>
+      <td><p>Mean duration from symptom onset to hospitil admission (days).
+Default = 4.5</p></td>
     </tr>
     <tr>
       <th>dur_get_ox_survive</th>
-      <td><p>Mean duration of oxygen given survive. Default = 6</p></td>
+      <td><p>Mean duration of oxygen given survive. Default = 5</p></td>
     </tr>
     <tr>
       <th>dur_get_ox_die</th>
-      <td><p>Mean duration of oxygen given death. Default = 3.5</p></td>
+      <td><p>Mean duration of oxygen given death. Default = 5</p></td>
     </tr>
     <tr>
       <th>dur_not_get_ox_survive</th>
       <td><p>Mean duration without oxygen given survive.
-Default = 6 * 1.5</p></td>
+Default = 5</p></td>
     </tr>
     <tr>
       <th>dur_not_get_ox_die</th>
       <td><p>Mean duration without  oxygen given death.
-Default = dur_get_ox_die * 0.5</p></td>
+Default = 5</p></td>
     </tr>
     <tr>
       <th>dur_get_mv_survive</th>
       <td><p>Mean duration of ventilation given survive.
-Default = 5.5</p></td>
+Default = 7.3</p></td>
     </tr>
     <tr>
       <th>dur_get_mv_die</th>
-      <td><p>Mean duration of ventilation given death. Default = 4</p></td>
+      <td><p>Mean duration of ventilation given death. Default = 6</p></td>
     </tr>
     <tr>
       <th>dur_not_get_mv_survive</th>
       <td><p>Mean duration without ventilation given
-survive. Default = 12</p></td>
+survive. Default = 7.3</p></td>
     </tr>
     <tr>
       <th>dur_not_get_mv_die</th>
       <td><p>Mean duration without ventilation given
-death. Default = 12</p></td>
+death. Default = 1</p></td>
     </tr>
     <tr>
       <th>dur_rec</th>
-      <td><p>Duration of recovery after coming off ventilation. Default = 6</p></td>
+      <td><p>Duration of recovery after coming off ventilation. Default = 2</p></td>
     </tr>
     <tr>
       <th>hosp_bed_capacity</th>

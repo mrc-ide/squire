@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     <p>Format output of calibration for plotting</p>
     </div>
 
-    <pre class="usage"><span class='fu'>calibrate_output_parsing</span>(<span class='no'>r</span>)</pre>
+    <pre class="usage"><span class='fu'>calibrate_output_parsing</span>(<span class='no'>r</span>, <span class='kw'>date_0</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span>())</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -129,12 +129,16 @@
       <th>r</th>
       <td><p>Output of <code><a href='calibrate.html'>calibrate</a></code></p></td>
     </tr>
+    <tr>
+      <th>date_0</th>
+      <td><p>Date of time 0, if specified a date column will be added</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>list</code> with:</p><ul>
-<li><p>df: Data frame of case numbers, hospital beds, icu beds and deaths</p></li>
+<li><p>df: Data frame of case numbers, hospital beds, ICU beds and deaths</p></li>
 <li><p>data: Raw data used in calibration</p></li>
 <li><p>parameters: Parameters used in simulation</p></li>
 </ul>
