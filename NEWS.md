@@ -1,3 +1,7 @@
+# squire 0.2.3
+
+* `format_output` and calibrate orderly plotting functioanlity in
+
 # squire 0.2.2
 
 * `calibrate` now allows different seeding events (#50) and undereporting (#11)

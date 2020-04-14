@@ -23,19 +23,34 @@ collapse_age <- function(d){
 #'
 #' @return Output data.frame
 collapse_for_report <- function(d){
+
+  if ("date" %in% names(d)) {
   d %>%
     dplyr::mutate(group = dplyr::case_when(
-      grepl("IMVGet", .data$compartment) ~ "ICU",
-      grepl("IOxGet", .data$compartment) ~ "hospital",
+      grepl("IMV", .data$compartment) ~ "ICU",
+      grepl("IOx", .data$compartment) ~ "hospital",
       .data$compartment == "n_E2_I" ~ "infections",
       .data$compartment == "delta_D" ~ "deaths",
       TRUE ~ .data$compartment)) %>%
-    dplyr::group_by(.data$group, .data$t, .data$replicate) %>%
+    dplyr::group_by(.data$group, .data$t, .data$date, .data$replicate) %>%
     dplyr::summarise(y = sum(.data$y)) %>%
     dplyr::ungroup() %>%
     dplyr::rename(compartment = .data$group)
+  } else {
+    d %>%
+      dplyr::mutate(group = dplyr::case_when(
+        grepl("IMV", .data$compartment) ~ "ICU",
+        grepl("IOx", .data$compartment) ~ "hospital",
+        .data$compartment == "n_E2_I" ~ "infections",
+        .data$compartment == "delta_D" ~ "deaths",
+        TRUE ~ .data$compartment)) %>%
+      dplyr::group_by(.data$group, .data$t, .data$replicate) %>%
+      dplyr::summarise(y = sum(.data$y)) %>%
+      dplyr::ungroup() %>%
+      dplyr::rename(compartment = .data$group)
 }
 
+}
 #' Format model output as data.frame
 #'
 #' @param x squire_simulation object

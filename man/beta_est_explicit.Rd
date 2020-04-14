@@ -4,12 +4,12 @@
 \alias{beta_est_explicit}
 \title{Estimate beta parameter}
 \usage{
-beta_est_explicit(dur_R, dur_hosp, prob_hosp, mixing_matrix, R0)
+beta_est_explicit(dur_IMild, dur_ICase, prob_hosp, mixing_matrix, R0)
 }
 \arguments{
-\item{dur_R}{Duration of mild infectiousness (days)}
+\item{dur_IMild}{Duration of mild infectiousness (days)}
 
-\item{dur_hosp}{Delay between symptom onset and requiring hospitalisation (days)}
+\item{dur_ICase}{Delay between symptom onset and requiring hospitalisation (days)}
 
 \item{prob_hosp}{Probability of hospitilisation by ages}
 

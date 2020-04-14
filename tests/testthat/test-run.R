@@ -207,14 +207,11 @@ test_that("health system capacity", {
                                 ICU_bed_capacity = icu_cap,
                                 replicates = 1)
 
-  o1 <- extract_report_summaries(r)
-  icu_out <- dplyr::filter(o1, compartment == "ICU")
-  hosp_out <- dplyr::filter(o1, compartment %in% c("hospital", "IRec1", "IRec2")) %>%
-    dplyr::group_by(t, replicate) %>%
-    dplyr::summarise(y = sum(y))
+  icu_occ <- extract_ICU_occ(r)
+  hosp_occ <- extract_hospital_occ(r)
 
-  expect_equal(max(icu_out$y), icu_cap)
-  expect_equal(max(hosp_out$y), bed_cap)
+  expect_equal(max(icu_occ$y), icu_cap)
+  expect_equal(max(hosp_occ$y), bed_cap)
 })
 
 

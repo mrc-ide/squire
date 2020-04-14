@@ -245,25 +245,27 @@ compartments but this is quite slow to do, so we provide some helper functions. 
 
 
 ```{r untransformed}
+library(ggplot2)
 library(patchwork)
+library(dplyr)
 
 x <- run_explicit_SEEIR_model(country = "Afghanistan", hosp_bed_capacity = 500, ICU_bed_capacity = 1000)
 
 deaths <- extract_deaths(r)
 a <- ggplot(deaths, aes(x = t, y = y, col = replicate)) +
-  geom_line()
+  geom_line() + ylab("Daily Deaths")
 
 infection_incidence <- extract_infection_incidence(r)
 b <- ggplot(infection_incidence, aes(x = t, y = y, col = replicate)) +
-  geom_line()
+  geom_line() + ylab("Case Incidence")
 
 hosp_occ <- extract_hospital_occ(r)
 c <- ggplot(hosp_occ, aes(x = t, y = y, col = replicate)) +
-  geom_line()
+  geom_line() + ylab("Hospital Bed Occupancy")
 
 ICU_occ <- extract_ICU_occ(r)
 d <- ggplot(ICU_occ, aes(x = t, y = y, col = replicate)) +
-  geom_line()
+  geom_line() + ylab("ICU Occupancy")
 
 z <- a + b + c + d +
   plot_layout(guides = 'collect')
@@ -274,35 +276,47 @@ z
 ### 4.  Calibrating the Model to Observed Deaths Data
 
 The model can be simply calibrated to the cumulative time series of deaths reported in settings. 
-This can be conducted using the `calibrate` function. For example:
+This can be done using the `calibrate` function. For example:
 
 ```{r example data}
 
 calibration <- calibrate(country = "Afghanistan", deaths = 25, reporting_fraction = 1,
                          seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
                          min_seeding_cases = 5, max_seeding_cases = 50,
-                         replicates = 100, dt = 0.1)
+                         replicates = 10, dt = 0.25)
 
 ```
 
 Simulation replicates are aligned to the current death total and the outputs are 
-returned as a `squire_calibration` object, which has dedicated plotting functions.
+returned as a `squire_simulation` object.
 
-These allow the predicted cumulative cases based from the observed deaths to be plotted:
+These can be plotted by either extracting the desired variables again using 
+`format_output` and providing the date that the deaths relates to. E.g. for the 
+following 4 weeks:
 
-```{r cases over time}
-plot(out, what = "cases")
+```{r deaths over time}
+
+x <- format_output(calibration, var_select = c("n_E2_I"), date_0 = Sys.Date()) %>%
+  mutate(replicate = factor(replicate)) %>%
+  filter(t < 14)
+ggplot(x, aes(x = date, y = y, col = replicate)) +
+  geom_line() + ylab("Case Incidence") + xlab("Date") +
+  theme(legend.position = "none")
+
 ```
 
-Additionally, we can plot the incidence of deaths as well as the healthcare
-demands:
+Alternatively, there are a few unexposed functions for plotting these outputs:
 
-```{r healthcare over time}
-plot(out, what = "healthcare")
-```
+```{r orderly style}
 
-We can also control how far we forecast. To forecast for 14 days:
+o1 <- squire:::calibrate_output_parsing(calibration, date_0 = Sys.Date())
+a <- squire:::plot_calibration_healthcare(df = o1, data = df)
+b <- squire:::plot_calibration_healthcare_barplot(df = o1, data = df)
+c <- squire:::plot_calibration_cases(df = o1, data = df)
+d <- squire:::plot_calibration_cases_barplot(df = o1, data = df)
 
-```{r healthcare forecast over time}
-plot(out, what = "healthcare", forecast = 14)
+z <- a + b + c + d +
+  plot_layout(guides = 'collect')
+z
+
 ```

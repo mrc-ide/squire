@@ -31,18 +31,18 @@ run_explicit_SEEIR_model(
   prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
   prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
   p_dist = rep(1, length(prob_hosp)),
-  dur_E = 4.58,
-  dur_R = 2.09,
-  dur_hosp = 5,
-  dur_get_ox_survive = 6,
-  dur_get_ox_die = 3.5,
-  dur_not_get_ox_survive = 6 * 1.5,
-  dur_not_get_ox_die = dur_get_ox_die * 0.5,
-  dur_get_mv_survive = 5.5,
-  dur_get_mv_die = 4,
-  dur_not_get_mv_survive = 12,
+  dur_E = 4.6,
+  dur_IMild = 2.1,
+  dur_ICase = 4.5,
+  dur_get_ox_survive = 5,
+  dur_get_ox_die = 5,
+  dur_not_get_ox_survive = 5,
+  dur_not_get_ox_die = 5,
+  dur_get_mv_survive = 7.3,
+  dur_get_mv_die = 6,
+  dur_not_get_mv_survive = 7.3,
   dur_not_get_mv_die = 1,
-  dur_rec = 6,
+  dur_rec = 2,
   hosp_bed_capacity = NULL,
   ICU_bed_capacity = NULL,
   seeding_cases = NULL
@@ -110,34 +110,35 @@ that is not treated. Default = rep(0.95, 16)}
 \item{p_dist}{Preferentiality of age group receiving treatment relative to
 other age groups when demand exceeds healthcare capacity.}
 
-\item{dur_E}{Mean duration of incubation period (days). Default = 4.58}
+\item{dur_E}{Mean duration of incubation period (days). Default = 4.6}
 
-\item{dur_R}{Mean duration of mild infection (days). Default = 2.09}
+\item{dur_IMild}{Mean duration of mild infection (days). Default = 2.1}
 
-\item{dur_hosp}{Mean duration of hospitilsation (days). Default = 5}
+\item{dur_ICase}{Mean duration from symptom onset to hospitil admission (days).
+Default = 4.5}
 
-\item{dur_get_ox_survive}{Mean duration of oxygen given survive. Default = 6}
+\item{dur_get_ox_survive}{Mean duration of oxygen given survive. Default = 5}
 
-\item{dur_get_ox_die}{Mean duration of oxygen given death. Default = 3.5}
+\item{dur_get_ox_die}{Mean duration of oxygen given death. Default = 5}
 
 \item{dur_not_get_ox_survive}{Mean duration without oxygen given survive.
-Default = 6 * 1.5}
+Default = 5}
 
 \item{dur_not_get_ox_die}{Mean duration without  oxygen given death.
-Default = dur_get_ox_die * 0.5}
+Default = 5}
 
 \item{dur_get_mv_survive}{Mean duration of ventilation given survive.
-Default = 5.5}
+Default = 7.3}
 
-\item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 4}
+\item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 6}
 
 \item{dur_not_get_mv_survive}{Mean duration without ventilation given
-survive. Default = 12}
+survive. Default = 7.3}
 
 \item{dur_not_get_mv_die}{Mean duration without ventilation given
-death. Default = 12}
+death. Default = 1}
 
-\item{dur_rec}{Duration of recovery after coming off ventilation. Default = 6}
+\item{dur_rec}{Duration of recovery after coming off ventilation. Default = 2}
 
 \item{hosp_bed_capacity}{General bed capacity.}
 

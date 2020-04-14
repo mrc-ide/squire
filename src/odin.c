@@ -250,12 +250,12 @@ typedef struct explict_SEIR_internal {
   double gamma_get_mv_survive;
   double gamma_get_ox_die;
   double gamma_get_ox_survive;
-  double gamma_hosp;
+  double gamma_ICase;
+  double gamma_IMild;
   double gamma_not_get_mv_die;
   double gamma_not_get_mv_survive;
   double gamma_not_get_ox_die;
   double gamma_not_get_ox_survive;
-  double gamma_R;
   double gamma_rec;
   double hosp_bed_capacity;
   double *ICase1_0;
@@ -848,12 +848,12 @@ SEXP explict_SEIR_create(SEXP user) {
   internal->gamma_get_mv_survive = NA_REAL;
   internal->gamma_get_ox_die = NA_REAL;
   internal->gamma_get_ox_survive = NA_REAL;
-  internal->gamma_hosp = NA_REAL;
+  internal->gamma_ICase = NA_REAL;
+  internal->gamma_IMild = NA_REAL;
   internal->gamma_not_get_mv_die = NA_REAL;
   internal->gamma_not_get_mv_survive = NA_REAL;
   internal->gamma_not_get_ox_die = NA_REAL;
   internal->gamma_not_get_ox_survive = NA_REAL;
-  internal->gamma_R = NA_REAL;
   internal->gamma_rec = NA_REAL;
   internal->hosp_bed_capacity = NA_REAL;
   internal->ICase1_0 = NULL;
@@ -1144,12 +1144,12 @@ SEXP explict_SEIR_contents(SEXP internal_p) {
   SET_VECTOR_ELT(contents, 175, ScalarReal(internal->gamma_get_mv_survive));
   SET_VECTOR_ELT(contents, 176, ScalarReal(internal->gamma_get_ox_die));
   SET_VECTOR_ELT(contents, 177, ScalarReal(internal->gamma_get_ox_survive));
-  SET_VECTOR_ELT(contents, 178, ScalarReal(internal->gamma_hosp));
-  SET_VECTOR_ELT(contents, 179, ScalarReal(internal->gamma_not_get_mv_die));
-  SET_VECTOR_ELT(contents, 180, ScalarReal(internal->gamma_not_get_mv_survive));
-  SET_VECTOR_ELT(contents, 181, ScalarReal(internal->gamma_not_get_ox_die));
-  SET_VECTOR_ELT(contents, 182, ScalarReal(internal->gamma_not_get_ox_survive));
-  SET_VECTOR_ELT(contents, 183, ScalarReal(internal->gamma_R));
+  SET_VECTOR_ELT(contents, 178, ScalarReal(internal->gamma_ICase));
+  SET_VECTOR_ELT(contents, 179, ScalarReal(internal->gamma_IMild));
+  SET_VECTOR_ELT(contents, 180, ScalarReal(internal->gamma_not_get_mv_die));
+  SET_VECTOR_ELT(contents, 181, ScalarReal(internal->gamma_not_get_mv_survive));
+  SET_VECTOR_ELT(contents, 182, ScalarReal(internal->gamma_not_get_ox_die));
+  SET_VECTOR_ELT(contents, 183, ScalarReal(internal->gamma_not_get_ox_survive));
   SET_VECTOR_ELT(contents, 184, ScalarReal(internal->gamma_rec));
   SET_VECTOR_ELT(contents, 185, ScalarReal(internal->hosp_bed_capacity));
   SEXP ICase1_0 = PROTECT(allocVector(REALSXP, internal->dim_ICase1_0));
@@ -1704,12 +1704,12 @@ SEXP explict_SEIR_contents(SEXP internal_p) {
   SET_STRING_ELT(nms, 175, mkChar("gamma_get_mv_survive"));
   SET_STRING_ELT(nms, 176, mkChar("gamma_get_ox_die"));
   SET_STRING_ELT(nms, 177, mkChar("gamma_get_ox_survive"));
-  SET_STRING_ELT(nms, 178, mkChar("gamma_hosp"));
-  SET_STRING_ELT(nms, 179, mkChar("gamma_not_get_mv_die"));
-  SET_STRING_ELT(nms, 180, mkChar("gamma_not_get_mv_survive"));
-  SET_STRING_ELT(nms, 181, mkChar("gamma_not_get_ox_die"));
-  SET_STRING_ELT(nms, 182, mkChar("gamma_not_get_ox_survive"));
-  SET_STRING_ELT(nms, 183, mkChar("gamma_R"));
+  SET_STRING_ELT(nms, 178, mkChar("gamma_ICase"));
+  SET_STRING_ELT(nms, 179, mkChar("gamma_IMild"));
+  SET_STRING_ELT(nms, 180, mkChar("gamma_not_get_mv_die"));
+  SET_STRING_ELT(nms, 181, mkChar("gamma_not_get_mv_survive"));
+  SET_STRING_ELT(nms, 182, mkChar("gamma_not_get_ox_die"));
+  SET_STRING_ELT(nms, 183, mkChar("gamma_not_get_ox_survive"));
   SET_STRING_ELT(nms, 184, mkChar("gamma_rec"));
   SET_STRING_ELT(nms, 185, mkChar("hosp_bed_capacity"));
   SET_STRING_ELT(nms, 186, mkChar("ICase1_0"));
@@ -1884,12 +1884,12 @@ SEXP explict_SEIR_set_user(SEXP internal_p, SEXP user) {
   internal->gamma_get_mv_survive = user_get_scalar_double(user, "gamma_get_mv_survive", internal->gamma_get_mv_survive, NA_REAL, NA_REAL);
   internal->gamma_get_ox_die = user_get_scalar_double(user, "gamma_get_ox_die", internal->gamma_get_ox_die, NA_REAL, NA_REAL);
   internal->gamma_get_ox_survive = user_get_scalar_double(user, "gamma_get_ox_survive", internal->gamma_get_ox_survive, NA_REAL, NA_REAL);
-  internal->gamma_hosp = user_get_scalar_double(user, "gamma_hosp", internal->gamma_hosp, NA_REAL, NA_REAL);
+  internal->gamma_ICase = user_get_scalar_double(user, "gamma_ICase", internal->gamma_ICase, NA_REAL, NA_REAL);
+  internal->gamma_IMild = user_get_scalar_double(user, "gamma_IMild", internal->gamma_IMild, NA_REAL, NA_REAL);
   internal->gamma_not_get_mv_die = user_get_scalar_double(user, "gamma_not_get_mv_die", internal->gamma_not_get_mv_die, NA_REAL, NA_REAL);
   internal->gamma_not_get_mv_survive = user_get_scalar_double(user, "gamma_not_get_mv_survive", internal->gamma_not_get_mv_survive, NA_REAL, NA_REAL);
   internal->gamma_not_get_ox_die = user_get_scalar_double(user, "gamma_not_get_ox_die", internal->gamma_not_get_ox_die, NA_REAL, NA_REAL);
   internal->gamma_not_get_ox_survive = user_get_scalar_double(user, "gamma_not_get_ox_survive", internal->gamma_not_get_ox_survive, NA_REAL, NA_REAL);
-  internal->gamma_R = user_get_scalar_double(user, "gamma_R", internal->gamma_R, NA_REAL, NA_REAL);
   internal->gamma_rec = user_get_scalar_double(user, "gamma_rec", internal->gamma_rec, NA_REAL, NA_REAL);
   internal->hosp_bed_capacity = user_get_scalar_double(user, "hosp_bed_capacity", internal->hosp_bed_capacity, NA_REAL, NA_REAL);
   internal->ICU_bed_capacity = user_get_scalar_double(user, "ICU_bed_capacity", internal->ICU_bed_capacity, NA_REAL, NA_REAL);
@@ -2031,9 +2031,9 @@ SEXP explict_SEIR_set_user(SEXP internal_p, SEXP user) {
   internal->dim_temp = internal->N_age;
   internal->p_E1_E2 = 1 - exp(-(internal->gamma_E) * internal->dt);
   internal->p_E2_I = 1 - exp(-(internal->gamma_E) * internal->dt);
-  internal->p_ICase1_ICase2 = 1 - exp(-(internal->gamma_hosp) * internal->dt);
-  internal->p_ICase2_Hosp = 1 - exp(-(internal->gamma_hosp) * internal->dt);
-  internal->p_IMild_R = 1 - exp(-(internal->gamma_R) * internal->dt);
+  internal->p_ICase1_ICase2 = 1 - exp(-(internal->gamma_ICase) * internal->dt);
+  internal->p_ICase2_Hosp = 1 - exp(-(internal->gamma_ICase) * internal->dt);
+  internal->p_IMild_R = 1 - exp(-(internal->gamma_IMild) * internal->dt);
   internal->p_IMVGetDie1_IMVGetDie2 = 1 - exp(-(internal->gamma_get_mv_die) * internal->dt);
   internal->p_IMVGetDie2_D = 1 - exp(-(internal->gamma_get_mv_die) * internal->dt);
   internal->p_IMVGetLive1_IMVGetLive2 = 1 - exp(-(internal->gamma_get_mv_survive) * internal->dt);
@@ -2679,10 +2679,10 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
     internal->delta_R[i - 1] = internal->n_IOxGetLive2_R[i - 1] + internal->n_IOxNotGetLive2_R[i - 1] + internal->n_IRec2_R[i - 1] + internal->n_IMVNotGetLive2_R[i - 1] + internal->n_IMild_R[i - 1];
   }
   for (int i = 1; i <= internal->dim_n_E2_ICase1; ++i) {
-    internal->n_E2_ICase1[i - 1] = round(internal->n_E2_I[i - 1] * internal->prob_hosp[i - 1]);
+    internal->n_E2_ICase1[i - 1] = fround(internal->n_E2_I[i - 1] * internal->prob_hosp[i - 1], 0);
   }
   for (int i = 1; i <= internal->dim_number_requiring_IMV; ++i) {
-    internal->number_requiring_IMV[i - 1] = round(internal->n_ICase2_Hosp[i - 1] * internal->prob_severe[i - 1]);
+    internal->number_requiring_IMV[i - 1] = fround(internal->n_ICase2_Hosp[i - 1] * internal->prob_severe[i - 1], 0);
   }
   double beta = 0.0;
   cinterpolate_eval(step, internal->interpolate_beta, &beta);
@@ -2834,7 +2834,7 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
     internal->lambda[i - 1] = beta * odin_sum2(internal->s_ij, i - 1, i, 0, internal->dim_s_ij_2, internal->dim_s_ij_1);
   }
   for (int i = 1; i <= internal->dim_n_IMVGetDie1; ++i) {
-    internal->n_IMVGetDie1[i - 1] = round(internal->number_get_IMV[i - 1] * internal->prob_severe_death_treatment[i - 1]);
+    internal->n_IMVGetDie1[i - 1] = fround(internal->number_get_IMV[i - 1] * internal->prob_severe_death_treatment[i - 1], 0);
   }
   {
      int i = 1;
@@ -2914,10 +2914,10 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
     internal->n_IMVGetLive1[i - 1] = internal->number_get_IMV[i - 1] - internal->n_IMVGetDie1[i - 1];
   }
   for (int i = 1; i <= internal->dim_n_IMVNotGetDie1; ++i) {
-    internal->n_IMVNotGetDie1[i - 1] = round(internal->number_notget_IMV[i - 1] * internal->prob_severe_death_no_treatment[i - 1]);
+    internal->n_IMVNotGetDie1[i - 1] = fround(internal->number_notget_IMV[i - 1] * internal->prob_severe_death_no_treatment[i - 1], 0);
   }
   for (int i = 1; i <= internal->dim_n_IOxGetDie1; ++i) {
-    internal->n_IOxGetDie1[i - 1] = round(internal->number_get_Ox[i - 1] * internal->prob_non_severe_death_treatment[i - 1]);
+    internal->n_IOxGetDie1[i - 1] = fround(internal->number_get_Ox[i - 1] * internal->prob_non_severe_death_treatment[i - 1], 0);
   }
   for (int i = 1; i <= internal->dim_number_notget_Ox; ++i) {
     internal->number_notget_Ox[i - 1] = internal->number_requiring_Ox[i - 1] - internal->number_get_Ox[i - 1];
@@ -2941,7 +2941,7 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
     internal->n_IOxGetLive1[i - 1] = internal->number_get_Ox[i - 1] - internal->n_IOxGetDie1[i - 1];
   }
   for (int i = 1; i <= internal->dim_n_IOxNotGetDie1; ++i) {
-    internal->n_IOxNotGetDie1[i - 1] = round(internal->number_notget_Ox[i - 1] * internal->prob_non_severe_death_no_treatment[i - 1]);
+    internal->n_IOxNotGetDie1[i - 1] = fround(internal->number_notget_Ox[i - 1] * internal->prob_non_severe_death_no_treatment[i - 1], 0);
   }
   for (int i = 1; i <= internal->dim_n_S_E1; ++i) {
     internal->n_S_E1[i - 1] = Rf_rbinom(round(S[i - 1]), internal->p_S_E1[i - 1]);

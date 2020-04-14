@@ -10,8 +10,8 @@ N_age <- user() # Number of age groups
 ## RATES
 ##------------------------------------------------------------------------------
 gamma_E <- user() # rate of progression through latent infection
-gamma_R <- user() # rate of progression from mild infection to recovery
-gamma_hosp <- user() # rate of progression from symptom onset to requiring hospitalisation
+gamma_IMild <- user() # rate of progression from mild infection to recovery
+gamma_ICase <- user() # rate of progression from symptom onset to requiring hospitalisation
 
 # rate of progression through requiring oxygen compartment conditional on getting oxygen and surviving
 gamma_get_ox_survive <- user()
@@ -93,9 +93,9 @@ update(D[]) <- D[i] + delta_D[i] # Deaths
 p_S_E1[] <- 1 - exp(-lambda[i] * dt) # Infection - age dependent FOI based on mixing patterns
 p_E1_E2 <- 1 - exp(-gamma_E * dt) # Progression through latent infection
 p_E2_I <- 1 - exp(-gamma_E * dt) # Progression to onset of infectiousness. Number split between I_Mild and I_Case
-p_IMild_R <- 1 - exp(-gamma_R * dt) # Recovery from mild disease
-p_ICase1_ICase2 <- 1 - exp(-gamma_hosp * dt) # Delay between symptom onset and requiring hospitalisation
-p_ICase2_Hosp <- 1 - exp(-gamma_hosp * dt) # Progression to requiring hospitalisation. Number split between I_Oxygen and I_MV
+p_IMild_R <- 1 - exp(-gamma_IMild * dt) # Recovery from mild disease
+p_ICase1_ICase2 <- 1 - exp(-gamma_ICase * dt) # Delay between symptom onset and requiring hospitalisation
+p_ICase2_Hosp <- 1 - exp(-gamma_ICase * dt) # Progression to requiring hospitalisation. Number split between I_Oxygen and I_MV
 
 # Transition Probabilities for Those Requiring Oxygen -> Recovery
 p_IOxGetLive1_IOxGetLive2 <- 1 - exp(-gamma_get_ox_survive * dt) # Progression through requiring oxygen and receiving it -> Recovery

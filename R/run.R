@@ -144,23 +144,24 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #'   that is not treated. Default = rep(0.95, 16)
 #' @param p_dist Preferentiality of age group receiving treatment relative to
 #'   other age groups when demand exceeds healthcare capacity.
-#' @param dur_E Mean duration of incubation period (days). Default = 4.58
-#' @param dur_R Mean duration of mild infection (days). Default = 2.09
-#' @param dur_hosp Mean duration of hospitilsation (days). Default = 5
-#' @param dur_get_ox_survive Mean duration of oxygen given survive. Default = 6
-#' @param dur_get_ox_die Mean duration of oxygen given death. Default = 3.5
+#' @param dur_E Mean duration of incubation period (days). Default = 4.6
+#' @param dur_IMild Mean duration of mild infection (days). Default = 2.1
+#' @param dur_ICase Mean duration from symptom onset to hospitil admission (days).
+#'   Default = 4.5
+#' @param dur_get_ox_survive Mean duration of oxygen given survive. Default = 5
+#' @param dur_get_ox_die Mean duration of oxygen given death. Default = 5
 #' @param dur_not_get_ox_survive Mean duration without oxygen given survive.
-#'   Default = 6 * 1.5
+#'   Default = 5
 #' @param dur_not_get_ox_die Mean duration without  oxygen given death.
-#'  Default = dur_get_ox_die * 0.5
+#'  Default = 5
 #' @param dur_get_mv_survive Mean duration of ventilation given survive.
-#'   Default = 5.5
-#' @param dur_get_mv_die Mean duration of ventilation given death. Default = 4
+#'   Default = 7.3
+#' @param dur_get_mv_die Mean duration of ventilation given death. Default = 6
 #' @param dur_not_get_mv_survive Mean duration without ventilation given
-#'   survive. Default = 12
+#'   survive. Default = 7.3
 #' @param dur_not_get_mv_die Mean duration without ventilation given
-#'   death. Default = 12
-#' @param dur_rec Duration of recovery after coming off ventilation. Default = 6
+#'   death. Default = 1
+#' @param dur_rec Duration of recovery after coming off ventilation. Default = 2
 #' @param hosp_bed_capacity General bed capacity.
 #' @param ICU_bed_capacity ICU bed capacity.
 #' @param seeding_cases Initial number of cases seeding the epidemic
@@ -215,21 +216,21 @@ run_explicit_SEEIR_model <- function(
   p_dist = rep(1, length(prob_hosp)),
 
   # durations
-  dur_E  = 4.58,
-  dur_R = 2.09,
-  dur_hosp = 5,
+  dur_E  = 4.6,
+  dur_IMild = 2.1,
+  dur_ICase = 4.5,
 
-  dur_get_ox_survive = 6,
-  dur_get_ox_die = 3.5,
-  dur_not_get_ox_survive = 6 * 1.5,
-  dur_not_get_ox_die = dur_get_ox_die * 0.5,
+  dur_get_ox_survive = 5,
+  dur_get_ox_die = 5,
+  dur_not_get_ox_survive = 5,
+  dur_not_get_ox_die = 5,
 
-  dur_get_mv_survive = 5.5,
-  dur_get_mv_die = 4,
-  dur_not_get_mv_survive = 12,
+  dur_get_mv_survive = 7.3,
+  dur_get_mv_die = 6,
+  dur_not_get_mv_survive = 7.3,
   dur_not_get_mv_die = 1,
 
-  dur_rec = 6,
+  dur_rec = 2,
 
   # health system capacity
   hosp_bed_capacity = NULL,
@@ -319,7 +320,8 @@ run_explicit_SEEIR_model <- function(
 
   assert_pos(dt)
   assert_pos(dur_E)
-  assert_pos(dur_R)
+  assert_pos(dur_IMild)
+  assert_pos(dur_ICase)
   assert_pos(dur_get_ox_survive)
   assert_pos(dur_get_ox_die)
   assert_pos(dur_not_get_ox_survive)
@@ -369,8 +371,8 @@ run_explicit_SEEIR_model <- function(
 
   # durations
   gamma_E = 2 * 1/dur_E
-  gamma_R = 1/dur_R
-  gamma_hosp = 2 * 1/dur_hosp
+  gamma_IMild = 1/dur_IMild
+  gamma_ICase = 2 * 1/dur_ICase
   gamma_get_ox_survive = 2 * 1/dur_get_ox_survive
   gamma_get_ox_die = 2 * 1/dur_get_ox_die
   gamma_not_get_ox_survive = 2 * 1/dur_not_get_ox_survive
@@ -382,8 +384,8 @@ run_explicit_SEEIR_model <- function(
   gamma_rec = 2 * 1/dur_rec
 
   if (is.null(beta_set)) {
-  beta_set <- beta_est_explicit(dur_R = dur_R,
-                                dur_hosp = dur_hosp,
+  beta_set <- beta_est_explicit(dur_IMild = dur_IMild,
+                                dur_ICase = dur_ICase,
                                 prob_hosp = prob_hosp,
                                 mixing_matrix = process_contact_matrix_scaled_age(contact_matrix_set[[1]], population),
                                 R0 = R0)
@@ -421,8 +423,8 @@ run_explicit_SEEIR_model <- function(
                R_0 = mod_init$R,
                D_0 = mod_init$D,
                gamma_E = gamma_E,
-               gamma_R = gamma_R,
-               gamma_hosp = gamma_hosp,
+               gamma_IMild = gamma_IMild,
+               gamma_ICase = gamma_ICase,
                gamma_get_ox_survive = gamma_get_ox_survive,
                gamma_get_ox_die = gamma_get_ox_die,
                gamma_not_get_ox_survive = gamma_not_get_ox_survive,
