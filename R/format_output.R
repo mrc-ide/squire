@@ -110,7 +110,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
       if (compartments[i] %in% single_compartments) {
         new_compartments <- c(new_compartments, compartments[i])
       } else {
-        temp <- unique(all_names_simp[grepl(paste0("^", compartments[], "[1-2]"), all_names_simp)])
+        temp <- unique(all_names_simp[grepl(paste0("^", compartments[i], "[1-2]"), all_names_simp)])
         new_compartments <- c(new_compartments, temp)
       }
     }
@@ -126,7 +126,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   if (!is.null(var_select) & !is.null(summaries)) {
     summaries_output_list <- vector(mode = "list", length = length(summaries))
     for (i in 1:length(summaries)) {
-      indices <- which(summaries[i] %in% summary_variables)
+      indices <- which(summary_variables %in% summaries[i])
       temp_compartments <- summary_variable_compartments[[indices]]
       summaries_output_list[[i]] <- odin_sv(x$output[,unlist(index[temp_compartments]),], replicates = x$parameters$replicates, nt = nt)
     }
@@ -166,12 +166,14 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
     out <- out %>%
       dplyr::mutate(compartment = gsub("[1-2]$", "", .data$compartment)) %>%
       dplyr::group_by(.data$replicate, .data$age_group, .data$compartment, .data$date) %>%
-      dplyr::summarise(y = sum(.data$y))
+      dplyr::summarise(y = sum(.data$y)) %>%
+      dplyr::ungroup()
   } else if (combine_compartments == TRUE & reduce_age == TRUE) {
     out <- out %>%
       dplyr::mutate(compartment = gsub("[1-2]$", "", .data$compartment)) %>%
       dplyr::group_by(.data$replicate, .data$compartment, .data$date) %>%
-      dplyr::summarise(y = sum(.data$y))
+      dplyr::summarise(y = sum(.data$y)) %>%
+      dplyr::ungroup()
   }
 
   return(out)
