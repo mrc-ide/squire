@@ -133,6 +133,10 @@ This plot will plot each of the compartments of the model output. We can also pl
 ```{r subset variables plot}
 plot(r, var_select = c("E", "IMild"))
 ```
+Or, you can specify one of `deaths`, `infections`, `hospital_occupancy`, `ICU_occupancy`, `hospital_demand` or `ICU_demand`, and plot these summary metrics that represent the combintion of a number of different compartment e.g:
+```{r subset variables plot}
+plot(r, var_select = c("deaths"))
+```
 
 All of the plotting above makes uses of the `squire` function `format_output` which provides you with a means of manipulating and managing the output from a `run_explicit_SEEIR_model` call. Using it you can specify the model outputs (e.g. compartments) you want, as well as whether you want that output aggregated over age or not. Here we extract the latent compartment (E). The data columns correspond to the compartment name (`compartment`), timestep (`t`), model run number (`replicate`) and the model output (`y`). 
 
@@ -199,7 +203,7 @@ r <- run_explicit_SEEIR_model(population = population,
                               time_period = 200,
                               dt = 0.1,
                               replicates = 5)
-plot(r, var_select = "n_E2_I")
+plot(r, var_select = "infections")
 ```
 where `n_E2_I` is the daily number of new infections.
 
@@ -217,7 +221,7 @@ r <- run_explicit_SEEIR_model(population = population,
                               time_period = 220,
                               dt = 0.1,
                               replicates = 5)
-plot(r, var_select = "n_E2_I")
+plot(r, var_select = "infections")
 ```
 
 Alternatively, we could set a changing R0, which falls below 1 after 50 days:
@@ -232,16 +236,34 @@ r <- run_explicit_SEEIR_model(population = population,
                               time_period = 200,
                               dt = 0.1,
                               replicates = 5)
-plot(r, var_select = "n_E2_I")
+plot(r, var_select = "infections")
+```
+
+The model in squire also allows you to alter healthcare capacity. Default values for the arguments `hosp_bed_capacity` and `ICU_capacity` are taken from the World Bank and a systematic review of the literature. However, you can also specify your own:
+
+``` {r change healthcare capacity}
+
+library(patchwork)
+
+r <- run_explicit_SEEIR_model(population = population, 
+                              contact_matrix_set = contact_matrix,
+                              R0 = 2.5, 
+                              time_period = 200,
+                              dt = 0.1,
+                              replicates = 15,
+                              hosp_bed_capacity = 1000,
+                              ICU_bed_capacity = 100)
+
+c <- plot(r, var_select = "hospital_occupancy")
+d <- plot(r, var_select = "ICU_occupancy")
+c / d 
+
+
 ```
 
 ### 3. Extracting and Plotting Relevant Outputs  
 
-Alternative summaries of the models can be created, which give commonly reported
-measures, such as deaths, number of ICU beds and general hospital beds required. 
-
-These could be created by using the `format_output` on the output and selecting relevant 
-compartments but this is quite slow to do, so we provide some helper functions. These include:
+Whilst the above provides quick and easy ways to plot relevant outputs, we recognise users might want to play around with the data themselves. This can be done with the `format_output` function. 
 
 
 ```{r untransformed}
@@ -251,21 +273,25 @@ library(dplyr)
 
 x <- run_explicit_SEEIR_model(country = "Afghanistan", hosp_bed_capacity = 500, ICU_bed_capacity = 1000)
 
-deaths <- extract_deaths(r)
+deaths <- format_output(x = x, var_select = "deaths") %>%
+  mutate(replicate = factor(replicate))
 a <- ggplot(deaths, aes(x = t, y = y, col = replicate)) +
   geom_line() + ylab("Daily Deaths")
 
-infection_incidence <- extract_infection_incidence(r)
-b <- ggplot(infection_incidence, aes(x = t, y = y, col = replicate)) +
-  geom_line() + ylab("Case Incidence")
+infections <- format_output(x = x, var_select = "infections") %>%
+  mutate(replicate = factor(replicate))
+b <- ggplot(infections, aes(x = t, y = y, col = replicate)) +
+  geom_line() + ylab("Daily Infections")
 
-hosp_occ <- extract_hospital_occ(r)
-c <- ggplot(hosp_occ, aes(x = t, y = y, col = replicate)) +
+hosp_bed <- format_output(x = x, var_select = "hospital_occupancy") %>%
+  mutate(replicate = factor(replicate))
+c <- ggplot(hosp_bed, aes(x = t, y = y, col = replicate)) +
   geom_line() + ylab("Hospital Bed Occupancy")
 
-ICU_occ <- extract_ICU_occ(r)
-d <- ggplot(ICU_occ, aes(x = t, y = y, col = replicate)) +
-  geom_line() + ylab("ICU Occupancy")
+ICU_bed <- format_output(x = x, var_select = "ICU_occupancy") %>%
+  mutate(replicate = factor(replicate))
+d <- ggplot(ICU_bed, aes(x = t, y = y, col = replicate)) +
+  geom_line() + ylab("ICU Bed Occupancy")
 
 z <- a + b + c + d +
   plot_layout(guides = 'collect')
@@ -275,16 +301,14 @@ z
 
 ### 4.  Calibrating the Model to Observed Deaths Data
 
-The model can be simply calibrated to the cumulative time series of deaths reported in settings. 
-This can be done using the `calibrate` function. For example, let's generate some dummy time series
-data and calibrate to it:
+The model can be simply calibrated to the cumulative time series of deaths reported in settings. This can be done using the `calibrate` function. For example, let's generate some dummy time series data and calibrate to it:
 
 ```{r example data}
 df <- squire:::death_data_format(reporting_quality = 1)
 df
 ```
 
-Then to calibrate to this:
+Then to calibrate to this dummy data and visualise the full epidemic curve, we do the following. Note that simulation replicates are aligned to the current death total and the outputs are returned as a `squire_simulation` object. 
 
 ```{r calibration}
 calibration <- calibrate(country = "Afghanistan", deaths = max(df$deaths), 
@@ -292,38 +316,22 @@ calibration <- calibrate(country = "Afghanistan", deaths = max(df$deaths),
                          seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
                          min_seeding_cases = 5, max_seeding_cases = 50,
                          replicates = 10, dt = 0.25)
+
+plot(calibration, var_select = "infections", date_0 = Sys.Date())
+
 ```
 
-Simulation replicates are aligned to the current death total and the outputs are 
-returned as a `squire_simulation` object.
-
-These can be plotted by either extracting the desired variables again using 
-`format_output` and providing the date that the deaths relates to. E.g. for the 
-following 4 weeks:
+In the above, we visualise the full epidemic curve, but to examine short term model estimates of the epidemic trajectory (e.g. up to 14 days ahead), we can do the following: 
 
 ```{r deaths over time}
 
-x <- format_output(calibration, var_select = c("n_E2_I"), date_0 = Sys.Date()) %>%
+x <- format_output(calibration, var_select = "infections", date_0 = Sys.Date())
+x <- x %>%
   mutate(replicate = factor(replicate)) %>%
   filter(t < 14)
 ggplot(x, aes(x = date, y = y, col = replicate)) +
   geom_line() + ylab("Case Incidence") + xlab("Date") +
   theme(legend.position = "none")
 
-```
-
-Alternatively, there are a few unexposed functions for plotting these outputs:
-
-```{r orderly style}
-
-o1 <- squire:::calibrate_output_parsing(calibration, date_0 = Sys.Date())
-a <- squire:::plot_calibration_healthcare(df = o1, data = df)
-b <- squire:::plot_calibration_healthcare_barplot(df = o1, data = df)
-c <- squire:::plot_calibration_cases(df = o1, data = df)
-d <- squire:::plot_calibration_cases_barplot(df = o1, data = df)
-
-z <- a + b + c + d +
-  plot_layout(guides = 'collect')
-z
 
 ```
