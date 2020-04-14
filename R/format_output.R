@@ -100,7 +100,9 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   if(is.null(var_select)) {
     compartments <- unique(all_names_simp[!all_names_simp %in% c("step", "time")])
     compartment_output_list <- lapply(compartments, function(j) {
-      odin_sv(x$output[,unlist(index[j]),], replicates = x$parameters$replicates, nt = nt, reduce_age)
+      temp <- x$output[,unlist(index[j]),]
+      temp_array <- array(temp, dim = c(dim(temp)[1], dim(temp)[2], x$parameters$replicates))
+      odin_sv(temp_array, replicates = x$parameters$replicates, nt = nt, reduce_age)
     })
     names(compartment_output_list) <- compartments
   } else if (!is.null(var_select) & !is.null(compartments)) {
@@ -115,7 +117,9 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
       }
     }
     compartment_output_list <- lapply(new_compartments, function(j) {
-      odin_sv(x$output[,unlist(index[j]),], replicates = x$parameters$replicates, nt = nt, reduce_age)
+      temp <- x$output[,unlist(index[j]),]
+      temp_array <- array(temp, dim = c(dim(temp)[1], dim(temp)[2], x$parameters$replicates))
+      odin_sv(temp_array, replicates = x$parameters$replicates, nt = nt, reduce_age)
     })
     names(compartment_output_list) <- new_compartments
   } else {
@@ -128,7 +132,9 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
     for (i in 1:length(summaries)) {
       indices <- which(summary_variables %in% summaries[i])
       temp_compartments <- summary_variable_compartments[[indices]]
-      summaries_output_list[[i]] <- odin_sv(x$output[,unlist(index[temp_compartments]),], replicates = x$parameters$replicates, nt = nt, reduce_age)
+      temp <- x$output[,unlist(index[temp_compartments]),]
+      temp_array <- array(temp, dim = c(dim(temp)[1], dim(temp)[2], x$parameters$replicates))
+      summaries_output_list[[i]] <- odin_sv(temp_array, replicates = x$parameters$replicates, nt = nt, reduce_age)
     }
     names(summaries_output_list) <- summaries
   } else {
@@ -141,12 +147,12 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
 
   # generating df of extracted compartment/summary outputs, disaggregated by age or not
   if (reduce_age == TRUE) {
-    out <- data.frame("date" = as.numeric(x$output[,index$time,]),
+    out <- data.frame("t" = as.numeric(x$output[,index$time,]),
                       "replicate" = as.numeric(mapply(rep, seq_len(x$parameters$replicates), nt)),
                       "compartment" = as.character(mapply(rep, vars, nt*x$parameters$replicates)),
                       "y" = unlist(output_list))
   } else {
-    out <- data.frame("date" = rep(as.numeric(x$output[,index$time, ]), 17), # ASK OJ TO CHECK THIS
+    out <- data.frame("t" = rep(as.numeric(x$output[,index$time, ]), 17), # ASK OJ TO CHECK THIS
                       "age_group" = rep(1:17, each = nt), ##### NEED TO CHANGE ####
                       "replicate" = as.numeric(mapply(rep, seq_len(x$parameters$replicates), 17 * nt)),
                       "compartment" = as.character(mapply(rep, vars, 17*nt*x$parameters$replicates)),
@@ -165,13 +171,13 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   if (combine_compartments == TRUE & reduce_age == FALSE) {
     out <- out %>%
       dplyr::mutate(compartment = gsub("[1-2]$", "", .data$compartment)) %>%
-      dplyr::group_by(.data$replicate, .data$age_group, .data$compartment, .data$date) %>%
+      dplyr::group_by(.data$replicate, .data$age_group, .data$compartment, .data$t) %>%
       dplyr::summarise(y = sum(.data$y)) %>%
       dplyr::ungroup()
   } else if (combine_compartments == TRUE & reduce_age == TRUE) {
     out <- out %>%
       dplyr::mutate(compartment = gsub("[1-2]$", "", .data$compartment)) %>%
-      dplyr::group_by(.data$replicate, .data$compartment, .data$date) %>%
+      dplyr::group_by(.data$replicate, .data$compartment, .data$t) %>%
       dplyr::summarise(y = sum(.data$y)) %>%
       dplyr::ungroup()
   }
