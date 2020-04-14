@@ -10,10 +10,14 @@ test_that("output format works", {
   o1 <- format_output_simple_model(r1)
   o2 <- format_output_simple_model(r1, reduce_age = FALSE)
   o3 <- collapse_for_report(format_output_simple_model(r1, reduce_age = FALSE))
+  o4 <- format_output_simple_model(r1, var_select = "E")
+  o5 <- format_output_simple_model(r1, var_select = "E", date_0 = Sys.Date())
 
   expect_type(o1, "list")
   expect_type(o2, "list")
   expect_type(o3, "list")
+  expect_type(o4, "list")
+  expect_type(o5, "list")
 
   pop <- get_population("Afghanistan", simple_SEIR = FALSE)
   m1 <- run_explicit_SEEIR_model(R0 = 2,
@@ -56,6 +60,8 @@ test_that("output format works", {
 
   expect_error(format_output(m1, reduce_age = FALSE, date_0 = "wrong"))
   expect_error(format_output(m1, var_select = "moon"))
+  expect_error(format_output_simple_model(m1, var_select = "moon"))
+
 })
 
 test_that("new helper functions to extract relevant outputs", {

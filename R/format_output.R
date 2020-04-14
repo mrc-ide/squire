@@ -1,5 +1,3 @@
-
-
 #' Collapse age groups in output
 #'
 #' Sums over age groups for each compartment
@@ -64,8 +62,6 @@ collapse_for_report <- function(d){
 format_output <- function(x, var_select = NULL, reduce_age = TRUE,
                           combine_compartments = TRUE, date_0 = NULL){
 
-
-
   # Get relevant model details
   nt <- nrow(x$output)
   index <- odin_index(x$model)
@@ -89,7 +85,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
     stop("Selected variable are not all present in output")
   }
 
-  # Disaggregating var_select into compartments vs summary variables
+  # Disaggregating var_select into compartments and summary variables
   compartments <- var_select[!(var_select %in% summary_variables)]
   compartments <- if (identical(compartments, character(0))) NULL else compartments
   summaries <- var_select[var_select %in% summary_variables]
@@ -248,8 +244,6 @@ format_output_simple_model <- function(x, var_select = NULL, reduce_age = TRUE,
       odin_sv(temp_array, replicates = x$parameters$replicates, nt = nt, reduce_age)
     })
     names(compartment_output_list) <- new_compartments
-  } else {
-    compartment_output_list <- list()
   }
 
   # combining outputs for compartments and overall summaries into 1 list
