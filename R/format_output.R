@@ -97,10 +97,11 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
 
   # Check var_select contains only variables described above
   if(sum(!(var_select %in% c(single_compartments, multi_compartments, summary_variables))) > 0) {
-    stop("Selected variable are not all present in output. Either specify a compartment:\n",
-         paste0(c(single_compartments, c("\n",multi_compartments)),sep=", "),
-         "\n or a summary compartment:\n",
-         paste0(summary_variables, collapse = " "))
+    stop("Selected variable are not all present in output. Either specify a compartment:\n\n",
+         paste0(c(paste0(single_compartments, collapse = ","), "\n\n",
+                  paste0(multi_compartments, collapse = ","))),
+         "\n\nor a summary compartment:\n\n",
+         paste0(summary_variables, collapse = ", "))
   }
 
   # Disaggregating var_select into compartments and summary variables
