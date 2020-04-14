@@ -52,9 +52,20 @@ collapse_for_report <- function(d){
 #' Format model output as data.frame
 #'
 #' @param x squire_simulation object
-#' @param var_select Vector of compartment names, e.g. \code{c("S", "R")}
-#' @param reduce_age Collapse age-dimension
-#' @param combine_compartments Collapse compartments of same type together (e.g. E1 and E2 -> E)
+#' @param var_select Vector of compartment names, e.g. \code{c("S", "R")}. In
+#'   addition a number of summary compartment can be requested. These include:
+#' \itemize{
+#'       \item{"deaths"}{ Daily Deaths }
+#'       \item{"infections"}{ Daily Infections }
+#'       \item{"hospital_occupancy"}{ Occupied Hospital Beds }
+#'       \item{"ICU_occupancy"}{ Occupied ICU Beds }
+#'       \item{"hospital_demand}{ Required Hospital Beds }
+#'       \item{"ICU_demand}{ Required ICU Beds }
+#'       }
+#' @param reduce_age Collapse age-dimension, calculating the total in the
+#'   compartment.
+#' @param combine_compartments Collapse compartments of same type together
+#'   (e.g. E1 and E2 -> E)
 #' @param date_0 Date of time 0, if specified a date column will be added
 #'
 #' @return Formatted long data.frame
@@ -74,15 +85,22 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
                           "IMVGetLive", "IMVGetDie", "IMVNotGetLive", "IMVNotGetDie", "IRec")
 
   # Summary Values and Relevant Compartments
-  summary_variables <- c("deaths", "infections", "hospital_occupancy", "ICU_occupancy")
+  summary_variables <- c("deaths", "infections", "hospital_occupancy", "ICU_occupancy", "hospital_demand", "ICU_demand")
   summary_variable_compartments <- list(deaths = "delta_D",
                                         infections = "n_E2_I",
                                         hospital_occupancy = c("IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2", "IRec1", "IRec2"),
-                                        ICU_occupancy = c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2"))
+                                        ICU_occupancy = c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2"),
+                                        hospital_demand = c("IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2", "IRec1", "IRec2",
+                                                            "IOxNotGetLive1","IOxNotGetLive2","IOxNotGetDie1","IOxNotGetDie2"),
+                                        ICU_demand = c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2",
+                                                       "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2"))
 
   # Check var_select contains only variables described above
   if(sum(!(var_select %in% c(single_compartments, multi_compartments, summary_variables))) > 0) {
-    stop("Selected variable are not all present in output")
+    stop("Selected variable are not all present in output. Either specify a compartment:\n",
+         paste0(c(single_compartments, c("\n",multi_compartments)),sep=", "),
+         "\n or a summary compartment:\n",
+         paste0(summary_variables, collapse = " "))
   }
 
   # Disaggregating var_select into compartments and summary variables

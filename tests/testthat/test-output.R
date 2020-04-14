@@ -28,6 +28,7 @@ test_that("output format works", {
                                  contact_matrix_set=contact_matrices[[1]])
 
   o1 <- format_output(m1)
+  expect_true(all(table(o1$compartment) == 100))
   o2 <- format_output(m1, reduce_age = FALSE)
   o3 <- collapse_for_report(format_output(m1, reduce_age = FALSE))
   o4 <- format_output(m1, reduce_age = FALSE, date_0 = Sys.Date())
@@ -128,5 +129,19 @@ test_that("t correct in format_outputs",{
 
   expect_equal(length(get$compartment), 1/0.5 * r$parameters$replicates * r$parameters$time_period)
   expect_named(get, c("replicate", "compartment", "t", "y", "date"))
+
+})
+
+
+test_that("calibrate_output_parsing vs format_output",{
+
+  m1 <- calibrate(country = "Afghanistan", deaths = 6,
+                       reporting_fraction = 1, dt=0.5, replicates = 3,
+                       time_period = 365)
+
+  o1 <- format_output(m1, c("R","deaths","infections","hospital_demand","ICU_demand"))
+  g2 <- calibrate_output_parsing(m1)
+  expect_identical(o1$y[o1$replicate == 1 & o1$compartment == "ICU_demand"],
+                   g2$y[g2$replicate == 1 & g2$compartment == "ICU"])
 
 })
