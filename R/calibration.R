@@ -10,6 +10,7 @@
 #' @param dt dt
 #' @param ... Further aguments for \code{run_explicit_SEEIR_model()}
 #'
+#' @export
 #' @return List of time adjusted squire_simulations
 calibrate <- function(country, deaths, reporting_fraction = 1,
                       seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),

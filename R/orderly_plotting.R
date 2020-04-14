@@ -203,7 +203,7 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
   sub <- df[df$compartment %in% c("mild_cases", "hospital_cases") &
               df$date <=  Sys.Date() + forecast,] %>%
     dplyr::group_by(.data$date, .data$replicate) %>%
-    dplyr::summarise(y = sum(y))
+    dplyr::summarise(y = sum(.data$y))
 
 
   pd_group <- dplyr::group_by(sub, .data$date) %>%
