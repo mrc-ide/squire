@@ -1,3 +1,10 @@
+#' Get supported countries
+#'
+#' @export
+get_countries <-  function() {
+  unique(population$country)
+}
+
 #' Get population data
 #'
 #' @param country Country name
