@@ -23,5 +23,10 @@ test_that("cases and healthcare plotting works", {
   expect_s3_class(plot_calibration_cases(df = o1, data = df), "gg")
   expect_s3_class(plot_calibration_cases_barplot(df = o1, data = df), "gg")
 
+  x <- death_data_format(date = NULL,
+                         deaths = NULL,
+                         cases = NULL)
+  expect_type(x, "list")
+
 
 })

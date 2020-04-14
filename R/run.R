@@ -92,7 +92,7 @@ run_simple_SEEIR_model <- function(R0 = 3,
                 tt_contact_matrix = tt_contact_matrix,
                 time_period = time_period, replicates = replicates)
 
-  out <- list(output = results, parameters = parameters)
+  out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
   return(out)
 }
