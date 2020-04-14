@@ -7,16 +7,13 @@ test_that("output format works", {
                         time_period = 10,
                         replicates = 10,
                         contact_matrix_set=contact_matrices[[1]])
-  o1 <- format_output(r1)
-  o2 <- format_output(r1, reduce_age = FALSE)
-  o3 <- collapse_for_report(format_output(r1, reduce_age = FALSE))
-
+  o1 <- format_output_simple_model(r1)
+  o2 <- format_output_simple_model(r1, reduce_age = FALSE)
+  o3 <- collapse_for_report(format_output_simple_model(r1, reduce_age = FALSE))
 
   expect_type(o1, "list")
   expect_type(o2, "list")
   expect_type(o3, "list")
-  expect_named(o1, c("compartment", "t",  "replicate", "y"))
-  expect_named(o2, c("replicate", "age_group", "compartment", "t",  "y"))
 
   pop <- get_population("Afghanistan", simple_SEIR = FALSE)
   m1 <- run_explicit_SEEIR_model(R0 = 2,
@@ -32,6 +29,9 @@ test_that("output format works", {
   o4 <- format_output(m1, reduce_age = FALSE, date_0 = Sys.Date())
   o5 <- format_output(m1, var_select = c("E", "ICase"))
   o6 <- format_output(m1, var_select = c("E", "IMild"))
+  o7 <- format_output(m1, var_select = NULL)
+  o8 <- format_output(m1, var_select = "E", combine_compartments = FALSE)
+  o9 <- format_output(m1, var_select = "deaths")
 
   expect_type(o1, "list")
   expect_type(o2, "list")
@@ -39,14 +39,20 @@ test_that("output format works", {
   expect_type(o4, "list")
   expect_type(o5, "list")
   expect_type(o6, "list")
+  expect_type(o7, "list")
+  expect_type(o8, "list")
+  expect_type(o9, "list")
 
-  expect_named(o1, c("compartment", "t", "replicate", "y"))
-  expect_named(o2, c("replicate", "age_group", "compartment","t", "y"))
+  expect_named(o1, c("replicate", "compartment", "t", "y"))
+  expect_named(o2, c("replicate", "age_group", "compartment", "t",  "y"))
   expect_named(o3, c("compartment", "t", "replicate", "y"))
   expect_true(all(c("hospital","ICU","IMild","deaths") %in% unique(o3$compartment)))
   expect_named(o4, c("replicate", "age_group", "compartment", "t", "y", "date"))
-  expect_named(o5, c("compartment", "t", "replicate", "y"))
-  expect_named(o6, c("compartment", "t", "replicate", "y"))
+  expect_named(o5, c("replicate", "compartment", "t", "y"))
+  expect_named(o6, c("replicate", "compartment", "t", "y"))
+  expect_named(o7, c("replicate", "compartment", "t", "y"))
+  expect_named(o8, c("t", "replicate", "compartment", "y"))
+  expect_named(o9, c("replicate", "compartment", "t", "y"))
 
   expect_error(format_output(m1, reduce_age = FALSE, date_0 = "wrong"))
   expect_error(format_output(m1, var_select = "moon"))
@@ -62,9 +68,9 @@ test_that("new helper functions to extract relevant outputs", {
                                  replicates = 10,
                                  contact_matrix_set=contact_matrices[[1]])
   deaths <- extract_deaths(m1)
-  expect_named(deaths, c("compartment", "t", "replicate", "y"))
+  expect_named(deaths, c("replicate", "compartment", "t", "y"))
   infection_incidence <- extract_infection_incidence(m1)
-  expect_named(infection_incidence, c("compartment", "t", "replicate", "y"))
+  expect_named(infection_incidence, c("replicate", "compartment", "t", "y"))
   hospital_occ <- extract_hospital_occ(m1)
   expect_named(hospital_occ, c("t", "replicate", "y"))
   ICU_occ <- extract_ICU_occ(m1)
@@ -103,12 +109,18 @@ test_that("squire object check and summary", {
 test_that("t correct in format_outputs",{
 
   r <- calibrate(country = "Afghanistan", deaths = 6,
-                 reporting_fraction = 1, dt=1, replicates = 10,
+                 reporting_fraction = 1, dt=0.5, replicates = 3,
                  time_period = 365)
-  get <- format_output(r, reduce_age = FALSE, combine_compartments = FALSE,
+  get <- format_output(r, var_select = "E", reduce_age = FALSE, combine_compartments = TRUE,
                        date_0 = Sys.Date())
 
-  expect_true(table(table(get[get$replicate==1 & get$compartment == "D",]$t)) == 365)
-  expect_true(table(table(get[get$replicate==1 & get$compartment == "D",]$date)) == 365)
+  expect_equal(length(get$compartment), 1/0.5 * 17 * r$parameters$replicates * r$parameters$time_period)
+  expect_named(get, c("replicate", "age_group", "compartment", "t", "y", "date"))
+
+  get <- format_output(r, var_select = "E", reduce_age = TRUE, combine_compartments = TRUE,
+                       date_0 = Sys.Date())
+
+  expect_equal(length(get$compartment), 1/0.5 * r$parameters$replicates * r$parameters$time_period)
+  expect_named(get, c("replicate", "compartment", "t", "y", "date"))
 
 })
