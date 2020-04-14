@@ -151,4 +151,15 @@ test_that("calibrate_output_parsing vs format_output",{
   expect_true(identical(rowSums(m1$output[,mv,1]),
                         o1$y[o1$replicate == 1 & o1$compartment == "ICU_demand"]))
 
+  expect_true(identical(rowSums(m1$output[,mv,2]),
+                        o1$y[o1$replicate == 2 & o1$compartment == "ICU_demand"]))
+
+  expect_true(identical(rowSums(m1$output[,mv,1]),
+                        g2$y[g2$replicate == 1 & g2$compartment == "ICU"]))
+
+  expect_true(identical(rowSums(m1$output[,mv,2]),
+                        g2$y[g2$replicate == 2 & g2$compartment == "ICU"]))
+
+
+
 })
