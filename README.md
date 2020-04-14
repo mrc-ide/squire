@@ -160,8 +160,63 @@ two ojects:
 plot(r)
 ```
 
-<img src="man/figures/README-base plot-1.png" width="100%" /> This plot
-will plot each of the compartments of the model output.
+<img src="man/figures/README-base plot-1.png" width="100%" />
+
+This plot will plot each of the compartments of the model output. We can
+also plot specific compartments using the `var_select` argument that can
+be passed to `plot()`. Arguments passed to `var_select` must be one of
+the variables in the plot
+above.
+
+``` r
+plot(r, var_select = c("E", "IMild"))
+```
+
+<img src="man/figures/README-subset variables plot-1.png" width="100%" />
+
+All of the plotting above makes uses of the `squire` function
+`format_output` which provides you with a means of manipulating and
+managing the output from a `run_explicit_SEEIR_model` call. Using it you
+can specify the model outputs (e.g. compartments) you want, as well as
+whether you want that output aggregated over age or not. Here we extract
+the latent compartment (E). The data columns correspond to the
+compartment name (`compartment`), timestep (`t`), model run number
+(`replicate`) and the model output (`y`).
+
+``` r
+
+output <- format_output(r, var_select = "E")
+head(output)
+#> # A tibble: 6 x 4
+#>   compartment     t replicate     y
+#>   <chr>       <dbl>     <int> <dbl>
+#> 1 E             0.1         1    20
+#> 2 E             0.1         2    20
+#> 3 E             0.1         3    20
+#> 4 E             0.1         4    20
+#> 5 E             0.1         5    20
+#> 6 E             0.1         6    20
+```
+
+If we wanted age-disaggregated data, we could set `reduce_age` to
+`FALSE` which will generate the same dataframe as before, but with an
+additional column indicating the age-group.
+
+``` r
+
+output <- format_output(r, var_select = "E", reduce_age = FALSE)
+head(output)
+#> # A tibble: 6 x 5
+#> # Groups:   replicate, age_group, compartment [1]
+#>   replicate age_group compartment     t     y
+#>       <int>     <int> <chr>       <dbl> <dbl>
+#> 1         1         1 E             0.1     0
+#> 2         1         1 E             0.2     0
+#> 3         1         1 E             0.3     0
+#> 4         1         1 E             0.4     0
+#> 5         1         1 E             0.5     0
+#> 6         1         1 E             0.6     0
+```
 
 ### 2\. Changing parameters in the model.
 
@@ -192,32 +247,41 @@ r <- run_explicit_SEEIR_model(population = population,
                               contact_matrix_set = contact_matrix,
                               R0 = 2.5, 
                               time_period = 200,
-                              dt = 1,
+                              dt = 0.1,
                               replicates = 5)
 plot(r)
+#> Warning in plot.squire_simulation(r): Summary statistic estimated from <10
+#> replicates
+#> Warning in plot.squire_simulation(r): Confidence bounds estimated from <10
+#> replicates
 ```
 
 <img src="man/figures/README-set params-1.png" width="100%" />
 
 We can also change the R0 and contact matrix at set time points, to
 reflect changing behaviour resulting from interventions. For example to
-set a 80% reduction in the contact matrix after 50 days :
+set a 80% reduction in the contact matrix after 100 days :
 
 ``` r
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
-                              tt_contact_matrix = c(0, 50),
+                              tt_contact_matrix = c(0, 100),
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2),
                               R0 = 2.5, 
                               time_period = 200,
-                              dt = 1,
+                              dt = 0.1,
                               replicates = 5)
-plot(r)
+plot(r, var_select = "n_E2_I")
+#> Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Summary statistic
+#> estimated from <10 replicates
+#> Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Confidence bounds
+#> estimated from <10 replicates
 ```
 
 <img src="man/figures/README-set contact matrix decrease-1.png" width="100%" />
+where `n_E2_I` is the daily number of new infections.
 
 To show an 80% reduction after 50 days but only maintained for 30 days :
 
@@ -225,15 +289,19 @@ To show an 80% reduction after 50 days but only maintained for 30 days :
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
-                              tt_contact_matrix = c(0, 50, 80),
+                              tt_contact_matrix = c(0, 80, 120),
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2,
                                                         contact_matrix),
                               R0 = 2.5, 
-                              time_period = 200,
-                              dt = 1,
+                              time_period = 220,
+                              dt = 0.1,
                               replicates = 5)
-plot(r)
+plot(r, var_select = "n_E2_I")
+#> Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Summary statistic
+#> estimated from <10 replicates
+#> Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Confidence bounds
+#> estimated from <10 replicates
 ```
 
 <img src="man/figures/README-set contact matrix decrease and relax-1.png" width="100%" />
@@ -246,12 +314,16 @@ days:
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               contact_matrix_set = contact_matrix,
-                              tt_R0 = c(0, 50),
+                              tt_R0 = c(0, 80),
                               R0 = c(2.5, 0.9),
                               time_period = 200,
-                              dt = 1,
+                              dt = 0.1,
                               replicates = 5)
-plot(r)
+plot(r, var_select = "n_E2_I")
+#> Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Summary statistic
+#> estimated from <10 replicates
+#> Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Confidence bounds
+#> estimated from <10 replicates
 ```
 
 <img src="man/figures/README-set R0 decrease-1.png" width="100%" />
@@ -262,99 +334,110 @@ Alternative summaries of the models can be created, which give commonly
 reported measures, such as deaths, number of ICU beds and general
 hospital beds required.
 
-These could be created by using the outputs seen in the previous
-section, e.g. `r$output$ICase1 + r$output$ICase2` to get the total
-symptomatic cases.
-
-However, accessing outputs this waus is much slower. A quicker way is to
-change the simulation output with `output_transform = FALSE`, which will
-not transform the outputs produced by odin.
+These could be created by using the `format_output` on the output and
+selecting relevant compartments but this is quite slow to do, so we
+provide some helper functions. These include:
 
 ``` r
-# run the model
-r <- run_explicit_SEEIR_model(country = "Afghanistan",
-                              output_transform = FALSE)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+
+x <- run_explicit_SEEIR_model(country = "Afghanistan", hosp_bed_capacity = 500, ICU_bed_capacity = 1000)
+
+deaths <- extract_deaths(r)
+a <- ggplot(deaths, aes(x = t, y = y, col = replicate)) +
+  geom_line() + ylab("Daily Deaths")
+
+infection_incidence <- extract_infection_incidence(r)
+b <- ggplot(infection_incidence, aes(x = t, y = y, col = replicate)) +
+  geom_line() + ylab("Case Incidence")
+
+hosp_occ <- extract_hospital_occ(r)
+c <- ggplot(hosp_occ, aes(x = t, y = y, col = replicate)) +
+  geom_line() + ylab("Hospital Bed Occupancy")
+
+ICU_occ <- extract_ICU_occ(r)
+d <- ggplot(ICU_occ, aes(x = t, y = y, col = replicate)) +
+  geom_line() + ylab("ICU Occupancy")
+
+z <- a + b + c + d +
+  plot_layout(guides = 'collect')
+z
 ```
 
-To access the outputs we can use `untransformed_output`, specifying  
-which compartments are to be returned, and which specific summary
-outputs related to case incidence, death incidence and hospital bed
-demands are needed:
-
-``` r
-
-gcu <- untransformed_output(r, compartments = c("S", "R"),
-                               deaths = TRUE, 
-                               cases = TRUE, 
-                               beds = TRUE)
-```
-
-This object can then be easily plotted:
-
-``` r
-plot(gcu)
-```
-
-<img src="man/figures/README-plot gcu-1.png" width="100%" />
+<img src="man/figures/README-untransformed-1.png" width="100%" />
 
 ### 4\. Calibrating the Model to Observed Deaths Data
 
-The model can be simply calibrated to time series of deaths reported in
-settings. This can be conducted using the `calibrate` function, by
-providing a data frame of date and deaths. For example:
+The model can be simply calibrated to the cumulative time series of
+deaths reported in settings. This can be done using the `calibrate`
+function. For example, let’s generate some dummy time series data and
+calibrate to it:
 
 ``` r
-
-# create dummy data
-df <- data.frame("date" = Sys.Date() - 0:6,
-                 "deaths" = c(6, 2, 1, 1, 0, 0, 0),
-                 "cases" = c(394, 101, 89, 4, 0, 0, 0))
+df <- squire:::death_data_format(reporting_quality = 1)
 df
 #>         date deaths cases
-#> 1 2020-04-10      6   394
-#> 2 2020-04-09      2   101
-#> 3 2020-04-08      1    89
-#> 4 2020-04-07      1     4
-#> 5 2020-04-06      0     0
-#> 6 2020-04-05      0     0
-#> 7 2020-04-04      0     0
+#> 1 2020-04-14      4     4
+#> 2 2020-04-13      3     3
+#> 3 2020-04-12      3     3
 ```
 
+Then to calibrate to
+this:
+
 ``` r
-# run calibrate
-out <- calibrate(data = df, country = "Senegal", replicates = 10)
+calibration <- calibrate(country = "Afghanistan", deaths = max(df$deaths), 
+                         reporting_fraction = 1,
+                         seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
+                         min_seeding_cases = 5, max_seeding_cases = 50,
+                         replicates = 10, dt = 0.25)
 ```
 
 Simulation replicates are aligned to the current death total and the
-outputs are returned as a `squire_calibration` object, which has
-dedicated plotting functions.
+outputs are returned as a `squire_simulation` object.
 
-These allow the predicted cumulative cases based from the observed
-deaths to be plotted:
-
-``` r
-plot(out, what = "cases")
-```
-
-<img src="man/figures/README-cases over time-1.png" width="100%" />
-
-Additionally, we can plot the incidence of deaths as well as the
-healthcare demands:
+These can be plotted by either extracting the desired variables again
+using `format_output` and providing the date that the deaths relates to.
+E.g. for the following 4 weeks:
 
 ``` r
-plot(out, what = "healthcare")
-#> Warning: Removed 3315 row(s) containing missing values (geom_path).
-#> Warning: Removed 351 row(s) containing missing values (geom_path).
+
+x <- format_output(calibration, var_select = c("n_E2_I"), date_0 = Sys.Date()) %>%
+  mutate(replicate = factor(replicate)) %>%
+  filter(t < 14)
+ggplot(x, aes(x = date, y = y, col = replicate)) +
+  geom_line() + ylab("Case Incidence") + xlab("Date") +
+  theme(legend.position = "none")
 ```
 
-<img src="man/figures/README-healthcare over time-1.png" width="100%" />
+<img src="man/figures/README-deaths over time-1.png" width="100%" />
 
-We can also control how far we forecast. To forecast for 14 days:
+Alternatively, there are a few unexposed functions for plotting these
+outputs:
 
 ``` r
-plot(out, what = "healthcare", forecast = 14)
-#> Warning: Removed 3315 row(s) containing missing values (geom_path).
-#> Warning: Removed 351 row(s) containing missing values (geom_path).
+
+o1 <- squire:::calibrate_output_parsing(calibration, date_0 = Sys.Date())
+a <- squire:::plot_calibration_healthcare(df = o1, data = df)
+b <- squire:::plot_calibration_healthcare_barplot(df = o1, data = df)
+c <- squire:::plot_calibration_cases(df = o1, data = df)
+d <- squire:::plot_calibration_cases_barplot(df = o1, data = df)
+
+z <- a + b + c + d +
+  plot_layout(guides = 'collect')
+z
+#> Warning: Removed 4347 row(s) containing missing values (geom_path).
+#> Warning: Removed 489 row(s) containing missing values (geom_path).
 ```
 
-<img src="man/figures/README-healthcare forecast over time-1.png" width="100%" />
+<img src="man/figures/README-orderly style-1.png" width="100%" />
