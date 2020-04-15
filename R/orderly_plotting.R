@@ -113,22 +113,25 @@ calibrate_output_parsing <- function(r, date_0 = Sys.Date()) {
   ICU <- odin_sv(r$output[,mv,],
                  replicates = r$parameters$replicates, nt = nt)
   hospital <- odin_sv(r$output[,ox,],
-                          replicates = r$parameters$replicates, nt = nt)
+                      replicates = r$parameters$replicates, nt = nt)
   deaths <- odin_sv(r$output[,index$delta_D,],
                     replicates = r$parameters$replicates, nt = nt)
+  cumulative_deaths <- odin_sv(r$output[,index$D,],
+                               replicates = r$parameters$replicates, nt = nt)
+
 
   # collect into a long data frame
-  vars <- c("mild_cases", "hospital_cases", "deaths", "ICU", "hospital")
+  vars <- c("mild_cases", "hospital_cases", "deaths", "cumulative_deaths", "ICU", "hospital")
   df <- data.frame("date" = as.numeric(r$output[,index$time,]),
                    "replicate" = as.numeric(mapply(rep, seq_len(r$parameters$replicates), nt)),
                    "compartment" = as.character(mapply(rep, vars, nt*r$parameters$replicates)),
-                   "y" = c(mild_cases, hospital_cases, deaths, ICU, hospital))
+                   "y" = c(mild_cases, hospital_cases, deaths, cumulative_deaths, ICU, hospital))
 
   # Add date
   if(!is.null(date_0)){
     stopifnot(inherits(date_0, "Date"))
     df$date <- as.Date(df$date + date_0,
-                        format = "%Y/%m/%d")
+                       format = "%Y/%m/%d")
   }
 
   return(df)
@@ -247,8 +250,8 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
     ggplot2::ylab("Daily Number of Infections") +
     ggplot2::theme_bw()  +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
-    ggplot2::scale_fill_manual(name = "", labels = rev(c("Estimated", "Reported")),
-                               values = rev(c("#3f8ea7","#c59e96"))) +
+    ggplot2::scale_fill_manual(name = "", labels = (c("Estimated", "Reported")),
+                               values = (c("#3f8ea7","#c59e96"))) +
     ggplot2::scale_x_date(date_breaks = "2 week", date_labels = "%b %d") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
                    axis.title.x = ggplot2::element_blank(),
@@ -312,7 +315,7 @@ plot_calibration_healthcare <- function(df, data, forecast = 14) {
 }
 
 #' @noRd
-plot_calibration_healthcare_individual_barplot <- function(df, data, what = "ICU", forecast = 14) {
+plot_calibration_healthcare_barplot <- function(df, data, what = "ICU", forecast = 14) {
 
   # day
   df$day <- as.Date(as.character(df$date))
@@ -349,18 +352,18 @@ plot_calibration_healthcare_individual_barplot <- function(df, data, what = "ICU
     #                      linetype = "dashed",
     #                      size = 0.8,
     #                      show.legend = FALSE,
-    #                      inherit.aes = FALSE) +
-    ggplot2::geom_bar(data = pd_group,
-                      mapping = ggplot2::aes(x = .data$day, y = .data$y, fill = "what"),
-                      stat = "identity",
-                      show.legend = TRUE,
-                      inherit.aes = FALSE) +
+  #                      inherit.aes = FALSE) +
+  ggplot2::geom_bar(data = pd_group,
+                    mapping = ggplot2::aes(x = .data$day, y = .data$y, fill = "what"),
+                    stat = "identity",
+                    show.legend = TRUE,
+                    inherit.aes = FALSE) +
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
     ggplot2::ylab(title) +
     ggplot2::theme_bw()  +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
     ggplot2::scale_fill_manual(name = "", labels = rev(c("Estimated")),
-                               values = c("#c59e96")) +
+                               values = c("#3f8ea7")) +
     ggplot2::scale_x_date(date_breaks = "1 week", date_labels = "%b %d", limits = c(Sys.Date()-7, Sys.Date() + forecast)) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
                    axis.title.x = ggplot2::element_blank(),
@@ -375,11 +378,22 @@ plot_calibration_healthcare_individual_barplot <- function(df, data, what = "ICU
 }
 
 #' @noRd
-plot_calibration_healthcare_barplot <- function(df, data, forecast = 14) {
+plot_calibration_deaths_barplot <- function(df, data, forecast = 14, cumulative = FALSE) {
 
   # split to correct dates
-  sub <- df[df$compartment == "deaths" &
-              df$date <=  Sys.Date() + forecast,]
+  if(!cumulative) {
+    sub <- df[df$compartment == "deaths" &
+                df$date <=  Sys.Date() + forecast,]
+    title <- "Daily Deaths"
+
+    # format deaths
+    data$deaths <- rev(c(tail(data$deaths,1), diff(rev(data$deaths))))
+
+  } else {
+    sub <- df[df$compartment == "cumulative_deaths" &
+                df$date <=  Sys.Date() + forecast,]
+    title <- "Cumulative Deaths"
+  }
 
   pd_group <- dplyr::group_by(sub, .data$date, .data$compartment) %>%
     dplyr::summarise(quants = list(quantile(.data$y, c(0.025, 0.25, 0.5, 0.75, 0.975))),
@@ -389,8 +403,7 @@ plot_calibration_healthcare_barplot <- function(df, data, forecast = 14) {
                      yinner_max = round(.data$quants[[1]][4]),
                      y = median(.data$y))
 
-  # format cases
-  data$deaths <- rev(c(tail(data$deaths,1), diff(rev(data$deaths))))
+
 
   # Plot
   gg_healthcare <- ggplot2::ggplot(sub,
@@ -422,12 +435,12 @@ plot_calibration_healthcare_barplot <- function(df, data, forecast = 14) {
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
     ggplot2::geom_vline(xintercept = max(data$date[which(data$deaths != 0)]), linetype = "dotted") +
     ggplot2::theme_bw()  +
-    ggplot2::ylab("Daily Deaths") +
+    ggplot2::ylab(title) +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
     ggplot2::scale_x_date(date_breaks = "1 week", date_labels = "%b %d",
                           limits = c(data$date[max(which(data$deaths>0))]-7, Sys.Date() + forecast)) +
-    ggplot2::scale_fill_manual(name = "", labels = rev(c("Estimated", "Reported")),
-                               values = rev(c("#3f8ea7","#c59e96"))) +
+    ggplot2::scale_fill_manual(name = "", labels = (c("Estimated", "Reported")),
+                               values = (c("#3f8ea7","#c59e96"))) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
                    axis.title.x = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_blank(),

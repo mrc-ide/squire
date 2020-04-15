@@ -19,11 +19,12 @@ test_that("cases and healthcare plotting works", {
 
   # do we get ggplots from both
   expect_s3_class(plot_calibration_healthcare(df = o1, data = data), "gg")
-  expect_s3_class(plot_calibration_healthcare_barplot(df = o1, data = data), "gg")
+  expect_s3_class(plot_calibration_deaths_barplot(df = o1, data = data), "gg")
+  expect_s3_class(plot_calibration_deaths_barplot(df = o1, data = data, cumulative = TRUE), "gg")
   expect_s3_class(plot_calibration_cases(df = o1, data = data), "gg")
   expect_s3_class(plot_calibration_cases_barplot(df = o1, data = data), "gg")
-  expect_s3_class(plot_calibration_healthcare_individual_barplot(df = o1, data = data, what = "ICU"), "gg")
-  expect_s3_class(plot_calibration_healthcare_individual_barplot(df = o1, data = data, what = "hospital"), "gg")
+  expect_s3_class(plot_calibration_healthcare_barplot(df = o1, data = data, what = "ICU"), "gg")
+  expect_s3_class(plot_calibration_healthcare_barplot(df = o1, data = data, what = "hospital"), "gg")
 
   x <- death_data_format(date = NULL,
                          deaths = NULL,
