@@ -12,3 +12,16 @@ test_that("calibrate works", {
   expect_error(calibrate("Angola", 5, -0.1))
   expect_error(calibrate("Angola", 5, 1.1))
 })
+
+
+#------------------------------------------------
+test_that("calibrate R0 works", {
+  set.seed(123)
+  t1 <- calibrate("Angola", 5, 0.5, time_period = 120, replicates = 10, R0 = c(3,4))
+  expect_true(all(c(3, 4) %in% t1$parameters$R0))
+
+  set.seed(123)
+  t1 <- calibrate("Angola", 5, 0.5, time_period = 120, replicates = 10, R0 = c(3))
+  expect_true(all(t1$parameters$R0 == 3))
+
+})

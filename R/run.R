@@ -461,6 +461,7 @@ run_explicit_SEEIR_model <- function(
   parameters$ICU_bed_capacity <- ICU_bed_capacity
   parameters$beta_set <- beta_set
   parameters$seeding_cases <- mod_init$E1
+  parameters$contact_matrix_set <- contact_matrix_set
 
   out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
