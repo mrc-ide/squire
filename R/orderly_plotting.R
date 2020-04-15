@@ -37,7 +37,7 @@ death_data_format <- function(date = NULL,
     real_death_cumulative <- c(rev(round(n_deaths * 2^(-(1:n_dates)/3))), n_deaths)
     incidence <- c(real_death_cumulative[1], diff(real_death_cumulative))
 
-    # observed deaths
+    # Reported deaths
     deaths <- cumsum(stats::rbinom(incidence, incidence, reporting_quality))
     deaths[length(deaths)] <- n_deaths
 
@@ -178,9 +178,9 @@ plot_calibration_cases <- function(df, data, forecast = 0) {
                         inherit.aes = FALSE) +
     ggplot2::xlab("Date") +
     ggplot2::ylab("Daily Cases") +
-    ggplot2::scale_color_discrete(name = "Predicted", labels = c("Hospital Cases","Mild Cases")) +
-    ggplot2::scale_fill_discrete(name = "Predicted", labels = c("Hospital Cases","Mild Cases")) +
-    ggplot2::scale_shape_discrete(name = "Observed") +
+    ggplot2::scale_color_discrete(name = "Estimated", labels = c("Hospital Cases","Mild Cases")) +
+    ggplot2::scale_fill_discrete(name = "Estimated", labels = c("Hospital Cases","Mild Cases")) +
+    ggplot2::scale_shape_discrete(name = "Reported") +
     ggplot2::scale_x_date(date_breaks = "1 week", date_labels = "%b %d") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
@@ -224,7 +224,7 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
     ggplot2::geom_ribbon(data = pd_group,
                          mapping = ggplot2::aes(ymin = .data$ymin,
                                                 ymax = .data$ymax,
-                                                fill = "Predicted"),
+                                                fill = "Estimated"),
                          color = "white",
                          alpha = 0.2,
                          size = 0,
@@ -232,14 +232,14 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
     ggplot2::geom_ribbon(data = pd_group,
                          mapping = ggplot2::aes(ymin = .data$yinner_min,
                                                 ymax = .data$yinner_max,
-                                                fill = "Predicted"),
+                                                fill = "Estimated"),
                          color = "white",
                          alpha = 0.8,
                          size = 0,
                          show.legend = TRUE) +
     ggplot2::geom_bar(data = data,
                       mapping = ggplot2::aes(x = .data$date, y = .data$cases,
-                                             fill = "Observed"),
+                                             fill = "Reported"),
                       stat = "identity",
                       show.legend = TRUE,
                       inherit.aes = FALSE) +
@@ -247,7 +247,7 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
     ggplot2::ylab("Daily Number of Infections") +
     ggplot2::theme_bw()  +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
-    ggplot2::scale_fill_manual(name = "", labels = rev(c("Predicted", "Observed")),
+    ggplot2::scale_fill_manual(name = "", labels = rev(c("Estimated", "Reported")),
                                values = rev(c("#3f8ea7","#c59e96"))) +
     ggplot2::scale_x_date(date_breaks = "2 week", date_labels = "%b %d") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
@@ -267,7 +267,7 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
 plot_calibration_healthcare <- function(df, data, forecast = 14) {
 
   # split to correct dates
-  sub <- df[df$compartment %in% c("ICU", "hospital", "deaths") &
+  sub <- df[df$compartment %in%c("ICU", "hospital") &
               df$date <=  Sys.Date() + forecast,]
 
   pd_group <- dplyr::group_by(sub, .data$date, .data$compartment) %>%
@@ -276,19 +276,12 @@ plot_calibration_healthcare <- function(df, data, forecast = 14) {
                      y = median(.data$y),
                      ymax = .data$quants[[1]][3])
 
-  # format cases
-  data$deaths <- rev(c(tail(data$deaths,1), diff(rev(data$deaths))))
-
-
   # Plot
   gg_healthcare <- ggplot2::ggplot(sub, ggplot2::aes(x = .data$date,
                                                      y = .data$y, col = .data$compartment,
                                                      group = interaction(.data$compartment, .data$replicate))) +
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
-    ggplot2::geom_line(alpha = max(0.1, 1 / max(sub$replicate))) +
-    ggplot2::geom_line(data = pd_group,
-                       mapping = ggplot2::aes(group = .data$compartment),
-                       size = 0.8) +
+    ggplot2::geom_line(alpha = max(0.2, 1 / max(sub$replicate))) +
     ggplot2::geom_ribbon(data = pd_group,
                          mapping = ggplot2::aes(group = .data$compartment,
                                                 ymin = .data$ymin,
@@ -299,28 +292,87 @@ plot_calibration_healthcare <- function(df, data, forecast = 14) {
                          linetype = "dashed",
                          size = 0.8,
                          show.legend = FALSE) +
-    ggplot2::geom_point(data = data,
-                        mapping = ggplot2::aes(x = .data$date, y = .data$deaths, shape = "Deaths"),
-                        inherit.aes = FALSE) +
     ggplot2::xlab("Date") +
-    ggplot2::ylab("Daily Deaths / Healthcare Demands") +
-    ggplot2::scale_color_discrete(name = "Predicted", labels = c("Deaths", "Hospital Beds", "ICU Beds")) +
-    ggplot2::scale_fill_discrete(name = "Predicted", labels = c("Deaths", "Hospital Beds", "ICU Beds")) +
-    ggplot2::scale_shape_discrete(name = "Observed") +
+    ggplot2::ylab("Healthcare Demand") +
+    ggplot2::scale_color_discrete(name = "Estimated", labels = c("Hospital Beds", "ICU Beds")) +
+    ggplot2::scale_fill_discrete(name = "Estimated", labels = c("Hospital Beds", "ICU Beds")) +
     ggplot2::theme_bw() +
-    ggplot2::scale_x_date(date_breaks = "2 week", date_labels = "%b %d", limits = c(Sys.Date()-7, Sys.Date() + forecast)) +
+    ggplot2::scale_x_date(date_breaks = "1 week", date_labels = "%b %d", limits = c(Sys.Date()-14, Sys.Date() + forecast)) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
                    axis.title.x = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_blank(),
                    panel.grid.minor.x = ggplot2::element_blank(),
                    panel.border = ggplot2::element_blank(),
                    panel.background = ggplot2::element_blank(),
-                   axis.line = ggplot2::element_line(colour = "black"))
+                   axis.line = ggplot2::element_line(colour = "black")) +
+    ggplot2::guides(colour = ggplot2::guide_legend(override.aes = list(alpha = 1)))
 
   gg_healthcare
 
 }
 
+#' @noRd
+plot_calibration_healthcare_individual_barplot <- function(df, data, what = "ICU", forecast = 14) {
+
+  # day
+  df$day <- as.Date(as.character(df$date))
+
+  # split to correct dates
+  sub <- df[df$compartment %in% what &
+              df$date <=  Sys.Date() + forecast,]
+
+  pd_group <- dplyr::group_by(sub, .data$day, .data$compartment) %>%
+    dplyr::summarise(quants = list(quantile(.data$y, c(0.025, 0.5, 0.975))),
+                     ymin = .data$quants[[1]][1],
+                     y = median(.data$y),
+                     ymax = .data$quants[[1]][3])
+
+  # y axis
+  if (what == "ICU") {
+    title <- "ICU Demand"
+  } else if(what == "hospital") {
+    title <- "Hospital Bed Demand"
+  }
+
+  # Plot
+  gg_healthcare <- ggplot2::ggplot(sub, ggplot2::aes(x = .data$day,
+                                                     y = .data$y, col = .data$compartment,
+                                                     group = interaction(.data$compartment, .data$replicate))) +
+    # ggplot2::geom_ribbon(data = pd_group,
+    #                      mapping = ggplot2::aes(x = .data$day,
+    #                                             ymin = .data$ymin,
+    #                                             ymax = .data$ymax,
+    #                                             color = .data$compartment),
+    #                      fill = "#3f8ea7",
+    #                      color = "white",
+    #                      alpha = 0.2,
+    #                      linetype = "dashed",
+    #                      size = 0.8,
+    #                      show.legend = FALSE,
+    #                      inherit.aes = FALSE) +
+    ggplot2::geom_bar(data = pd_group,
+                      mapping = ggplot2::aes(x = .data$day, y = .data$y, fill = "what"),
+                      stat = "identity",
+                      show.legend = TRUE,
+                      inherit.aes = FALSE) +
+    ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
+    ggplot2::ylab(title) +
+    ggplot2::theme_bw()  +
+    ggplot2::scale_y_continuous(expand = c(0,0)) +
+    ggplot2::scale_fill_manual(name = "", labels = rev(c("Estimated")),
+                               values = c("#c59e96")) +
+    ggplot2::scale_x_date(date_breaks = "1 week", date_labels = "%b %d", limits = c(Sys.Date()-7, Sys.Date() + forecast)) +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
+                   axis.title.x = ggplot2::element_blank(),
+                   panel.grid.major.x = ggplot2::element_blank(),
+                   panel.grid.minor.x = ggplot2::element_blank(),
+                   legend.position = "none",
+                   panel.border = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_blank(),
+                   axis.line = ggplot2::element_line(colour = "black"))
+
+  gg_healthcare
+}
 
 #' @noRd
 plot_calibration_healthcare_barplot <- function(df, data, forecast = 14) {
@@ -348,7 +400,7 @@ plot_calibration_healthcare_barplot <- function(df, data, forecast = 14) {
     ggplot2::geom_ribbon(data = pd_group,
                          mapping = ggplot2::aes(ymin = .data$ymin,
                                                 ymax = .data$ymax,
-                                                fill = "Predicted"),
+                                                fill = "Estimated"),
                          color = "white",
                          alpha = 0.2,
                          size = 0,
@@ -356,14 +408,14 @@ plot_calibration_healthcare_barplot <- function(df, data, forecast = 14) {
     ggplot2::geom_ribbon(data = pd_group,
                          mapping = ggplot2::aes(ymin = .data$yinner_min,
                                                 ymax = .data$yinner_max,
-                                                fill = "Predicted"),
+                                                fill = "Estimated"),
                          color = "white",
                          alpha = 0.8,
                          size = 0,
                          show.legend = TRUE) +
     ggplot2::geom_bar(data = data,
                       mapping = ggplot2::aes(x = .data$date, y = .data$deaths,
-                                             fill = "Observed"),
+                                             fill = "Reported"),
                       stat = "identity",
                       show.legend = TRUE,
                       inherit.aes = FALSE) +
@@ -374,7 +426,7 @@ plot_calibration_healthcare_barplot <- function(df, data, forecast = 14) {
     ggplot2::scale_y_continuous(expand = c(0,0)) +
     ggplot2::scale_x_date(date_breaks = "1 week", date_labels = "%b %d",
                           limits = c(data$date[max(which(data$deaths>0))]-7, Sys.Date() + forecast)) +
-    ggplot2::scale_fill_manual(name = "", labels = rev(c("Predicted", "Observed")),
+    ggplot2::scale_fill_manual(name = "", labels = rev(c("Estimated", "Reported")),
                                values = rev(c("#3f8ea7","#c59e96"))) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, colour = "black"),
                    axis.title.x = ggplot2::element_blank(),
