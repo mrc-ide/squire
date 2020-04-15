@@ -127,6 +127,7 @@
   <span class='kw'>seeding_age_groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"35-40"</span>, <span class='st'>"40-45"</span>, <span class='st'>"45-50"</span>, <span class='st'>"50-55"</span>),
   <span class='kw'>min_seeding_cases</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>max_seeding_cases</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2.7</span>, <span class='fl'>3</span>, <span class='fl'>3.5</span>),
   <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
   <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
   <span class='no'>...</span>
@@ -145,7 +146,9 @@
     </tr>
     <tr>
       <th>reporting_fraction</th>
-      <td><p>REporting fraction</p></td>
+      <td><p>Reporting fraction. Numeric for what proportion of
+the total deaths the reported deaths represent. E.g. 0.5 results in
+the model calibrating to twice the deaths provided by <code>deaths</code></p></td>
     </tr>
     <tr>
       <th>seeding_age_groups</th>
@@ -158,6 +161,11 @@
     <tr>
       <th>max_seeding_cases</th>
       <td><p>Maximum seeding cases</p></td>
+    </tr>
+    <tr>
+      <th>R0</th>
+      <td><p>Vector or R0 values to sample from to introduce uncertainty
+in predictions. Default = c(2.7, 3.0, 3.5)</p></td>
     </tr>
     <tr>
       <th>replicates</th>
