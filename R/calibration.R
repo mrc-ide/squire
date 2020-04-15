@@ -2,8 +2,12 @@
 #'
 #' @param country Country name
 #' @param deaths Number of observed deaths
-#' @param reporting_fraction REporting fraction
+#' @param reporting_fraction Reporting fraction. Numeric for what proportion of
+#'   the total deaths the reported deaths represent. E.g. 0.5 results in
+#'   the model calibrating to twice the deaths provided by \code{deaths}
 #' @param seeding_age_groups Age groups for seeding
+#' @param R0 Vector or R0 values to sample from to introduce uncertainty
+#'   in predictions. Default = c(2.7, 3.0, 3.5)
 #' @param min_seeding_cases Minimum seeding cases
 #' @param max_seeding_cases Maximum seeding cases
 #' @param replicates Replicates
@@ -14,8 +18,11 @@
 #' @return List of time adjusted squire_simulations
 calibrate <- function(country, deaths, reporting_fraction = 1,
                       seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
-                      min_seeding_cases = 5, max_seeding_cases = 50,
-                      replicates = 100, dt = 0.1, ...) {
+                      min_seeding_cases = 5,
+                      max_seeding_cases = 50,
+                      R0 = c(2.7, 3.0, 3.5),
+                      replicates = 100,
+                      dt = 0.1, ...) {
 
   assert_numeric(deaths)
   assert_numeric(reporting_fraction)
@@ -52,10 +59,18 @@ calibrate <- function(country, deaths, reporting_fraction = 1,
     seeding_cases
   })
 
+  # sample our R0
+  if (length(R0) == 1) {
+    R0 <- rep(R0, replicates)
+  } else {
+    R0 <- sample(R0, replicates, TRUE)
+  }
+
   # run model with fixed day step (to match up with daily deaths)
   r <- run_explicit_SEEIR_model(population = pop$n,
                                 contact_matrix_set = contact_matrix,
                                 replicates = 1,
+                                R0 = R0[1],
                                 dt = dt, ...)
 
   # get the index for looking up D and R
@@ -69,6 +84,12 @@ calibrate <- function(country, deaths, reporting_fraction = 1,
   # running and storing the model output for each of the different initial seeding cases
   for(i in 2:replicates) {
     r$mod$set_user(E1_0 = E1_0[[i]])
+    beta <- beta_est_explicit(dur_IMild = r$parameters$dur_IMild,
+                      dur_ICase = r$parameters$dur_ICase,
+                      prob_hosp = r$parameters$prob_hosp,
+                      mixing_matrix =  process_contact_matrix_scaled_age(r$parameters$contact_matrix_set[[1]], r$parameters$population),
+                      R0 = R0[i])
+    r$mod$set_user(beta_set = beta)
     r$output <- r$mod$run(t, replicate = 1)
     while (sum(r$output[nt, index$R, 1]) < (sum(pop$n)/10)) {
       r$output <- r$mod$run(t, replicate = 1)
@@ -94,6 +115,7 @@ calibrate <- function(country, deaths, reporting_fraction = 1,
   colnames(outarray) <- names(r$output[1,,1])
   r$output <- outarray
   r$parameters$replicates <- replicates
+  r$parameters$R0 <- R0
 
   return(r)
 }

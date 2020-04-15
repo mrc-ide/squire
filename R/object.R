@@ -45,7 +45,9 @@ print.squire_simulation <- function(x, ...){
 #' @param var_select Vector of variable names to plot (default is all)
 #' @param summary_f Function to summarise each compartment
 #'   passed to the \code{fun} argument of \code{\link[ggplot2]{stat_summary}}
-#' @param x_var X variable to use for plotting (default is \code{"t"}, but can be set to, \code{"date"}, if \code{date_0} provided)
+#' @param x_var X variable to use for plotting (default is \code{"t"},
+#'   but can be set to, \code{"date"}, if \code{date_0} provided), which will
+#'   cause the date to be plotted rather than time.
 #' @param ... additional arguments affecting the plot produced.
 #'
 #' @export
