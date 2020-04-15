@@ -163,28 +163,29 @@
 <p><img src="reference/figures/README-base%20plot-1.png" width="100%"></p>
 <p>This plot will plot each of the compartments of the model output. We can also plot specific compartments using the <code>var_select</code> argument that can be passed to <code><a href="https://rdrr.io/r/graphics/plot.html">plot()</a></code>. Arguments passed to <code>var_select</code> must be one of the variables in the plot above.</p>
 <div class="sourceCode" id="cb7"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"E"</span>, <span class="st">"IMild"</span>))</pre></div>
-<p><img src="reference/figures/README-subset%20variables%20plot-1.png" width="100%"></p>
+<p><img src="reference/figures/README-subset%20variables%20plot-1.png" width="100%"> Or, you can specify one of <code>deaths</code>, <code>infections</code>, <code>hospital_occupancy</code>, <code>ICU_occupancy</code>, <code>hospital_demand</code> or <code>ICU_demand</code>, and plot these summary metrics that represent the combintion of a number of different compartment e.g:</p>
+<div class="sourceCode" id="cb8"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"deaths"</span>)</pre></div>
+<p><img src="reference/figures/README-subset%20variables%20plot2-1.png" width="100%"></p>
 <p>All of the plotting above makes uses of the <code>squire</code> function <code>format_output</code> which provides you with a means of manipulating and managing the output from a <code>run_explicit_SEEIR_model</code> call. Using it you can specify the model outputs (e.g. compartments) you want, as well as whether you want that output aggregated over age or not. Here we extract the latent compartment (E). The data columns correspond to the compartment name (<code>compartment</code>), timestep (<code>t</code>), model run number (<code>replicate</code>) and the model output (<code>y</code>).</p>
-<div class="sourceCode" id="cb8"><pre class="r">
+<div class="sourceCode" id="cb9"><pre class="r">
 <span class="no">output</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"E"</span>)
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">output</span>)
 <span class="co">#&gt; # A tibble: 6 x 4</span>
-<span class="co">#&gt;   compartment     t replicate     y</span>
-<span class="co">#&gt;   &lt;chr&gt;       &lt;dbl&gt;     &lt;int&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 E             0.1         1    20</span>
-<span class="co">#&gt; 2 E             0.1         2    20</span>
-<span class="co">#&gt; 3 E             0.1         3    20</span>
-<span class="co">#&gt; 4 E             0.1         4    20</span>
-<span class="co">#&gt; 5 E             0.1         5    20</span>
-<span class="co">#&gt; 6 E             0.1         6    20</span></pre></div>
+<span class="co">#&gt;   replicate compartment     t     y</span>
+<span class="co">#&gt;       &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt;</span>
+<span class="co">#&gt; 1         1 E             0.1    20</span>
+<span class="co">#&gt; 2         1 E             0.2    20</span>
+<span class="co">#&gt; 3         1 E             0.3    20</span>
+<span class="co">#&gt; 4         1 E             0.4    20</span>
+<span class="co">#&gt; 5         1 E             0.5    20</span>
+<span class="co">#&gt; 6         1 E             0.6    20</span></pre></div>
 <p>If we wanted age-disaggregated data, we could set <code>reduce_age</code> to <code>FALSE</code> which will generate the same dataframe as before, but with an additional column indicating the age-group.</p>
-<div class="sourceCode" id="cb9"><pre class="r">
+<div class="sourceCode" id="cb10"><pre class="r">
 <span class="no">output</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"E"</span>, <span class="kw">reduce_age</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">output</span>)
 <span class="co">#&gt; # A tibble: 6 x 5</span>
-<span class="co">#&gt; # Groups:   replicate, age_group, compartment [1]</span>
 <span class="co">#&gt;   replicate age_group compartment     t     y</span>
-<span class="co">#&gt;       &lt;int&gt;     &lt;int&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt;</span>
+<span class="co">#&gt;       &lt;dbl&gt;     &lt;int&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1         1         1 E             0.1     0</span>
 <span class="co">#&gt; 2         1         1 E             0.2     0</span>
 <span class="co">#&gt; 3         1         1 E             0.3     0</span>
@@ -197,7 +198,7 @@
 <a href="#2-changing-parameters-in-the-model" class="anchor"></a>2. Changing parameters in the model.</h3>
 <p>The model has a number of parameters for setting the R0, demography, contact matrices, the durations of each compartment and the health care outcomes and healthcare availability. In addition, the initial state of the population can be changed as well as simulation parameters, such as the number of replicates, length of simulation and the timestep. For a full list of model inputs, please see the function <a href="https://mrc-ide.github.io/squire/reference/run_explicit_SEEIR_model.html">documentation</a></p>
 <p>For example, changing the initial R0 (default = 3), number of replicates ( default = 10), simualtion length (default = 365 days) and time step (default = 0.5 days), as well as setting the population and contact matrix manually:</p>
-<div class="sourceCode" id="cb10"><pre class="r">
+<div class="sourceCode" id="cb11"><pre class="r">
 <span class="co"># Get the population</span>
 <span class="no">pop</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/get_population.html">get_population</a></span>(<span class="st">"United Kingdom"</span>)
 <span class="no">population</span> <span class="kw">&lt;-</span> <span class="no">pop</span>$<span class="no">n</span>
@@ -219,7 +220,7 @@
 <span class="co">#&gt; replicates</span></pre></div>
 <p><img src="reference/figures/README-set%20params-1.png" width="100%"></p>
 <p>We can also change the R0 and contact matrix at set time points, to reflect changing behaviour resulting from interventions. For example to set a 80% reduction in the contact matrix after 100 days :</p>
-<div class="sourceCode" id="cb11"><pre class="r">
+<div class="sourceCode" id="cb12"><pre class="r">
 <span class="co"># run the model</span>
 <span class="no">r</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(<span class="kw">population</span> <span class="kw">=</span> <span class="no">population</span>,
                               <span class="kw">tt_contact_matrix</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">100</span>),
@@ -229,14 +230,14 @@
                               <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
                               <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.1</span>,
                               <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">5</span>)
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"n_E2_I"</span>)
-<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Summary statistic</span>
-<span class="co">#&gt; estimated from &lt;10 replicates</span>
-<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Confidence bounds</span>
-<span class="co">#&gt; estimated from &lt;10 replicates</span></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>)
+<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Summary</span>
+<span class="co">#&gt; statistic estimated from &lt;10 replicates</span>
+<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Confidence</span>
+<span class="co">#&gt; bounds estimated from &lt;10 replicates</span></pre></div>
 <p><img src="reference/figures/README-set%20contact%20matrix%20decrease-1.png" width="100%"> where <code>n_E2_I</code> is the daily number of new infections.</p>
 <p>To show an 80% reduction after 50 days but only maintained for 30 days :</p>
-<div class="sourceCode" id="cb12"><pre class="r">
+<div class="sourceCode" id="cb13"><pre class="r">
 <span class="co"># run the model</span>
 <span class="no">r</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(<span class="kw">population</span> <span class="kw">=</span> <span class="no">population</span>,
                               <span class="kw">tt_contact_matrix</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">80</span>, <span class="fl">120</span>),
@@ -247,14 +248,14 @@
                               <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">220</span>,
                               <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.1</span>,
                               <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">5</span>)
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"n_E2_I"</span>)
-<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Summary statistic</span>
-<span class="co">#&gt; estimated from &lt;10 replicates</span>
-<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Confidence bounds</span>
-<span class="co">#&gt; estimated from &lt;10 replicates</span></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>)
+<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Summary</span>
+<span class="co">#&gt; statistic estimated from &lt;10 replicates</span>
+<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Confidence</span>
+<span class="co">#&gt; bounds estimated from &lt;10 replicates</span></pre></div>
 <p><img src="reference/figures/README-set%20contact%20matrix%20decrease%20and%20relax-1.png" width="100%"></p>
 <p>Alternatively, we could set a changing R0, which falls below 1 after 50 days:</p>
-<div class="sourceCode" id="cb13"><pre class="r">
+<div class="sourceCode" id="cb14"><pre class="r">
 <span class="co"># run the model</span>
 <span class="no">r</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(<span class="kw">population</span> <span class="kw">=</span> <span class="no">population</span>,
                               <span class="kw">contact_matrix_set</span> <span class="kw">=</span> <span class="no">contact_matrix</span>,
@@ -263,21 +264,40 @@
                               <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
                               <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.1</span>,
                               <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">5</span>)
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"n_E2_I"</span>)
-<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Summary statistic</span>
-<span class="co">#&gt; estimated from &lt;10 replicates</span>
-<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "n_E2_I"): Confidence bounds</span>
-<span class="co">#&gt; estimated from &lt;10 replicates</span></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>)
+<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Summary</span>
+<span class="co">#&gt; statistic estimated from &lt;10 replicates</span>
+<span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Confidence</span>
+<span class="co">#&gt; bounds estimated from &lt;10 replicates</span></pre></div>
 <p><img src="reference/figures/README-set%20R0%20decrease-1.png" width="100%"></p>
+<p>The model in squire also allows you to alter healthcare capacity. Default values for the arguments <code>hosp_bed_capacity</code> and <code>ICU_capacity</code> are taken from the World Bank and a systematic review of the literature. However, you can also specify your own:</p>
+<div class="sourceCode" id="cb15"><pre class="r">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">patchwork</span>)
+<span class="co">#&gt; Warning: package 'patchwork' was built under R version 3.5.3</span>
+
+<span class="no">r</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(<span class="kw">population</span> <span class="kw">=</span> <span class="no">population</span>,
+                              <span class="kw">contact_matrix_set</span> <span class="kw">=</span> <span class="no">contact_matrix</span>,
+                              <span class="kw">R0</span> <span class="kw">=</span> <span class="fl">2.5</span>,
+                              <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
+                              <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.1</span>,
+                              <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">15</span>,
+                              <span class="kw">hosp_bed_capacity</span> <span class="kw">=</span> <span class="fl">1000</span>,
+                              <span class="kw">ICU_bed_capacity</span> <span class="kw">=</span> <span class="fl">100</span>)
+
+<span class="no">c</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"hospital_occupancy"</span>)
+<span class="no">d</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"ICU_occupancy"</span>)
+<span class="no">c</span> / <span class="no">d</span></pre></div>
+<p><img src="reference/figures/README-change%20healthcare%20capacity-1.png" width="100%"></p>
 </div>
 <div id="3-extracting-and-plotting-relevant-outputs" class="section level3">
 <h3 class="hasAnchor">
 <a href="#3-extracting-and-plotting-relevant-outputs" class="anchor"></a>3. Extracting and Plotting Relevant Outputs</h3>
-<p>Alternative summaries of the models can be created, which give commonly reported measures, such as deaths, number of ICU beds and general hospital beds required.</p>
-<p>These could be created by using the <code>format_output</code> on the output and selecting relevant compartments but this is quite slow to do, so we provide some helper functions. These include:</p>
-<div class="sourceCode" id="cb14"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
+<p>Whilst the above provides quick and easy ways to plot relevant outputs, we recognise users might want to play around with the data themselves. This can be done with the <code>format_output</code> function.</p>
+<div class="sourceCode" id="cb16"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
+<span class="co">#&gt; Warning: package 'ggplot2' was built under R version 3.5.3</span>
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">patchwork</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
+<span class="co">#&gt; Warning: package 'dplyr' was built under R version 3.5.3</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Attaching package: 'dplyr'</span>
 <span class="co">#&gt; The following objects are masked from 'package:stats':</span>
@@ -289,21 +309,25 @@
 
 <span class="no">x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(<span class="kw">country</span> <span class="kw">=</span> <span class="st">"Afghanistan"</span>, <span class="kw">hosp_bed_capacity</span> <span class="kw">=</span> <span class="fl">500</span>, <span class="kw">ICU_bed_capacity</span> <span class="kw">=</span> <span class="fl">1000</span>)
 
-<span class="no">deaths</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/extract_deaths.html">extract_deaths</a></span>(<span class="no">r</span>)
+<span class="no">deaths</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"deaths"</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">replicate</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">replicate</span>))
 <span class="no">a</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">deaths</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">t</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">col</span> <span class="kw">=</span> <span class="no">replicate</span>)) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Daily Deaths"</span>)
 
-<span class="no">infection_incidence</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/extract_infection_incidence.html">extract_infection_incidence</a></span>(<span class="no">r</span>)
-<span class="no">b</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">infection_incidence</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">t</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">col</span> <span class="kw">=</span> <span class="no">replicate</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Case Incidence"</span>)
+<span class="no">infections</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">replicate</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">replicate</span>))
+<span class="no">b</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">infections</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">t</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">col</span> <span class="kw">=</span> <span class="no">replicate</span>)) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Daily Infections"</span>)
 
-<span class="no">hosp_occ</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/extract_hospital_occ.html">extract_hospital_occ</a></span>(<span class="no">r</span>)
-<span class="no">c</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">hosp_occ</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">t</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">col</span> <span class="kw">=</span> <span class="no">replicate</span>)) +
+<span class="no">hosp_bed</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"hospital_occupancy"</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">replicate</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">replicate</span>))
+<span class="no">c</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">hosp_bed</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">t</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">col</span> <span class="kw">=</span> <span class="no">replicate</span>)) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Hospital Bed Occupancy"</span>)
 
-<span class="no">ICU_occ</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/extract_ICU_occ.html">extract_ICU_occ</a></span>(<span class="no">r</span>)
-<span class="no">d</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">ICU_occ</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">t</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">col</span> <span class="kw">=</span> <span class="no">replicate</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"ICU Occupancy"</span>)
+<span class="no">ICU_bed</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"ICU_occupancy"</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">replicate</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">replicate</span>))
+<span class="no">d</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">ICU_bed</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">t</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">col</span> <span class="kw">=</span> <span class="no">replicate</span>)) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"ICU Bed Occupancy"</span>)
 
 <span class="no">z</span> <span class="kw">&lt;-</span> <span class="no">a</span> + <span class="no">b</span> + <span class="no">c</span> + <span class="no">d</span> +
   <span class="fu">plot_layout</span>(<span class="kw">guides</span> <span class="kw">=</span> <span class="st">'collect'</span>)
@@ -314,42 +338,37 @@
 <h3 class="hasAnchor">
 <a href="#4-calibrating-the-model-to-observed-deaths-data" class="anchor"></a>4. Calibrating the Model to Observed Deaths Data</h3>
 <p>The model can be simply calibrated to the cumulative time series of deaths reported in settings. This can be done using the <code>calibrate</code> function. For example, let’s generate some dummy time series data and calibrate to it:</p>
-<div class="sourceCode" id="cb15"><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu"><a href="reference/death_data_format.html">death_data_format</a></span>(<span class="kw">reporting_quality</span> <span class="kw">=</span> <span class="fl">1</span>)
+<div class="sourceCode" id="cb17"><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu"><a href="reference/death_data_format.html">death_data_format</a></span>(<span class="kw">reporting_quality</span> <span class="kw">=</span> <span class="fl">1</span>)
 <span class="no">df</span>
 <span class="co">#&gt;         date deaths cases</span>
-<span class="co">#&gt; 1 2020-04-14      4     4</span>
-<span class="co">#&gt; 2 2020-04-13      3     3</span>
-<span class="co">#&gt; 3 2020-04-12      3     3</span></pre></div>
-<p>Then to calibrate to this:</p>
-<div class="sourceCode" id="cb16"><pre class="r"><span class="no">calibration</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(<span class="kw">country</span> <span class="kw">=</span> <span class="st">"Afghanistan"</span>, <span class="kw">deaths</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">df</span>$<span class="no">deaths</span>),
+<span class="co">#&gt; 1 2020-04-15      4     3</span>
+<span class="co">#&gt; 2 2020-04-14      3     3</span>
+<span class="co">#&gt; 3 2020-04-13      3     3</span>
+<span class="co">#&gt; 4 2020-04-12      2     2</span>
+<span class="co">#&gt; 5 2020-04-11      2     2</span>
+<span class="co">#&gt; 6 2020-04-10      1     1</span>
+<span class="co">#&gt; 7 2020-04-09      1     1</span>
+<span class="co">#&gt; 8 2020-04-08      1     1</span>
+<span class="co">#&gt; 9 2020-04-07      1     1</span></pre></div>
+<p>Then to calibrate to this dummy data and visualise the full epidemic curve, we do the following. Note that simulation replicates are aligned to the current death total and the outputs are returned as a <code>squire_simulation</code> object.</p>
+<div class="sourceCode" id="cb18"><pre class="r"><span class="no">calibration</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(<span class="kw">country</span> <span class="kw">=</span> <span class="st">"Afghanistan"</span>, <span class="kw">deaths</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">df</span>$<span class="no">deaths</span>),
                          <span class="kw">reporting_fraction</span> <span class="kw">=</span> <span class="fl">1</span>,
                          <span class="kw">seeding_age_groups</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"35-40"</span>, <span class="st">"40-45"</span>, <span class="st">"45-50"</span>, <span class="st">"50-55"</span>),
                          <span class="kw">min_seeding_cases</span> <span class="kw">=</span> <span class="fl">5</span>, <span class="kw">max_seeding_cases</span> <span class="kw">=</span> <span class="fl">50</span>,
-                         <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">10</span>, <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.25</span>)</pre></div>
-<p>Simulation replicates are aligned to the current death total and the outputs are returned as a <code>squire_simulation</code> object.</p>
-<p>These can be plotted by either extracting the desired variables again using <code>format_output</code> and providing the date that the deaths relates to. E.g. for the following 4 weeks:</p>
-<div class="sourceCode" id="cb17"><pre class="r">
-<span class="no">x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span>(<span class="no">calibration</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"n_E2_I"</span>), <span class="kw">date_0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span>()) <span class="kw">%&gt;%</span>
+                         <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">10</span>, <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.25</span>)
+
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">calibration</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>, <span class="kw">date_0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span>())</pre></div>
+<p><img src="reference/figures/README-calibration-1.png" width="100%"></p>
+<p>In the above, we visualise the full epidemic curve, but to examine short term model estimates of the epidemic trajectory (e.g. up to 14 days ahead), we can do the following:</p>
+<div class="sourceCode" id="cb19"><pre class="r">
+<span class="no">x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span>(<span class="no">calibration</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>, <span class="kw">date_0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span>())
+<span class="no">x</span> <span class="kw">&lt;-</span> <span class="no">x</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">replicate</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">replicate</span>)) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">t</span> <span class="kw">&lt;</span> <span class="fl">14</span>)
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">x</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">date</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">col</span> <span class="kw">=</span> <span class="no">replicate</span>)) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Case Incidence"</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Date"</span>) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"none"</span>)</pre></div>
 <p><img src="reference/figures/README-deaths%20over%20time-1.png" width="100%"></p>
-<p>Alternatively, there are a few unexposed functions for plotting these outputs:</p>
-<div class="sourceCode" id="cb18"><pre class="r">
-<span class="no">o1</span> <span class="kw">&lt;-</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu"><a href="reference/calibrate_output_parsing.html">calibrate_output_parsing</a></span>(<span class="no">calibration</span>, <span class="kw">date_0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span>())
-<span class="no">a</span> <span class="kw">&lt;-</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">plot_calibration_healthcare</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">o1</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>)
-<span class="no">b</span> <span class="kw">&lt;-</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">plot_calibration_healthcare_barplot</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">o1</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>)
-<span class="no">c</span> <span class="kw">&lt;-</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">plot_calibration_cases</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">o1</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>)
-<span class="no">d</span> <span class="kw">&lt;-</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">plot_calibration_cases_barplot</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">o1</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>)
-
-<span class="no">z</span> <span class="kw">&lt;-</span> <span class="no">a</span> + <span class="no">b</span> + <span class="no">c</span> + <span class="no">d</span> +
-  <span class="fu">plot_layout</span>(<span class="kw">guides</span> <span class="kw">=</span> <span class="st">'collect'</span>)
-<span class="no">z</span>
-<span class="co">#&gt; Warning: Removed 4347 row(s) containing missing values (geom_path).</span>
-<span class="co">#&gt; Warning: Removed 489 row(s) containing missing values (geom_path).</span></pre></div>
-<p><img src="reference/figures/README-orderly%20style-1.png" width="100%"></p>
 </div>
 </div>
 </div>
