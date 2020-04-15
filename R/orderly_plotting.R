@@ -143,11 +143,17 @@ calibrate_output_parsing <- function(r, date_0 = Sys.Date()) {
 #' @importFrom stats median runif quantile
 plot_calibration_cases <- function(df, data, forecast = 0) {
 
+  # day
+  df$day <- as.Date(as.character(df$date))
+
   # split to correct dates
   sub <- df[df$compartment %in% c("mild_cases", "hospital_cases") &
-              df$date <=  Sys.Date() + forecast,]
+              df$date <=  Sys.Date() + forecast + 1,] %>%
+    dplyr::group_by(.data$day, .data$replicate, .data$compartment) %>%
+    dplyr::summarise(y = sum(.data$y), n=dplyr::n()) %>%
+    dplyr::filter(.data$day <= Sys.Date() + forecast)
 
-  pd_group <- dplyr::group_by(sub, .data$date, .data$compartment) %>%
+  pd_group <- dplyr::group_by(sub, .data$day, .data$compartment) %>%
     dplyr::summarise(quants = list(quantile(.data$y, c(0.025, 0.5, 0.975))),
                      ymin = .data$quants[[1]][1],
                      ymax = .data$quants[[1]][3],
@@ -158,7 +164,7 @@ plot_calibration_cases <- function(df, data, forecast = 0) {
 
   # Plot
   gg_cases <- ggplot2::ggplot(
-    sub, ggplot2::aes(x = .data$date,
+    sub, ggplot2::aes(x = .data$day,
                       y = .data$y, col = .data$compartment,
                       group = interaction(.data$compartment, .data$replicate))) +
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
@@ -202,14 +208,18 @@ plot_calibration_cases <- function(df, data, forecast = 0) {
 #' @importFrom stats median runif
 plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
 
+  # day
+  df$day <- as.Date(as.character(df$date))
+
   # split to correct dates
   sub <- df[df$compartment %in% c("mild_cases", "hospital_cases") &
-              df$date <=  Sys.Date() + forecast,] %>%
-    dplyr::group_by(.data$date, .data$replicate) %>%
-    dplyr::summarise(y = sum(.data$y))
+              df$date <=  Sys.Date() + forecast + 1,] %>%
+    dplyr::group_by(.data$day, .data$replicate) %>%
+    dplyr::summarise(y = sum(.data$y)) %>%
+    dplyr::filter(.data$day <= Sys.Date() + forecast)
 
 
-  pd_group <- dplyr::group_by(sub, .data$date) %>%
+  pd_group <- dplyr::group_by(sub, .data$day) %>%
     dplyr::summarise(quants = list(quantile(.data$y, c(0.025, 0.25, 0.5, 0.75, 0.975))),
                      ymin = .data$quants[[1]][1],
                      ymax = .data$quants[[1]][5],
@@ -221,7 +231,7 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
   data$cases <- rev(c(tail(data$cases,1), diff(rev(data$cases))))
 
   # Plot
-  gg_cases <- ggplot2::ggplot(sub, ggplot2::aes(x = .data$date,
+  gg_cases <- ggplot2::ggplot(sub, ggplot2::aes(x = .data$day,
                                                 y = .data$y,
                                                 col = .data$compartment)) +
     ggplot2::geom_ribbon(data = pd_group,
@@ -269,18 +279,24 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
 #' @noRd
 plot_calibration_healthcare <- function(df, data, forecast = 14) {
 
+  # day
+  df$day <- as.Date(as.character(df$date))
+
   # split to correct dates
   sub <- df[df$compartment %in%c("ICU", "hospital") &
-              df$date <=  Sys.Date() + forecast,]
+              df$date <=  Sys.Date() + forecast + 1,] %>%
+    dplyr::group_by(.data$day, .data$replicate, .data$compartment) %>%
+    dplyr::summarise(y = sum(.data$y), n=dplyr::n()) %>%
+    dplyr::filter(.data$day <= Sys.Date() + forecast)
 
-  pd_group <- dplyr::group_by(sub, .data$date, .data$compartment) %>%
+  pd_group <- dplyr::group_by(sub, .data$day, .data$compartment) %>%
     dplyr::summarise(quants = list(quantile(.data$y, c(0.025, 0.5, 0.975))),
                      ymin = .data$quants[[1]][1],
                      y = median(.data$y),
                      ymax = .data$quants[[1]][3])
 
   # Plot
-  gg_healthcare <- ggplot2::ggplot(sub, ggplot2::aes(x = .data$date,
+  gg_healthcare <- ggplot2::ggplot(sub, ggplot2::aes(x = .data$day,
                                                      y = .data$y, col = .data$compartment,
                                                      group = interaction(.data$compartment, .data$replicate))) +
     ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
@@ -322,9 +338,12 @@ plot_calibration_healthcare_barplot <- function(df, data, what = "ICU", forecast
 
   # split to correct dates
   sub <- df[df$compartment %in% what &
-              df$date <=  Sys.Date() + forecast,]
+              df$date <=  Sys.Date() + forecast + 1,] %>%
+    dplyr::group_by(.data$day, .data$replicate) %>%
+    dplyr::summarise(y = sum(.data$y), n=dplyr::n()) %>%
+    dplyr::filter(.data$day <= Sys.Date() + forecast)
 
-  pd_group <- dplyr::group_by(sub, .data$day, .data$compartment) %>%
+  pd_group <- dplyr::group_by(sub, .data$day) %>%
     dplyr::summarise(quants = list(quantile(.data$y, c(0.025, 0.5, 0.975))),
                      ymin = .data$quants[[1]][1],
                      y = median(.data$y),
@@ -339,20 +358,7 @@ plot_calibration_healthcare_barplot <- function(df, data, what = "ICU", forecast
 
   # Plot
   gg_healthcare <- ggplot2::ggplot(sub, ggplot2::aes(x = .data$day,
-                                                     y = .data$y, col = .data$compartment,
-                                                     group = interaction(.data$compartment, .data$replicate))) +
-    # ggplot2::geom_ribbon(data = pd_group,
-    #                      mapping = ggplot2::aes(x = .data$day,
-    #                                             ymin = .data$ymin,
-    #                                             ymax = .data$ymax,
-    #                                             color = .data$compartment),
-    #                      fill = "#3f8ea7",
-    #                      color = "white",
-    #                      alpha = 0.2,
-    #                      linetype = "dashed",
-    #                      size = 0.8,
-    #                      show.legend = FALSE,
-  #                      inherit.aes = FALSE) +
+                                                     y = .data$y)) +
   ggplot2::geom_bar(data = pd_group,
                     mapping = ggplot2::aes(x = .data$day, y = .data$y, fill = "what"),
                     stat = "identity",
@@ -380,10 +386,17 @@ plot_calibration_healthcare_barplot <- function(df, data, what = "ICU", forecast
 #' @noRd
 plot_calibration_deaths_barplot <- function(df, data, forecast = 14, cumulative = FALSE) {
 
+  # day
+  df$day <- as.Date(as.character(df$date))
+
   # split to correct dates
   if(!cumulative) {
     sub <- df[df$compartment == "deaths" &
-                df$date <=  Sys.Date() + forecast,]
+                df$date <=  Sys.Date() + forecast + 1,]  %>%
+      dplyr::group_by(.data$day, .data$replicate) %>%
+      dplyr::summarise(y = sum(.data$y), n=dplyr::n()) %>%
+      dplyr::filter(.data$day <= Sys.Date() + forecast)
+
     title <- "Daily Deaths"
 
     # format deaths
@@ -391,25 +404,30 @@ plot_calibration_deaths_barplot <- function(df, data, forecast = 14, cumulative 
 
   } else {
     sub <- df[df$compartment == "cumulative_deaths" &
-                df$date <=  Sys.Date() + forecast,]
+                df$date <=  Sys.Date() + forecast + 1,]  %>%
+      dplyr::group_by(.data$day, .data$replicate) %>%
+      dplyr::summarise(y = sum(.data$y), n=dplyr::n()) %>%
+      dplyr::filter(.data$day <= Sys.Date() + forecast)
+
     title <- "Cumulative Deaths"
   }
 
-  pd_group <- dplyr::group_by(sub, .data$date, .data$compartment) %>%
+  pd_group <- dplyr::group_by(sub, .data$day) %>%
     dplyr::summarise(quants = list(quantile(.data$y, c(0.025, 0.25, 0.5, 0.75, 0.975))),
                      ymin = round(.data$quants[[1]][1]),
                      ymax = round(.data$quants[[1]][5]),
                      yinner_min = round(.data$quants[[1]][2]),
                      yinner_max = round(.data$quants[[1]][4]),
-                     y = median(.data$y))
+                     y = median(.data$y),
+                     n = dplyr::n())
 
 
 
   # Plot
   gg_healthcare <- ggplot2::ggplot(sub,
-                                   ggplot2::aes(x = .data$date,
-                                                y = .data$y, fill = .data$compartment,
-                                                group = .data$compartment)) +
+                                   ggplot2::aes(x = .data$day,
+                                                y = .data$y,
+                                                fill = .data$compartment)) +
     ggplot2::geom_ribbon(data = pd_group,
                          mapping = ggplot2::aes(ymin = .data$ymin,
                                                 ymax = .data$ymax,
