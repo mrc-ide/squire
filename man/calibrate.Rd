@@ -11,6 +11,7 @@ calibrate(
   seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
   min_seeding_cases = 5,
   max_seeding_cases = 50,
+  R0 = c(2.7, 3, 3.5),
   replicates = 100,
   dt = 0.1,
   ...
@@ -21,13 +22,18 @@ calibrate(
 
 \item{deaths}{Number of observed deaths}
 
-\item{reporting_fraction}{REporting fraction}
+\item{reporting_fraction}{Reporting fraction. Numeric for what proportion of
+the total deaths the reported deaths represent. E.g. 0.5 results in
+the model calibrating to twice the deaths provided by \code{deaths}}
 
 \item{seeding_age_groups}{Age groups for seeding}
 
 \item{min_seeding_cases}{Minimum seeding cases}
 
 \item{max_seeding_cases}{Maximum seeding cases}
+
+\item{R0}{Vector or R0 values to sample from to introduce uncertainty
+in predictions. Default = c(2.7, 3.0, 3.5)}
 
 \item{replicates}{Replicates}
 
