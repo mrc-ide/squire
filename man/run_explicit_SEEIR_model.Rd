@@ -142,9 +142,13 @@ death. Default = 1}
 
 \item{dur_rec}{Duration of recovery after coming off ventilation. Default = 2}
 
-\item{hosp_bed_capacity}{General bed capacity.}
+\item{hosp_bed_capacity}{General bed capacity. Can be single number of vector if capacity time-varies.}
 
-\item{ICU_bed_capacity}{ICU bed capacity.}
+\item{ICU_bed_capacity}{ICU bed capacity. Can be single number of vector if capacity time-varies.}
+
+\item{tt_hosp_beds}{Times at which hospital bed capacity changes (Default = 0 = doesn't change)}
+
+\item{tt_ICU_beds}{Times at which ICU bed capacity changes (Default = 0 = doesn't change)}
 
 \item{seeding_cases}{Initial number of cases seeding the epidemic}
 }
