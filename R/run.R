@@ -162,8 +162,10 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' @param dur_not_get_mv_die Mean duration without ventilation given
 #'   death. Default = 1
 #' @param dur_rec Duration of recovery after coming off ventilation. Default = 2
-#' @param hosp_bed_capacity General bed capacity.
-#' @param ICU_bed_capacity ICU bed capacity.
+#' @param hosp_bed_capacity General bed capacity. Can be single number of vector if capacity time-varies.
+#' @param ICU_bed_capacity ICU bed capacity. Can be single number of vector if capacity time-varies.
+#' @param tt_hosp_beds Times at which hospital bed capacity changes (Default = 0 = doesn't change)
+#' @param tt_ICU_beds Times at which ICU bed capacity changes (Default = 0 = doesn't change)
 #' @param seeding_cases Initial number of cases seeding the epidemic
 #'
 #' @return Simulation output
