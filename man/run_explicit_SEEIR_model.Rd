@@ -45,6 +45,8 @@ run_explicit_SEEIR_model(
   dur_rec = 2,
   hosp_bed_capacity = NULL,
   ICU_bed_capacity = NULL,
+  tt_hosp_beds = 0,
+  tt_ICU_beds = 0,
   seeding_cases = NULL
 )
 }
