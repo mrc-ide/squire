@@ -43,15 +43,14 @@ NULL, which will generate this based on the \code{country}.}
 
 \item{max_seeding_cases}{Maximum seeding cases}
 
-\item{R0}{R0 to be passed to \code{\link(run_explicit_SEEIR_model)}.
+\item{R0}{R0 to be passed to \code{\link{run_explicit_SEEIR_model}}.
 Default = 3}
 
 \item{R0_scan}{Vector or R0 values to sample from to introduce uncertainty
 in predictions. Default = NULL, which will not scan. If provided, the first
 value in \code{R0} will be drawn from \code{R0_scan}}
 
-\item{replicates}{Replicates to be passed to
-\code{\link(run_explicit_SEEIR_model)}. Default = 100}
+\item{replicates}{Number of replicates. Default = 10}
 
 \item{...}{Further aguments for \code{run_explicit_SEEIR_model()}}
 }

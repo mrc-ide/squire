@@ -1,13 +1,13 @@
 #' Calibrate deaths
 #'
 #' @param deaths Number of observed deaths
-#' @param R0 R0 to be passed to \code{\link(run_explicit_SEEIR_model)}.
+#' @param R0 R0 to be passed to \code{\link{run_explicit_SEEIR_model}}.
 #'   Default = 3
 #' @param R0_scan Vector or R0 values to sample from to introduce uncertainty
 #'   in predictions. Default = NULL, which will not scan. If provided, the first
 #'   value in \code{R0} will be drawn from \code{R0_scan}
 #' @param replicates Replicates to be passed to
-#'   \code{\link(run_explicit_SEEIR_model)}. Default = 100
+#'   \code{\link{run_explicit_SEEIR_model}. Default = 100
 #' @param reporting_fraction Reporting fraction. Numeric for what proportion of
 #'   the total deaths the reported deaths represent. E.g. 0.5 results in
 #'   the model calibrating to twice the deaths provided by \code{deaths}
