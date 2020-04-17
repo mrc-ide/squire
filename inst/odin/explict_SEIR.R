@@ -44,9 +44,6 @@ prob_severe_death_treatment[] <- user() # probability of dying from severe disea
 prob_severe_death_no_treatment[] <- user() # probability of dying from severe disease (i.e. requiring mechanical ventilation) by age given you do NOT receive appropriate treatment (proxy here is whether an ICU bed is available)
 p_dist[] <- user() # distributing infections in given age class to available hosp/ICU beds (make all equal to make it random and not related to age)
 
-hosp_bed_capacity <- user() # total number of hospital beds available
-ICU_bed_capacity <- user() # total number of ICU beds available
-
 ##########################################################
 ## Core equations for transitions between compartments: ##
 ##########################################################
@@ -302,6 +299,18 @@ temp[] <- IMild[i] + ICase1[i] + ICase2[i]
 s_ij[,] <- m[i, j] * temp[j]
 lambda[] <- beta * sum(s_ij[i, ])
 
+## Interpolation for Hospital and ICU Capacity
+hosp_bed_capacity <- interpolate(tt_hosp_beds, hosp_beds, "constant")
+tt_hosp_beds[] <- user()
+hosp_beds[] <- user()
+dim(tt_hosp_beds) <- user()
+dim(hosp_beds) <- length(tt_hosp_beds)
+
+ICU_bed_capacity <- interpolate(tt_ICU_beds, ICU_beds, "constant")
+tt_ICU_beds[] <- user()
+ICU_beds[] <- user()
+dim(tt_ICU_beds) <- user()
+dim(ICU_beds) <- length(tt_ICU_beds)
 
 ## Initial states:
 initial(S[]) <- S_0[i]

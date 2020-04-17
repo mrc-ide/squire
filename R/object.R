@@ -51,11 +51,11 @@ print.squire_simulation <- function(x, ...){
 #' @param ... additional arguments affecting the plot produced.
 #'
 #' @export
-plot.squire_simulation <- function(x, replicates = FALSE,
+plot.squire_simulation <- function(x, var_select = NULL,
+                                   replicates = FALSE,
                                    summarise = TRUE,
                                    ci = TRUE,
                                    q = c(0.025, 0.975),
-                                   var_select = NULL,
                                    summary_f = mean,
                                    x_var = "t", ...){
 
@@ -64,6 +64,10 @@ plot.squire_simulation <- function(x, replicates = FALSE,
   pd <- pd %>%
     dplyr::mutate(x = .data[[x_var]])
 
+  # t sometimes seems to be being rounded weirdly
+  if(x_var == "t") {
+    pd$x <- round(pd$x, ceiling(log10(1/x$parameters$dt)))
+  }
 
   # Format summary data
   pds <- pd %>%

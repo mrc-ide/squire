@@ -8,8 +8,13 @@ test_that("cases and healthcare plotting works", {
                           deaths = rev(c(1, 1, 2, 3, 4, 6)),
                           cases = c(740,700,400,300,200,110,58))
 
-  t1 <- calibrate("United Kingdom", max(data$deaths), 1, time_period = 120, max_seeding_cases = 5,
-                  min_seeding_cases = 1, replicates = 10)
+  t1 <- calibrate(country = "United Kingdom",
+                  deaths =  max(data$deaths),
+                  reporting_fraction = 1,
+                  time_period = 120,
+                  max_seeding_cases = 5,
+                  min_seeding_cases = 1,
+                  replicates = 10)
   o1 <- calibrate_output_parsing(t1, date_0 = Sys.Date())
   o2 <- calibrate_output_parsing(t1)
 

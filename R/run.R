@@ -162,8 +162,10 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' @param dur_not_get_mv_die Mean duration without ventilation given
 #'   death. Default = 1
 #' @param dur_rec Duration of recovery after coming off ventilation. Default = 2
-#' @param hosp_bed_capacity General bed capacity.
-#' @param ICU_bed_capacity ICU bed capacity.
+#' @param hosp_bed_capacity General bed capacity. Can be single number of vector if capacity time-varies.
+#' @param ICU_bed_capacity ICU bed capacity. Can be single number of vector if capacity time-varies.
+#' @param tt_hosp_beds Times at which hospital bed capacity changes (Default = 0 = doesn't change)
+#' @param tt_ICU_beds Times at which ICU bed capacity changes (Default = 0 = doesn't change)
 #' @param seeding_cases Initial number of cases seeding the epidemic
 #'
 #' @return Simulation output
@@ -235,6 +237,8 @@ run_explicit_SEEIR_model <- function(
   # health system capacity
   hosp_bed_capacity = NULL,
   ICU_bed_capacity = NULL,
+  tt_hosp_beds = 0,
+  tt_ICU_beds = 0,
 
   seeding_cases = NULL
 
@@ -246,21 +250,12 @@ run_explicit_SEEIR_model <- function(
 
 
   # Handle country population args
-  if (is.null(country) &&
-      (is.null(population) || is.null(contact_matrix_set))) {
-    stop("User must provide either the country being simulated or
-         both the population size and contact_matrix_set")
-  }
-
-  # If a country was provided then grab the population and matrices if needed
-  if (is.null(population)) {
-    population <- get_population(country)
-
-  if (is.null(contact_matrix_set)) {
-    contact_matrix_set <- get_mixing_matrix(country)
-  }
-   population <- population$n
-  }
+  cpm <- parse_country_population_mixing_matrix(country = country,
+                                                population = population,
+                                                contact_matrix_set = contact_matrix_set)
+  country <- cpm$country
+  population <- cpm$population
+  contact_matrix_set <- cpm$contact_matrix_set
 
   # Standardise contact matrix set
   if(is.matrix(contact_matrix_set)){
@@ -282,7 +277,7 @@ run_explicit_SEEIR_model <- function(
     if (!is.null(country)) {
       beds <- get_healthcare_capacity(country)
       hosp_beds <- beds$hosp_beds
-      hosp_bed_capacity <- round(hosp_beds * sum(population)/1000)
+      hosp_bed_capacity <- rep(round(hosp_beds * sum(population)/1000), length(tt_hosp_beds))
     } else {
       hosp_bed_capacity <- 5 * sum(population)/1000
     }
@@ -291,7 +286,7 @@ run_explicit_SEEIR_model <- function(
     if (!is.null(country)) {
       beds <- get_healthcare_capacity(country)
       ICU_beds <- beds$ICU_beds
-      ICU_bed_capacity <- round(ICU_beds * sum(population)/1000)
+      ICU_bed_capacity <- rep(round(ICU_beds * sum(population)/1000), length(tt_ICU_beds))
     } else {
       ICU_bed_capacity <- 3 * hosp_bed_capacity/100
     }
@@ -316,7 +311,10 @@ run_explicit_SEEIR_model <- function(
   mc <- matrix_check(population[-1], contact_matrix_set)
   stopifnot(length(R0) == length(tt_R0))
   stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
+  stopifnot(length(hosp_bed_capacity) == length(tt_hosp_beds))
+  stopifnot(length(ICU_bed_capacity) == length(tt_ICU_beds))
   tc <- lapply(list(tt_R0/dt, tt_contact_matrix/dt), check_time_change, time_period/dt)
+  tc2 <- lapply(list(tt_hosp_beds/dt, tt_ICU_beds/dt), check_time_change, time_period/dt)
 
   assert_pos(dt)
   assert_pos(dur_E)
@@ -332,6 +330,8 @@ run_explicit_SEEIR_model <- function(
   assert_pos(dur_not_get_mv_die)
   assert_pos(time_period)
   assert_pos(replicates)
+  assert_pos(hosp_bed_capacity)
+  assert_pos(ICU_bed_capacity)
 
   assert_length(prob_hosp, length(population))
   assert_length(prob_severe, length(population))
@@ -441,8 +441,10 @@ run_explicit_SEEIR_model <- function(
                prob_severe_death_treatment = prob_severe_death_treatment,
                prob_severe_death_no_treatment = prob_severe_death_no_treatment,
                p_dist = p_dist,
-               hosp_bed_capacity = hosp_bed_capacity,
-               ICU_bed_capacity = ICU_bed_capacity,
+               hosp_beds = hosp_bed_capacity,
+               ICU_beds = ICU_bed_capacity,
+               tt_hosp_beds = round(tt_hosp_beds/dt),
+               tt_ICU_beds = round(tt_ICU_beds/dt),
                tt_matrix = round(tt_contact_matrix/dt),
                mix_mat_set = matrices_set,
                tt_beta = round(tt_R0/dt),

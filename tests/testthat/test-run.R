@@ -156,6 +156,20 @@ test_that("run explicit works", {
   r7 <- run_explicit_SEEIR_model(R0 = 2, country = "Afghanistan")
   expect_type(r7$output, "double")
   expect_null(check_squire(r7))
+
+  expect_error(run_explicit_SEEIR_model(country = "Afghanistan",
+                                        hosp_bed_capacity = c(1000, 2000),
+                                        tt_hosp_beds = 0))
+  expect_error(run_explicit_SEEIR_model(country = "Afghanistan",
+                                        ICU_bed_capacity = c(1000, 2000),
+                                        tt_ICU_beds = 0))
+
+  r8 <- run_explicit_SEEIR_model(country = "Afghanistan",
+                                 ICU_bed_capacity = c(1000, 2000),
+                                 tt_ICU_beds = c(0, 100))
+  expect_type(r8, "list")
+
+
 })
 
 
