@@ -1,8 +1,14 @@
-#' Get supported countries
+#' Get supported LMIC countries
 #'
 #' @export
-get_countries <-  function() {
-  unique(population$country)
+get_lmic_countries <-  function() {
+  lmic <- c(
+    income_group$country[(income_group$income_group != 'High income')],
+    income_group$country[
+      is.na(income_group$income_group) & income_group$country != 'China, Taiwan Province of China'
+    ]
+  )
+  lmic[!is.na(lmic)]
 }
 
 #' Get population data
