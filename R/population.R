@@ -1,5 +1,6 @@
 #' Get supported LMIC countries
 #'
+#' @return vector of support LMIC
 #' @export
 get_lmic_countries <-  function() {
   lmic <- c(

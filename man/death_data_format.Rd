@@ -4,8 +4,12 @@
 \alias{death_data_format}
 \title{Generate death time seris}
 \usage{
-death_data_format(date = NULL, deaths = NULL, cases = NULL,
-  reporting_quality = 0.2)
+death_data_format(
+  date = NULL,
+  deaths = NULL,
+  cases = NULL,
+  reporting_quality = 0.2
+)
 }
 \arguments{
 \item{date}{Character or Date vector of time series}
