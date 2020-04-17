@@ -5,26 +5,37 @@
 \title{Calibrate deaths}
 \usage{
 calibrate(
-  country,
   deaths,
   reporting_fraction = 1,
+  country = NULL,
+  population = NULL,
+  contact_matrix_set = NULL,
   seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
   min_seeding_cases = 5,
   max_seeding_cases = 50,
-  R0 = c(2.7, 3, 3.5),
+  R0 = 3,
+  R0_scan = NULL,
   replicates = 100,
-  dt = 0.1,
   ...
 )
 }
 \arguments{
-\item{country}{Country name}
-
 \item{deaths}{Number of observed deaths}
 
 \item{reporting_fraction}{Reporting fraction. Numeric for what proportion of
 the total deaths the reported deaths represent. E.g. 0.5 results in
 the model calibrating to twice the deaths provided by \code{deaths}}
+
+\item{country}{Character for country beign simulated. WIll be used to
+generate \code{population} and \code{contact_matrix_set} if
+unprovided. Either \code{country} or \code{population} and
+\code{contact_matrix_set} must be provided.}
+
+\item{population}{Population vector (for each age group). Default = NULL,
+which will cause population to be sourced from \code{country}}
+
+\item{contact_matrix_set}{Contact matrices used in simulation. Default =
+NULL, which will generate this based on the \code{country}.}
 
 \item{seeding_age_groups}{Age groups for seeding}
 
@@ -32,12 +43,15 @@ the model calibrating to twice the deaths provided by \code{deaths}}
 
 \item{max_seeding_cases}{Maximum seeding cases}
 
-\item{R0}{Vector or R0 values to sample from to introduce uncertainty
-in predictions. Default = c(2.7, 3.0, 3.5)}
+\item{R0}{R0 to be passed to \code{\link(run_explicit_SEEIR_model)}.
+Default = 3}
 
-\item{replicates}{Replicates}
+\item{R0_scan}{Vector or R0 values to sample from to introduce uncertainty
+in predictions. Default = NULL, which will not scan. If provided, the first
+value in \code{R0} will be drawn from \code{R0_scan}}
 
-\item{dt}{dt}
+\item{replicates}{Replicates to be passed to
+\code{\link(run_explicit_SEEIR_model)}. Default = 100}
 
 \item{...}{Further aguments for \code{run_explicit_SEEIR_model()}}
 }

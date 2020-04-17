@@ -250,21 +250,12 @@ run_explicit_SEEIR_model <- function(
 
 
   # Handle country population args
-  if (is.null(country) &&
-      (is.null(population) || is.null(contact_matrix_set))) {
-    stop("User must provide either the country being simulated or
-         both the population size and contact_matrix_set")
-  }
-
-  # If a country was provided then grab the population and matrices if needed
-  if (is.null(population)) {
-    population <- get_population(country)
-
-  if (is.null(contact_matrix_set)) {
-    contact_matrix_set <- get_mixing_matrix(country)
-  }
-   population <- population$n
-  }
+  cpm <- parse_country_population_mixing_matrix(country = country,
+                                                population = population,
+                                                contact_matrix_set = contact_matrix_set)
+  country <- cpm$country
+  population <- cpm$population
+  contact_matrix_set <- cpm$contact_matrix_set
 
   # Standardise contact matrix set
   if(is.matrix(contact_matrix_set)){
