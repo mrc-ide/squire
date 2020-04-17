@@ -20,9 +20,12 @@ Suggests:
     covr,
     readxl
 RoxygenNote: 7.1.0
+Remotes: mrc-ide/odin.js,
+    ropensci/jsonvalidate
 Imports: 
     odin,
-    odin.js (>= 0.1.3),
+    odin.js,
+    jsonvalidate,
     dde,
     dplyr,
     tidyr,
