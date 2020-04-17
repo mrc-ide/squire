@@ -123,11 +123,11 @@
     <pre class="usage"><span class='co'># S3 method for squire_simulation</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(
   <span class='no'>x</span>,
+  <span class='kw'>var_select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>summarise</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>ci</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>q</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.025</span>, <span class='fl'>0.975</span>),
-  <span class='kw'>var_select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>summary_f</span> <span class='kw'>=</span> <span class='no'>mean</span>,
   <span class='kw'>x_var</span> <span class='kw'>=</span> <span class='st'>"t"</span>,
   <span class='no'>...</span>
@@ -139,6 +139,10 @@
     <tr>
       <th>x</th>
       <td><p>An iccm_simulation object</p></td>
+    </tr>
+    <tr>
+      <th>var_select</th>
+      <td><p>Vector of variable names to plot (default is all)</p></td>
     </tr>
     <tr>
       <th>replicates</th>
@@ -155,10 +159,6 @@
     <tr>
       <th>q</th>
       <td><p>Quantiles for upper and lower of interval ribbon</p></td>
-    </tr>
-    <tr>
-      <th>var_select</th>
-      <td><p>Vector of variable names to plot (default is all)</p></td>
     </tr>
     <tr>
       <th>summary_f</th>

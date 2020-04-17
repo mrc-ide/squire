@@ -121,25 +121,23 @@
     </div>
 
     <pre class="usage"><span class='fu'>calibrate</span>(
-  <span class='no'>country</span>,
   <span class='no'>deaths</span>,
   <span class='kw'>reporting_fraction</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>country</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>seeding_age_groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"35-40"</span>, <span class='st'>"40-45"</span>, <span class='st'>"45-50"</span>, <span class='st'>"50-55"</span>),
   <span class='kw'>min_seeding_cases</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>max_seeding_cases</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2.7</span>, <span class='fl'>3</span>, <span class='fl'>3.5</span>),
+  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>R0_scan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
   <span class='no'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>country</th>
-      <td><p>Country name</p></td>
-    </tr>
     <tr>
       <th>deaths</th>
       <td><p>Number of observed deaths</p></td>
@@ -149,6 +147,23 @@
       <td><p>Reporting fraction. Numeric for what proportion of
 the total deaths the reported deaths represent. E.g. 0.5 results in
 the model calibrating to twice the deaths provided by <code>deaths</code></p></td>
+    </tr>
+    <tr>
+      <th>country</th>
+      <td><p>Character for country beign simulated. WIll be used to
+generate <code>population</code> and <code>contact_matrix_set</code> if
+unprovided. Either <code>country</code> or <code>population</code> and
+<code>contact_matrix_set</code> must be provided.</p></td>
+    </tr>
+    <tr>
+      <th>population</th>
+      <td><p>Population vector (for each age group). Default = NULL,
+which will cause population to be sourced from <code>country</code></p></td>
+    </tr>
+    <tr>
+      <th>contact_matrix_set</th>
+      <td><p>Contact matrices used in simulation. Default =
+NULL, which will generate this based on the <code>country</code>.</p></td>
     </tr>
     <tr>
       <th>seeding_age_groups</th>
@@ -164,16 +179,18 @@ the model calibrating to twice the deaths provided by <code>deaths</code></p></t
     </tr>
     <tr>
       <th>R0</th>
+      <td><p>R0 to be passed to <code><a href='run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model</a></code>.
+Default = 3</p></td>
+    </tr>
+    <tr>
+      <th>R0_scan</th>
       <td><p>Vector or R0 values to sample from to introduce uncertainty
-in predictions. Default = c(2.7, 3.0, 3.5)</p></td>
+in predictions. Default = NULL, which will not scan. If provided, the first
+value in <code>R0</code> will be drawn from <code>R0_scan</code></p></td>
     </tr>
     <tr>
       <th>replicates</th>
-      <td><p>Replicates</p></td>
-    </tr>
-    <tr>
-      <th>dt</th>
-      <td><p>dt</p></td>
+      <td><p>Number of replicates. Default = 10</p></td>
     </tr>
     <tr>
       <th>...</th>

@@ -161,6 +161,8 @@
   <span class='kw'>dur_rec</span> <span class='kw'>=</span> <span class='fl'>2</span>,
   <span class='kw'>hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tt_hosp_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>tt_ICU_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>seeding_cases</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
@@ -322,11 +324,19 @@ death. Default = 1</p></td>
     </tr>
     <tr>
       <th>hosp_bed_capacity</th>
-      <td><p>General bed capacity.</p></td>
+      <td><p>General bed capacity. Can be single number of vector if capacity time-varies.</p></td>
     </tr>
     <tr>
       <th>ICU_bed_capacity</th>
-      <td><p>ICU bed capacity.</p></td>
+      <td><p>ICU bed capacity. Can be single number of vector if capacity time-varies.</p></td>
+    </tr>
+    <tr>
+      <th>tt_hosp_beds</th>
+      <td><p>Times at which hospital bed capacity changes (Default = 0 = doesn't change)</p></td>
+    </tr>
+    <tr>
+      <th>tt_ICU_beds</th>
+      <td><p>Times at which ICU bed capacity changes (Default = 0 = doesn't change)</p></td>
     </tr>
     <tr>
       <th>seeding_cases</th>
