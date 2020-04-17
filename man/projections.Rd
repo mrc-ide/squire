@@ -7,7 +7,7 @@
 projections(r, mitigation, tt_mitigation)
 }
 \arguments{
-\item{r}{Calibrated \code{\link{squire_simulation}} object.}
+\item{r}{Calibrated \code{{squire_simulation}} object.}
 
 \item{mitigation}{Numeric vector for changes to R0 since calibration.}
 
