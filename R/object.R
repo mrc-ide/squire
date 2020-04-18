@@ -35,6 +35,36 @@ print.squire_simulation <- function(x, ...){
   invisible(x)
 }
 
+
+#' @noRd
+squire_simulation_plot_prep <- function(x,
+                                        var_select,
+                                        q = c(0.025, 0.975),
+                                        summary_f = mean,
+                                        x_var = "t",
+                                        ...) {
+
+  pd <- format_output(x, var_select = var_select, ...)
+
+  pd <- pd %>%
+    dplyr::mutate(x = .data[[x_var]])
+
+  # t sometimes seems to be being rounded weirdly
+  if(x_var == "t") {
+    pd$x <- round(pd$x, ceiling(log10(1/x$parameters$dt)))
+  }
+
+  # Format summary data
+  pds <- pd %>%
+    dplyr::group_by(.data$x, .data$compartment) %>%
+    dplyr::summarise(ymin = stats::quantile(.data$y, q[1]),
+                     ymax = stats::quantile(.data$y, q[2]),
+                     y = summary_f(.data$y))
+
+  return(list(pd = pd, pds = pds))
+
+}
+
 #' squire simulation plot
 #'
 #' @param x An iccm_simulation object
@@ -60,21 +90,16 @@ plot.squire_simulation <- function(x, var_select = NULL,
                                    x_var = "t", ...){
 
 
-  pd <- format_output(x, var_select = var_select, ...)
-  pd <- pd %>%
-    dplyr::mutate(x = .data[[x_var]])
+  # summarise accordingly
+  pds <- squire_simulation_plot_prep(x = x,
+                                     x_var = x_var,
+                                     var_select = var_select,
+                                     q = q,
+                                     summary_f = summary_f,
+                                     ...)
+  pd <- pds$pd
+  pds <- pds$pds
 
-  # t sometimes seems to be being rounded weirdly
-  if(x_var == "t") {
-    pd$x <- round(pd$x, ceiling(log10(1/x$parameters$dt)))
-  }
-
-  # Format summary data
-  pds <- pd %>%
-    dplyr::group_by(.data$x, .data$compartment) %>%
-    dplyr::summarise(ymin = stats::quantile(.data$y, q[1]),
-              ymax = stats::quantile(.data$y, q[2]),
-              y = summary_f(.data$y))
   # Plot
   p <- ggplot2::ggplot()
 

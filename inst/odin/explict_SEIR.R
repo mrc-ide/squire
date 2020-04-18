@@ -301,12 +301,14 @@ lambda[] <- beta * sum(s_ij[i, ])
 
 ## Interpolation for Hospital and ICU Capacity
 hosp_bed_capacity <- interpolate(tt_hosp_beds, hosp_beds, "constant")
+#output(hosp_bed_capacity) <- TRUE
 tt_hosp_beds[] <- user()
 hosp_beds[] <- user()
 dim(tt_hosp_beds) <- user()
 dim(hosp_beds) <- length(tt_hosp_beds)
 
 ICU_bed_capacity <- interpolate(tt_ICU_beds, ICU_beds, "constant")
+#output(ICU_bed_capacity) <- TRUE
 tt_ICU_beds[] <- user()
 ICU_beds[] <- user()
 dim(tt_ICU_beds) <- user()

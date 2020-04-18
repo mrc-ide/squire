@@ -1,3 +1,7 @@
+# squire 0.3.0
+
+* `projection` function for doing scenario projections
+
 # squire 0.2.3
 
 * `format_output` and calibrate orderly plotting functioanlity in

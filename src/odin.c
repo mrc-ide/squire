@@ -2731,10 +2731,10 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
     internal->delta_R[i - 1] = internal->n_IOxGetLive2_R[i - 1] + internal->n_IOxNotGetLive2_R[i - 1] + internal->n_IRec2_R[i - 1] + internal->n_IMVNotGetLive2_R[i - 1] + internal->n_IMild_R[i - 1];
   }
   for (int i = 1; i <= internal->dim_n_E2_ICase1; ++i) {
-    internal->n_E2_ICase1[i - 1] = round(internal->n_E2_I[i - 1] * internal->prob_hosp[i - 1]);
+    internal->n_E2_ICase1[i - 1] = fround(internal->n_E2_I[i - 1] * internal->prob_hosp[i - 1], 0);
   }
   for (int i = 1; i <= internal->dim_number_requiring_IMV; ++i) {
-    internal->number_requiring_IMV[i - 1] = round(internal->n_ICase2_Hosp[i - 1] * internal->prob_severe[i - 1]);
+    internal->number_requiring_IMV[i - 1] = fround(internal->n_ICase2_Hosp[i - 1] * internal->prob_severe[i - 1], 0);
   }
   double beta = 0.0;
   cinterpolate_eval(step, internal->interpolate_beta, &beta);
@@ -2960,10 +2960,10 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
      internal->number_get_Ox[i - 1] = ((total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 16)) <= 0 ? 0 : fmin(internal->number_requiring_Ox[16], Rf_rbinom(round(total_number_get_hosp - odin_sum1(internal->number_get_Ox, 0, 16)), internal->ox_multinom_prob[16] / (double) odin_sum1(internal->ox_multinom_prob, 16, 17))));
   }
   for (int i = 1; i <= internal->dim_n_IMVGetDie1; ++i) {
-    internal->n_IMVGetDie1[i - 1] = round(internal->number_get_IMV[i - 1] * internal->prob_severe_death_treatment[i - 1]);
+    internal->n_IMVGetDie1[i - 1] = fround(internal->number_get_IMV[i - 1] * internal->prob_severe_death_treatment[i - 1], 0);
   }
   for (int i = 1; i <= internal->dim_n_IOxGetDie1; ++i) {
-    internal->n_IOxGetDie1[i - 1] = round(internal->number_get_Ox[i - 1] * internal->prob_non_severe_death_treatment[i - 1]);
+    internal->n_IOxGetDie1[i - 1] = fround(internal->number_get_Ox[i - 1] * internal->prob_non_severe_death_treatment[i - 1], 0);
   }
   for (int i = 1; i <= internal->dim_number_notget_IMV; ++i) {
     internal->number_notget_IMV[i - 1] = internal->number_requiring_IMV[i - 1] - internal->number_get_IMV[i - 1];
@@ -2984,13 +2984,13 @@ void explict_SEIR_rhs(explict_SEIR_internal* internal, size_t step, double * sta
     internal->n_IMVGetLive1[i - 1] = internal->number_get_IMV[i - 1] - internal->n_IMVGetDie1[i - 1];
   }
   for (int i = 1; i <= internal->dim_n_IMVNotGetDie1; ++i) {
-    internal->n_IMVNotGetDie1[i - 1] = round(internal->number_notget_IMV[i - 1] * internal->prob_severe_death_no_treatment[i - 1]);
+    internal->n_IMVNotGetDie1[i - 1] = fround(internal->number_notget_IMV[i - 1] * internal->prob_severe_death_no_treatment[i - 1], 0);
   }
   for (int i = 1; i <= internal->dim_n_IOxGetLive1; ++i) {
     internal->n_IOxGetLive1[i - 1] = internal->number_get_Ox[i - 1] - internal->n_IOxGetDie1[i - 1];
   }
   for (int i = 1; i <= internal->dim_n_IOxNotGetDie1; ++i) {
-    internal->n_IOxNotGetDie1[i - 1] = round(internal->number_notget_Ox[i - 1] * internal->prob_non_severe_death_no_treatment[i - 1]);
+    internal->n_IOxNotGetDie1[i - 1] = fround(internal->number_notget_Ox[i - 1] * internal->prob_non_severe_death_no_treatment[i - 1], 0);
   }
   for (int i = 1; i <= internal->dim_n_S_E1; ++i) {
     internal->n_S_E1[i - 1] = Rf_rbinom(round(S[i - 1]), internal->p_S_E1[i - 1]);

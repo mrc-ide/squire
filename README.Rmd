@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 # squire
 
 <!-- badges: start -->
+[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![Travis build status](https://travis-ci.org/mrc-ide/squire.svg?branch=master)](https://travis-ci.org/mrc-ide/squire)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/mrc-ide/squire?branch=master&svg=true)](https://ci.appveyor.com/project/pwinskill/squire)
 [![Codecov test coverage](https://codecov.io/gh/mrc-ide/squire/branch/master/graph/badge.svg)](https://codecov.io/gh/mrc-ide/squire?branch=master)
@@ -334,4 +335,97 @@ ggplot(x, aes(x = date, y = y, col = replicate)) +
   theme(legend.position = "none")
 
 
+```
+
+### 5. Conducting scenario projections to fitted data
+
+Once you have calibrated the model to death data, it is possible to then implement mitigation strategies forwards in time from the point of calibration. This is achieved using the `projection` function. For example, to contrast an unmitigated epidemic against a mitigation scenario with a 20% reduction in R0 today and a further 40% in 20 days time:
+
+```{r projection}
+
+# first calibrate
+t1 <- calibrate(country = "Angola", 
+                deaths = 5,
+                  reporting_fraction = 1,
+                  dt = 0.2,
+                  time_period = 200,
+                  replicates = 25,
+                  R0_scan = c(3,4,5))
+
+# create our projections
+p2 <- projections(r = t1, R0_change = c(0.8, 0.4), tt_R0 = c(0, 20))
+```
+
+The output generated from `projections` is the same class and structure as from `calibrate` and can be plotted against the unmitigated scenario using `projection_plotting`:
+
+```{r projection plotting}
+ggproj <- projection_plotting(r_list = list(t1,p2),
+                    scenarios = c("Unmitigated","Mitigation"),
+                    var_select = c("ICU_occupancy", "ICU_demand"),
+                    add_parms_to_scenarios = TRUE,ci = FALSE,summarise = TRUE)
+
+# and lets add in the ICU capacity
+ggproj + ggplot2::geom_hline(yintercept = t1$parameters$ICU_bed_capacity)
+```
+
+We can see above that the intervention introduced was sufficient to prevent ICU demand (in red) from exceeding the supply, whereas in the unmitigated strategy this did occur.
+
+We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 50% today before relaxing it to 80% in 20 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with `add_parms_to_scenarios = FALSE`):
+
+```{r projection relative beds}
+
+# first calibrate
+t1 <- calibrate(country = "Angola", 
+                deaths = 5,
+                  reporting_fraction = 1,
+                  dt = 0.2,
+                  time_period = 200,
+                  replicates = 25,
+                  R0_scan = c(3,4,5))
+
+# create our projections
+p2 <- projections(r = t1, 
+                  contact_matrix_set_change = c(0.5, 0.8), 
+                  tt_contact_matrix = c(0, 20), 
+                  hosp_bed_capacity_change = c(1, 1.2),
+                  tt_hosp_beds = c(0, 30),
+                  ICU_bed_capacity_change = c(1, 1.2),
+                  tt_ICU_beds = c(0,30))
+
+projection_plotting(r_list = list(t1,p2),
+                    scenarios = c("Unmitigated","Mitigation"),
+                    var_select = c("ICU_occupancy", "ICU_demand","deaths"),
+                    add_parms_to_scenarios = FALSE,
+                    ci = FALSE,summarise = TRUE)
+```
+
+Above we can see that the increase in bed causes the mitigation strategy to plateau at a higher bed occupancy, however, not high enough to meet the demand. However, despite this the the peak in daily deaths is lower, which in turn causes a noticable decrease in total deaths:
+
+```{r total deaths projection}
+projection_plotting(r_list = list(t1,p2),
+                    scenarios = c("Unmitigated","Mitigation"),
+                    var_select = c("D"),
+                    add_parms_to_scenarios = FALSE,
+                    ci = FALSE,summarise = TRUE)
+```
+
+Lastly, rather than using relative changes to the interventions, we can provide absolute measures. For example, to change the R0 to 2 today and add 5000 ICU beds in 40 days time: 
+
+```{r projection plotting absolute}
+
+# what is the current capacity
+icu <- tail(t1$parameters$ICU_bed_capacity,1)
+
+# create our projections
+p2 <- projections(r = t1, 
+                  R0 = 2,
+                  tt_R0 = 0,
+                  ICU_bed_capacity = c(icu, icu + 5000),
+                  tt_ICU_beds = c(0,40))
+
+projection_plotting(r_list = list(t1,p2),
+                    scenarios = c("Unmitigated","Mitigation"),
+                    var_select = c("ICU_occupancy", "ICU_demand","deaths"),
+                    add_parms_to_scenarios = FALSE,
+                    ci = FALSE,summarise = TRUE)
 ```
