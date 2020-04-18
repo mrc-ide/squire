@@ -50,7 +50,8 @@ Default = 3}
 in predictions. Default = NULL, which will not scan. If provided, the first
 value in \code{R0} will be drawn from \code{R0_scan}}
 
-\item{replicates}{Number of replicates. Default = 10}
+\item{replicates}{Replicates to be passed to
+\code{\link{run_explicit_SEEIR_model}}. Default = 100}
 
 \item{...}{Further aguments for \code{run_explicit_SEEIR_model()}}
 }

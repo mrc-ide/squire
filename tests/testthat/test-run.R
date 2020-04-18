@@ -137,8 +137,9 @@ test_that("run explicit works", {
                                  time_period = 100,
                                  replicates = 10,
                                  contact_matrix_set = list(contact_matrices[[1]],
-                                                           contact_matrices[[2]]),
-                                 tt_contact_matrix = c(0, 50))
+                                                           contact_matrices[[1]]*0.5,
+                                                           contact_matrices[[1]]*0.2),
+                                 tt_contact_matrix = c(0, 40, 70))
   expect_true(!identical(r1$output, r5$output))
 
   set.seed(123)
