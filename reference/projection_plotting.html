@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Estimate beta parameter — beta_est_explicit • squire</title>
+<title>Plot projections against each other — projection_plotting • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Estimate beta parameter — beta_est_explicit" />
-<meta property="og:description" content="Estimate beta parameter" />
+<meta property="og:title" content="Plot projections against each other — projection_plotting" />
+<meta property="og:description" content="Plot projections against each other" />
 
 
 
@@ -111,45 +111,82 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Estimate beta parameter</h1>
+    <h1>Plot projections against each other</h1>
     
-    <div class="hidden name"><code>beta_est_explicit.Rd</code></div>
+    <div class="hidden name"><code>projection_plotting.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Estimate beta parameter</p>
+    <p>Plot projections against each other</p>
     </div>
 
-    <pre class="usage"><span class='fu'>beta_est_explicit</span>(<span class='no'>dur_IMild</span>, <span class='no'>dur_ICase</span>, <span class='no'>prob_hosp</span>, <span class='no'>mixing_matrix</span>, <span class='no'>R0</span>)</pre>
+    <pre class="usage"><span class='fu'>projection_plotting</span>(
+  <span class='no'>r_list</span>,
+  <span class='no'>scenarios</span>,
+  <span class='kw'>add_parms_to_scenarios</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>var_select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>summarise</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>ci</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>q</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.025</span>, <span class='fl'>0.975</span>),
+  <span class='kw'>summary_f</span> <span class='kw'>=</span> <span class='no'>mean</span>,
+  <span class='kw'>x_var</span> <span class='kw'>=</span> <span class='st'>"t"</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>dur_IMild</th>
-      <td><p>Duration of mild infectiousness (days)</p></td>
+      <th>r_list</th>
+      <td><p>List of different projection runs from <code><a href='projections.html'>projections</a></code></p></td>
     </tr>
     <tr>
-      <th>dur_ICase</th>
-      <td><p>Delay between symptom onset and requiring hospitalisation (days)</p></td>
+      <th>scenarios</th>
+      <td><p>Character vector describing the different scenarios.</p></td>
     </tr>
     <tr>
-      <th>prob_hosp</th>
-      <td><p>Probability of hospitilisation by ages</p></td>
+      <th>add_parms_to_scenarios</th>
+      <td><p>Logical. Should the parameters used for the
+projection runs be added to scenarios. Default = TRUE</p></td>
     </tr>
     <tr>
-      <th>mixing_matrix</th>
-      <td><p>Mixing matrix</p></td>
+      <th>var_select</th>
+      <td><p>Vector of variable names to plot (default is all)</p></td>
     </tr>
     <tr>
-      <th>R0</th>
-      <td><p>Basic reproduction number</p></td>
+      <th>replicates</th>
+      <td><p>Plot replicates</p></td>
+    </tr>
+    <tr>
+      <th>summarise</th>
+      <td><p>Logical, add summary line</p></td>
+    </tr>
+    <tr>
+      <th>ci</th>
+      <td><p>logical add confidence interval ribbon</p></td>
+    </tr>
+    <tr>
+      <th>q</th>
+      <td><p>Quantiles for upper and lower of interval ribbon</p></td>
+    </tr>
+    <tr>
+      <th>summary_f</th>
+      <td><p>Function to summarise each compartment
+passed to the <code>fun</code> argument of <code><a href='https://ggplot2.tidyverse.org/reference/stat_summary.html'>stat_summary</a></code></p></td>
+    </tr>
+    <tr>
+      <th>x_var</th>
+      <td><p>X variable to use for plotting (default is <code>"t"</code>,
+but can be set to, <code>"date"</code>, if <code>date_0</code> provided), which will
+cause the date to be plotted rather than time.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>additional arguments passed to <code><a href='format_output.html'>format_output</a></code></p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Beta parameter</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

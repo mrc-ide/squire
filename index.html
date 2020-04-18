@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -176,9 +176,9 @@
 <span class="co">#&gt; 1         1 E             0.1    20</span>
 <span class="co">#&gt; 2         1 E             0.2    20</span>
 <span class="co">#&gt; 3         1 E             0.3    20</span>
-<span class="co">#&gt; 4         1 E             0.4    20</span>
-<span class="co">#&gt; 5         1 E             0.5    20</span>
-<span class="co">#&gt; 6         1 E             0.6    20</span></pre></div>
+<span class="co">#&gt; 4         1 E             0.4    19</span>
+<span class="co">#&gt; 5         1 E             0.5    19</span>
+<span class="co">#&gt; 6         1 E             0.6    19</span></pre></div>
 <p>If we wanted age-disaggregated data, we could set <code>reduce_age</code> to <code>FALSE</code> which will generate the same dataframe as before, but with an additional column indicating the age-group.</p>
 <div class="sourceCode" id="cb10"><pre class="r">
 <span class="no">output</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"E"</span>, <span class="kw">reduce_age</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
@@ -273,7 +273,6 @@
 <p>The model in squire also allows you to alter healthcare capacity. Default values for the arguments <code>hosp_bed_capacity</code> and <code>ICU_capacity</code> are taken from the World Bank and a systematic review of the literature. However, you can also specify your own:</p>
 <div class="sourceCode" id="cb15"><pre class="r">
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">patchwork</span>)
-<span class="co">#&gt; Warning: package 'patchwork' was built under R version 3.5.3</span>
 
 <span class="no">r</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(<span class="kw">population</span> <span class="kw">=</span> <span class="no">population</span>,
                               <span class="kw">contact_matrix_set</span> <span class="kw">=</span> <span class="no">contact_matrix</span>,
@@ -294,10 +293,8 @@
 <a href="#3-extracting-and-plotting-relevant-outputs" class="anchor"></a>3. Extracting and Plotting Relevant Outputs</h3>
 <p>Whilst the above provides quick and easy ways to plot relevant outputs, we recognise users might want to play around with the data themselves. This can be done with the <code>format_output</code> function.</p>
 <div class="sourceCode" id="cb16"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
-<span class="co">#&gt; Warning: package 'ggplot2' was built under R version 3.5.3</span>
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">patchwork</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
-<span class="co">#&gt; Warning: package 'dplyr' was built under R version 3.5.3</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Attaching package: 'dplyr'</span>
 <span class="co">#&gt; The following objects are masked from 'package:stats':</span>
@@ -341,15 +338,10 @@
 <div class="sourceCode" id="cb17"><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu"><a href="reference/death_data_format.html">death_data_format</a></span>(<span class="kw">reporting_quality</span> <span class="kw">=</span> <span class="fl">1</span>)
 <span class="no">df</span>
 <span class="co">#&gt;         date deaths cases</span>
-<span class="co">#&gt; 1 2020-04-15      4     3</span>
-<span class="co">#&gt; 2 2020-04-14      3     3</span>
-<span class="co">#&gt; 3 2020-04-13      3     3</span>
-<span class="co">#&gt; 4 2020-04-12      2     2</span>
-<span class="co">#&gt; 5 2020-04-11      2     2</span>
-<span class="co">#&gt; 6 2020-04-10      1     1</span>
-<span class="co">#&gt; 7 2020-04-09      1     1</span>
-<span class="co">#&gt; 8 2020-04-08      1     1</span>
-<span class="co">#&gt; 9 2020-04-07      1     1</span></pre></div>
+<span class="co">#&gt; 1 2020-04-18      6     7</span>
+<span class="co">#&gt; 2 2020-04-17      5     5</span>
+<span class="co">#&gt; 3 2020-04-16      4     4</span>
+<span class="co">#&gt; 4 2020-04-15      3     3</span></pre></div>
 <p>Then to calibrate to this dummy data and visualise the full epidemic curve, we do the following. Note that simulation replicates are aligned to the current death total and the outputs are returned as a <code>squire_simulation</code> object.</p>
 <div class="sourceCode" id="cb18"><pre class="r"><span class="no">calibration</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(<span class="kw">country</span> <span class="kw">=</span> <span class="st">"Afghanistan"</span>, <span class="kw">deaths</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">df</span>$<span class="no">deaths</span>),
                          <span class="kw">reporting_fraction</span> <span class="kw">=</span> <span class="fl">1</span>,
@@ -369,6 +361,84 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Case Incidence"</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Date"</span>) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"none"</span>)</pre></div>
 <p><img src="reference/figures/README-deaths%20over%20time-1.png" width="100%"></p>
+</div>
+<div id="5-conducting-scenario-projections-to-fitted-data" class="section level3">
+<h3 class="hasAnchor">
+<a href="#5-conducting-scenario-projections-to-fitted-data" class="anchor"></a>5. Conducting scenario projections to fitted data</h3>
+<p>Once you have calibrated the model to death data, it is possible to then implement mitigation strategies forwards in time from the point of calibration. This is achieved using the <code>projection</code> function. For example, to contrast an unmitigated epidemic against a mitigation scenario with a 20% reduction in R0 today and a further 40% in 20 days time:</p>
+<div class="sourceCode" id="cb20"><pre class="r">
+<span class="co"># first calibrate</span>
+<span class="no">t1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(<span class="kw">country</span> <span class="kw">=</span> <span class="st">"Angola"</span>,
+                <span class="kw">deaths</span> <span class="kw">=</span> <span class="fl">5</span>,
+                  <span class="kw">reporting_fraction</span> <span class="kw">=</span> <span class="fl">1</span>,
+                  <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.2</span>,
+                  <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
+                  <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">25</span>,
+                  <span class="kw">R0_scan</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">5</span>))
+
+<span class="co"># create our projections</span>
+<span class="no">p2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(<span class="kw">r</span> <span class="kw">=</span> <span class="no">t1</span>, <span class="kw">R0_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.8</span>, <span class="fl">0.4</span>), <span class="kw">tt_R0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">20</span>))</pre></div>
+<p>The output generated from <code>projections</code> is the same class and structure as from <code>calibrate</code> and can be plotted against the unmitigated scenario using <code>projection_plotting</code>:</p>
+<div class="sourceCode" id="cb21"><pre class="r"><span class="no">ggproj</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">t1</span>,<span class="no">p2</span>),
+                    <span class="kw">scenarios</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Unmitigated"</span>,<span class="st">"Mitigation"</span>),
+                    <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ICU_occupancy"</span>, <span class="st">"ICU_demand"</span>),
+                    <span class="kw">add_parms_to_scenarios</span> <span class="kw">=</span> <span class="fl">TRUE</span>,<span class="kw">ci</span> <span class="kw">=</span> <span class="fl">FALSE</span>,<span class="kw">summarise</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
+
+<span class="co"># and lets add in the ICU capacity</span>
+<span class="no">ggproj</span> + <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span>(<span class="kw">yintercept</span> <span class="kw">=</span> <span class="no">t1</span>$<span class="no">parameters</span>$<span class="no">ICU_bed_capacity</span>)</pre></div>
+<p><img src="reference/figures/README-projection%20plotting-1.png" width="100%"></p>
+<p>We can see above that the intervention introduced was sufficient to prevent ICU demand (in red) from exceeding the supply, whereas in the unmitigated strategy this did occur.</p>
+<p>We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 50% today before relaxing it to 80% in 20 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with <code>add_parms_to_scenarios = FALSE</code>):</p>
+<div class="sourceCode" id="cb22"><pre class="r">
+<span class="co"># first calibrate</span>
+<span class="no">t1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(<span class="kw">country</span> <span class="kw">=</span> <span class="st">"Angola"</span>,
+                <span class="kw">deaths</span> <span class="kw">=</span> <span class="fl">5</span>,
+                  <span class="kw">reporting_fraction</span> <span class="kw">=</span> <span class="fl">1</span>,
+                  <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.2</span>,
+                  <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
+                  <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">25</span>,
+                  <span class="kw">R0_scan</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">5</span>))
+
+<span class="co"># create our projections</span>
+<span class="no">p2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(<span class="kw">r</span> <span class="kw">=</span> <span class="no">t1</span>,
+                  <span class="kw">contact_matrix_set_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.5</span>, <span class="fl">0.8</span>),
+                  <span class="kw">tt_contact_matrix</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">20</span>),
+                  <span class="kw">hosp_bed_capacity_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">1.2</span>),
+                  <span class="kw">tt_hosp_beds</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">30</span>),
+                  <span class="kw">ICU_bed_capacity_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">1.2</span>),
+                  <span class="kw">tt_ICU_beds</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>,<span class="fl">30</span>))
+
+<span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">t1</span>,<span class="no">p2</span>),
+                    <span class="kw">scenarios</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Unmitigated"</span>,<span class="st">"Mitigation"</span>),
+                    <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ICU_occupancy"</span>, <span class="st">"ICU_demand"</span>,<span class="st">"deaths"</span>),
+                    <span class="kw">add_parms_to_scenarios</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
+                    <span class="kw">ci</span> <span class="kw">=</span> <span class="fl">FALSE</span>,<span class="kw">summarise</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>
+<p><img src="reference/figures/README-projection%20relative%20beds-1.png" width="100%"></p>
+<p>Above we can see that the increase in bed causes the mitigation strategy to plateau at a higher bed occupancy, however, not high enough to meet the demand. However, despite this the the peak in daily deaths is lower, which in turn causes a noticable decrease in total deaths:</p>
+<div class="sourceCode" id="cb23"><pre class="r"><span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">t1</span>,<span class="no">p2</span>),
+                    <span class="kw">scenarios</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Unmitigated"</span>,<span class="st">"Mitigation"</span>),
+                    <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"D"</span>),
+                    <span class="kw">add_parms_to_scenarios</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
+                    <span class="kw">ci</span> <span class="kw">=</span> <span class="fl">FALSE</span>,<span class="kw">summarise</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>
+<p><img src="reference/figures/README-total%20deaths%20projection-1.png" width="100%"></p>
+<p>Lastly, rather than using relative changes to the interventions, we can provide absolute measures. For example, to change the R0 to 2 today and add 5000 ICU beds in 40 days time:</p>
+<div class="sourceCode" id="cb24"><pre class="r">
+<span class="co"># what is the current capacity</span>
+<span class="no">icu</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="no">t1</span>$<span class="no">parameters</span>$<span class="no">ICU_bed_capacity</span>,<span class="fl">1</span>)
+
+<span class="co"># create our projections</span>
+<span class="no">p2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(<span class="kw">r</span> <span class="kw">=</span> <span class="no">t1</span>,
+                  <span class="kw">R0</span> <span class="kw">=</span> <span class="fl">2</span>,
+                  <span class="kw">tt_R0</span> <span class="kw">=</span> <span class="fl">0</span>,
+                  <span class="kw">ICU_bed_capacity</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">icu</span>, <span class="no">icu</span> + <span class="fl">5000</span>),
+                  <span class="kw">tt_ICU_beds</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>,<span class="fl">40</span>))
+
+<span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">t1</span>,<span class="no">p2</span>),
+                    <span class="kw">scenarios</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Unmitigated"</span>,<span class="st">"Mitigation"</span>),
+                    <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ICU_occupancy"</span>, <span class="st">"ICU_demand"</span>,<span class="st">"deaths"</span>),
+                    <span class="kw">add_parms_to_scenarios</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
+                    <span class="kw">ci</span> <span class="kw">=</span> <span class="fl">FALSE</span>,<span class="kw">summarise</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>
+<p><img src="reference/figures/README-projection%20plotting%20absolute-1.png" width="100%"></p>
 </div>
 </div>
 </div>
@@ -396,6 +466,7 @@
   <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
+<li><a href="https://www.repostatus.org/#wip"><img src="https://www.repostatus.org/badges/latest/wip.svg" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public."></a></li>
 <li><a href="https://travis-ci.org/mrc-ide/squire"><img src="https://travis-ci.org/mrc-ide/squire.svg?branch=master" alt="Travis build status"></a></li>
 <li><a href="https://ci.appveyor.com/project/pwinskill/squire"><img src="https://ci.appveyor.com/api/projects/status/github/mrc-ide/squire?branch=master&amp;svg=true" alt="AppVeyor build status"></a></li>
 <li><a href="https://codecov.io/gh/mrc-ide/squire?branch=master"><img src="https://codecov.io/gh/mrc-ide/squire/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>

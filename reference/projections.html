@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Run the SEEIR model — run_simple_SEEIR_model • squire</title>
+<title>Provide projections from calibrated simulations by changing RO, contact
+matrices or bed availability — projections • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +40,10 @@
 
 
 
-<meta property="og:title" content="Run the SEEIR model — run_simple_SEEIR_model" />
-<meta property="og:description" content="Run the SEEIR model" />
+<meta property="og:title" content="Provide projections from calibrated simulations by changing RO, contact
+matrices or bed availability — projections" />
+<meta property="og:description" content="Provide projections from calibrated simulations by changing RO, contact
+matrices or bed availability" />
 
 
 
@@ -111,89 +114,124 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Run the SEEIR model</h1>
+    <h1>Provide projections from calibrated simulations by changing RO, contact
+matrices or bed availability</h1>
     
-    <div class="hidden name"><code>run_simple_SEEIR_model.Rd</code></div>
+    <div class="hidden name"><code>projections.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Run the SEEIR model</p>
+    <p>Provide projections from calibrated simulations by changing RO, contact
+matrices or bed availability</p>
     </div>
 
-    <pre class="usage"><span class='fu'>run_simple_SEEIR_model</span>(
-  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+    <pre class="usage"><span class='fu'>projections</span>(
+  <span class='no'>r</span>,
+  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>tt_R0</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
-  <span class='kw'>init</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>dur_E</span> <span class='kw'>=</span> <span class='fl'>4.58</span>,
-  <span class='kw'>dur_I</span> <span class='kw'>=</span> <span class='fl'>2.09</span>,
-  <span class='no'>population</span>,
-  <span class='no'>contact_matrix_set</span>,
+  <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>contact_matrix_set_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>tt_contact_matrix</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>time_period</span> <span class='kw'>=</span> <span class='fl'>365</span>,
-  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>
+  <span class='kw'>hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>hosp_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tt_hosp_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ICU_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tt_ICU_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>r</th>
+      <td><p>Calibrated <code>{squire_simulation}</code> object.</p></td>
+    </tr>
+    <tr>
       <th>R0</th>
-      <td><p>Basic reproduction number</p></td>
+      <td><p>Numeric vector for R0 from t = 0 in the calibration.
+E.g. <code>R0 = c(2, 1)</code>. Default = NULL, which will use <code>R0_change</code>
+to alter R0 if provided.</p></td>
+    </tr>
+    <tr>
+      <th>R0_change</th>
+      <td><p>Numeric vector for relative changes in R0 relative to the
+final R0 used in the calibration (i.e. at t = 0 in the calibration)
+E.g. <code>R0 = c(0.8, 0.5)</code>. Default = NULL, which will use <code>R0</code> to
+parameterise changes in R0 if provided.</p></td>
     </tr>
     <tr>
       <th>tt_R0</th>
       <td><p>Change time points for R0</p></td>
     </tr>
     <tr>
-      <th>dt</th>
-      <td><p>Time step</p></td>
-    </tr>
-    <tr>
-      <th>init</th>
-      <td><p>Data.frame of initial conditions</p></td>
-    </tr>
-    <tr>
-      <th>dur_E</th>
-      <td><p>Mean duration of incubation period (days)</p></td>
-    </tr>
-    <tr>
-      <th>dur_I</th>
-      <td><p>Mean duration of infectious period (days)</p></td>
-    </tr>
-    <tr>
-      <th>population</th>
-      <td><p>Population vector (for each age group)</p></td>
-    </tr>
-    <tr>
       <th>contact_matrix_set</th>
-      <td><p>Contact matrices used in simulation</p></td>
+      <td><p>Contact matrices used in simulation. Default =
+NULL, which will use <code>contact_matrix_set_change</code> to alter the contact
+matrix if provided.</p></td>
+    </tr>
+    <tr>
+      <th>contact_matrix_set_change</th>
+      <td><p>Numeric vector for relative changes in the
+contact matrix realtive to the final contact matrix used in the calibration
+(i.e. at t = 0 in the calibration).
+E.g. <code>contact_matrix_set_change = c(0.8, 0.5)</code>. Default = NULL, which
+will use <code>contact_matrix_set</code> to parameterise changes in contact
+matrices if if provided.</p></td>
     </tr>
     <tr>
       <th>tt_contact_matrix</th>
-      <td><p>Time change points for matrix change</p></td>
+      <td><p>Time change points for matrix change. Default = 0</p></td>
     </tr>
     <tr>
-      <th>time_period</th>
-      <td><p>Length of simulation</p></td>
+      <th>hosp_bed_capacity</th>
+      <td><p>Numeric vector for hospital bed capacity
+from t = 0 in the calibration. Default = NULL, which will use
+<code>hosp_bed_capacity_change</code> to alter hosp_bed_capacity if provided.</p></td>
     </tr>
     <tr>
-      <th>replicates</th>
-      <td><p>Number of replicates</p></td>
+      <th>hosp_bed_capacity_change</th>
+      <td><p>Numeric vector for relative changes in
+hospital bed capacity relative to the final hospital bed capacity used in the
+calibration (i.e. at t = 0 in the calibration).
+E.g. <code>hosp_bed_capacity_change = c(0.8, 0.5)</code>. Default = NULL, which
+will use <code>hosp_bed_capacity</code> to parameterise changes in hospital bed capacity
+if provided.</p></td>
+    </tr>
+    <tr>
+      <th>tt_hosp_beds</th>
+      <td><p>Change time points for hosp_bed_capacity</p></td>
+    </tr>
+    <tr>
+      <th>ICU_bed_capacity</th>
+      <td><p>Numeric vector for ICU bed capacity
+from t = 0 in the calibration. Default = NULL, which will use
+<code>ICU_bed_capacity_change</code> to alter ICU_bed_capacity if provided.</p></td>
+    </tr>
+    <tr>
+      <th>ICU_bed_capacity_change</th>
+      <td><p>Numeric vector for relative changes in
+ICU bed capacity relative to the final ICU bed capacity used in the
+calibration (i.e. at t = 0 in the calibration).
+E.g. <code>ICU_bed_capacity_change = c(0.8, 0.5)</code>. Default = NULL, which
+will use <code>ICU_bed_capacity</code> to parameterise changes in ICU bed capacity
+if provided.</p></td>
+    </tr>
+    <tr>
+      <th>tt_ICU_beds</th>
+      <td><p>Change time points for ICU_bed_capacity</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Simulation output</p>
+    <p>The user can specify changes to R0, contact matrices and bed
+provision, which will come into effect from the current day in the calibration.
+These changes can either set these to be specific values or change them
+relative to their values in the original simulation. If no change is
+requested, the simulation will use parameters chosen for the calibration run.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='no'>pop</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_population.html'>get_population</a></span>(<span class='st'>"Afghanistan"</span>)
-<span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'>run_simple_SEEIR_model</span>(<span class='kw'>population</span> <span class='kw'>=</span> <span class='no'>pop</span>$<span class='no'>n</span>, <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-<span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-<span class='kw'>contact_matrix_set</span><span class='kw'>=</span><span class='no'>contact_matrices</span><span class='kw'>[[</span><span class='fl'>1</span>]])
-}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
