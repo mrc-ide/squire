@@ -81,6 +81,8 @@ update(IRec1[]) <- IRec1[i] + delta_IRec1[i] # First of the compartments for tho
 update(IRec2[]) <- IRec2[i] + delta_IRec2[i] # Second of the compartments for those recovering from ICU (2 comps)
 update(R[]) <- R[i] + delta_R[i] # Recovered
 update(D[]) <- D[i] + delta_D[i] # Deaths
+total_deaths <- sum(delta_D)
+output(total_deaths) <- TRUE
 
 ###########################################################################
 ## Defining individual probabilities of transition between compartments: ##
@@ -144,6 +146,8 @@ n_ICase2_Hosp[] <- rbinom(ICase2[i], p_ICase2_Hosp) # Number progressing to requ
 ICU_occ <- sum(IMVGetLive1) + sum(IMVGetLive2) + sum(IMVGetDie1) + sum(IMVGetDie2) # Summing number of infections in compartments that use ICU beds
 number_requiring_IMV[] <- round(n_ICase2_Hosp[i] * prob_severe[i]) # Number of new hospitalisations that are going to require mechanical ventilation
 total_number_requiring_IMV <- sum(number_requiring_IMV)
+total_ICU_req <- ICU_occ + total_number_requiring_IMV
+output(total_ICU_req) <- TRUE
 current_free_ICUs <- ICU_bed_capacity + sum(n_IMVGetLive2_Rec) + sum(n_IMVGetDie2_D) - ICU_occ # Number of ICU beds that are currently free
 total_number_get_IMV <- if(current_free_ICUs <= 0) 0 else(if(current_free_ICUs - total_number_requiring_IMV >= 0) total_number_requiring_IMV else(current_free_ICUs)) # Working out the number of new ICU requiring infections that get a bed
 

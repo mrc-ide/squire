@@ -9,10 +9,15 @@
 #' @return List of time adjusted squire_simulations
 trigger_run <- function(trigger_type = NULL,
                         trigger_threshold = NULL,
+                        suppression_reduction = 0.3,
+                        suppression_duration = 30,
                         replicates = 25,
                         country = NULL,
                         population = NULL,
                         contact_matrix_set = NULL,
+                        dt = 0.1,
+                        R0 = c(3, 3),
+                        tt_R0 = c(0, 50),
                         ...) {
 
   # argument checks
@@ -21,10 +26,10 @@ trigger_run <- function(trigger_type = NULL,
   assert_numeric(replicates)
 
   # return errors if trigger parameters not specified
-  if (trigger_type == NULL) {
+  if (is.null(trigger_type)) {
     stop("Argument triger_type not specified: choose one of deaths or ICU_capacity")
   }
-  if(trigger_threshold == NULL) {
+  if(is.null(trigger_threshold)) {
     stop("Argument trigger_threshold not specified.")
   }
 
@@ -39,12 +44,45 @@ trigger_run <- function(trigger_type = NULL,
   # run model with fixed day step (to match up with daily deaths)
   r <- run_explicit_SEEIR_model(population = population,
                                 contact_matrix_set = contact_matrix_set,
-                                replicates = 1,
+                                replicates = 10,
                                 ...)
 
-  # get the index for looking up D and R
+  # get the index for looking up ICU requirements and deaths
   index <- odin_index(r$model)
-  beta <- r$model$contents()$beta_set
+  out <- r$output
+
+  for (i in 1:5) {
+    if (trigger_type == "ICU_capacity") {
+      req <- out[, index$total_ICU_req, ]
+      timings <- apply(req, 2, function(x){
+        trigger_times <- min(which(x > trigger_threshold))
+      })
+    } else if (trigger_type == "deaths") {
+      req <- out[, index$total_deaths, ]
+      timings <- apply(req, 2, function(x){
+        trigger_times <- min(which(x > trigger_threshold))
+      })
+    } else {
+      stop("trigger_type not one of ICU capacity or deaths")
+    }
+    beta <- r$model$contents()$beta_set[1]
+    for(j in 1:replicates) {
+      r$model$set_user(beta_set = c(beta * suppression_reduction, beta))
+      r$model$set_user(tt_beta = c(timings[j] * dt, timings[j] * dt + suppression_duration))
+      length_output <- dim(r$output)[1]
+      r$output <- r$model$run(timings[j]:length_output, replicate = 1)
+      out[timings[i]:length_output, , j] <- r$output
+    }
+  }
+
+
+
+
+
+
+
+
+
 
   # run our replicates
   t <- seq(from = 1, to = r$parameters$time_period / r$parameters$dt)
