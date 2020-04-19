@@ -301,14 +301,20 @@ dim(tt_ICU_beds) <- user()
 dim(ICU_beds) <- length(tt_ICU_beds)
 
 # Interpolation for beta
-suppression_triggered <- if ((ICU_occ + total_number_requiring_IMV) > ICU_bed_capacity) 1 else 0
-counter <- if (suppression_triggered == 1 & counter < 1) round(30/dt) else counter - 1
+#suppression_triggered <- if ((ICU_occ + total_number_requiring_IMV) > ICU_bed_capacity) 1 else 0
+#ICU_require <- ICU_occ + total_number_requiring_IMV
+#output(ICU_require) <- TRUE
+#output(ICU_bed_capacity) <- TRUE
+#counter[] <- if (suppression_triggered == 1 && sum(counter) < 1) round(30/dt) else counter[i] - 1
+#output(counter) <- TRUE
 temp_beta <- interpolate(tt_beta, beta_set, "constant")
-beta <- if (counter > 1) temp_beta * suppression_reduction else temp_beta
+beta <- temp_beta
+#beta <- if (sum(counter) > 1) temp_beta * suppression_reduction else temp_beta
+output(beta) <- TRUE
 tt_beta[] <- user()
 beta_set[] <- user()
+#dim(counter) <- 2
 suppression_reduction <- user()
-temp_supp_time_counter <- user()
 dim(tt_beta) <- user()
 dim(beta_set) <- length(tt_beta)
 
