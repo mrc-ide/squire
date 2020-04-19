@@ -63,7 +63,7 @@ calibrate <- function(deaths,
 
   # generating the seeding cases for each of the replicates
   E1_0 <- lapply(seq_len(replicates), function(x) {
-    seeding_cases <- rep(0, length = length(population))
+    seeding_cases <- rep(0, length.out = length(population))
     raw_seeding_cases <- round(stats::runif(n = 1, min = min_seeding_cases, max = max_seeding_cases))
     seeding_cases[age_group_indices] <- as.vector(stats::rmultinom(1,
                                                             size = raw_seeding_cases,
@@ -108,16 +108,16 @@ calibrate <- function(deaths,
   out[[1]] <- r
   # running and storing the model output for each of the different initial seeding cases
   for(i in 2:replicates) {
-    r$mod$set_user(E1_0 = E1_0[[i]])
+    r$model$set_user(E1_0 = E1_0[[i]])
     beta[1] <- beta_est_explicit(dur_IMild = r$parameters$dur_IMild,
                       dur_ICase = r$parameters$dur_ICase,
                       prob_hosp = r$parameters$prob_hosp,
                       mixing_matrix =  process_contact_matrix_scaled_age(r$parameters$contact_matrix_set[[1]], r$parameters$population),
                       R0 = R0_scan[i])
-    r$mod$set_user(beta_set = beta)
-    r$output <- r$mod$run(t, replicate = 1)
+    r$model$set_user(beta_set = beta)
+    r$output <- r$model$run(t, replicate = 1)
     while (sum(r$output[nt, index$R, 1]) < (sum(r$parameters$population)/20)) {
-      r$output <- r$mod$run(t, replicate = 1)
+      r$output <- r$model$run(t, replicate = 1)
     }
     out[[i]] <- r
   }
