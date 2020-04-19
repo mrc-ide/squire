@@ -287,18 +287,6 @@ mix_mat_set[, ,] <- user()
 dim(tt_matrix) <- user()
 dim(mix_mat_set) <- c(length(tt_matrix), N_age, N_age)
 
-# Interpolation for beta
-beta <- interpolate(tt_beta, beta_set, "constant")
-tt_beta[] <- user()
-beta_set[] <- user()
-dim(tt_beta) <- user()
-dim(beta_set) <- length(tt_beta)
-
-# Generating Force of Infection
-temp[] <- IMild[i] + ICase1[i] + ICase2[i]
-s_ij[,] <- m[i, j] * temp[j]
-lambda[] <- beta * sum(s_ij[i, ])
-
 ## Interpolation for Hospital and ICU Capacity
 hosp_bed_capacity <- interpolate(tt_hosp_beds, hosp_beds, "constant")
 tt_hosp_beds[] <- user()
@@ -311,6 +299,23 @@ tt_ICU_beds[] <- user()
 ICU_beds[] <- user()
 dim(tt_ICU_beds) <- user()
 dim(ICU_beds) <- length(tt_ICU_beds)
+
+# Interpolation for beta
+suppression_triggered <- if ((ICU_occ + total_number_requiring_IMV) > ICU_bed_capacity) 1 else 0
+counter <- if (suppression_triggered == 1 & counter < 1) round(30/dt) else counter - 1
+temp_beta <- interpolate(tt_beta, beta_set, "constant")
+beta <- if (counter > 1) temp_beta * suppression_reduction else temp_beta
+tt_beta[] <- user()
+beta_set[] <- user()
+suppression_reduction <- user()
+temp_supp_time_counter <- user()
+dim(tt_beta) <- user()
+dim(beta_set) <- length(tt_beta)
+
+# Generating Force of Infection
+temp[] <- IMild[i] + ICase1[i] + ICase2[i]
+s_ij[,] <- m[i, j] * temp[j]
+lambda[] <- beta * sum(s_ij[i, ])
 
 ## Initial states:
 initial(S[]) <- S_0[i]
