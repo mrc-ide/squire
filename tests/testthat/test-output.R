@@ -142,7 +142,7 @@ test_that("calibrate_output_parsing vs format_output",{
   o1 <- format_output(m1, c("R","deaths","infections","hospital_demand","ICU_demand"))
   g2 <- calibrate_output_parsing(m1)
   expect_identical(o1$y[o1$replicate == 1 & o1$compartment == "ICU_demand"],
-                   g2$y[g2$replicate == 1 & g2$compartment == "ICU"])
+                   g2$y[g2$replicate == 1 & g2$compartment == "ICU_demand"])
 
 
   index <- odin_index(m1$model)
@@ -155,10 +155,10 @@ test_that("calibrate_output_parsing vs format_output",{
                         o1$y[o1$replicate == 2 & o1$compartment == "ICU_demand"]))
 
   expect_true(identical(rowSums(m1$output[,mv,1]),
-                        g2$y[g2$replicate == 1 & g2$compartment == "ICU"]))
+                        g2$y[g2$replicate == 1 & g2$compartment == "ICU_demand"]))
 
   expect_true(identical(rowSums(m1$output[,mv,2]),
-                        g2$y[g2$replicate == 2 & g2$compartment == "ICU"]))
+                        g2$y[g2$replicate == 2 & g2$compartment == "ICU_demand"]))
 
 
 

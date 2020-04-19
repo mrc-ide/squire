@@ -106,13 +106,11 @@ calibrate_output_parsing <- function(r, date_0 = Sys.Date()) {
 
 
   # collet outputs as vectors
-  mild_cases <- odin_sv(r$output[,index$n_E2_I,] - r$output[,index$n_E2_ICase1,],
+  infections <- odin_sv(r$output[,index$n_E2_I,],
                         replicates = r$parameters$replicates, nt = nt)
-  hospital_cases <- odin_sv(r$output[,index$n_E2_ICase1,],
-                            replicates = r$parameters$replicates, nt = nt)
-  ICU <- odin_sv(r$output[,mv,],
+  ICU_demand <- odin_sv(r$output[,mv,],
                  replicates = r$parameters$replicates, nt = nt)
-  hospital <- odin_sv(r$output[,ox,],
+  hospital_demand <- odin_sv(r$output[,ox,],
                       replicates = r$parameters$replicates, nt = nt)
   deaths <- odin_sv(r$output[,index$delta_D,],
                     replicates = r$parameters$replicates, nt = nt)
@@ -121,11 +119,11 @@ calibrate_output_parsing <- function(r, date_0 = Sys.Date()) {
 
 
   # collect into a long data frame
-  vars <- c("mild_cases", "hospital_cases", "deaths", "cumulative_deaths", "ICU", "hospital")
+  vars <- c("infections", "deaths", "cumulative_deaths", "ICU_demand", "hospital_demand")
   df <- data.frame("date" = as.numeric(r$output[,index$time,]),
                    "replicate" = as.numeric(mapply(rep, seq_len(r$parameters$replicates), nt)),
                    "compartment" = as.character(mapply(rep, vars, nt*r$parameters$replicates)),
-                   "y" = c(mild_cases, hospital_cases, deaths, cumulative_deaths, ICU, hospital))
+                   "y" = c(infections, deaths, cumulative_deaths, ICU_demand, hospital_demand))
 
   # Add date
   if(!is.null(date_0)){
@@ -147,7 +145,7 @@ plot_calibration_cases <- function(df, data, forecast = 0) {
   df$day <- as.Date(as.character(df$date))
 
   # split to correct dates
-  sub <- df[df$compartment %in% c("mild_cases", "hospital_cases") &
+  sub <- df[df$compartment %in% c("infections") &
               df$date <=  Sys.Date() + forecast + 1,] %>%
     dplyr::group_by(.data$day, .data$replicate, .data$compartment) %>%
     dplyr::summarise(y = sum(.data$y), n=dplyr::n()) %>%
@@ -167,7 +165,6 @@ plot_calibration_cases <- function(df, data, forecast = 0) {
     sub, ggplot2::aes(x = .data$day,
                       y = .data$y, col = .data$compartment,
                       group = interaction(.data$compartment, .data$replicate))) +
-    ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
     ggplot2::geom_line(alpha = max(0.1, 1 / max(sub$replicate))) +
     ggplot2::geom_line(data = pd_group,
                        mapping = ggplot2::aes(group = .data$compartment),
@@ -212,7 +209,7 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
   df$day <- as.Date(as.character(df$date))
 
   # split to correct dates
-  sub <- df[df$compartment %in% c("mild_cases", "hospital_cases") &
+  sub <- df[df$compartment %in% c("infections") &
               df$date <=  Sys.Date() + forecast + 1,] %>%
     dplyr::group_by(.data$day, .data$replicate) %>%
     dplyr::summarise(y = sum(.data$y)) %>%
@@ -256,7 +253,6 @@ plot_calibration_cases_barplot <- function(df, data, forecast = 0) {
                       stat = "identity",
                       show.legend = TRUE,
                       inherit.aes = FALSE) +
-    ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
     ggplot2::ylab("Daily Number of Infections") +
     ggplot2::theme_bw()  +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
@@ -283,7 +279,7 @@ plot_calibration_healthcare <- function(df, data, forecast = 14) {
   df$day <- as.Date(as.character(df$date))
 
   # split to correct dates
-  sub <- df[df$compartment %in%c("ICU", "hospital") &
+  sub <- df[df$compartment %in%c("ICU_demand", "hospital_demand") &
               df$date <=  Sys.Date() + forecast + 1,] %>%
     dplyr::group_by(.data$day, .data$replicate, .data$compartment) %>%
     dplyr::summarise(y = sum(.data$y), n=dplyr::n()) %>%
@@ -299,7 +295,6 @@ plot_calibration_healthcare <- function(df, data, forecast = 14) {
   gg_healthcare <- ggplot2::ggplot(sub, ggplot2::aes(x = .data$day,
                                                      y = .data$y, col = .data$compartment,
                                                      group = interaction(.data$compartment, .data$replicate))) +
-    ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
     ggplot2::geom_line(alpha = max(0.2, 1 / max(sub$replicate))) +
     ggplot2::geom_ribbon(data = pd_group,
                          mapping = ggplot2::aes(group = .data$compartment,
@@ -331,7 +326,7 @@ plot_calibration_healthcare <- function(df, data, forecast = 14) {
 }
 
 #' @noRd
-plot_calibration_healthcare_barplot <- function(df, data, what = "ICU", forecast = 14) {
+plot_calibration_healthcare_barplot <- function(df, data, what = "ICU_demand", forecast = 14) {
 
   # day
   df$day <- as.Date(as.character(df$date))
@@ -350,9 +345,9 @@ plot_calibration_healthcare_barplot <- function(df, data, what = "ICU", forecast
                      ymax = .data$quants[[1]][3])
 
   # y axis
-  if (what == "ICU") {
+  if (what == "ICU_demand") {
     title <- "ICU Demand"
-  } else if(what == "hospital") {
+  } else if(what == "hospital_demand") {
     title <- "Hospital Bed Demand"
   }
 
@@ -364,7 +359,6 @@ plot_calibration_healthcare_barplot <- function(df, data, what = "ICU", forecast
                     stat = "identity",
                     show.legend = TRUE,
                     inherit.aes = FALSE) +
-    ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
     ggplot2::ylab(title) +
     ggplot2::theme_bw()  +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
@@ -450,8 +444,6 @@ plot_calibration_deaths_barplot <- function(df, data, forecast = 14, cumulative 
                       stat = "identity",
                       show.legend = TRUE,
                       inherit.aes = FALSE) +
-    ggplot2::geom_vline(xintercept = Sys.Date(), linetype = "dashed") +
-    ggplot2::geom_vline(xintercept = max(data$date[which(data$deaths != 0)]), linetype = "dotted") +
     ggplot2::theme_bw()  +
     ggplot2::ylab(title) +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
