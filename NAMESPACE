@@ -3,6 +3,7 @@
 S3method(plot,squire_simulation)
 S3method(print,squire_simulation)
 S3method(summary,squire_simulation)
+export(adjusted_eigen)
 export(beta_est)
 export(beta_est_explicit)
 export(calibrate)

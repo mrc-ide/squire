@@ -4,7 +4,9 @@
 \name{income_strata_healthcare_capacity}
 \alias{income_strata_healthcare_capacity}
 \title{Income strata healthcare capacity}
-\format{A data.frame}
+\format{
+A data.frame
+}
 \usage{
 income_strata_healthcare_capacity
 }
