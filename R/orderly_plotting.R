@@ -42,7 +42,7 @@ death_data_format <- function(date = NULL,
     deaths[length(deaths)] <- n_deaths
 
     # cases
-    cases <- round(deaths*stats::runif(length(deaths), 0.8, 1.2))
+    cases <- deaths*100
 
   } else {
     if(is.null(deaths)) {

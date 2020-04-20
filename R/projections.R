@@ -265,13 +265,13 @@ projections <- function(r,
                               R0 = R0)
 
     # change these user params
-    r$model$set_user(tt_beta = tt_R0/r$parameters$dt)
+    r$model$set_user(tt_beta = round(tt_R0/r$parameters$dt))
     r$model$set_user(beta_set = beta)
-    r$model$set_user(tt_matrix = tt_contact_matrix/r$parameters$dt)
+    r$model$set_user(tt_matrix = round(tt_contact_matrix/r$parameters$dt))
     r$model$set_user(mix_mat_set = matrices_set)
-    r$model$set_user(tt_hosp_beds = tt_hosp_beds/r$parameters$dt)
+    r$model$set_user(tt_hosp_beds = round(tt_hosp_beds/r$parameters$dt))
     r$model$set_user(hosp_beds = hosp_bed_capacity)
-    r$model$set_user(tt_ICU_beds = tt_ICU_beds/r$parameters$dt)
+    r$model$set_user(tt_ICU_beds = round(tt_ICU_beds/r$parameters$dt))
     r$model$set_user(ICU_beds = ICU_bed_capacity)
 
     # run the model
