@@ -116,7 +116,7 @@ calibrate <- function(deaths,
                       R0 = R0_scan[i])
     r$model$set_user(beta_set = beta)
     r$output <- r$model$run(t, replicate = 1)
-    while (sum(r$output[nt, index$R, 1]) < (sum(r$parameters$population)/20)) {
+    while (sum(r$output[nt, index$D, 1]) < deaths) {
       r$output <- r$model$run(t, replicate = 1)
     }
     out[[i]] <- r
