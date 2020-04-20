@@ -4,9 +4,5 @@ language: R
 cache: packages
 os:
   - linux
-addons:
-  apt:
-    packages:
-      - libv8-dev
 after_success:
   - Rscript -e 'covr::codecov()'
