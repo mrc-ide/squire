@@ -90,12 +90,22 @@ calibrate <- function(deaths,
     R0_scan <- rep(R0[1], replicates)
   }
 
+
   # run model with fixed day step (to match up with daily deaths)
   r <- run_explicit_SEEIR_model(population = population,
                                 contact_matrix_set = contact_matrix_set,
                                 replicates = 1,
                                 R0 = R0,
                                 ...)
+
+  # get model run outputs
+  t <- seq(from = 1, to = r$parameters$time_period / r$parameters$dt)
+  nt <- length(t)
+
+  # get the index for looking up D and R
+  index <- odin_index(r$model)
+
+  # check that this reached the deaths
   while (sum(r$output[nt, index$D, 1]) < deaths) {
     r <- run_explicit_SEEIR_model(population = population,
                                   contact_matrix_set = contact_matrix_set,
@@ -104,15 +114,13 @@ calibrate <- function(deaths,
                                   ...)
   }
 
-  # get the index for looking up D and R
-  index <- odin_index(r$model)
-  beta <- r$model$contents()$beta_set
-
-  # run our replicates
-  t <- seq(from = 1, to = r$parameters$time_period / r$parameters$dt)
-  nt <- length(t)
+  # assign to our results
   out <- list()
   out[[1]] <- r
+
+  # what is the beta for updating in each rep
+  beta <- r$model$contents()$beta_set
+
   # running and storing the model output for each of the different initial seeding cases
   for(i in 2:replicates) {
     r$model$set_user(E1_0 = E1_0[[i]])
