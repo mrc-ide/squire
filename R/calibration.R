@@ -96,6 +96,13 @@ calibrate <- function(deaths,
                                 replicates = 1,
                                 R0 = R0,
                                 ...)
+  while (sum(r$output[nt, index$D, 1]) < deaths) {
+    r <- run_explicit_SEEIR_model(population = population,
+                                  contact_matrix_set = contact_matrix_set,
+                                  replicates = 1,
+                                  R0 = R0,
+                                  ...)
+  }
 
   # get the index for looking up D and R
   index <- odin_index(r$model)
