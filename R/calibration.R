@@ -87,7 +87,7 @@ calibrate <- function(deaths,
 
     R0[1] <- R0_scan[1]
   } else {
-    R0_scan <- rep(R0, replicates)
+    R0_scan <- rep(R0[1], replicates)
   }
 
   # run model with fixed day step (to match up with daily deaths)
