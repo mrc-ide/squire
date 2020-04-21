@@ -39,7 +39,6 @@ beta_est <- function(duration_infectiousness, mixing_matrix, R0) {
 #' @export
 #'
 adjusted_eigen <- function(dur_IMild, dur_ICase, prob_hosp, mixing_matrix) {
-
   # assertions
   assert_single_pos(dur_ICase, zero_allowed = FALSE)
   assert_single_pos(dur_IMild, zero_allowed = FALSE)

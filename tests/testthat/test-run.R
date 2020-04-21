@@ -248,3 +248,30 @@ test_that("seeding", {
   o <- format_output(r)
   expect_equal(sum(dplyr::filter(o, compartment == "E", t == 1, replicate == 1)$y), 3)
 })
+
+test_that("run deterministic parameterises model correctly", {
+  pop <- get_population("Afghanistan")
+  m <- get_mixing_matrix("Afghanistan")
+  output <- run_deterministic_SEIR_model(
+    pop$n,
+    m,
+    c(0, 50),
+    c(3, 3/2),
+    365,
+    100000,
+    1000000
+  )
+  dur_R <- 2.09
+  dur_hosp <- 5
+  probs <- default_probs()
+  m <- process_contact_matrix_scaled_age(m, pop$n)
+  beta <- beta_est_explicit(dur_R, dur_hosp, probs$prob_hosp, m, 3)
+  m <- t(t(m) / pop$n)
+  mix_mat_set <- aperm(array(c(m), dim = c(dim(m), 1)), c(3, 1, 2))
+  expect_equal(length(output$output[,1]), 365)
+  expect_equal(output$parameters$beta, c(beta, beta/2))
+  expect_equal(output$parameters$tt_beta, c(0, 50))
+  expect_equal(output$parameters$mix_mat_set, mix_mat_set)
+  expect_equal(output$parameters$hosp_bed_capacity, 100000)
+  expect_equal(output$parameters$ICU_bed_capacity, 1000000)
+})
