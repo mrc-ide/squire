@@ -146,6 +146,7 @@ n_ICase2_Hosp[] <- rbinom(ICase2[i], p_ICase2_Hosp) # Number progressing to requ
 ICU_occ <- sum(IMVGetLive1) + sum(IMVGetLive2) + sum(IMVGetDie1) + sum(IMVGetDie2) # Summing number of infections in compartments that use ICU beds
 number_requiring_IMV[] <- round(n_ICase2_Hosp[i] * prob_severe[i]) # Number of new hospitalisations that are going to require mechanical ventilation
 total_number_requiring_IMV <- sum(number_requiring_IMV)
+output(total_number_requiring_IMV) <- TRUE
 total_ICU_req <- ICU_occ + total_number_requiring_IMV
 output(total_ICU_req) <- TRUE
 current_free_ICUs <- ICU_bed_capacity + sum(n_IMVGetLive2_Rec) + sum(n_IMVGetDie2_D) - ICU_occ # Number of ICU beds that are currently free
