@@ -229,6 +229,11 @@ typedef struct explicit_SEIR_deterministic_internal {
   double *number_get_Ox;
   double *number_requiring_IMV;
   double *number_requiring_Ox;
+  int offset_output_IMV_dist_weighting;
+  int offset_output_number_get_IMV;
+  int offset_output_number_get_Ox;
+  int offset_output_number_requiring_Ox;
+  int offset_output_Ox_dist_weighting;
   int offset_variable_D;
   int offset_variable_E2;
   int offset_variable_ICase1;
@@ -769,6 +774,7 @@ SEXP explicit_SEIR_deterministic_initial_conditions(SEXP internal_p, SEXP t_ptr)
 void explicit_SEIR_deterministic_rhs(explicit_SEIR_deterministic_internal* internal, double t, double * state, double * dstatedt, double * output);
 void explicit_SEIR_deterministic_rhs_dde(size_t neq, double t, double * state, double * dstatedt, void * internal);
 void explicit_SEIR_deterministic_rhs_desolve(int * neq, double * t, double * state, double * dstatedt, double * output, int * np);
+void explicit_SEIR_deterministic_output_dde(size_t n_eq, double t, double * state, size_t n_output, double * output, void * internal_p);
 SEXP explicit_SEIR_deterministic_rhs_r(SEXP internal_p, SEXP t, SEXP state);
 explict_SEIR_internal* explict_SEIR_get_internal(SEXP internal_p, int closed_error);
 static void explict_SEIR_finalise(SEXP internal_p);
@@ -1069,7 +1075,7 @@ void explicit_SEIR_deterministic_initmod_desolve(void(* odeparms) (int *, double
 }
 SEXP explicit_SEIR_deterministic_contents(SEXP internal_p) {
   explicit_SEIR_deterministic_internal *internal = explicit_SEIR_deterministic_get_internal(internal_p, 1);
-  SEXP contents = PROTECT(allocVector(VECSXP, 195));
+  SEXP contents = PROTECT(allocVector(VECSXP, 200));
   SEXP beta_set = PROTECT(allocVector(REALSXP, internal->dim_beta_set));
   memcpy(REAL(beta_set), internal->beta_set, internal->dim_beta_set * sizeof(double));
   SET_VECTOR_ELT(contents, 0, beta_set);
@@ -1345,74 +1351,79 @@ SEXP explicit_SEIR_deterministic_contents(SEXP internal_p) {
   SEXP number_requiring_Ox = PROTECT(allocVector(REALSXP, internal->dim_number_requiring_Ox));
   memcpy(REAL(number_requiring_Ox), internal->number_requiring_Ox, internal->dim_number_requiring_Ox * sizeof(double));
   SET_VECTOR_ELT(contents, 156, number_requiring_Ox);
-  SET_VECTOR_ELT(contents, 157, ScalarInteger(internal->offset_variable_D));
-  SET_VECTOR_ELT(contents, 158, ScalarInteger(internal->offset_variable_E2));
-  SET_VECTOR_ELT(contents, 159, ScalarInteger(internal->offset_variable_ICase1));
-  SET_VECTOR_ELT(contents, 160, ScalarInteger(internal->offset_variable_ICase2));
-  SET_VECTOR_ELT(contents, 161, ScalarInteger(internal->offset_variable_IMild));
-  SET_VECTOR_ELT(contents, 162, ScalarInteger(internal->offset_variable_IMVGetDie1));
-  SET_VECTOR_ELT(contents, 163, ScalarInteger(internal->offset_variable_IMVGetDie2));
-  SET_VECTOR_ELT(contents, 164, ScalarInteger(internal->offset_variable_IMVGetLive1));
-  SET_VECTOR_ELT(contents, 165, ScalarInteger(internal->offset_variable_IMVGetLive2));
-  SET_VECTOR_ELT(contents, 166, ScalarInteger(internal->offset_variable_IMVNotGetDie1));
-  SET_VECTOR_ELT(contents, 167, ScalarInteger(internal->offset_variable_IMVNotGetDie2));
-  SET_VECTOR_ELT(contents, 168, ScalarInteger(internal->offset_variable_IMVNotGetLive1));
-  SET_VECTOR_ELT(contents, 169, ScalarInteger(internal->offset_variable_IMVNotGetLive2));
-  SET_VECTOR_ELT(contents, 170, ScalarInteger(internal->offset_variable_IOxGetDie1));
-  SET_VECTOR_ELT(contents, 171, ScalarInteger(internal->offset_variable_IOxGetDie2));
-  SET_VECTOR_ELT(contents, 172, ScalarInteger(internal->offset_variable_IOxGetLive1));
-  SET_VECTOR_ELT(contents, 173, ScalarInteger(internal->offset_variable_IOxGetLive2));
-  SET_VECTOR_ELT(contents, 174, ScalarInteger(internal->offset_variable_IOxNotGetDie1));
-  SET_VECTOR_ELT(contents, 175, ScalarInteger(internal->offset_variable_IOxNotGetDie2));
-  SET_VECTOR_ELT(contents, 176, ScalarInteger(internal->offset_variable_IOxNotGetLive1));
-  SET_VECTOR_ELT(contents, 177, ScalarInteger(internal->offset_variable_IOxNotGetLive2));
-  SET_VECTOR_ELT(contents, 178, ScalarInteger(internal->offset_variable_IRec1));
-  SET_VECTOR_ELT(contents, 179, ScalarInteger(internal->offset_variable_IRec2));
-  SET_VECTOR_ELT(contents, 180, ScalarInteger(internal->offset_variable_R));
+  SET_VECTOR_ELT(contents, 157, ScalarInteger(internal->offset_output_IMV_dist_weighting));
+  SET_VECTOR_ELT(contents, 158, ScalarInteger(internal->offset_output_number_get_IMV));
+  SET_VECTOR_ELT(contents, 159, ScalarInteger(internal->offset_output_number_get_Ox));
+  SET_VECTOR_ELT(contents, 160, ScalarInteger(internal->offset_output_number_requiring_Ox));
+  SET_VECTOR_ELT(contents, 161, ScalarInteger(internal->offset_output_Ox_dist_weighting));
+  SET_VECTOR_ELT(contents, 162, ScalarInteger(internal->offset_variable_D));
+  SET_VECTOR_ELT(contents, 163, ScalarInteger(internal->offset_variable_E2));
+  SET_VECTOR_ELT(contents, 164, ScalarInteger(internal->offset_variable_ICase1));
+  SET_VECTOR_ELT(contents, 165, ScalarInteger(internal->offset_variable_ICase2));
+  SET_VECTOR_ELT(contents, 166, ScalarInteger(internal->offset_variable_IMild));
+  SET_VECTOR_ELT(contents, 167, ScalarInteger(internal->offset_variable_IMVGetDie1));
+  SET_VECTOR_ELT(contents, 168, ScalarInteger(internal->offset_variable_IMVGetDie2));
+  SET_VECTOR_ELT(contents, 169, ScalarInteger(internal->offset_variable_IMVGetLive1));
+  SET_VECTOR_ELT(contents, 170, ScalarInteger(internal->offset_variable_IMVGetLive2));
+  SET_VECTOR_ELT(contents, 171, ScalarInteger(internal->offset_variable_IMVNotGetDie1));
+  SET_VECTOR_ELT(contents, 172, ScalarInteger(internal->offset_variable_IMVNotGetDie2));
+  SET_VECTOR_ELT(contents, 173, ScalarInteger(internal->offset_variable_IMVNotGetLive1));
+  SET_VECTOR_ELT(contents, 174, ScalarInteger(internal->offset_variable_IMVNotGetLive2));
+  SET_VECTOR_ELT(contents, 175, ScalarInteger(internal->offset_variable_IOxGetDie1));
+  SET_VECTOR_ELT(contents, 176, ScalarInteger(internal->offset_variable_IOxGetDie2));
+  SET_VECTOR_ELT(contents, 177, ScalarInteger(internal->offset_variable_IOxGetLive1));
+  SET_VECTOR_ELT(contents, 178, ScalarInteger(internal->offset_variable_IOxGetLive2));
+  SET_VECTOR_ELT(contents, 179, ScalarInteger(internal->offset_variable_IOxNotGetDie1));
+  SET_VECTOR_ELT(contents, 180, ScalarInteger(internal->offset_variable_IOxNotGetDie2));
+  SET_VECTOR_ELT(contents, 181, ScalarInteger(internal->offset_variable_IOxNotGetLive1));
+  SET_VECTOR_ELT(contents, 182, ScalarInteger(internal->offset_variable_IOxNotGetLive2));
+  SET_VECTOR_ELT(contents, 183, ScalarInteger(internal->offset_variable_IRec1));
+  SET_VECTOR_ELT(contents, 184, ScalarInteger(internal->offset_variable_IRec2));
+  SET_VECTOR_ELT(contents, 185, ScalarInteger(internal->offset_variable_R));
   SEXP Ox_dist_weighting = PROTECT(allocVector(REALSXP, internal->dim_Ox_dist_weighting));
   memcpy(REAL(Ox_dist_weighting), internal->Ox_dist_weighting, internal->dim_Ox_dist_weighting * sizeof(double));
-  SET_VECTOR_ELT(contents, 181, Ox_dist_weighting);
+  SET_VECTOR_ELT(contents, 186, Ox_dist_weighting);
   SEXP p_dist = PROTECT(allocVector(REALSXP, internal->dim_p_dist));
   memcpy(REAL(p_dist), internal->p_dist, internal->dim_p_dist * sizeof(double));
-  SET_VECTOR_ELT(contents, 182, p_dist);
+  SET_VECTOR_ELT(contents, 187, p_dist);
   SEXP prob_hosp = PROTECT(allocVector(REALSXP, internal->dim_prob_hosp));
   memcpy(REAL(prob_hosp), internal->prob_hosp, internal->dim_prob_hosp * sizeof(double));
-  SET_VECTOR_ELT(contents, 183, prob_hosp);
+  SET_VECTOR_ELT(contents, 188, prob_hosp);
   SEXP prob_non_severe_death_no_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_non_severe_death_no_treatment));
   memcpy(REAL(prob_non_severe_death_no_treatment), internal->prob_non_severe_death_no_treatment, internal->dim_prob_non_severe_death_no_treatment * sizeof(double));
-  SET_VECTOR_ELT(contents, 184, prob_non_severe_death_no_treatment);
+  SET_VECTOR_ELT(contents, 189, prob_non_severe_death_no_treatment);
   SEXP prob_non_severe_death_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_non_severe_death_treatment));
   memcpy(REAL(prob_non_severe_death_treatment), internal->prob_non_severe_death_treatment, internal->dim_prob_non_severe_death_treatment * sizeof(double));
-  SET_VECTOR_ELT(contents, 185, prob_non_severe_death_treatment);
+  SET_VECTOR_ELT(contents, 190, prob_non_severe_death_treatment);
   SEXP prob_severe = PROTECT(allocVector(REALSXP, internal->dim_prob_severe));
   memcpy(REAL(prob_severe), internal->prob_severe, internal->dim_prob_severe * sizeof(double));
-  SET_VECTOR_ELT(contents, 186, prob_severe);
+  SET_VECTOR_ELT(contents, 191, prob_severe);
   SEXP prob_severe_death_no_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_severe_death_no_treatment));
   memcpy(REAL(prob_severe_death_no_treatment), internal->prob_severe_death_no_treatment, internal->dim_prob_severe_death_no_treatment * sizeof(double));
-  SET_VECTOR_ELT(contents, 187, prob_severe_death_no_treatment);
+  SET_VECTOR_ELT(contents, 192, prob_severe_death_no_treatment);
   SEXP prob_severe_death_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_severe_death_treatment));
   memcpy(REAL(prob_severe_death_treatment), internal->prob_severe_death_treatment, internal->dim_prob_severe_death_treatment * sizeof(double));
-  SET_VECTOR_ELT(contents, 188, prob_severe_death_treatment);
+  SET_VECTOR_ELT(contents, 193, prob_severe_death_treatment);
   SEXP R_0 = PROTECT(allocVector(REALSXP, internal->dim_R_0));
   memcpy(REAL(R_0), internal->R_0, internal->dim_R_0 * sizeof(double));
-  SET_VECTOR_ELT(contents, 189, R_0);
+  SET_VECTOR_ELT(contents, 194, R_0);
   SEXP S_0 = PROTECT(allocVector(REALSXP, internal->dim_S_0));
   memcpy(REAL(S_0), internal->S_0, internal->dim_S_0 * sizeof(double));
-  SET_VECTOR_ELT(contents, 190, S_0);
+  SET_VECTOR_ELT(contents, 195, S_0);
   SEXP s_ij = PROTECT(allocVector(REALSXP, internal->dim_s_ij));
   memcpy(REAL(s_ij), internal->s_ij, internal->dim_s_ij * sizeof(double));
   odin_set_dim(s_ij, 2, internal->dim_s_ij_1, internal->dim_s_ij_2);
-  SET_VECTOR_ELT(contents, 191, s_ij);
+  SET_VECTOR_ELT(contents, 196, s_ij);
   SEXP temp = PROTECT(allocVector(REALSXP, internal->dim_temp));
   memcpy(REAL(temp), internal->temp, internal->dim_temp * sizeof(double));
-  SET_VECTOR_ELT(contents, 192, temp);
+  SET_VECTOR_ELT(contents, 197, temp);
   SEXP tt_beta = PROTECT(allocVector(REALSXP, internal->dim_tt_beta));
   memcpy(REAL(tt_beta), internal->tt_beta, internal->dim_tt_beta * sizeof(double));
-  SET_VECTOR_ELT(contents, 193, tt_beta);
+  SET_VECTOR_ELT(contents, 198, tt_beta);
   SEXP tt_matrix = PROTECT(allocVector(REALSXP, internal->dim_tt_matrix));
   memcpy(REAL(tt_matrix), internal->tt_matrix, internal->dim_tt_matrix * sizeof(double));
-  SET_VECTOR_ELT(contents, 194, tt_matrix);
-  SEXP nms = PROTECT(allocVector(STRSXP, 195));
+  SET_VECTOR_ELT(contents, 199, tt_matrix);
+  SEXP nms = PROTECT(allocVector(STRSXP, 200));
   SET_STRING_ELT(nms, 0, mkChar("beta_set"));
   SET_STRING_ELT(nms, 1, mkChar("D_0"));
   SET_STRING_ELT(nms, 2, mkChar("dim_beta_set"));
@@ -1570,44 +1581,49 @@ SEXP explicit_SEIR_deterministic_contents(SEXP internal_p) {
   SET_STRING_ELT(nms, 154, mkChar("number_get_Ox"));
   SET_STRING_ELT(nms, 155, mkChar("number_requiring_IMV"));
   SET_STRING_ELT(nms, 156, mkChar("number_requiring_Ox"));
-  SET_STRING_ELT(nms, 157, mkChar("offset_variable_D"));
-  SET_STRING_ELT(nms, 158, mkChar("offset_variable_E2"));
-  SET_STRING_ELT(nms, 159, mkChar("offset_variable_ICase1"));
-  SET_STRING_ELT(nms, 160, mkChar("offset_variable_ICase2"));
-  SET_STRING_ELT(nms, 161, mkChar("offset_variable_IMild"));
-  SET_STRING_ELT(nms, 162, mkChar("offset_variable_IMVGetDie1"));
-  SET_STRING_ELT(nms, 163, mkChar("offset_variable_IMVGetDie2"));
-  SET_STRING_ELT(nms, 164, mkChar("offset_variable_IMVGetLive1"));
-  SET_STRING_ELT(nms, 165, mkChar("offset_variable_IMVGetLive2"));
-  SET_STRING_ELT(nms, 166, mkChar("offset_variable_IMVNotGetDie1"));
-  SET_STRING_ELT(nms, 167, mkChar("offset_variable_IMVNotGetDie2"));
-  SET_STRING_ELT(nms, 168, mkChar("offset_variable_IMVNotGetLive1"));
-  SET_STRING_ELT(nms, 169, mkChar("offset_variable_IMVNotGetLive2"));
-  SET_STRING_ELT(nms, 170, mkChar("offset_variable_IOxGetDie1"));
-  SET_STRING_ELT(nms, 171, mkChar("offset_variable_IOxGetDie2"));
-  SET_STRING_ELT(nms, 172, mkChar("offset_variable_IOxGetLive1"));
-  SET_STRING_ELT(nms, 173, mkChar("offset_variable_IOxGetLive2"));
-  SET_STRING_ELT(nms, 174, mkChar("offset_variable_IOxNotGetDie1"));
-  SET_STRING_ELT(nms, 175, mkChar("offset_variable_IOxNotGetDie2"));
-  SET_STRING_ELT(nms, 176, mkChar("offset_variable_IOxNotGetLive1"));
-  SET_STRING_ELT(nms, 177, mkChar("offset_variable_IOxNotGetLive2"));
-  SET_STRING_ELT(nms, 178, mkChar("offset_variable_IRec1"));
-  SET_STRING_ELT(nms, 179, mkChar("offset_variable_IRec2"));
-  SET_STRING_ELT(nms, 180, mkChar("offset_variable_R"));
-  SET_STRING_ELT(nms, 181, mkChar("Ox_dist_weighting"));
-  SET_STRING_ELT(nms, 182, mkChar("p_dist"));
-  SET_STRING_ELT(nms, 183, mkChar("prob_hosp"));
-  SET_STRING_ELT(nms, 184, mkChar("prob_non_severe_death_no_treatment"));
-  SET_STRING_ELT(nms, 185, mkChar("prob_non_severe_death_treatment"));
-  SET_STRING_ELT(nms, 186, mkChar("prob_severe"));
-  SET_STRING_ELT(nms, 187, mkChar("prob_severe_death_no_treatment"));
-  SET_STRING_ELT(nms, 188, mkChar("prob_severe_death_treatment"));
-  SET_STRING_ELT(nms, 189, mkChar("R_0"));
-  SET_STRING_ELT(nms, 190, mkChar("S_0"));
-  SET_STRING_ELT(nms, 191, mkChar("s_ij"));
-  SET_STRING_ELT(nms, 192, mkChar("temp"));
-  SET_STRING_ELT(nms, 193, mkChar("tt_beta"));
-  SET_STRING_ELT(nms, 194, mkChar("tt_matrix"));
+  SET_STRING_ELT(nms, 157, mkChar("offset_output_IMV_dist_weighting"));
+  SET_STRING_ELT(nms, 158, mkChar("offset_output_number_get_IMV"));
+  SET_STRING_ELT(nms, 159, mkChar("offset_output_number_get_Ox"));
+  SET_STRING_ELT(nms, 160, mkChar("offset_output_number_requiring_Ox"));
+  SET_STRING_ELT(nms, 161, mkChar("offset_output_Ox_dist_weighting"));
+  SET_STRING_ELT(nms, 162, mkChar("offset_variable_D"));
+  SET_STRING_ELT(nms, 163, mkChar("offset_variable_E2"));
+  SET_STRING_ELT(nms, 164, mkChar("offset_variable_ICase1"));
+  SET_STRING_ELT(nms, 165, mkChar("offset_variable_ICase2"));
+  SET_STRING_ELT(nms, 166, mkChar("offset_variable_IMild"));
+  SET_STRING_ELT(nms, 167, mkChar("offset_variable_IMVGetDie1"));
+  SET_STRING_ELT(nms, 168, mkChar("offset_variable_IMVGetDie2"));
+  SET_STRING_ELT(nms, 169, mkChar("offset_variable_IMVGetLive1"));
+  SET_STRING_ELT(nms, 170, mkChar("offset_variable_IMVGetLive2"));
+  SET_STRING_ELT(nms, 171, mkChar("offset_variable_IMVNotGetDie1"));
+  SET_STRING_ELT(nms, 172, mkChar("offset_variable_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 173, mkChar("offset_variable_IMVNotGetLive1"));
+  SET_STRING_ELT(nms, 174, mkChar("offset_variable_IMVNotGetLive2"));
+  SET_STRING_ELT(nms, 175, mkChar("offset_variable_IOxGetDie1"));
+  SET_STRING_ELT(nms, 176, mkChar("offset_variable_IOxGetDie2"));
+  SET_STRING_ELT(nms, 177, mkChar("offset_variable_IOxGetLive1"));
+  SET_STRING_ELT(nms, 178, mkChar("offset_variable_IOxGetLive2"));
+  SET_STRING_ELT(nms, 179, mkChar("offset_variable_IOxNotGetDie1"));
+  SET_STRING_ELT(nms, 180, mkChar("offset_variable_IOxNotGetDie2"));
+  SET_STRING_ELT(nms, 181, mkChar("offset_variable_IOxNotGetLive1"));
+  SET_STRING_ELT(nms, 182, mkChar("offset_variable_IOxNotGetLive2"));
+  SET_STRING_ELT(nms, 183, mkChar("offset_variable_IRec1"));
+  SET_STRING_ELT(nms, 184, mkChar("offset_variable_IRec2"));
+  SET_STRING_ELT(nms, 185, mkChar("offset_variable_R"));
+  SET_STRING_ELT(nms, 186, mkChar("Ox_dist_weighting"));
+  SET_STRING_ELT(nms, 187, mkChar("p_dist"));
+  SET_STRING_ELT(nms, 188, mkChar("prob_hosp"));
+  SET_STRING_ELT(nms, 189, mkChar("prob_non_severe_death_no_treatment"));
+  SET_STRING_ELT(nms, 190, mkChar("prob_non_severe_death_treatment"));
+  SET_STRING_ELT(nms, 191, mkChar("prob_severe"));
+  SET_STRING_ELT(nms, 192, mkChar("prob_severe_death_no_treatment"));
+  SET_STRING_ELT(nms, 193, mkChar("prob_severe_death_treatment"));
+  SET_STRING_ELT(nms, 194, mkChar("R_0"));
+  SET_STRING_ELT(nms, 195, mkChar("S_0"));
+  SET_STRING_ELT(nms, 196, mkChar("s_ij"));
+  SET_STRING_ELT(nms, 197, mkChar("temp"));
+  SET_STRING_ELT(nms, 198, mkChar("tt_beta"));
+  SET_STRING_ELT(nms, 199, mkChar("tt_matrix"));
   setAttrib(contents, R_NamesSymbol, nms);
   UNPROTECT(75);
   return contents;
@@ -1800,6 +1816,11 @@ SEXP explicit_SEIR_deterministic_set_user(SEXP internal_p, SEXP user) {
   internal->IOxNotGetLive2_0 = (double*) user_get_array(user, false, internal->IOxNotGetLive2_0, "IOxNotGetLive2_0", NA_REAL, NA_REAL, 1, internal->dim_IOxNotGetLive2_0);
   internal->IRec1_0 = (double*) user_get_array(user, false, internal->IRec1_0, "IRec1_0", NA_REAL, NA_REAL, 1, internal->dim_IRec1_0);
   internal->IRec2_0 = (double*) user_get_array(user, false, internal->IRec2_0, "IRec2_0", NA_REAL, NA_REAL, 1, internal->dim_IRec2_0);
+  internal->offset_output_IMV_dist_weighting = 8 + internal->dim_number_requiring_IMV;
+  internal->offset_output_number_get_IMV = 8 + internal->dim_number_requiring_IMV + internal->dim_IMV_dist_weighting;
+  internal->offset_output_number_get_Ox = 8 + internal->dim_number_requiring_IMV + internal->dim_IMV_dist_weighting + internal->dim_number_get_IMV + internal->dim_number_requiring_Ox + internal->dim_Ox_dist_weighting;
+  internal->offset_output_number_requiring_Ox = 8 + internal->dim_number_requiring_IMV + internal->dim_IMV_dist_weighting + internal->dim_number_get_IMV;
+  internal->offset_output_Ox_dist_weighting = 8 + internal->dim_number_requiring_IMV + internal->dim_IMV_dist_weighting + internal->dim_number_get_IMV + internal->dim_number_requiring_Ox;
   internal->offset_variable_D = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1 + internal->dim_IMVNotGetLive2 + internal->dim_IMVNotGetDie1 + internal->dim_IMVNotGetDie2 + internal->dim_IRec1 + internal->dim_IRec2 + internal->dim_R;
   internal->offset_variable_E2 = internal->dim_S + internal->dim_E1;
   internal->offset_variable_ICase1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild;
@@ -1995,8 +2016,40 @@ SEXP explicit_SEIR_deterministic_metadata(SEXP internal_p) {
   SET_STRING_ELT(variable_names, 25, mkChar("D"));
   SET_VECTOR_ELT(ret, 0, variable_length);
   UNPROTECT(2);
-  SET_VECTOR_ELT(ret, 1, R_NilValue);
-  SET_VECTOR_ELT(ret, 2, ScalarInteger(0));
+  SEXP output_length = PROTECT(allocVector(VECSXP, 14));
+  SEXP output_names = PROTECT(allocVector(STRSXP, 14));
+  setAttrib(output_length, R_NamesSymbol, output_names);
+  SET_VECTOR_ELT(output_length, 0, R_NilValue);
+  SET_VECTOR_ELT(output_length, 1, R_NilValue);
+  SET_VECTOR_ELT(output_length, 2, R_NilValue);
+  SET_VECTOR_ELT(output_length, 3, R_NilValue);
+  SET_VECTOR_ELT(output_length, 4, R_NilValue);
+  SET_VECTOR_ELT(output_length, 5, R_NilValue);
+  SET_VECTOR_ELT(output_length, 6, R_NilValue);
+  SET_VECTOR_ELT(output_length, 7, R_NilValue);
+  SET_VECTOR_ELT(output_length, 8, ScalarInteger(internal->dim_number_requiring_IMV));
+  SET_VECTOR_ELT(output_length, 9, ScalarInteger(internal->dim_IMV_dist_weighting));
+  SET_VECTOR_ELT(output_length, 10, ScalarInteger(internal->dim_number_get_IMV));
+  SET_VECTOR_ELT(output_length, 11, ScalarInteger(internal->dim_number_requiring_Ox));
+  SET_VECTOR_ELT(output_length, 12, ScalarInteger(internal->dim_Ox_dist_weighting));
+  SET_VECTOR_ELT(output_length, 13, ScalarInteger(internal->dim_number_get_Ox));
+  SET_STRING_ELT(output_names, 0, mkChar("ICU_occ"));
+  SET_STRING_ELT(output_names, 1, mkChar("current_free_ICUs"));
+  SET_STRING_ELT(output_names, 2, mkChar("total_number_requiring_IMV"));
+  SET_STRING_ELT(output_names, 3, mkChar("total_number_get_IMV"));
+  SET_STRING_ELT(output_names, 4, mkChar("hosp_occ"));
+  SET_STRING_ELT(output_names, 5, mkChar("current_free_hosp"));
+  SET_STRING_ELT(output_names, 6, mkChar("total_number_requiring_ox"));
+  SET_STRING_ELT(output_names, 7, mkChar("total_number_get_hosp"));
+  SET_STRING_ELT(output_names, 8, mkChar("number_requiring_IMV"));
+  SET_STRING_ELT(output_names, 9, mkChar("IMV_dist_weighting"));
+  SET_STRING_ELT(output_names, 10, mkChar("number_get_IMV"));
+  SET_STRING_ELT(output_names, 11, mkChar("number_requiring_Ox"));
+  SET_STRING_ELT(output_names, 12, mkChar("Ox_dist_weighting"));
+  SET_STRING_ELT(output_names, 13, mkChar("number_get_Ox"));
+  SET_VECTOR_ELT(ret, 1, output_length);
+  UNPROTECT(2);
+  SET_VECTOR_ELT(ret, 2, ScalarInteger(8 + internal->dim_number_requiring_IMV + internal->dim_IMV_dist_weighting + internal->dim_number_get_IMV + internal->dim_number_requiring_Ox + internal->dim_Ox_dist_weighting + internal->dim_number_get_Ox));
   SEXP interpolate_t = PROTECT(allocVector(VECSXP, 3));
   SEXP interpolate_t_nms = PROTECT(allocVector(STRSXP, 3));
   setAttrib(interpolate_t, R_NamesSymbol, interpolate_t_nms);
@@ -2142,10 +2195,10 @@ void explicit_SEIR_deterministic_rhs(explicit_SEIR_deterministic_internal* inter
   double total_number_get_IMV = (current_free_ICUs <= 0 ? 0 : ((current_free_ICUs - total_number_requiring_IMV >= 0 ? total_number_requiring_IMV : (current_free_ICUs))));
   cinterpolate_eval(t, internal->interpolate_m, internal->m);
   for (int i = 1; i <= internal->dim_number_get_IMV; ++i) {
-    internal->number_get_IMV[i - 1] = internal->IMV_dist_weighting[i - 1] / (double) odin_sum1(internal->IMV_dist_weighting, 0, internal->dim_IMV_dist_weighting) * total_number_get_IMV;
+    internal->number_get_IMV[i - 1] = (total_number_requiring_IMV == 0 ? 0 : internal->IMV_dist_weighting[i - 1] / (double) odin_sum1(internal->IMV_dist_weighting, 0, internal->dim_IMV_dist_weighting) * total_number_get_IMV);
   }
   for (int i = 1; i <= internal->dim_number_get_Ox; ++i) {
-    internal->number_get_Ox[i - 1] = internal->Ox_dist_weighting[i - 1] / (double) odin_sum1(internal->Ox_dist_weighting, 0, internal->dim_Ox_dist_weighting) * total_number_get_hosp;
+    internal->number_get_Ox[i - 1] = (total_number_requiring_ox == 0 ? 0 : internal->Ox_dist_weighting[i - 1] / (double) odin_sum1(internal->Ox_dist_weighting, 0, internal->dim_Ox_dist_weighting) * total_number_get_hosp);
   }
   for (int i = 1; i <= internal->dim_IMVGetDie1; ++i) {
     dstatedt[internal->offset_variable_IMVGetDie1 + i - 1] = (internal->prob_severe_death_treatment[i - 1] * internal->number_get_IMV[i - 1]) - internal->gamma_get_mv_die * IMVGetDie1[i - 1];
@@ -2185,6 +2238,22 @@ void explicit_SEIR_deterministic_rhs(explicit_SEIR_deterministic_internal* inter
   for (int i = 1; i <= internal->dim_S; ++i) {
     dstatedt[0 + i - 1] = -(S[i - 1]) * internal->lambda[i - 1];
   }
+  if (output) {
+    output[4] = hosp_occ;
+    output[0] = ICU_occ;
+    output[5] = current_free_hosp;
+    output[1] = current_free_ICUs;
+    memcpy(output + 8, internal->number_requiring_IMV, internal->dim_number_requiring_IMV * sizeof(double));
+    memcpy(output + internal->offset_output_number_requiring_Ox, internal->number_requiring_Ox, internal->dim_number_requiring_Ox * sizeof(double));
+    memcpy(output + internal->offset_output_IMV_dist_weighting, internal->IMV_dist_weighting, internal->dim_IMV_dist_weighting * sizeof(double));
+    memcpy(output + internal->offset_output_Ox_dist_weighting, internal->Ox_dist_weighting, internal->dim_Ox_dist_weighting * sizeof(double));
+    output[2] = total_number_requiring_IMV;
+    output[6] = total_number_requiring_ox;
+    output[7] = total_number_get_hosp;
+    output[3] = total_number_get_IMV;
+    memcpy(output + internal->offset_output_number_get_IMV, internal->number_get_IMV, internal->dim_number_get_IMV * sizeof(double));
+    memcpy(output + internal->offset_output_number_get_Ox, internal->number_get_Ox, internal->dim_number_get_Ox * sizeof(double));
+  }
 }
 void explicit_SEIR_deterministic_rhs_dde(size_t neq, double t, double * state, double * dstatedt, void * internal) {
   explicit_SEIR_deterministic_rhs((explicit_SEIR_deterministic_internal*)internal, t, state, dstatedt, NULL);
@@ -2192,10 +2261,67 @@ void explicit_SEIR_deterministic_rhs_dde(size_t neq, double t, double * state, d
 void explicit_SEIR_deterministic_rhs_desolve(int * neq, double * t, double * state, double * dstatedt, double * output, int * np) {
   explicit_SEIR_deterministic_rhs(explicit_SEIR_deterministic_internal_ds, *t, state, dstatedt, output);
 }
+void explicit_SEIR_deterministic_output_dde(size_t n_eq, double t, double * state, size_t n_output, double * output, void * internal_p) {
+  explicit_SEIR_deterministic_internal *internal = (explicit_SEIR_deterministic_internal*) internal_p;
+  double * ICase2 = state + internal->offset_variable_ICase2;
+  double * IMVGetLive1 = state + internal->offset_variable_IMVGetLive1;
+  double * IMVGetLive2 = state + internal->offset_variable_IMVGetLive2;
+  double * IMVGetDie1 = state + internal->offset_variable_IMVGetDie1;
+  double * IMVGetDie2 = state + internal->offset_variable_IMVGetDie2;
+  double * IRec1 = state + internal->offset_variable_IRec1;
+  double * IRec2 = state + internal->offset_variable_IRec2;
+  double * IOxGetLive1 = state + internal->offset_variable_IOxGetLive1;
+  double * IOxGetLive2 = state + internal->offset_variable_IOxGetLive2;
+  double * IOxGetDie1 = state + internal->offset_variable_IOxGetDie1;
+  double * IOxGetDie2 = state + internal->offset_variable_IOxGetDie2;
+  double hosp_occ = odin_sum1(IOxGetLive1, 0, internal->dim_IOxGetLive1) + odin_sum1(IOxGetLive2, 0, internal->dim_IOxGetLive2) + odin_sum1(IOxGetDie1, 0, internal->dim_IOxGetDie1) + odin_sum1(IOxGetDie2, 0, internal->dim_IOxGetDie2) + odin_sum1(IRec1, 0, internal->dim_IRec1) + odin_sum1(IRec2, 0, internal->dim_IRec2);
+  double ICU_occ = odin_sum1(IMVGetLive1, 0, internal->dim_IMVGetLive1) + odin_sum1(IMVGetLive2, 0, internal->dim_IMVGetLive2) + odin_sum1(IMVGetDie1, 0, internal->dim_IMVGetDie1) + odin_sum1(IMVGetDie2, 0, internal->dim_IMVGetDie2);
+  double current_free_hosp = internal->hosp_bed_capacity - hosp_occ + internal->gamma_get_ox_die * odin_sum1(IOxGetDie2, 0, internal->dim_IOxGetDie2) + internal->gamma_get_ox_survive * odin_sum1(IOxGetLive2, 0, internal->dim_IOxGetLive2) + internal->gamma_rec * odin_sum1(IRec2, 0, internal->dim_IRec2) - internal->gamma_get_mv_survive * odin_sum1(IMVGetLive2, 0, internal->dim_IMVGetLive2);
+  double current_free_ICUs = internal->ICU_bed_capacity - ICU_occ + internal->gamma_get_mv_survive * odin_sum1(IMVGetLive2, 0, internal->dim_IMVGetLive2) + internal->gamma_get_mv_die * odin_sum1(IMVGetDie2, 0, internal->dim_IMVGetDie2);
+  output[4] = hosp_occ;
+  output[0] = ICU_occ;
+  for (int i = 1; i <= internal->dim_number_requiring_IMV; ++i) {
+    internal->number_requiring_IMV[i - 1] = internal->gamma_hosp * ICase2[i - 1] * internal->prob_severe[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_number_requiring_Ox; ++i) {
+    internal->number_requiring_Ox[i - 1] = internal->gamma_hosp * ICase2[i - 1] * (1 - internal->prob_severe[i - 1]);
+  }
+  output[5] = current_free_hosp;
+  output[1] = current_free_ICUs;
+  for (int i = 1; i <= internal->dim_IMV_dist_weighting; ++i) {
+    internal->IMV_dist_weighting[i - 1] = internal->number_requiring_IMV[i - 1] * internal->p_dist[i - 1];
+  }
+  memcpy(output + 8, internal->number_requiring_IMV, internal->dim_number_requiring_IMV * sizeof(double));
+  memcpy(output + internal->offset_output_number_requiring_Ox, internal->number_requiring_Ox, internal->dim_number_requiring_Ox * sizeof(double));
+  for (int i = 1; i <= internal->dim_Ox_dist_weighting; ++i) {
+    internal->Ox_dist_weighting[i - 1] = internal->number_requiring_Ox[i - 1] * internal->p_dist[i - 1];
+  }
+  double total_number_requiring_IMV = odin_sum1(internal->number_requiring_IMV, 0, internal->dim_number_requiring_IMV);
+  double total_number_requiring_ox = odin_sum1(internal->number_requiring_Ox, 0, internal->dim_number_requiring_Ox);
+  memcpy(output + internal->offset_output_IMV_dist_weighting, internal->IMV_dist_weighting, internal->dim_IMV_dist_weighting * sizeof(double));
+  memcpy(output + internal->offset_output_Ox_dist_weighting, internal->Ox_dist_weighting, internal->dim_Ox_dist_weighting * sizeof(double));
+  output[2] = total_number_requiring_IMV;
+  output[6] = total_number_requiring_ox;
+  double total_number_get_hosp = (current_free_hosp <= 0 ? 0 : ((current_free_hosp - total_number_requiring_ox >= 0 ? total_number_requiring_ox : (current_free_hosp))));
+  double total_number_get_IMV = (current_free_ICUs <= 0 ? 0 : ((current_free_ICUs - total_number_requiring_IMV >= 0 ? total_number_requiring_IMV : (current_free_ICUs))));
+  for (int i = 1; i <= internal->dim_number_get_IMV; ++i) {
+    internal->number_get_IMV[i - 1] = (total_number_requiring_IMV == 0 ? 0 : internal->IMV_dist_weighting[i - 1] / (double) odin_sum1(internal->IMV_dist_weighting, 0, internal->dim_IMV_dist_weighting) * total_number_get_IMV);
+  }
+  for (int i = 1; i <= internal->dim_number_get_Ox; ++i) {
+    internal->number_get_Ox[i - 1] = (total_number_requiring_ox == 0 ? 0 : internal->Ox_dist_weighting[i - 1] / (double) odin_sum1(internal->Ox_dist_weighting, 0, internal->dim_Ox_dist_weighting) * total_number_get_hosp);
+  }
+  output[7] = total_number_get_hosp;
+  output[3] = total_number_get_IMV;
+  memcpy(output + internal->offset_output_number_get_IMV, internal->number_get_IMV, internal->dim_number_get_IMV * sizeof(double));
+  memcpy(output + internal->offset_output_number_get_Ox, internal->number_get_Ox, internal->dim_number_get_Ox * sizeof(double));
+}
 SEXP explicit_SEIR_deterministic_rhs_r(SEXP internal_p, SEXP t, SEXP state) {
   SEXP dstatedt = PROTECT(allocVector(REALSXP, LENGTH(state)));
   explicit_SEIR_deterministic_internal *internal = explicit_SEIR_deterministic_get_internal(internal_p, 1);
-  double *output = NULL;
+  SEXP output_ptr = PROTECT(allocVector(REALSXP, 8 + internal->dim_number_requiring_IMV + internal->dim_IMV_dist_weighting + internal->dim_number_get_IMV + internal->dim_number_requiring_Ox + internal->dim_Ox_dist_weighting + internal->dim_number_get_Ox));
+  setAttrib(dstatedt, install("output"), output_ptr);
+  UNPROTECT(1);
+  double *output = REAL(output_ptr);
   explicit_SEIR_deterministic_rhs(internal, REAL(t)[0], REAL(state), REAL(dstatedt), output);
   UNPROTECT(1);
   return dstatedt;

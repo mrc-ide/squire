@@ -73,15 +73,15 @@ number_requiring_IMV[] <- gamma_hosp * ICase2[i] * prob_severe[i]
 total_number_requiring_IMV <- sum(number_requiring_IMV)
 total_number_get_IMV <- if(current_free_ICUs <= 0) 0 else(if(current_free_ICUs - total_number_requiring_IMV >= 0) total_number_requiring_IMV else(current_free_ICUs)) # Working out the number of new ICU requiring infections that get a bed
 IMV_dist_weighting[] <- number_requiring_IMV[i] * p_dist[i]
-number_get_IMV[] <- IMV_dist_weighting[i]/sum(IMV_dist_weighting) * total_number_get_IMV
+number_get_IMV[] <- if (total_number_requiring_IMV == 0) 0 else IMV_dist_weighting[i]/sum(IMV_dist_weighting) * total_number_get_IMV
 
-# output(ICU_occ) <- TRUE
-# output(current_free_ICUs) <- TRUE
-# output(number_requiring_IMV) <- TRUE
-# output(total_number_requiring_IMV) <- TRUE
-# output(total_number_get_IMV) <- TRUE
-# output(IMV_dist_weighting) <- TRUE
-# output(number_get_IMV) <- TRUE
+output(ICU_occ) <- TRUE
+output(current_free_ICUs) <- TRUE
+output(number_requiring_IMV) <- TRUE
+output(total_number_requiring_IMV) <- TRUE
+output(total_number_get_IMV) <- TRUE
+output(IMV_dist_weighting) <- TRUE
+output(number_get_IMV) <- TRUE
 
 deriv(IMVGetLive1[]) <- (1 - prob_severe_death_treatment[i]) * number_get_IMV[i] - gamma_get_mv_survive * IMVGetLive1[i]
 deriv(IMVGetLive2[]) <- gamma_get_mv_survive * IMVGetLive1[i] -  gamma_get_mv_survive * IMVGetLive2[i]
@@ -102,15 +102,15 @@ number_requiring_Ox[] <- gamma_hosp * ICase2[i] * (1 - prob_severe[i]) # NOTE TH
 total_number_requiring_ox <- sum(number_requiring_Ox)
 total_number_get_hosp <- if (current_free_hosp <= 0) 0 else (if(current_free_hosp - total_number_requiring_ox >= 0) total_number_requiring_ox else(current_free_hosp)) # Working out the number of new hospital bed requiring infections that get a bed
 Ox_dist_weighting[] <- number_requiring_Ox[i] * p_dist[i]
-number_get_Ox[] <- Ox_dist_weighting[i]/sum(Ox_dist_weighting) * total_number_get_hosp
+number_get_Ox[] <- if (total_number_requiring_ox == 0) 0 else Ox_dist_weighting[i]/sum(Ox_dist_weighting) * total_number_get_hosp
 
-# output(hosp_occ) <- TRUE
-# output(current_free_hosp) <- TRUE
-# output(number_requiring_Ox) <- TRUE
-# output(total_number_requiring_ox) <- TRUE
-# output(total_number_get_hosp) <- TRUE
-# output(Ox_dist_weighting) <- TRUE
-# output(number_get_Ox) <- TRUE
+output(hosp_occ) <- TRUE
+output(current_free_hosp) <- TRUE
+output(number_requiring_Ox) <- TRUE
+output(total_number_requiring_ox) <- TRUE
+output(total_number_get_hosp) <- TRUE
+output(Ox_dist_weighting) <- TRUE
+output(number_get_Ox) <- TRUE
 
 deriv(IOxGetLive1[]) <- (1 - prob_non_severe_death_treatment[i]) * number_get_Ox[i] - gamma_get_ox_survive * IOxGetLive1[i]
 deriv(IOxGetLive2[]) <- gamma_get_ox_survive * IOxGetLive1[i] -  gamma_get_ox_survive * IOxGetLive2[i]

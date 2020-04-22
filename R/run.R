@@ -531,15 +531,16 @@ run_deterministic_SEIR_model <- function(
   )
   mm <- t(t(m) / population)
   mix_mat_set <- aperm(array(c(mm), dim = c(dim(mm), 1)), c(3, 1, 2))
+  seed <- c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0)
 
   pars <- list(
     N_age = length(population),
-    S_0 = population,
-    E1_0 = rep(0, length(population)),
+    S_0 = population - seed,
+    E1_0 = seed,
     E2_0 = rep(0, length(population)),
-    IMild_0 = rep(1, length(population)),
-    ICase1_0 = rep(1, length(population)),
-    ICase2_0 = rep(1, length(population)),
+    IMild_0 = rep(0, length(population)),
+    ICase1_0 = rep(0, length(population)),
+    ICase2_0 = rep(0, length(population)),
     IOxGetLive1_0 = rep(0, length(population)),
     IOxGetLive2_0 = rep(0, length(population)),
     IOxGetDie1_0 = rep(0, length(population)),
@@ -587,7 +588,7 @@ run_deterministic_SEIR_model <- function(
     beta_set = beta
   )
 
-  mod <- explicit_SEIR_deterministic(user = pars, use_dde = TRUE)
+  mod <- explicit_SEIR_deterministic(user = pars)
   t <- seq(from = 0, to = time_period - 1)
   results <- mod$run(t)
   out <- list(output = results, parameters = pars, model = mod)
