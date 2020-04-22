@@ -1,5 +1,6 @@
 #' Return the default probabilities for modelling
 #' @return list of default probabilities
+#' @export
 default_probs <- function() {
   prob_hosp <- c(
     0.000744192, 0.000634166,0.001171109, 0.002394593, 0.005346437 ,
