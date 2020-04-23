@@ -33,7 +33,7 @@ test_that("particle works", {
                              return = "full")
 
   expect_true(names(out) == "log_likelihood")
-  expect_lt(out$log_likelihood - -205.6076, 0.01)
+  expect_lt(out$log_likelihood , 0)
 
 
   expect_error(out <- run_particle_filter(data = data,
@@ -67,7 +67,7 @@ test_that("particle works", {
                              return = "full")
 
   expect_true(all(names(out) == c("log_likelihood","states")))
-  expect_lt(out$log_likelihood - -205.6076, 0.01)
+  expect_lt(out$log_likelihood , 0)
 
   index <- c(index$D) - 1L
   particles <- apply(out$states[, index, ], c(1, 3), sum)
@@ -75,4 +75,46 @@ test_that("particle works", {
   points(as.Date(data$date), cumsum(data$deaths), pch = 19)
 
 
+})
+
+
+test_that("particle_filter error cases", {
+  set.seed(1)
+
+  time_steps_per_day <- 4
+  data <- read.csv(squire_file("extdata/example.csv"),
+                   stringsAsFactors = FALSE)
+  d <- particle_filter_data(data, "2020-02-02", time_steps_per_day)
+  squire_model <- explicit_model()
+
+  pars_model <- parameters_explicit_SEEIR("Angola")
+  pars_obs <- list(phi_general = 0.95,
+                   k_general = 2,
+                   phi_ICU = 0.95,
+                   k_ICU = 2,
+                   phi_death = 926 / 1019,
+                   k_death = 2,
+                   exp_noise = 1e6)
+
+  expect_warning(mod <- squire_model$odin_model(user = pars_model))
+  compare <- squire_model$compare_model(mod, pars_obs, d)
+
+  expect_error(
+    particle_filter(NULL, mod, compare, 100),
+    "Expected a data set derived from particle_filter_data")
+  expect_error(
+    particle_filter(data, mod, compare, 100),
+    "Expected a data set derived from particle_filter_data")
+  expect_error(
+    particle_filter(d, NULL, compare, 100),
+    "Expected 'model' to be an 'odin_model' object")
+  expect_error(
+    particle_filter(d, mod, compare, 1),
+    "At least two particles required")
+  expect_error(
+    particle_filter(d, mod, compare, 100, forecast_days = 1),
+    "forecasting only possible if particles are saved")
+  expect_error(
+    particle_filter(d, mod, compare, 100, forecast_days = -1),
+    "forecast_days must be positive")
 })

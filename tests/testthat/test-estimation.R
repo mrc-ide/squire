@@ -195,7 +195,15 @@ test_that("sample_grid_scan works", {
                           n_sample_pairs = n_sample_pairs,
                           n_particles = 2,
                           full_output = TRUE)
+  expect_equal(dim(res$trajectories), c(days_between, length(model$.__enclos_env__$private$ynames), n_sample_pairs))
 
+
+  res <- sample_grid_scan(scan_results = scan_results,
+                          n_sample_pairs = n_sample_pairs,
+                          n_particles = 2,
+                          forecast_days = 5,
+                          full_output = TRUE)
+  expect_equal(dim(res$trajectories), c(days_between+5, length(model$.__enclos_env__$private$ynames), n_sample_pairs))
 
   res <- sample_grid_scan(scan_results = scan_results,
                           n_sample_pairs = n_sample_pairs,
