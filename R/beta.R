@@ -8,7 +8,7 @@
 #' @export
 #'
 # #' @examples
-beta_est <- function(duration_infectiousness, mixing_matrix, R0) {
+beta_est_simple <- function(duration_infectiousness, mixing_matrix, R0) {
   if(length(duration_infectiousness) > 1){
     stop("duration_infectiousness must be of length = 1")
   }
@@ -65,4 +65,45 @@ beta_est_explicit <- function(dur_IMild, dur_ICase, prob_hosp, mixing_matrix, R0
   beta <- R0/(adjusted_eigen)
 
   return(beta)
+}
+
+
+#' Estimate beta for a squire model using model parameters
+#' @param squire_model A squire model. Default = \code{explicit_SEEIR()}
+#' @param model_params Squire model parameters, from a call to
+#'   \code{generate_parameters()}.
+#' @param R0 Basic reproduction number
+#'
+#' @return Beta parameter
+beta_est <- function(squire_model, model_params, R0) {
+
+  # asserts
+  assert_custom_class(squire_model, "squire_model")
+  assert_custom_class(model_params, "squire_parameters")
+  assert_pos(R0)
+
+  mat <- process_contact_matrix_scaled_age(model_params$contact_matrix_set[[1]],
+                                              model_params$population)
+
+  # Calculate beta
+  if (class(squire_model)[1] == "explicit_SEEIR_model") {
+
+    assert_custom_class(model_params, "explicit_SEEIR_parameters")
+    new_beta <- squire_model$generate_beta_func(dur_IMild = 1/model_params$gamma_IMild,
+                                                dur_ICase = 2/model_params$gamma_ICase,
+                                                prob_hosp = model_params$prob_hosp,
+                                                mixing_matrix = mat,
+                                                R0 = R0)
+
+  } else if (class(squire_model)[1] == "simple_SEEIR_model") {
+
+    assert_custom_class(model_params, "simple_SEEIR_parameters")
+    new_beta <- squire_model$generate_beta_func(dur_I = 1/model_params$dur_I,
+                                                    mixing_matrix = mat,
+                                                    R0 = R0)
+
+  }
+
+  return(new_beta)
+
 }

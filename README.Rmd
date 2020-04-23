@@ -353,7 +353,7 @@ t1 <- calibrate(country = "Angola",
                   R0_scan = c(3,4,5))
 
 # create our projections
-p2 <- projections(r = t1, R0_change = c(0.8, 0.4), tt_R0 = c(0, 20))
+p2 <- projections(r = t1, R0_change = c(0.3, 0.15), tt_R0 = c(0, 20))
 ```
 
 The output generated from `projections` is the same class and structure as from `calibrate` and can be plotted against the unmitigated scenario using `projection_plotting`:
@@ -368,7 +368,7 @@ ggproj <- projection_plotting(r_list = list(t1,p2),
 ggproj + ggplot2::geom_hline(yintercept = t1$parameters$ICU_bed_capacity)
 ```
 
-We can see above that the intervention introduced was sufficient to prevent ICU demand (in red) from exceeding the supply, whereas in the unmitigated strategy this did occur.
+We can see above that the intervention introduced was insufficient to prevent ICU demand (in red) from exceeding the supply, whereas in the unmitigated strategy this did occur.
 
 We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 50% today before relaxing it to 80% in 20 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with `add_parms_to_scenarios = FALSE`):
 

@@ -228,6 +228,28 @@ assert_dataframe <- function(x, message = "%s must be a data frame", name = depa
 }
 
 #------------------------------------------------
+# x is a date
+assert_date <- function(x,
+                        message = "%s must be a date or ISO-formatted string",
+                        name = deparse(substitute(x))) {
+
+  if (all(class(x) == "Date")) {
+    return(TRUE)
+  } else {
+    if (is.character(x)) {
+      if(all(class(as.Date(x)) == "Date")) {
+        return(TRUE)
+      }
+    } else {
+      stop(sprintf(message, name), call. = FALSE)
+    }
+  }
+
+  return(TRUE)
+}
+
+
+#------------------------------------------------
 # x inherits from custom class c
 assert_custom_class <- function(x, c, message = "%s must inherit from class '%s'", name = deparse(substitute(x))) {
   if (!inherits(x, c)) {

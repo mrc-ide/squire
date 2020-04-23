@@ -154,6 +154,20 @@ odin_index <- function(model) {
   model$transform_variables(seq_len(1L + n_state + n_out))
 }
 
+
+## Indices for cumulative cases total
+#' @noRd
+cases_total_index <- function(model) {
+
+  index <- odin_index(model)
+  indices <- c("IMild", "ICase1", "ICase2", "IOxGetLive1", "IOxGetLive2",
+               "IOxGetDie1", "IOxGetDie2", "IOxNotGetLive1", "IOxNotGetLive2",
+               "IOxNotGetDie1", "IOxNotGetDie2", "IMVGetLive1", "IMVGetLive2",
+               "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
+               "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")
+  return(unlist(index[indices]))
+}
+
 ## Take odin state and calculate sum across ages in a replicate and vectorise
 #' @noRd
 odin_sv <- function(state, replicates, nt, reduce_age = TRUE) {

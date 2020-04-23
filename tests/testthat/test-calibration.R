@@ -4,10 +4,10 @@ context("calibration")
 test_that("calibrate works", {
   t1 <- calibrate(country = "Angola", deaths = 5,
                   reporting_fraction = 0.5,
-                  time_period = 120, replicates = 10)
+                  time_period = 120, replicates = 2)
   expect_type(t1, "list")
   expect_s3_class(t1, "squire_simulation")
-  expect_true(dim(t1$output)[3] == 10)
+  expect_true(dim(t1$output)[3] == 2)
   expect_error(calibrate(country = "Angola", deaths = 5,
                          reporting_fraction = 0.5,
                          time_period = 120, seeding_age_groups = "wrong"),

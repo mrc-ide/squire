@@ -44,7 +44,7 @@ init_check <- function(init, population){
 }
 
 
-#' Check and set up initial values for explict model
+#' Check and set up initial values for explicit model
 #'
 #' @inheritParams run_explicit_SEEIR_model
 #'

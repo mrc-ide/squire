@@ -1,38 +1,32 @@
-#' Run the SEEIR model
+# -----------------------------------------------------------------------------
+#' Parmeters for the simple SEEIR model
 #'
 #' @param R0 Basic reproduction number
 #' @param tt_R0 Change time points for R0
 #' @param dt Time step
 #' @param init Data.frame of initial conditions
 #' @param dur_E Mean duration of incubation period (days)
-#' @param dur_I Mean duration of infectious period (days)
+#' @param dur_I Mean duration of infectious period (days) in simple model
 #' @param population Population vector (for each age group)
 #' @param contact_matrix_set Contact matrices used in simulation
 #' @param tt_contact_matrix Time change points for matrix change
 #' @param time_period Length of simulation
 #' @param replicates Number of replicates
 #'
-#' @return Simulation output
+#' @return Paramater List
 #' @export
 #'
-#' @examples
-#' \dontrun{
-#' pop <- get_population("Afghanistan")
-#' m1 <- run_simple_SEEIR_model(population = pop$n, dt = 1,
-#' R0 = 2,
-#' contact_matrix_set=contact_matrices[[1]])
-#' }
-run_simple_SEEIR_model <- function(R0 = 3,
-                            tt_R0 = 0,
-                            dt = 0.1,
-                            init = NULL,
-                            dur_E  = 4.58,
-                            dur_I = 2.09,
-                            population,
-                            contact_matrix_set,
-                            tt_contact_matrix = 0,
-                            time_period = 365,
-                            replicates = 10) {
+parameters_SEEIR_model <- function(R0 = 3,
+                                   tt_R0 = 0,
+                                   dt = 0.1,
+                                   init = NULL,
+                                   dur_E  = 4.58,
+                                   dur_I = 2.09,
+                                   population,
+                                   contact_matrix_set,
+                                   tt_contact_matrix = 0,
+                                   time_period = 365,
+                                   replicates = 10) {
 
   # Initialise initial conditions
   init <- init_check(init, population)
@@ -77,28 +71,16 @@ run_simple_SEEIR_model <- function(R0 = 3,
                tt_matrix = tt_contact_matrix, mix_mat_set = matrices_set,
                dt = dt)
 
-  # Running the Model
-  mod <- simple_SEIR(user = pars)
-  t <- seq(from = 1, to = time_period/dt)
-  results <- mod$run(t, replicate = replicates)
+  class(pars) <- c("simple_SEEIR_parameters", "squire_parameters")
+  return(pars)
 
-  # Summarise inputs
-  parameters = list(R0 = R0, tt_R0 = tt_R0,
-                dt = dt,
-                init = init,
-                dur_E  = dur_E, dur_I = dur_I,
-                population = population,
-                contact_matrix_set = contact_matrix_set,
-                tt_contact_matrix = tt_contact_matrix,
-                time_period = time_period, replicates = replicates)
-
-  out <- list(output = results, parameters = parameters, model = mod)
-  out <- structure(out, class = "squire_simulation")
-  return(out)
 }
 
+
+
+
 # -----------------------------------------------------------------------------
-#' Run the explicit SEEIR model
+#' Parmaters for explicit SEEIR model
 #'
 #' @details All durations are in days.
 #'
@@ -117,8 +99,6 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #'   Default = NULL, which causes beta to be estimated from R0
 #' @param time_period Length of simulation. Default = 365
 #' @param dt Time Step. Default = 0.5
-#' @param replicates  Number of replicates. Default = 10
-#' @param seed Random seed used for simulations. Deafult = runif(1, 0, 10000)
 #' @param init Data.frame of initial conditions. Default = NULL
 #' @param prob_hosp probability of hospitalisation by age.
 #'   Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
@@ -166,19 +146,11 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' @param ICU_bed_capacity ICU bed capacity. Can be single number of vector if capacity time-varies.
 #' @param tt_hosp_beds Times at which hospital bed capacity changes (Default = 0 = doesn't change)
 #' @param tt_ICU_beds Times at which ICU bed capacity changes (Default = 0 = doesn't change)
-#' @param seeding_cases Initial number of cases seeding the epidemic
 #'
-#' @return Simulation output
+#' @return Paramater List
 #' @export
 #'
-#' @examples
-#' \dontrun{
-#' pop <- get_population("Afghanistan")
-#' m1 <- run_explicit_SEEIR_model(R0 = 2,
-#' population = pop$n, dt = 1,
-#' contact_matrix_set=contact_matrices[[1]])
-#' }
-run_explicit_SEEIR_model <- function(
+parameters_explicit_SEEIR <- function(
 
   # demography
   country = NULL,
@@ -196,7 +168,7 @@ run_explicit_SEEIR_model <- function(
   dt = 0.1,
   replicates = 10,
   init = NULL,
-  seed = stats::runif(1, 0, 100000000),
+  seeding_cases = NULL,
 
   # parameters
   # probabilities
@@ -238,16 +210,9 @@ run_explicit_SEEIR_model <- function(
   hosp_bed_capacity = NULL,
   ICU_bed_capacity = NULL,
   tt_hosp_beds = 0,
-  tt_ICU_beds = 0,
+  tt_ICU_beds = 0
 
-  seeding_cases = NULL
-
-  ) {
-
-  # Grab function arguments
-  args <- as.list(environment())
-  set.seed(seed)
-
+) {
 
   # Handle country population args
   cpm <- parse_country_population_mixing_matrix(country = country,
@@ -264,11 +229,11 @@ run_explicit_SEEIR_model <- function(
 
   # populate contact matrix set if not provided
   if (length(contact_matrix_set) == 1) {
-      baseline <- contact_matrix_set[[1]]
-      contact_matrix_set <- vector("list", length(tt_contact_matrix))
-      for(i in seq_along(tt_contact_matrix)) {
-        contact_matrix_set[[i]] <- baseline
-      }
+    baseline <- contact_matrix_set[[1]]
+    contact_matrix_set <- vector("list", length(tt_contact_matrix))
+    for(i in seq_along(tt_contact_matrix)) {
+      contact_matrix_set[[i]] <- baseline
+    }
   }
 
 
@@ -384,11 +349,12 @@ run_explicit_SEEIR_model <- function(
   gamma_rec = 2 * 1/dur_rec
 
   if (is.null(beta_set)) {
-  beta_set <- beta_est_explicit(dur_IMild = dur_IMild,
-                                dur_ICase = dur_ICase,
-                                prob_hosp = prob_hosp,
-                                mixing_matrix = process_contact_matrix_scaled_age(contact_matrix_set[[1]], population),
-                                R0 = R0)
+    baseline_matrix <- process_contact_matrix_scaled_age(contact_matrix_set[[1]], population)
+    beta_set <- beta_est_explicit(dur_IMild = dur_IMild,
+                                  dur_ICase = dur_ICase,
+                                  prob_hosp = prob_hosp,
+                                  mixing_matrix = baseline_matrix,
+                                  R0 = R0)
   }
 
   # normalise to sum to 1
@@ -449,23 +415,12 @@ run_explicit_SEEIR_model <- function(
                mix_mat_set = matrices_set,
                tt_beta = round(tt_R0/dt),
                beta_set = beta_set,
-               dt = dt)
+               dt = dt,
+               population = population,
+               contact_matrix_set = contact_matrix_set)
 
-  # Running the Model
-  mod <- explicit_SEIR(user = pars, unused_user_action = "ignore")
-  t <- seq(from = 1, to = time_period/dt)
-  results <- mod$run(t, replicate = replicates)
+  class(pars) <- c("explicit_SEEIR_parameters", "squire_parameters")
 
-  # Summarise inputs
-  parameters <- args
-  parameters$population <- population
-  parameters$hosp_bed_capacity <- hosp_bed_capacity
-  parameters$ICU_bed_capacity <- ICU_bed_capacity
-  parameters$beta_set <- beta_set
-  parameters$seeding_cases <- mod_init$E1
-  parameters$contact_matrix_set <- contact_matrix_set
+  return(pars)
 
-  out <- list(output = results, parameters = parameters, model = mod)
-  out <- structure(out, class = "squire_simulation")
-  return(out)
 }

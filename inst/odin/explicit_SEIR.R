@@ -173,6 +173,12 @@ number_get_IMV[17] <- if ((total_number_get_IMV - sum(number_get_IMV[1:16])) <= 
 # output(number_get_IMV[]) <- TRUE
 # output(imv_multinom_prob[]) <- TRUE
 # output(total_number_get_IMV) <- TRUE
+# output(n_IMVGetDie2_D[]) <- TRUE
+# output(n_IMVGetLive2_Rec[]) <- TRUE
+# output(n_IMVNotGetDie1[]) <- TRUE
+# output(ICU_occ) <- TRUE
+# output(current_free_ICUs) <- TRUE
+
 
 n_IMVGetDie1[] <- round(number_get_IMV[i] * prob_severe_death_treatment[i]) # Number of individuals requiring mechanical ventilation and who recieve it who die
 n_IMVGetDie1_IMVGetDie2[] <- rbinom(IMVGetDie1[i], p_IMVGetDie1_IMVGetDie2) # Progression through the "require and receive mechanical ventilation but still die" compartment
@@ -226,12 +232,17 @@ n_IOxGetLive1_IOxGetLive2[] <- rbinom(IOxGetLive1[i], p_IOxGetLive1_IOxGetLive2)
 n_IOxGetLive2_R[] <- rbinom(IOxGetLive2[i], p_IOxGetLive2_R) # Progression through the "require and receive oxygen and survive" compartment to recovery
 
 number_notget_Ox[] <- number_requiring_Ox[i] - number_get_Ox[i] # Calculating the number of cases requiring a hospital bed and who do not receive it
+
 # output(number_notget_Ox[]) <- TRUE
 # output(number_requiring_Ox[]) <- TRUE
 # output(number_get_Ox[]) <- TRUE
+# output(n_IOxGetDie2_D[]) <- TRUE
+# output(n_IOxGetLive2_R[]) <- TRUE
 # output(ox_multinom_prob[]) <- TRUE
 # output(total_number_get_hosp) <- TRUE
 # output(n_IOxNotGetDie1[]) <- TRUE
+# output(hosp_occ) <- TRUE
+# output(current_free_hosp) <- TRUE
 
 n_IOxNotGetDie1[] <- round(number_notget_Ox[i] * prob_non_severe_death_no_treatment[i]) # Number of individuals requiring oxygen but do not receive it and who die
 n_IOxNotGetDie1_IOxNotGetDie2[] <- rbinom(IOxNotGetDie1[i], p_IOxNotGetDie1_IOxNotGetDie2) # Progression through the "require but do not receive oxygen and die" compartment
