@@ -7,4 +7,4 @@ r_github_packages:
 r_packages:
   - covr
 after_success:
-  - Rscript -e 'covr::codecov(quiet = FALSE)'
+  - Rscript -e 'covr::codecov()'
