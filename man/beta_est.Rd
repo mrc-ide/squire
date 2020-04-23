@@ -2,14 +2,15 @@
 % Please edit documentation in R/beta.R
 \name{beta_est}
 \alias{beta_est}
-\title{Estimate beta parameter}
+\title{Estimate beta for a squire model using model parameters}
 \usage{
-beta_est(duration_infectiousness, mixing_matrix, R0)
+beta_est(squire_model, model_params, R0)
 }
 \arguments{
-\item{duration_infectiousness}{Duration of infectiousness (days)}
+\item{squire_model}{A squire model. Default = \code{explicit_SEEIR()}}
 
-\item{mixing_matrix}{Mixing matrix}
+\item{model_params}{Squire model parameters, from a call to
+\code{generate_parameters()}.}
 
 \item{R0}{Basic reproduction number}
 }
@@ -17,5 +18,5 @@ beta_est(duration_infectiousness, mixing_matrix, R0)
 Beta parameter
 }
 \description{
-Estimate beta parameter
+Estimate beta for a squire model using model parameters
 }

@@ -56,8 +56,7 @@ scan_R0_date <- function(
   date_contact_matrix_set = NULL,
   squire_model = explicit_SEIR(),
   pars_obs = NULL,
-  n_particles = 100,
-  ...) {
+  n_particles = 100) {
 
   ## Assertions
 
@@ -78,10 +77,10 @@ scan_R0_date <- function(
   # Set up observation parameters that translate our model outputs to observations
   if (is.null(pars_obs)) {
     pars_obs <-  list(phi_cases = 0.1,
-                                  k_cases = 2,
-                                  phi_death = 1,
-                                  k_death = 2,
-                                  exp_noise = 1e6)
+                      k_cases = 2,
+                      phi_death = 1,
+                      k_death = 2,
+                      exp_noise = 1e6)
   }
 
   #
@@ -216,16 +215,16 @@ R0_date_particle_filter <- function(R0,
     tt_beta <- 0
   } else {
     tt_beta <- c(0, intervention_dates_for_odin(dates = date_R0_change,
-                                           start_date = start_date,
-                                           steps_per_day = 1/model_params$dt))
+                                                start_date = start_date,
+                                                steps_per_day = 1/model_params$dt))
   }
 
   if (is.null(date_contact_matrix_set)) {
     tt_contact_matrix <- 0
   } else {
     tt_contact_matrix <- c(0, intervention_dates_for_odin(dates = date_contact_matrix_set,
-                                                     start_date = start_date,
-                                                     steps_per_day = 1/model_params$dt))
+                                                          start_date = start_date,
+                                                          steps_per_day = 1/model_params$dt))
   }
 
   # Second create the new R0s for the R0

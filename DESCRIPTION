@@ -26,6 +26,7 @@ Imports:
     dplyr,
     tidyr,
     rlang,
+    furrr,
     magrittr,
     purrr,
     crayon,

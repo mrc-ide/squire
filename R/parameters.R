@@ -11,7 +11,6 @@
 #' @param contact_matrix_set Contact matrices used in simulation
 #' @param tt_contact_matrix Time change points for matrix change
 #' @param time_period Length of simulation
-#' @param replicates Number of replicates
 #'
 #' @return Paramater List
 #' @export
@@ -25,8 +24,7 @@ parameters_SEEIR_model <- function(R0 = 3,
                                    population,
                                    contact_matrix_set,
                                    tt_contact_matrix = 0,
-                                   time_period = 365,
-                                   replicates = 10) {
+                                   time_period = 365) {
 
   # Initialise initial conditions
   init <- init_check(init, population)
@@ -53,7 +51,6 @@ parameters_SEEIR_model <- function(R0 = 3,
   pn2 <- pos_num(dur_E, "dur_E")
   pn3 <- pos_num(dur_I, "dur_I")
   pn4 <- pos_num(time_period, "time_period")
-  pn5 <- pos_num(replicates, "replicates")
 
   # Convert and Generate Parameters As Required
   gamma_E <- 2 * 1 / dur_E
@@ -100,6 +97,7 @@ parameters_SEEIR_model <- function(R0 = 3,
 #' @param time_period Length of simulation. Default = 365
 #' @param dt Time Step. Default = 0.5
 #' @param init Data.frame of initial conditions. Default = NULL
+#' @param seeding_cases Initial number of cases seeding the epidemic
 #' @param prob_hosp probability of hospitalisation by age.
 #'   Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
 #'   0.008100662, 0.015590734, 0.024597885, 0.035377529,
@@ -166,7 +164,6 @@ parameters_explicit_SEEIR <- function(
   # initial state, duration, reps
   time_period = 365,
   dt = 0.1,
-  replicates = 10,
   init = NULL,
   seeding_cases = NULL,
 
@@ -294,7 +291,6 @@ parameters_explicit_SEEIR <- function(
   assert_pos(dur_not_get_mv_survive)
   assert_pos(dur_not_get_mv_die)
   assert_pos(time_period)
-  assert_pos(replicates)
   assert_pos(hosp_bed_capacity)
   assert_pos(ICU_bed_capacity)
 

@@ -118,6 +118,7 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' @param time_period Length of simulation. Default = 365
 #' @param dt Time Step. Default = 0.5
 #' @param replicates  Number of replicates. Default = 10
+#' @param seeding_cases Initial number of cases seeding the epidemic
 #' @param seed Random seed used for simulations. Deafult = runif(1, 0, 10000)
 #' @param init Data.frame of initial conditions. Default = NULL
 #' @param prob_hosp probability of hospitalisation by age.
