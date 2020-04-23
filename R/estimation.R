@@ -101,8 +101,7 @@ scan_R0_date <- function(
     n_particles = n_particles,
     forecast_days = 0,
     save_particles = FALSE,
-    return = "ll",
-    .progress = TRUE
+    return = "ll"
   )
 
   ## Construct a matrix with start_date as columns, and beta as rows
@@ -136,65 +135,6 @@ scan_R0_date <- function(
   class(results) <- "squire_scan"
   results
 }
-
-#' @export
-plot.squire_scan <- function(x, ..., what = "likelihood") {
-  if (what == "likelihood") {
-    graphics::image(x=x$x, y=x$y, z=x$mat_log_ll,
-                    xlab="beta", ylab="Start date", main = "Log-likelihood")
-  } else if (what == "probability") {
-    graphics::image(x=x$x, y=x$y, z=x$renorm_mat_LL,
-                    xlab="beta", ylab="Start date", main = "Probability")
-  }
-}
-
-
-#' @export
-plot.sample_grid_search <- function(x, ..., what = "ICU") {
-
-  idx <- odin_index(x$inputs$model$odin_model(user = x$inputs$model_params,
-                                              unused_user_action = "ignore"))
-
-  # what are we plotting
-  if (what == "cases") {
-
-    index <- unlist(
-      idx[c("IMild", "ICase1", "ICase2", "IOxGetLive1", "IOxGetLive2",
-            "IOxGetDie1", "IOxGetDie2", "IOxNotGetLive1", "IOxNotGetLive2",
-            "IOxNotGetDie1", "IOxNotGetDie2", "IMVGetLive1", "IMVGetLive2",
-            "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
-            "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")]) - 1L
-    ylab <- "Cumulative Cases"
-    particles <- vapply(seq_len(dim(x$trajectories)[3]), function(y) {
-      rowSums(x$trajectories[,index,y], na.rm = TRUE)},
-      FUN.VALUE = numeric(dim(x$trajectories)[1]))
-    plot_particles(particles, ylab = ylab)
-    points(as.Date(x$inputs$data$date), cumsum(x$inputs$data$cases / x$inputs$pars_obs$phi_cases), pch = 19)
-
-  }
-
-  else if(what == "deaths") {
-
-    index <- c(idx$D) - 1L
-    ylab <- "Deaths"
-    xlab <- "R0"
-    particles <- vapply(seq_len(dim(x$trajectories)[3]), function(y) {
-      out <- c(0,diff(rowSums(x$trajectories[,index,y], na.rm = TRUE)))
-      names(out)[1] <- rownames(x$trajectories)[1]
-      out},
-      FUN.VALUE = numeric(dim(x$trajectories)[1]))
-    plot_particles(particles, ylab = ylab)
-    points(as.Date(x$inputs$data$date),
-           x$inputs$data$deaths/ x$inputs$pars_obs$phi_death, pch = 19)
-
-  } else {
-
-    stop("Requested what must be one of 'ICU', 'deaths'")
-
-  }
-
-}
-
 
 #' Particle filter outputs
 #'
@@ -386,3 +326,63 @@ sample_grid_scan <- function(scan_results,
   return(res)
 
 }
+
+
+#' @export
+plot.squire_scan <- function(x, ..., what = "likelihood") {
+  if (what == "likelihood") {
+    graphics::image(x=x$x, y=x$y, z=x$mat_log_ll,
+                    xlab="beta", ylab="Start date", main = "Log-likelihood")
+  } else if (what == "probability") {
+    graphics::image(x=x$x, y=x$y, z=x$renorm_mat_LL,
+                    xlab="beta", ylab="Start date", main = "Probability")
+  }
+}
+
+
+#' @export
+plot.sample_grid_search <- function(x, ..., what = "ICU") {
+
+  idx <- odin_index(x$inputs$model$odin_model(user = x$inputs$model_params,
+                                              unused_user_action = "ignore"))
+
+  # what are we plotting
+  if (what == "cases") {
+
+    index <- unlist(
+      idx[c("IMild", "ICase1", "ICase2", "IOxGetLive1", "IOxGetLive2",
+            "IOxGetDie1", "IOxGetDie2", "IOxNotGetLive1", "IOxNotGetLive2",
+            "IOxNotGetDie1", "IOxNotGetDie2", "IMVGetLive1", "IMVGetLive2",
+            "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
+            "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")]) - 1L
+    ylab <- "Cumulative Cases"
+    particles <- vapply(seq_len(dim(x$trajectories)[3]), function(y) {
+      rowSums(x$trajectories[,index,y], na.rm = TRUE)},
+      FUN.VALUE = numeric(dim(x$trajectories)[1]))
+    plot_particles(particles, ylab = ylab)
+    points(as.Date(x$inputs$data$date), cumsum(x$inputs$data$cases / x$inputs$pars_obs$phi_cases), pch = 19)
+
+  }
+
+  else if(what == "deaths") {
+
+    index <- c(idx$D) - 1L
+    ylab <- "Deaths"
+    xlab <- "R0"
+    particles <- vapply(seq_len(dim(x$trajectories)[3]), function(y) {
+      out <- c(0,diff(rowSums(x$trajectories[,index,y], na.rm = TRUE)))
+      names(out)[1] <- rownames(x$trajectories)[1]
+      out},
+      FUN.VALUE = numeric(dim(x$trajectories)[1]))
+    plot_particles(particles, ylab = ylab)
+    points(as.Date(x$inputs$data$date),
+           x$inputs$data$deaths/ x$inputs$pars_obs$phi_death, pch = 19)
+
+  } else {
+
+    stop("Requested what must be one of 'ICU', 'deaths'")
+
+  }
+
+}
+
