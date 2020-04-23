@@ -11,6 +11,7 @@ particle_filter(
   n_particles,
   forecast_days = 0,
   save_particles = FALSE,
+  full_output = FALSE,
   save_sample_state = FALSE,
   save_end_states = FALSE
 )
@@ -30,6 +31,9 @@ states.  Requires that \code{save_particles} is \code{TRUE}.}
 
 \item{save_particles}{Logical, indicating if we save full particle
 histories (this is slower).}
+
+\item{full_output}{Logical, indicating whether the full model output,
+including the state and the declared outputs are returned. Deafult = FALSE}
 
 \item{save_sample_state}{Logical, indicating whether we should save a
 single particle, chosen at random, at the final time point for which

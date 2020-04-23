@@ -39,7 +39,7 @@ test_that("scan_R0_date works", {
   expect_is(scan_results, "squire_scan")
   expect_true("inputs" %in% names(scan_results))
   expect_setequal(names(scan_results$inputs),
-                  c("model", "model_params", "pars_obs", "data"))
+                  c("model", "model_params", "interventions", "pars_obs", "data"))
 
   R0_grid <- seq(R0_min, R0_max, R0_step)
   date_grid <- seq(as.Date(first_start_date), as.Date(last_start_date), day_step)
@@ -137,5 +137,72 @@ test_that("Unreasonable start dates are less likely", {
   # Eralay Feb start most likely
   expect_gt(scan_results$renorm_mat_LL[[1]], scan_results$renorm_mat_LL[[2]])
 
+
+})
+
+context("sample_grid_scan")
+
+# Only tests that a grid search can be run
+test_that("sample_grid_scan works", {
+
+
+  set.seed(123)
+  data <- read.csv(squire_file("extdata/example.csv"))
+  model_start_date <- "2020-02-05"
+
+  it <- read.csv(squire_file("extdata/example_intervention.csv"))
+  it$date <- as.Date(it$date)
+  it <- interventions_unique(it)
+
+  date_R0_change <- it$dates_change
+  R0_change <- it$change
+
+
+  # Parameters for run
+  R0_min <- 2
+  R0_max <- 4
+  R0_step <- 2
+  first_start_date <- "2020-02-01"
+  last_start_date <- "2020-02-04"
+  day_step <- 3
+
+  scan_results <- scan_R0_date(R0_min = R0_min,
+                               R0_max = R0_max,
+                               R0_step = R0_step,
+                               first_start_date = first_start_date,
+                               last_start_date = last_start_date,
+                               day_step = day_step,
+                               data = data,
+                               model_params = parameters_explicit_SEEIR(country = "Algeria"),
+                               R0_change = R0_change,
+                               date_R0_change = date_R0_change,
+                               squire_model = explicit_model(),
+                               n_particles = 5)
+
+  n_sample_pairs <- 2
+  res <- sample_grid_scan(scan_results = scan_results,
+                          n_sample_pairs = n_sample_pairs,
+                          n_particles = 10)
+
+  model <- res$inputs$model$odin_model(user = res$inputs$model_params,
+                                       unused_user_action = "ignore")
+  # check length based on model and dates
+  days_between <- length( min(as.Date(res$param_grid$start_date)) : as.Date(tail(rownames(res$trajectories[,,1]),1)))
+  expect_equal(dim(res$trajectories), c(days_between, length(model$initial()), n_sample_pairs))
+
+
+  res <- sample_grid_scan(scan_results = scan_results,
+                          n_sample_pairs = n_sample_pairs,
+                          n_particles = 10,
+                          full_output = TRUE)
+
+
+  res <- sample_grid_scan(scan_results = scan_results,
+                          n_sample_pairs = n_sample_pairs,
+                          n_particles = 10,forecast_days = 5,
+                          full_output = FALSE)
+
+  model <- res$inputs$model$odin_model(user = res$inputs$model_params,
+                                       unused_user_action = "ignore")
 
 })

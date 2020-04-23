@@ -399,6 +399,42 @@ projection_plotting <- function(r_list,
 
 }
 
+## Final time varying variables at t = 0 in calibrate
+#' @noRd
+t0_variables <- function(r) {
+
+  dims <- dim(r$output)
+
+  # what state time point do we want
+  state_pos <- vapply(seq_len(dims[3]), function(x) {
+    which(r$output[,"time",x] == 0)
+  }, FUN.VALUE = numeric(1))
+
+  lapply(seq_len(dims[3]), function(i) {
+
+    last <- tail(which(r$parameters$tt_R0 < state_pos[i]), 1)
+    R0 <- r$parameters$R0[last]
+
+    last <- tail(which(r$parameters$tt_contact_matrix < state_pos[i]), 1)
+    contact_matrix_set <- r$parameters$contact_matrix_set[last]
+
+    last <- tail(which(r$parameters$tt_hosp_beds < state_pos[i]), 1)
+    hosp_bed_capacity <- r$parameters$hosp_bed_capacity[last]
+
+    last <- tail(which(r$parameters$tt_ICU_beds < state_pos[i]), 1)
+    ICU_bed_capacity <- r$parameters$ICU_bed_capacity[last]
+
+    return(list(
+      R0 = R0,
+      contact_matrix_set = contact_matrix_set,
+      hosp_bed_capacity = hosp_bed_capacity,
+      ICU_bed_capacity = ICU_bed_capacity
+    ))
+
+  })
+
+}
+
 
 #' @noRd
 projection_inputs <- function(p3){

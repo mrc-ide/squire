@@ -21,6 +21,9 @@
 #'
 #' @param save_particles Whether to save trajectories
 #'
+#' @param full_output Logical, indicating whether the full model output,
+#'   including the state and the declared outputs are returned. Deafult = FALSE
+#'
 #' @param return Set return depending on what is needed. 'full' gives
 #'   the entire particle filter output, 'll' gives the
 #'   log-likelihood, 'sample' gives a sampled particle's
@@ -41,6 +44,7 @@ run_particle_filter <- function(data,
                                 n_particles = 1000,
                                 forecast_days = 0,
                                 save_particles = FALSE,
+                                full_output = FALSE,
                                 return = "full") {
   # parameter checks
   if (!(return %in% c("full", "ll", "sample", "single"))) {
@@ -83,6 +87,7 @@ run_particle_filter <- function(data,
                                 n_particles = n_particles,
                                 save_particles = save_particles,
                                 forecast_days = forecast_days,
+                                full_output = full_output,
                                 save_sample_state = save_sample_state)
 
   # Set return type
@@ -118,6 +123,9 @@ run_particle_filter <- function(data,
 #' @param save_particles Logical, indicating if we save full particle
 #'   histories (this is slower).
 #'
+#' @param full_output Logical, indicating whether the full model output,
+#'   including the state and the declared outputs are returned. Deafult = FALSE
+#'
 #' @param save_sample_state Logical, indicating whether we should save a
 #'  single particle, chosen at random, at the final time point for which
 #'  we have data
@@ -129,7 +137,9 @@ run_particle_filter <- function(data,
 #'
 particle_filter <- function(data, model, compare, n_particles,
                             forecast_days = 0, save_particles = FALSE,
+                            full_output = FALSE,
                             save_sample_state = FALSE, save_end_states = FALSE) {
+
   if (!inherits(data, "particle_filter_data")) {
     stop("Expected a data set derived from particle_filter_data")
   }
@@ -148,23 +158,47 @@ particle_filter <- function(data, model, compare, n_particles,
   if (save_particles && save_end_states){
     stop("Can not have both save_particles and save_end_states input as TRUE")
   }
+  if (full_output) {
+    save_particles <- TRUE
+  }
 
+  # which indexes are the initials
   i_state <- seq_along(model$initial()) + 1L
+
+  ## ---------------------------------------------------------------------------
+  ## Initial Step
+  ## ---------------------------------------------------------------------------
 
   ## Special treatment for the burn-in phase; later we might use this
   ## same approach for skipping steps though.
   if (save_particles) {
+
+    ## Storage for particles depending on full output or not:
+    if (full_output) {
+      particles <- array(NA_real_,
+                         c(max(data$day_end) + 1L + forecast_days,
+                           length(model$.__enclos_env__$private$ynames),
+                           n_particles))
+    } else {
+      particles <- array(NA_real_,
+                         c(max(data$day_end) + 1L + forecast_days,
+                           length(i_state), n_particles))
+    }
+
+    # run for the first steps
+    step <- seq(data$step_start[[1L]], data$step_end[[1L]], attr(data, "steps_per_day"))
+    state_with_history <- model$run(step, use_names = FALSE, replicate = n_particles)
+
     ## Storage for all particles:
-    particles <- array(NA_real_,
-                       c(max(data$day_end) + 1L + forecast_days,
-                         length(i_state), n_particles))
-    step <- seq(data$step_start[[1L]], data$step_end[[1L]],
-                attr(data, "steps_per_day"))
-    state_with_history <-
-      model$run(step, use_names = FALSE, replicate = n_particles)
-    particles[seq_len(data$day_end[[1]] + 1), , ] <-
-      state_with_history[, i_state, ]
+    if (full_output) {
+      particles[seq_len(data$day_end[[1]] + 1), , ] <- state_with_history[, , ]
+    } else {
+      particles[seq_len(data$day_end[[1]] + 1), , ] <- state_with_history[, i_state, ]
+    }
+
+    # Grab just the state to continue using
     state <- state_with_history[length(step), i_state, , drop = TRUE]
+
   } else {
     particles <- NULL
     step <- c(data$step_start[[1L]], data$step_end[[1L]])
@@ -172,24 +206,40 @@ particle_filter <- function(data, model, compare, n_particles,
                        return_minimal = TRUE)[, 1, , drop = TRUE]
   }
 
+  ## ---------------------------------------------------------------------------
+  ## Particle filter stepping
+  ## ---------------------------------------------------------------------------
+
   log_likelihood <- 0
   for (t in seq_len(nrow(data))[-1L]) {
 
     # if saving particles we will want each time step
     if (save_particles) {
-      step <- seq(data$step_start[t], data$step_end[t],
-                  attr(data, "steps_per_day"))
+      step <- seq(data$step_start[t], data$step_end[t], attr(data, "steps_per_day"))
     } else {
       step <- c(data$step_start[t], data$step_end[t])
     }
+
+    # previous state for comparison
     prev_state <- state
 
-    state <- particle_run_model(state, step, model, save_particles)
+    # generate new states
+    state <- particle_run_model(state, step, model, save_particles, full_output)
+
     if (save_particles) {
-      particles[(data$day_start[t] + 2L):(data$day_end[t] + 1L), , ] <- state
-      state <- state[length(step)-1L, , , drop = TRUE]
+
+      ## Storage for all particles:
+      if (full_output) {
+        particles[(data$day_start[t] + 2L):(data$day_end[t] + 1L), , ] <- state[-1 , , ] #minus first row as return_initial=FALSE doesn't work
+        state <- state[length(step),i_state , , drop = TRUE]
+      } else {
+        particles[(data$day_start[t] + 2L):(data$day_end[t] + 1L), , ] <- state
+        state <- state[length(step)-1L, , , drop = TRUE]
+      }
+
     }
 
+    # calculate the weights for this fit
     log_weights <- compare(t, state, prev_state)
     if (!is.null(log_weights)) {
       weights <- scale_log_weights(log_weights)
@@ -199,6 +249,7 @@ particle_filter <- function(data, model, compare, n_particles,
         break
       }
 
+      # resample based on the weights
       kappa <- resample(weights$weights, "systematic")
       state <- state[, kappa]
       if (save_particles) {
@@ -207,16 +258,30 @@ particle_filter <- function(data, model, compare, n_particles,
     }
   }
 
+  ## ---------------------------------------------------------------------------
+  ## Forecasting from last state and returns
+  ## ---------------------------------------------------------------------------
+
+  # forecast ahead
   if (forecast_days > 0) {
-    step <- seq(data$step_end[nrow(data)],
-                length.out = forecast_days + 1L,
-                by = attr(data, "steps_per_day"))
-    state_with_history <-
-      model$run(step, state, replicate = n_particles, use_names = FALSE)
+
+    # step for our forecast
+    step <- seq(data$step_end[nrow(data)], length.out = forecast_days + 1L, by = attr(data, "steps_per_day"))
+
+    # run with full return
+    state_with_history <- model$run(step, state, replicate = n_particles, use_names = FALSE)
+
+    ## Storage for all particles:
     i <- seq(data$day_end[nrow(data)] + 1, length.out = forecast_days + 1L)
-    particles[i, , ] <- state_with_history[, i_state, ]
+    if (full_output) {
+      particles[i, , ] <- state_with_history[, , ]
+    } else {
+      particles[i, , ] <- state_with_history[, i_state, ]
+    }
+
   }
 
+  # start the return object creation with likelihoods and other return options
   ret <- list(log_likelihood = log_likelihood)
   if (save_particles) {
     date <- data$date[[1]] + seq_len(nrow(particles)) - 1L
@@ -393,19 +458,48 @@ intervention_dates_for_odin <- function(dates,
 
 }
 
+#' @noRd
+interventions_unique <- function(df, x = "C") {
+
+  assert_dataframe(df)
+  if (!"date" %in% names(df)) {
+    stop("df needs column 'date'")
+  }
+  if (!x %in% names(df)) {
+    stop(sprintf("df has no column %s", x))
+  }
+
+  dates_change <- head(df[cumsum(rle(df[[x]])$lengths)+1,]$date, -1)
+  tt <- seq_along(dates_change) - 1L
+  change <- head(df[cumsum(rle(df[[x]])$lengths)+1,][[x]], -1)
+
+  return(list(dates_change = dates_change,
+              tt = tt,
+              change = change))
+}
+
 
 
 #' @noRd
-particle_run_model <- function(y, step, model, history = FALSE) {
+particle_run_model <- function(y, step, model,
+                               history = FALSE,
+                               full_output = FALSE) {
 
-  if(!history) {
-    model$run(step, y, use_names = FALSE, return_minimal = TRUE,
-            replicate = ncol(y))[, 1, , drop = TRUE]
+  # do we need the full output
+  if (full_output) {
+    return(model$run(step, y, use_names = FALSE, replicate = ncol(y)))
   } else {
-    aperm(model$run(step, y, use_names = FALSE,
-              replicate = ncol(y), return_minimal = TRUE),
-          c(2, 1, 3))
+    # otherwise is it just the state or do we need all the
+    if(!history) {
+      model$run(step, y, use_names = FALSE, return_minimal = TRUE,
+                replicate = ncol(y))[, 1, , drop = TRUE]
+    } else {
+      aperm(model$run(step, y, use_names = FALSE,
+                      replicate = ncol(y), return_minimal = TRUE),
+            c(2, 1, 3))
+    }
   }
+
 }
 
 #' @noRd

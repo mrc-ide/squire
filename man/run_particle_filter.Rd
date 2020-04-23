@@ -14,6 +14,7 @@ run_particle_filter(
   n_particles = 1000,
   forecast_days = 0,
   save_particles = FALSE,
+  full_output = FALSE,
   return = "full"
 )
 }
@@ -35,6 +36,9 @@ model to data in the particle filter}
 \item{forecast_days}{Days ahead to include in output}
 
 \item{save_particles}{Whether to save trajectories}
+
+\item{full_output}{Logical, indicating whether the full model output,
+including the state and the declared outputs are returned. Deafult = FALSE}
 
 \item{return}{Set return depending on what is needed. 'full' gives
 the entire particle filter output, 'll' gives the
