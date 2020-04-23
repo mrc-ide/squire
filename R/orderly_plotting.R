@@ -42,7 +42,7 @@ death_data_format <- function(date = NULL,
     deaths[length(deaths)] <- n_deaths
 
     # cases
-    cases <- round(deaths*stats::runif(length(deaths), 0.8, 1.2))
+    cases <- deaths*100
 
   } else {
     if(is.null(deaths)) {
@@ -282,7 +282,7 @@ plot_calibration_healthcare <- function(df, data, forecast = 14) {
   sub <- df[df$compartment %in%c("ICU_demand", "hospital_demand") &
               df$date <=  Sys.Date() + forecast + 1,] %>%
     dplyr::group_by(.data$day, .data$replicate, .data$compartment) %>%
-    dplyr::summarise(y = sum(.data$y), n=dplyr::n()) %>%
+    dplyr::summarise(y = mean(.data$y), n=dplyr::n()) %>%
     dplyr::filter(.data$day <= Sys.Date() + forecast)
 
   pd_group <- dplyr::group_by(sub, .data$day, .data$compartment) %>%
@@ -335,7 +335,7 @@ plot_calibration_healthcare_barplot <- function(df, data, what = "ICU_demand", f
   sub <- df[df$compartment %in% what &
               df$date <=  Sys.Date() + forecast + 1,] %>%
     dplyr::group_by(.data$day, .data$replicate) %>%
-    dplyr::summarise(y = sum(.data$y), n=dplyr::n()) %>%
+    dplyr::summarise(y = mean(.data$y), n=dplyr::n()) %>%
     dplyr::filter(.data$day <= Sys.Date() + forecast)
 
   pd_group <- dplyr::group_by(sub, .data$day) %>%
@@ -388,7 +388,7 @@ plot_calibration_deaths_barplot <- function(df, data, forecast = 14, cumulative 
     sub <- df[df$compartment == "deaths" &
                 df$date <=  Sys.Date() + forecast + 1,]  %>%
       dplyr::group_by(.data$day, .data$replicate) %>%
-      dplyr::summarise(y = sum(.data$y), n=dplyr::n()) %>%
+      dplyr::summarise(y = mean(.data$y), n=dplyr::n()) %>%
       dplyr::filter(.data$day <= Sys.Date() + forecast)
 
     title <- "Daily Deaths"
@@ -400,7 +400,7 @@ plot_calibration_deaths_barplot <- function(df, data, forecast = 14, cumulative 
     sub <- df[df$compartment == "cumulative_deaths" &
                 df$date <=  Sys.Date() + forecast + 1,]  %>%
       dplyr::group_by(.data$day, .data$replicate) %>%
-      dplyr::summarise(y = sum(.data$y), n=dplyr::n()) %>%
+      dplyr::summarise(y = mean(.data$y), n=dplyr::n()) %>%
       dplyr::filter(.data$day <= Sys.Date() + forecast)
 
     title <- "Cumulative Deaths"
