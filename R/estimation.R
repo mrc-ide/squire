@@ -88,8 +88,8 @@ scan_R0_date <- function(
   #
   ## Particle filter outputs, extracting log-likelihoods
   message("Running Grid Search...")
-  #pf_run_ll <- furrr::future_pmap_dbl(
-  pf_run_ll <- purrr::pmap_dbl(
+  #pf_run_ll <- purrr::pmap_dbl(
+  pf_run_ll <- furrr::future_pmap_dbl(
     .l = param_grid,
     .f = R0_date_particle_filter,
     squire_model = squire_model,
@@ -277,8 +277,8 @@ sample_grid_scan <- function(scan_results,
 
   ## Particle filter outputs
   ## Sample one particle
-  # traces <- furrr::future_pmap(
-  traces <- purrr::pmap(
+  # traces <- purrr::pmap(
+  traces <- furrr::future_pmap(
     .l = param_grid,
     .f = R0_date_particle_filter,
     squire_model = squire_model,

@@ -16,12 +16,12 @@ test_that("scan_R0_date works", {
 
 
   # Parameters for run
-  R0_min <- 2
+  R0_min <- 3
   R0_max <- 4
-  R0_step <- 2
+  R0_step <- 1
   first_start_date <- "2020-02-01"
-  last_start_date <- "2020-02-04"
-  day_step <- 3
+  last_start_date <- "2020-02-02"
+  day_step <- 1
 
   scan_results <- scan_R0_date(R0_min = R0_min,
                                R0_max = R0_max,
@@ -29,12 +29,12 @@ test_that("scan_R0_date works", {
                                first_start_date = first_start_date,
                                last_start_date = last_start_date,
                                day_step = day_step,
-                               data = data,
+                               data = data[1:10,],
                                model_params = parameters_explicit_SEEIR(country = "Algeria"),
                                R0_change = R0_change,
                                date_R0_change = date_R0_change,
                                squire_model = explicit_model(),
-                               n_particles = 5)
+                               n_particles = 2)
 
   expect_is(scan_results, "squire_scan")
   expect_true("inputs" %in% names(scan_results))
@@ -86,12 +86,12 @@ test_that("Transmission is more likely", {
                                first_start_date = first_start_date,
                                last_start_date = last_start_date,
                                day_step = day_step,
-                               data = data,
+                               data = data[1:10,],
                                model_params = parameters_explicit_SEEIR(country = "Algeria"),
                                R0_change = R0_change,
                                date_R0_change = date_R0_change,
                                squire_model = explicit_model(),
-                               n_particles = 5)
+                               n_particles = 2)
 
   # No transmission b = 0 much less likely than some transmission b = 0.1
   expect_lt(scan_results$mat_log_ll[[1]], scan_results$mat_log_ll[[2]])
@@ -127,12 +127,12 @@ test_that("Unreasonable start dates are less likely", {
                                first_start_date = first_start_date,
                                last_start_date = last_start_date,
                                day_step = day_step,
-                               data = data,
+                               data = data[1:10,],
                                model_params = parameters_explicit_SEEIR(country = "Algeria"),
                                R0_change = R0_change,
                                date_R0_change = date_R0_change,
                                squire_model = explicit_model(),
-                               n_particles = 5)
+                               n_particles = 2)
 
   # Eralay Feb start most likely
   expect_gt(scan_results$renorm_mat_LL[[1]], scan_results$renorm_mat_LL[[2]])
@@ -172,17 +172,17 @@ test_that("sample_grid_scan works", {
                                first_start_date = first_start_date,
                                last_start_date = last_start_date,
                                day_step = day_step,
-                               data = data,
+                               data = data[1:10,],
                                model_params = parameters_explicit_SEEIR(country = "Algeria"),
                                R0_change = R0_change,
                                date_R0_change = date_R0_change,
                                squire_model = explicit_model(),
-                               n_particles = 5)
+                               n_particles = 2)
 
   n_sample_pairs <- 2
   res <- sample_grid_scan(scan_results = scan_results,
                           n_sample_pairs = n_sample_pairs,
-                          n_particles = 10)
+                          n_particles = 2)
 
   model <- res$inputs$model$odin_model(user = res$inputs$model_params,
                                        unused_user_action = "ignore")
@@ -193,13 +193,13 @@ test_that("sample_grid_scan works", {
 
   res <- sample_grid_scan(scan_results = scan_results,
                           n_sample_pairs = n_sample_pairs,
-                          n_particles = 10,
+                          n_particles = 2,
                           full_output = TRUE)
 
 
   res <- sample_grid_scan(scan_results = scan_results,
                           n_sample_pairs = n_sample_pairs,
-                          n_particles = 10,forecast_days = 5,
+                          n_particles = 2,forecast_days = 5,
                           full_output = FALSE)
 
   model <- res$inputs$model$odin_model(user = res$inputs$model_params,
