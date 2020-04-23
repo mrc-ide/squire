@@ -73,9 +73,9 @@ test_that("Transmission is more likely", {
 
 
   # Parameters for run
-  R0_min <- 0.1
-  R0_max <- 4
-  R0_step <- 2
+  R0_min <- 0.0001
+  R0_max <- 3
+  R0_step <- 2.5
   first_start_date <- "2020-01-21"
   last_start_date <- "2020-01-21"
   day_step <- 1
