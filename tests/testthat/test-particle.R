@@ -5,14 +5,14 @@ test_that("particle works", {
   data <- read.csv(squire_file("extdata/example.csv"))
 
   model_start_date <- "2020-02-01"
-  dt <- 0.1
+  dt <- 1
 
   data <- data[order(data$date), ]
   data <- data[data$deaths>0 | data$cases>0,]
 
   model_params <- parameters_explicit_SEEIR(country = "Algeria",
                                             seeding_cases = 5,
-                                            dt=0.1)
+                                            dt=dt)
 
   index <- odin_index(explicit_SEIR(user = model_params,
                                     unused_user_action = "ignore"))
@@ -33,7 +33,7 @@ test_that("particle works", {
                              return = "full")
 
   expect_true(names(out) == "log_likelihood")
-  expect_lt(out$log_likelihood - -271.3572, 0.0001)
+  expect_lt(out$log_likelihood - -205.6076, 0.01)
 
 
   expect_error(out <- run_particle_filter(data = data,
@@ -67,7 +67,7 @@ test_that("particle works", {
                              return = "full")
 
   expect_true(all(names(out) == c("log_likelihood","states")))
-  expect_lt(out$log_likelihood - -271.3572, 0.0001)
+  expect_lt(out$log_likelihood - -205.6076, 0.01)
 
   index <- c(index$D) - 1L
   particles <- apply(out$states[, index, ], c(1, 3), sum)

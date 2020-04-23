@@ -34,7 +34,7 @@ test_that("scan_R0_date works", {
                                R0_change = R0_change,
                                date_R0_change = date_R0_change,
                                squire_model = explicit_model(),
-                               n_particles = 20)
+                               n_particles = 5)
 
   expect_is(scan_results, "squire_scan")
   expect_true("inputs" %in% names(scan_results))
@@ -91,7 +91,7 @@ test_that("Transmission is more likely", {
                                R0_change = R0_change,
                                date_R0_change = date_R0_change,
                                squire_model = explicit_model(),
-                               n_particles = 20)
+                               n_particles = 5)
 
   # No transmission b = 0 much less likely than some transmission b = 0.1
   expect_lt(scan_results$mat_log_ll[[1]], scan_results$mat_log_ll[[2]])
@@ -132,7 +132,7 @@ test_that("Unreasonable start dates are less likely", {
                                R0_change = R0_change,
                                date_R0_change = date_R0_change,
                                squire_model = explicit_model(),
-                               n_particles = 20)
+                               n_particles = 5)
 
   # Eralay Feb start most likely
   expect_gt(scan_results$renorm_mat_LL[[1]], scan_results$renorm_mat_LL[[2]])
