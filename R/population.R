@@ -1,3 +1,17 @@
+#' Get supported LMIC countries
+#'
+#' @return vector of support LMIC
+#' @export
+get_lmic_countries <-  function() {
+  lmic <- c(
+    squire::income_group$country[(squire::income_group$income_group != 'High income')],
+    squire::income_group$country[
+      is.na(squire::income_group$income_group) & squire::income_group$country != 'China, Taiwan Province of China'
+    ]
+  )
+  lmic[!is.na(lmic)]
+}
+
 #' Get population data
 #'
 #' @param country Country name
