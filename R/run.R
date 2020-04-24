@@ -1,3 +1,33 @@
+#' Return the default probabilities for modelling
+#' @return list of default probabilities
+#' @export
+default_probs <- function() {
+  prob_hosp <- c(
+    0.000744192, 0.000634166,0.001171109, 0.002394593, 0.005346437 ,
+    0.010289885, 0.016234604, 0.023349169, 0.028944623, 0.038607042 ,
+    0.057734879, 0.072422135, 0.101602458, 0.116979814, 0.146099064,
+    0.176634654 ,0.180000000)
+  list(
+    prob_hosp = prob_hosp,
+    prob_severe = c(
+      0.05022296,	0.05022296,	0.05022296,	0.05022296,	0.05022296,
+      0.05022296,	0.05022296,	0.053214942, 0.05974426,	0.074602879,
+      0.103612417, 0.149427991, 0.223777304,	0.306985918,
+      0.385779555, 0.461217861, 0.709444444),
+    prob_non_severe_death_treatment = c(
+      0.0125702,	0.0125702,	0.0125702,	0.0125702,
+      0.0125702,	0.0125702,	0.0125702,	0.013361147,
+      0.015104687,	0.019164124,	0.027477519,	0.041762108,
+      0.068531658,	0.105302319,	0.149305732,	0.20349534,	0.5804312),
+    prob_non_severe_death_no_treatment = rep(0.6, length(prob_hosp)),
+    prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
+    prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
+    p_dist = rep(1, length(prob_hosp))
+  )
+}
+
+probs <- default_probs()
+
 #' Run the SEEIR model
 #'
 #' @param R0 Basic reproduction number
@@ -200,22 +230,13 @@ run_explicit_SEEIR_model <- function(
 
   # parameters
   # probabilities
-  prob_hosp = c(0.000744192, 0.000634166,0.001171109, 0.002394593, 0.005346437 ,
-                0.010289885, 0.016234604, 0.023349169, 0.028944623, 0.038607042 ,
-                0.057734879, 0.072422135, 0.101602458, 0.116979814, 0.146099064,
-                0.176634654 ,0.180000000),
-  prob_severe = c(0.05022296,	0.05022296,	0.05022296,	0.05022296,	0.05022296,
-                  0.05022296,	0.05022296,	0.053214942, 0.05974426,	0.074602879,
-                  0.103612417, 0.149427991, 0.223777304,	0.306985918,
-                  0.385779555, 0.461217861, 0.709444444),
-  prob_non_severe_death_treatment = c(0.0125702,	0.0125702,	0.0125702,	0.0125702,
-                                      0.0125702,	0.0125702,	0.0125702,	0.013361147,
-                                      0.015104687,	0.019164124,	0.027477519,	0.041762108,
-                                      0.068531658,	0.105302319,	0.149305732,	0.20349534,	0.5804312),
-  prob_non_severe_death_no_treatment = rep(0.6, length(prob_hosp)),
-  prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
-  prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
-  p_dist = rep(1, length(prob_hosp)),
+  prob_hosp = probs$prob_hosp,
+  prob_severe = probs$prob_severe,
+  prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
+  prob_non_severe_death_no_treatment = probs$prob_non_severe_death_no_treatment,
+  prob_severe_death_treatment = probs$prob_severe_death_treatment,
+  prob_severe_death_no_treatment = probs$prob_severe_death_no_treatment,
+  p_dist = probs$p_dist,
 
   # durations
   dur_E  = 4.6,
@@ -468,4 +489,108 @@ run_explicit_SEEIR_model <- function(
   out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
   return(out)
+}
+
+#' Run the deterministic explicit SEIR model
+#'
+#' @param population Population vector (for each age group). Default = NULL,
+#'   which will cause population to be sourced from \code{country}
+#' @param contact_matrix Contact matrix to use in the simulation.
+#' @param tt_R0 Time change points for R0
+#' @param R0_set The values of R0 to use for the simulation
+#' @param time_period Length of simulation. Default = 365
+#' @param hosp_bed_capacity General bed capacity. Can be single number of vector if capacity time-varies.
+#' @param ICU_bed_capacity ICU bed capacity. Can be single number of vector if capacity time-varies.
+#'
+#' @return Simulation output
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' pop <- get_population("Afghanistan")
+#' m <- get_mixing_matrix("Afghanistan")
+#' run_deterministic_SEIR_model(pop$n, m, [0, 50], [3, 3/2], 365, 100000,
+#' 1000000)
+#' }
+run_deterministic_SEIR_model <- function(
+  population,
+  contact_matrix,
+  tt_R0,
+  R0_set,
+  time_period,
+  hosp_bed_capacity,
+  ICU_bed_capacity
+  ) {
+  m <- process_contact_matrix_scaled_age(contact_matrix, population)
+  dur_R <- 2.09
+  dur_hosp <- 5
+  beta <- vapply(
+    R0_set,
+    function(R0) beta_est_explicit(dur_R, dur_hosp, probs$prob_hosp, m, R0),
+    numeric(1)
+  )
+  mm <- t(t(m) / population)
+  mix_mat_set <- aperm(array(c(mm), dim = c(dim(mm), 1)), c(3, 1, 2))
+  seed <- c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0)
+
+  pars <- list(
+    N_age = length(population),
+    S_0 = population - seed,
+    E1_0 = seed,
+    E2_0 = rep(0, length(population)),
+    IMild_0 = rep(0, length(population)),
+    ICase1_0 = rep(0, length(population)),
+    ICase2_0 = rep(0, length(population)),
+    IOxGetLive1_0 = rep(0, length(population)),
+    IOxGetLive2_0 = rep(0, length(population)),
+    IOxGetDie1_0 = rep(0, length(population)),
+    IOxGetDie2_0 = rep(0, length(population)),
+    IOxNotGetLive1_0 = rep(0, length(population)),
+    IOxNotGetLive2_0 = rep(0, length(population)),
+    IOxNotGetDie1_0 = rep(0, length(population)),
+    IOxNotGetDie2_0 = rep(0, length(population)),
+    IMVGetLive1_0 = rep(0, length(population)),
+    IMVGetLive2_0 = rep(0, length(population)),
+    IMVGetDie1_0 = rep(0, length(population)),
+    IMVGetDie2_0 = rep(0, length(population)),
+    IMVNotGetLive1_0 = rep(0, length(population)),
+    IMVNotGetLive2_0 = rep(0, length(population)),
+    IMVNotGetDie1_0 = rep(0, length(population)),
+    IMVNotGetDie2_0 = rep(0, length(population)),
+    IRec1_0 = rep(0, length(population)),
+    IRec2_0 = rep(0, length(population)),
+    R_0 = rep(0, length(population)),
+    D_0 = rep(0, length(population)),
+    gamma_E = (2 * 1/4.58),
+    gamma_R = (1/dur_R),
+    gamma_hosp = (2 * 1/dur_hosp),
+    gamma_get_ox_survive = (2 * 1/6),
+    gamma_get_ox_die = (2 * 1/3.5),
+    gamma_not_get_ox_survive = (2 * 1/9),
+    gamma_not_get_ox_die = (0.5 * 2 * 1/9),
+    gamma_get_mv_survive = (2 * 1/5.5),
+    gamma_get_mv_die = (2 * 1/4),
+    gamma_not_get_mv_survive = (2 * 1/12),
+    gamma_not_get_mv_die = (2 * 1/1),
+    gamma_rec = (2 * 1/6),
+    prob_hosp = probs$prob_hosp,
+    prob_severe = probs$prob_severe,
+    prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
+    prob_non_severe_death_no_treatment = probs$prob_non_severe_death_no_treatment,
+    prob_severe_death_treatment = probs$prob_severe_death_treatment,
+    prob_severe_death_no_treatment = probs$prob_severe_death_no_treatment,
+    p_dist = probs$p_dist,
+    hosp_bed_capacity = hosp_bed_capacity,
+    ICU_bed_capacity = ICU_bed_capacity,
+    tt_matrix = c(0),
+    mix_mat_set = mix_mat_set,
+    tt_beta = tt_R0,
+    beta_set = beta
+  )
+
+  mod <- explicit_SEIR_deterministic(user = pars)
+  t <- seq(from = 0, to = time_period - 1)
+  results <- mod$run(t)
+  out <- list(output = results, parameters = pars, model = mod)
+  structure(out, class = "squire_simulation")
 }

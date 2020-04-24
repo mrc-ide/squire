@@ -36,6 +36,7 @@ div_pop <- function(contact, population){
 #' @param population Vector of population by age
 #'
 #' @return Processed matrix
+#' @export
 process_contact_matrix_scaled_age <- function(contact_matrix, population) {
   # Convert Unbalanced Matrix of Per-Capita Rates to Total Number of Contacts
   # Between Diff Age Groups and Balance By Taking the Mean of i->j and j->i
