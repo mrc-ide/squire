@@ -102,7 +102,8 @@ scan_R0_date <- function(
     n_particles = n_particles,
     forecast_days = 0,
     save_particles = FALSE,
-    return = "ll"
+    return = "ll",
+    .progress = TRUE
   )
 
   ## Construct a matrix with start_date as columns, and beta as rows

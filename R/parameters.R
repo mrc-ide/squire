@@ -15,7 +15,7 @@
 #' @return Paramater List
 #' @export
 #'
-parameters_SEEIR_model <- function(R0 = 3,
+parameters_simple_SEEIR <- function(R0 = 3,
                                    tt_R0 = 0,
                                    dt = 0.1,
                                    init = NULL,
