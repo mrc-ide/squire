@@ -2,7 +2,7 @@
 % Please edit documentation in R/beta.R
 \name{beta_est_explicit}
 \alias{beta_est_explicit}
-\title{Estimate beta parameter}
+\title{Estimate beta parameter for explicit model}
 \usage{
 beta_est_explicit(dur_IMild, dur_ICase, prob_hosp, mixing_matrix, R0)
 }
@@ -21,5 +21,5 @@ beta_est_explicit(dur_IMild, dur_ICase, prob_hosp, mixing_matrix, R0)
 Beta parameter
 }
 \description{
-Estimate beta parameter
+Estimate beta parameter for explicit model
 }

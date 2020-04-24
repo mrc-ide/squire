@@ -8,7 +8,7 @@
 #' @export
 #'
 # #' @examples
-beta_est <- function(duration_infectiousness, mixing_matrix, R0) {
+beta_est_simple <- function(duration_infectiousness, mixing_matrix, R0) {
   if(length(duration_infectiousness) > 1){
     stop("duration_infectiousness must be of length = 1")
   }
