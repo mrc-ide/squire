@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Extract infection incidence from model output — extract_infection_incidence • squire</title>
+<title>Compute age-adjusted eigenvalue for mixing matrix — adjusted_eigen • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Extract infection incidence from model output — extract_infection_incidence" />
-<meta property="og:description" content="Extract infection incidence from model output" />
+<meta property="og:title" content="Compute age-adjusted eigenvalue for mixing matrix — adjusted_eigen" />
+<meta property="og:description" content="Compute age-adjusted eigenvalue for mixing matrix" />
 
 
 
@@ -111,37 +111,41 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Extract infection incidence from model output</h1>
+    <h1>Compute age-adjusted eigenvalue for mixing matrix</h1>
     
-    <div class="hidden name"><code>extract_infection_incidence.Rd</code></div>
+    <div class="hidden name"><code>adjusted_eigen.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Extract infection incidence from model output</p>
+    <p>Compute age-adjusted eigenvalue for mixing matrix</p>
     </div>
 
-    <pre class="usage"><span class='fu'>extract_infection_incidence</span>(<span class='no'>x</span>, <span class='kw'>reduce_age</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>date_0</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>adjusted_eigen</span>(<span class='no'>dur_IMild</span>, <span class='no'>dur_ICase</span>, <span class='no'>prob_hosp</span>, <span class='no'>mixing_matrix</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>squire_simulation object</p></td>
+      <th>dur_IMild</th>
+      <td><p>Duration of mild infectiousness (days)</p></td>
     </tr>
     <tr>
-      <th>reduce_age</th>
-      <td><p>Collapse age-dimension</p></td>
+      <th>dur_ICase</th>
+      <td><p>Delay between symptom onset and requiring hospitalisation (days)</p></td>
     </tr>
     <tr>
-      <th>date_0</th>
-      <td><p>Date of time 0, if specified a date column will be added</p></td>
+      <th>prob_hosp</th>
+      <td><p>Probability of hospitilisation by ages</p></td>
+    </tr>
+    <tr>
+      <th>mixing_matrix</th>
+      <td><p>Mixing matrix</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Formatted long data.frame</p>
+    <p>Eigenvalue</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
