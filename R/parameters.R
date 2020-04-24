@@ -169,22 +169,14 @@ parameters_explicit_SEEIR <- function(
 
   # parameters
   # probabilities
-  prob_hosp = c(0.000744192, 0.000634166,0.001171109, 0.002394593, 0.005346437 ,
-                0.010289885, 0.016234604, 0.023349169, 0.028944623, 0.038607042 ,
-                0.057734879, 0.072422135, 0.101602458, 0.116979814, 0.146099064,
-                0.176634654 ,0.180000000),
-  prob_severe = c(0.05022296,	0.05022296,	0.05022296,	0.05022296,	0.05022296,
-                  0.05022296,	0.05022296,	0.053214942, 0.05974426,	0.074602879,
-                  0.103612417, 0.149427991, 0.223777304,	0.306985918,
-                  0.385779555, 0.461217861, 0.709444444),
-  prob_non_severe_death_treatment = c(0.0125702,	0.0125702,	0.0125702,	0.0125702,
-                                      0.0125702,	0.0125702,	0.0125702,	0.013361147,
-                                      0.015104687,	0.019164124,	0.027477519,	0.041762108,
-                                      0.068531658,	0.105302319,	0.149305732,	0.20349534,	0.5804312),
-  prob_non_severe_death_no_treatment = rep(0.6, length(prob_hosp)),
-  prob_severe_death_treatment = rep(0.5, length(prob_hosp)),
-  prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
-  p_dist = rep(1, length(prob_hosp)),
+  # probabilities
+  prob_hosp = probs$prob_hosp,
+  prob_severe = probs$prob_severe,
+  prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
+  prob_non_severe_death_no_treatment = probs$prob_non_severe_death_no_treatment,
+  prob_severe_death_treatment = probs$prob_severe_death_treatment,
+  prob_severe_death_no_treatment = probs$prob_severe_death_no_treatment,
+  p_dist = probs$p_dist,
 
   # durations
   dur_E  = 4.6,
