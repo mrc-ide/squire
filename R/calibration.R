@@ -164,10 +164,10 @@ calibrate <- function(deaths,
 
 #' Calibrate via particle filter grid search using time series of deaths
 #'
-#' @param forecast = 0
 #' @param reporting_fraction Reporting fraction. Numeric for what proportion of
 #'   the total deaths the reported deaths represent. E.g. 0.5 results in
 #'   the model calibrating to twice the deaths provided by \code{data$deaths}
+#' @param replicates Replicates to be run. Default = 100
 #' @param ... Further aguments for the model parameter function. If using the
 #'   \code{\link{explicit_model}} (default) this will be
 #'   \code{parameters_explicit_SEEIR}.
@@ -190,6 +190,7 @@ calibrate_particle <- function(data,
                                forecast = 0,
                                n_particles = 100,
                                reporting_fraction = 1,
+                               replicates = 100,
                                date_R0_change = NULL,
                                R0_change = NULL,
                                date_ICU_bed_capacity_change = NULL,
@@ -200,7 +201,6 @@ calibrate_particle <- function(data,
                                contact_matrix_set = NULL,
                                country = NULL,
                                population = NULL,
-                               replicates = 100,
                                ...) {
 
   # Asserts on arguments

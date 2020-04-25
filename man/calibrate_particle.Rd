@@ -17,6 +17,7 @@ calibrate_particle(
   forecast = 0,
   n_particles = 100,
   reporting_fraction = 1,
+  replicates = 100,
   date_R0_change = NULL,
   R0_change = NULL,
   date_ICU_bed_capacity_change = NULL,
@@ -27,7 +28,6 @@ calibrate_particle(
   contact_matrix_set = NULL,
   country = NULL,
   population = NULL,
-  replicates = 100,
   ...
 )
 }
@@ -51,13 +51,13 @@ and \code{particle_filter_data()}}
 
 \item{pars_obs}{list of parameters to use for the comparison function.}
 
-\item{forecast}{= 0}
-
 \item{n_particles}{Number of particles. Positive Integer. Default = 100}
 
 \item{reporting_fraction}{Reporting fraction. Numeric for what proportion of
 the total deaths the reported deaths represent. E.g. 0.5 results in
 the model calibrating to twice the deaths provided by \code{data$deaths}}
+
+\item{replicates}{Replicates to be run. Default = 100}
 
 \item{date_R0_change}{Calendar dates at which R0_change occurs.
 Defaut = NULL, i.e. no change in R0}

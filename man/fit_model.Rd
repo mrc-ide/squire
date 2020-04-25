@@ -57,8 +57,6 @@ and \code{particle_filter_data()}}
 
 \item{pars_obs}{list of parameters to use for the comparison function.}
 
-\item{forecast}{= 0}
-
 \item{n_particles}{Number of particles. Positive Integer. Default = 100}
 
 \item{reporting_fraction}{Reporting fraction. Numeric for what proportion of
@@ -82,8 +80,7 @@ Defaut = NULL, i.e. no change}
 capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
 
-\item{replicates}{Replicates to be passed to
-\code{\link{run_explicit_SEEIR_model}}. Default = 100}
+\item{replicates}{Replicates to be run. Default = 100}
 
 \item{country}{Character for country beign simulated. WIll be used to
 generate \code{population} and \code{contact_matrix_set} if
