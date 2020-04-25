@@ -18,6 +18,7 @@ contact_matrix_set <- cpm$contact_matrix_set
 replicates <- 10
 r <- run_explicit_SEEIR_model(country = "Malawi")
 ICU_capacity <- r$parameters$ICU_bed_capacity
+
 r <- run_explicit_SEEIR_model(population = population,
                               contact_matrix_set = contact_matrix_set,
                               tt_R0 = tt_R0, R0 = R0, dt = dt,
