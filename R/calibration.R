@@ -66,9 +66,9 @@ calibrate <- function(deaths,
     seeding_cases <- rep(0, length.out = length(population))
     raw_seeding_cases <- round(stats::runif(n = 1, min = min_seeding_cases, max = max_seeding_cases))
     seeding_cases[age_group_indices] <- as.vector(stats::rmultinom(1,
-                                                            size = raw_seeding_cases,
-                                                            prob = rep(1/num_age_groups,
-                                                                       num_age_groups)))
+                                                                   size = raw_seeding_cases,
+                                                                   prob = rep(1/num_age_groups,
+                                                                              num_age_groups)))
     seeding_cases
   })
 
@@ -125,10 +125,10 @@ calibrate <- function(deaths,
   for(i in 2:replicates) {
     r$model$set_user(E1_0 = E1_0[[i]])
     beta[1] <- beta_est_explicit(dur_IMild = r$parameters$dur_IMild,
-                      dur_ICase = r$parameters$dur_ICase,
-                      prob_hosp = r$parameters$prob_hosp,
-                      mixing_matrix =  process_contact_matrix_scaled_age(r$parameters$contact_matrix_set[[1]], r$parameters$population),
-                      R0 = R0_scan[i])
+                                 dur_ICase = r$parameters$dur_ICase,
+                                 prob_hosp = r$parameters$prob_hosp,
+                                 mixing_matrix =  process_contact_matrix_scaled_age(r$parameters$contact_matrix_set[[1]], r$parameters$population),
+                                 R0 = R0_scan[i])
     r$model$set_user(beta_set = beta)
     r$output <- r$model$run(t, replicate = 1)
     while (sum(r$output[nt, index$D, 1]) < deaths) {
@@ -192,13 +192,13 @@ calibrate_particle <- function(data,
                                reporting_fraction = 1,
                                R0_change = NULL,
                                date_R0_change = NULL,
+                               contact_matrix_set = NULL,
                                date_contact_matrix_set = NULL,
                                date_ICU_bed_capacity_change = NULL,
                                date_hosp_bed_capacity_change = NULL,
                                replicates = 100,
                                country = NULL,
                                population = NULL,
-                               contact_matrix_set = NULL,
                                ...) {
 
   # Asserts on arguments
@@ -289,4 +289,133 @@ calibrate_particle <- function(data,
   r$parameters$replicates <- replicates
 
   return(r)
+}
+
+
+#' Fit model to data using either \code{calibrate} or \code{calibrate_particle}
+#'
+#' @inheritParams calibrate_particle
+#' @inheritParams calibrate
+#'
+#' @export
+#' @return List of time/dated squire simulations
+#'
+fit_model <- function(data = NULL,
+                              deaths = NULL,
+                              R0_min = NULL,
+                              R0_max = NULL,
+                              R0_step = NULL,
+                              first_start_date = NULL,
+                              last_start_date = NULL,
+                              day_step = NULL,
+                              squire_model = explicit_model(),
+                              pars_obs = NULL,
+                              forecast = 0,
+                              n_particles = 100,
+                              reporting_fraction = 1,
+                              R0_change = NULL,
+                              date_R0_change = NULL,
+                              date_contact_matrix_set = NULL,
+                              date_ICU_bed_capacity_change = NULL,
+                              date_hosp_bed_capacity_change = NULL,
+                              replicates = 100,
+                              country = NULL,
+                              population = NULL,
+                              contact_matrix_set = NULL,
+                              seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
+                              min_seeding_cases = 5,
+                              max_seeding_cases = 50,
+                              R0 = 3,
+                              R0_scan = NULL,
+                              ...) {
+
+
+  if(is.null(deaths) && is.null(data)) {
+    stop("One of data or deaths must be supplied")
+  }
+
+  # run the particle filter calibration
+  if(!is.null(data)) {
+
+    if(is.null(R0_min)) {
+      stop("If data is provided, R0_min must be set. see calibrate_particle")
+    }
+    if(is.null(R0_max)) {
+      stop("If data is provided, R0_max must be set. see calibrate_particle")
+    }
+    if(is.null(R0_step)) {
+      stop("If data is provided, R0_step must be set. see calibrate_particle")
+    }
+    if(is.null(first_start_date)) {
+      stop("If data is provided, first_start_date must be set. see calibrate_particle")
+    }
+    if(is.null(last_start_date)) {
+      stop("If data is provided, last_start_date must be set. see calibrate_particle")
+    }
+    if(is.null(day_step)) {
+      stop("If data is provided, day_step must be set. see calibrate_particle")
+    }
+
+    calibrate_particle(data = data,
+                       R0_min = R0_min,
+                       R0_max = R0_max,
+                       R0_step = R0_step,
+                       first_start_date = first_start_date,
+                       last_start_date = last_start_date,
+                       day_step = day_step,
+                       squire_model = squire_model,
+                       pars_obs = pars_obs,
+                       forecast = forecast,
+                       n_particles = n_particles,
+                       reporting_fraction = reporting_fraction,
+                       R0_change = R0_change,
+                       date_R0_change = date_R0_change,
+                       contact_matrix_set = contact_matrix_set,
+                       date_contact_matrix_set = date_contact_matrix_set,
+                       date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+                       date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
+                       replicates = replicates,
+                       country = country,
+                       population = population,
+                       ...)
+
+  }  else if(!is.null(deaths)) {
+
+    if(is.null(R0_min)) {
+      stop("If data is provided, R0_min must be set. see calibrate_particle")
+    }
+    if(is.null(R0_max)) {
+      stop("If data is provided, R0_max must be set. see calibrate_particle")
+    }
+    if(is.null(R0_step)) {
+      stop("If data is provided, R0_step must be set. see calibrate_particle")
+    }
+    if(is.null(first_start_date)) {
+      stop("If data is provided, first_start_date must be set. see calibrate_particle")
+    }
+    if(is.null(last_start_date)) {
+      stop("If data is provided, last_start_date must be set. see calibrate_particle")
+    }
+    if(is.null(day_step)) {
+      stop("If data is provided, day_step must be set. see calibrate_particle")
+    }
+
+    calibrate(deaths = deaths,
+              reporting_fraction = reporting_fraction,
+              country = country,
+              population = population,
+              contact_matrix_set = contact_matrix_set,
+              seeding_age_groups = seeding_age_groups,
+              min_seeding_cases = min_seeding_cases,
+              max_seeding_cases = max_seeding_cases,
+              R0 = R0,
+              R0_scan = R0_scan,
+              replicates = replicates,
+              ...)
+
+  } else {
+    return("Incorrect arguments provided for fit_model")
+  }
+
+
 }
