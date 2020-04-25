@@ -71,9 +71,10 @@ test_that("particle works", {
 
   index <- c(index$D) - 1L
   particles <- apply(out$states[, index, ], c(1, 3), sum)
+  pdf(file = NULL)
   plot_particles(particles, ylab = "D")
   points(as.Date(data$date), cumsum(data$deaths), pch = 19)
-
+  dev.off()
 
 })
 

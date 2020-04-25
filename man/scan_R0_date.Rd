@@ -16,6 +16,8 @@ scan_R0_date(
   R0_change = NULL,
   date_R0_change = NULL,
   date_contact_matrix_set = NULL,
+  date_ICU_bed_capacity_change = NULL,
+  date_hosp_bed_capacity_change = NULL,
   squire_model = explicit_SEIR(),
   pars_obs = NULL,
   n_particles = 100
@@ -48,6 +50,14 @@ Defaut = NULL, i.e. no change in R0}
 
 \item{date_contact_matrix_set}{Calendar dates at which the contact matrices
 set in \code{model_params} change. Defaut = NULL, i.e. no change}
+
+\item{date_ICU_bed_capacity_change}{Calendar dates at which ICU bed
+capacity changes set in \code{model_params} change.
+Defaut = NULL, i.e. no change}
+
+\item{date_hosp_bed_capacity_change}{Calendar dates at which hospital bed
+capacity changes set in \code{model_params} change.
+Defaut = NULL, i.e. no change}
 
 \item{squire_model}{A squire model. Default = \code{explicit_SEIR()}}
 

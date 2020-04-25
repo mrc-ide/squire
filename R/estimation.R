@@ -31,6 +31,14 @@
 #' @param date_contact_matrix_set Calendar dates at which the contact matrices
 #'   set in \code{model_params} change. Defaut = NULL, i.e. no change
 #'
+#' @param date_ICU_bed_capacity_change Calendar dates at which ICU bed
+#'   capacity changes set in \code{model_params} change.
+#'   Defaut = NULL, i.e. no change
+#'
+#' @param date_hosp_bed_capacity_change Calendar dates at which hospital bed
+#'   capacity changes set in \code{model_params} change.
+#'   Defaut = NULL, i.e. no change
+#'
 #' @param squire_model A squire model. Default = \code{explicit_SEIR()}
 #'
 #' @param pars_obs list of parameters to use for the comparison function.
@@ -54,6 +62,8 @@ scan_R0_date <- function(
   R0_change = NULL,
   date_R0_change = NULL,
   date_contact_matrix_set = NULL,
+  date_ICU_bed_capacity_change = NULL,
+  date_hosp_bed_capacity_change = NULL,
   squire_model = explicit_SEIR(),
   pars_obs = NULL,
   n_particles = 100) {
@@ -98,6 +108,8 @@ scan_R0_date <- function(
     R0_change = R0_change,
     date_R0_change = date_R0_change,
     date_contact_matrix_set = date_contact_matrix_set,
+    date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+    date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
     pars_obs = pars_obs,
     n_particles = n_particles,
     forecast_days = 0,
@@ -129,7 +141,9 @@ scan_R0_date <- function(
                     interventions = list(
                       R0_change = R0_change,
                       date_R0_change = date_R0_change,
-                      date_contact_matrix_set = date_contact_matrix_set
+                      date_contact_matrix_set = date_contact_matrix_set,
+                      date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+                      date_hosp_bed_capacity_change = date_hosp_bed_capacity_change
                     ),
                     pars_obs = pars_obs,
                     data = data))
@@ -152,6 +166,8 @@ R0_date_particle_filter <- function(R0,
                                     R0_change,
                                     date_R0_change,
                                     date_contact_matrix_set,
+                                    date_ICU_bed_capacity_change,
+                                    date_hosp_bed_capacity_change,
                                     pars_obs,
                                     n_particles,
                                     forecast_days = 0,
@@ -172,6 +188,22 @@ R0_date_particle_filter <- function(R0,
     tt_contact_matrix <- 0
   } else {
     tt_contact_matrix <- c(0, intervention_dates_for_odin(dates = date_contact_matrix_set,
+                                                          start_date = start_date,
+                                                          steps_per_day = 1/model_params$dt))
+  }
+
+  if (is.null(date_ICU_bed_capacity_change)) {
+    tt_ICU_beds <- 0
+  } else {
+    tt_ICU_beds <- c(0, intervention_dates_for_odin(dates = date_ICU_bed_capacity_change,
+                                                          start_date = start_date,
+                                                          steps_per_day = 1/model_params$dt))
+  }
+
+  if (is.null(date_hosp_bed_capacity_change)) {
+    tt_hosp_beds <- 0
+  } else {
+    tt_hosp_beds <- c(0, intervention_dates_for_odin(dates = date_hosp_bed_capacity_change,
                                                           start_date = start_date,
                                                           steps_per_day = 1/model_params$dt))
   }
@@ -288,12 +320,15 @@ sample_grid_scan <- function(scan_results,
     R0_change = scan_results$inputs$interventions$R0_change,
     date_R0_change = scan_results$inputs$interventions$date_R0_change,
     date_contact_matrix_set = scan_results$inputs$interventions$date_contact_matrix_set,
+    date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
+    date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
     pars_obs = pars_obs,
     n_particles = n_particles,
     forecast_days = forecast_days,
     full_output = full_output,
     save_particles = TRUE,
-    return = "sample"
+    return = "sample",
+    .progress = TRUE
   )
 
   # collapse into an array of trajectories

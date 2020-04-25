@@ -50,7 +50,9 @@ test_that("scan_R0_date works", {
   expect_true(all(scan_results$renorm_mat_LL <= 1 & scan_results$renorm_mat_LL >= 0))
 
   # Plots run, but not checked
+  pdf(file = NULL)
   plot(scan_results)
+  dev.off()
 
 
 })

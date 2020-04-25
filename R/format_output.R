@@ -195,9 +195,9 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
 
   # replacting time with date if date_0 is provided
   if(!is.null(date_0)){
-    stopifnot(inherits(date_0, "Date"))
-    out$date <- as.Date(out$t + date_0,
-                        format = "%d/%m/%y")
+    assert_date(date_0)
+    out$date <- as.Date(out$t + as.Date(date_0),
+                        format = "%Y-%m-%d")
   }
 
   return(out)
