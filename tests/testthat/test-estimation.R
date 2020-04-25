@@ -197,6 +197,7 @@ test_that("sample_grid_scan works", {
                           n_sample_pairs = n_sample_pairs,
                           n_particles = 2,
                           full_output = TRUE)
+  days_between <- length( min(as.Date(res$param_grid$start_date)) : as.Date(tail(rownames(res$trajectories[,,1]),1)))
   expect_equal(dim(res$trajectories), c(days_between, length(model$.__enclos_env__$private$ynames), n_sample_pairs))
 
 
@@ -205,14 +206,16 @@ test_that("sample_grid_scan works", {
                           n_particles = 2,
                           forecast_days = 5,
                           full_output = TRUE)
-  expect_equal(dim(res$trajectories), c(days_between+5, length(model$.__enclos_env__$private$ynames), n_sample_pairs))
+  days_between <- length( min(as.Date(res$param_grid$start_date)) : as.Date(tail(rownames(res$trajectories[,,1]),1)))
+  expect_equal(dim(res$trajectories), c(days_between, length(model$.__enclos_env__$private$ynames), n_sample_pairs))
 
   res <- sample_grid_scan(scan_results = scan_results,
                           n_sample_pairs = n_sample_pairs,
                           n_particles = 2,forecast_days = 5,
                           full_output = FALSE)
-
   model <- res$inputs$model$odin_model(user = res$inputs$model_params,
                                        unused_user_action = "ignore")
+  expect_is(model,"odin_model")
+  expect_is(odin_index(model),"list")
 
 })
