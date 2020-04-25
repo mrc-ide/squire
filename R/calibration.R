@@ -298,8 +298,9 @@ calibrate_particle <- function(data,
   r$output <- res$output
 
   # and adjust the time as before
+  full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
   for(i in seq_len(replicates)) {
-    r$output[,"time",i] <- r$output[,"time",i] - which(rownames(r$output) == as.Date(max(data$date)))
+    r$output[,"time",i] <- r$output[,"time",i] - which(rownames(r$output) == as.Date(max(data$date))) + 1L
   }
 
   # second let's recreate the output
