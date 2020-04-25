@@ -14,6 +14,7 @@ projection_plotting(
   ci = TRUE,
   q = c(0.025, 0.975),
   summary_f = mean,
+  date_0 = Sys.Date(),
   x_var = "t",
   ...
 )
@@ -38,6 +39,8 @@ projection runs be added to scenarios. Default = TRUE}
 
 \item{summary_f}{Function to summarise each compartment
 passed to the \code{fun} argument of \code{\link[ggplot2]{stat_summary}}}
+
+\item{date_0}{Date of time 0, if specified a date column will be added}
 
 \item{x_var}{X variable to use for plotting (default is \code{"t"},
 but can be set to, \code{"date"}, if \code{date_0} provided), which will

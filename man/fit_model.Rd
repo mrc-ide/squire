@@ -20,7 +20,7 @@ fit_model(
   reporting_fraction = 1,
   R0_change = NULL,
   date_R0_change = NULL,
-  date_contact_matrix_set = NULL,
+  date_contact_matrix_set_change = NULL,
   date_ICU_bed_capacity_change = NULL,
   date_hosp_bed_capacity_change = NULL,
   replicates = 100,
@@ -71,7 +71,7 @@ i.e. no change in R0}
 \item{date_R0_change}{Calendar dates at which R0_change occurs.
 Defaut = NULL, i.e. no change in R0}
 
-\item{date_contact_matrix_set}{Calendar dates at which the contact matrices
+\item{date_contact_matrix_set_change}{Calendar dates at which the contact matrices
 set in \code{model_params} change. Defaut = NULL, i.e. no change}
 
 \item{date_ICU_bed_capacity_change}{Calendar dates at which ICU bed
@@ -82,7 +82,8 @@ Defaut = NULL, i.e. no change}
 capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
 
-\item{replicates}{Number of replicates. Default = 10}
+\item{replicates}{Replicates to be passed to
+\code{\link{run_explicit_SEEIR_model}}. Default = 100}
 
 \item{country}{Character for country beign simulated. WIll be used to
 generate \code{population} and \code{contact_matrix_set} if

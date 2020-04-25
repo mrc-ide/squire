@@ -17,15 +17,17 @@ calibrate_particle(
   forecast = 0,
   n_particles = 100,
   reporting_fraction = 1,
-  R0_change = NULL,
   date_R0_change = NULL,
-  contact_matrix_set = NULL,
-  date_contact_matrix_set = NULL,
+  R0_change = NULL,
   date_ICU_bed_capacity_change = NULL,
+  ICU_bed_capacity = NULL,
   date_hosp_bed_capacity_change = NULL,
-  replicates = 100,
+  hosp_bed_capacity = NULL,
+  date_contact_matrix_set_change = NULL,
+  contact_matrix_set = NULL,
   country = NULL,
   population = NULL,
+  replicates = 100,
   ...
 )
 }
@@ -57,27 +59,29 @@ and \code{particle_filter_data()}}
 the total deaths the reported deaths represent. E.g. 0.5 results in
 the model calibrating to twice the deaths provided by \code{data$deaths}}
 
-\item{R0_change}{Numeric vector for relative changes in R0. Default = NULL,
-i.e. no change in R0}
-
 \item{date_R0_change}{Calendar dates at which R0_change occurs.
 Defaut = NULL, i.e. no change in R0}
 
-\item{contact_matrix_set}{Contact matrices used in simulation. Default =
-NULL, which will generate this based on the \code{country}.}
-
-\item{date_contact_matrix_set}{Calendar dates at which the contact matrices
-set in \code{model_params} change. Defaut = NULL, i.e. no change}
+\item{R0_change}{Numeric vector for relative changes in R0. Default = NULL,
+i.e. no change in R0}
 
 \item{date_ICU_bed_capacity_change}{Calendar dates at which ICU bed
 capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
 
+\item{ICU_bed_capacity}{ICU bed capacity. Can be single number of vector if capacity time-varies.}
+
 \item{date_hosp_bed_capacity_change}{Calendar dates at which hospital bed
 capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
 
-\item{replicates}{Number of replicates. Default = 10}
+\item{hosp_bed_capacity}{General bed capacity. Can be single number of vector if capacity time-varies.}
+
+\item{date_contact_matrix_set_change}{Calendar dates at which the contact matrices
+set in \code{model_params} change. Defaut = NULL, i.e. no change}
+
+\item{contact_matrix_set}{Contact matrices used in simulation. Default =
+NULL, which will generate this based on the \code{country}.}
 
 \item{country}{Character for country beign simulated. WIll be used to
 generate \code{population} and \code{contact_matrix_set} if

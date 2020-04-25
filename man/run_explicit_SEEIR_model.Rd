@@ -14,6 +14,7 @@ run_explicit_SEEIR_model(
   beta_set = NULL,
   time_period = 365,
   dt = 0.1,
+  day_return = FALSE,
   replicates = 10,
   init = NULL,
   seed = stats::runif(1, 0, 1e+08),
@@ -66,7 +67,10 @@ Default = NULL, which causes beta to be estimated from R0}
 
 \item{time_period}{Length of simulation. Default = 365}
 
-\item{dt}{Time Step. Default = 0.5}
+\item{dt}{Time Step. Default = 0.1}
+
+\item{day_return}{Logical, do we want to return outut after each day rather
+than each dt. Default = FALSE}
 
 \item{replicates}{Number of replicates. Default = 10}
 
