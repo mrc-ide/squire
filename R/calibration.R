@@ -215,10 +215,32 @@ calibrate_particle <- function(data,
   assert_numeric(R0_change)
   assert_custom_class(squire_model, "squire_model")
   assert_bounded(reporting_fraction, 0, 1, inclusive_left = FALSE, inclusive_right = TRUE)
-  if(!is.null(date_R0_change)) { assert_date(date_R0_change) }
-  if(!is.null(date_contact_matrix_set)) { assert_date(date_contact_matrix_set) }
-  if(!is.null(date_ICU_bed_capacity_change)) { assert_date(date_ICU_bed_capacity_change) }
-  if(!is.null(date_hosp_bed_capacity_change)) { assert_date(date_hosp_bed_capacity_change) }
+
+  # checks that dates are not in the future compared to our data
+  if(!is.null(date_R0_change)) {
+    assert_date(date_R0_change)
+    if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_R0_chage is greater than the last date in data")
+    }
+    }
+  if(!is.null(date_contact_matrix_set)) {
+    assert_date(date_contact_matrix_set)
+    if(as.Date(tail(date_contact_matrix_set,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_contact_matrix_set is greater than the last date in data")
+    }
+    }
+  if(!is.null(date_ICU_bed_capacity_change)) {
+    assert_date(date_ICU_bed_capacity_change)
+    if(as.Date(tail(date_ICU_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_ICU_bed_capacity_change is greater than the last date in data")
+    }
+    }
+  if(!is.null(date_hosp_bed_capacity_change)) {
+    assert_date(date_hosp_bed_capacity_change)
+    if(as.Date(tail(date_hosp_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_hosp_bed_capacity_change is greater than the last date in data")
+    }
+    }
 
   # adjust for reporting fraction
   data$deaths <- (data$deaths/reporting_fraction)
@@ -249,7 +271,7 @@ calibrate_particle <- function(data,
   # carry out sims drawn from the grid
   res <- sample_grid_scan(scan_results = scan_results,
                           n_sample_pairs = replicates,
-                          n_particle = n_particles,
+                          n_particles = n_particles,
                           forecast_days = forecast,
                           full_output = TRUE)
 

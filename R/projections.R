@@ -405,12 +405,30 @@ t0_variables <- function(r) {
 
   dims <- dim(r$output)
 
+  if("scan_results" %in% names(r)) {
+
+    if(!is.null(r$interventions$R0_change)) {
+    R0 <- tail(r$replicate_parameters$R0 * r$interventions$R0_change, 1)
+    } else {
+      Ro <- r$replicate_parameters$R0
+    }
+
+
+    ret <- list(
+      R0 = R0,
+      contact_matrix_set = contact_matrix_set,
+      hosp_bed_capacity = hosp_bed_capacity,
+      ICU_bed_capacity = ICU_bed_capacity
+    )
+
+  } else {
+
   # what state time point do we want
   state_pos <- vapply(seq_len(dims[3]), function(x) {
     which(r$output[,"time",x] == 0)
   }, FUN.VALUE = numeric(1))
 
-  lapply(seq_len(dims[3]), function(i) {
+  ret <- lapply(seq_len(dims[3]), function(i) {
 
     last <- tail(which(r$parameters$tt_R0 < state_pos[i]), 1)
     R0 <- r$parameters$R0[last]
@@ -432,6 +450,10 @@ t0_variables <- function(r) {
     ))
 
   })
+
+  }
+
+  return(ret)
 
 }
 
