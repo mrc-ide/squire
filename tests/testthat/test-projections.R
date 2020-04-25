@@ -72,7 +72,7 @@ test_that("projection plotting", {
 
   t1 <- calibrate(country = "Angola", deaths = 5,
                   reporting_fraction = 0.5,
-                  dt = 1,
+                  dt = 0.5,
                   time_period = 100,
                   replicates = 2,
                   R0_scan = c(3,4))
@@ -99,5 +99,61 @@ test_that("projection plotting", {
                                    scenarios = c("Unmitigated","Mitigation"),
                                    var_select = c("ICU_occupancy", "ICU_demand"),
                                    add_parms_to_scenarios = TRUE,ci = FALSE,summarise = TRUE))
+
+})
+
+
+
+#------------------------------------------------
+test_that("calibrate particle into projection works", {
+
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  replicates = 5
+  R0_min = 2.6
+  R0_max = 2.7
+  R0_step = 0.1
+  first_start_date = "2020-02-01"
+  last_start_date = "2020-02-02"
+  day_step = 1
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  pars_obs = NULL
+  n_particles = 10
+
+  out <- calibrate_particle(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    replicates = replicates,
+    country = country,
+    forecast = 10
+  )
+
+  p1 <- projections(r = out)
+
+  p2 <- projections(r = out,
+                    R0_change = c(0.5, 0.2),
+                    tt_R0 = c(0, 20))
+
+  expect_warning(g1 <- projection_plotting(r_list = list(p1,p2),
+                                           scenarios = c("Unmitigated","Mitigation"),
+                                           var_select = "infections", add_parms_to_scenarios = FALSE))
+  expect_s3_class(g1, "gg")
 
 })

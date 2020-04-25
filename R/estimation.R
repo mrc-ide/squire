@@ -28,7 +28,7 @@
 #' @param date_R0_change Calendar dates at which R0_change occurs.
 #'   Defaut = NULL, i.e. no change in R0
 #'
-#' @param date_contact_matrix_set Calendar dates at which the contact matrices
+#' @param date_contact_matrix_set_change Calendar dates at which the contact matrices
 #'   set in \code{model_params} change. Defaut = NULL, i.e. no change
 #'
 #' @param date_ICU_bed_capacity_change Calendar dates at which ICU bed
@@ -61,7 +61,7 @@ scan_R0_date <- function(
   model_params,
   R0_change = NULL,
   date_R0_change = NULL,
-  date_contact_matrix_set = NULL,
+  date_contact_matrix_set_change = NULL,
   date_ICU_bed_capacity_change = NULL,
   date_hosp_bed_capacity_change = NULL,
   squire_model = explicit_SEIR(),
@@ -107,7 +107,7 @@ scan_R0_date <- function(
     data = data,
     R0_change = R0_change,
     date_R0_change = date_R0_change,
-    date_contact_matrix_set = date_contact_matrix_set,
+    date_contact_matrix_set_change = date_contact_matrix_set_change,
     date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
     date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
     pars_obs = pars_obs,
@@ -141,7 +141,7 @@ scan_R0_date <- function(
                     interventions = list(
                       R0_change = R0_change,
                       date_R0_change = date_R0_change,
-                      date_contact_matrix_set = date_contact_matrix_set,
+                      date_contact_matrix_set_change = date_contact_matrix_set_change,
                       date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                       date_hosp_bed_capacity_change = date_hosp_bed_capacity_change
                     ),
@@ -165,7 +165,7 @@ R0_date_particle_filter <- function(R0,
                                     data,
                                     R0_change,
                                     date_R0_change,
-                                    date_contact_matrix_set,
+                                    date_contact_matrix_set_change,
                                     date_ICU_bed_capacity_change,
                                     date_hosp_bed_capacity_change,
                                     pars_obs,
@@ -184,10 +184,10 @@ R0_date_particle_filter <- function(R0,
                                                 steps_per_day = 1/model_params$dt))
   }
 
-  if (is.null(date_contact_matrix_set)) {
+  if (is.null(date_contact_matrix_set_change)) {
     tt_contact_matrix <- 0
   } else {
-    tt_contact_matrix <- c(0, intervention_dates_for_odin(dates = date_contact_matrix_set,
+    tt_contact_matrix <- c(0, intervention_dates_for_odin(dates = date_contact_matrix_set_change,
                                                           start_date = start_date,
                                                           steps_per_day = 1/model_params$dt))
   }
@@ -319,7 +319,7 @@ sample_grid_scan <- function(scan_results,
     data = data,
     R0_change = scan_results$inputs$interventions$R0_change,
     date_R0_change = scan_results$inputs$interventions$date_R0_change,
-    date_contact_matrix_set = scan_results$inputs$interventions$date_contact_matrix_set,
+    date_contact_matrix_set_change = scan_results$inputs$interventions$date_contact_matrix_set_change,
     date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
     date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
     pars_obs = pars_obs,
@@ -381,8 +381,7 @@ plot.squire_scan <- function(x, ..., what = "likelihood") {
 #' @export
 plot.sample_grid_search <- function(x, ..., what = "ICU") {
 
-  idx <- odin_index(x$inputs$model$odin_model(user = x$inputs$model_params,
-                                              unused_user_action = "ignore"))
+  idx <- odin_index(x$model)
 
   # what are we plotting
   if (what == "cases") {
@@ -392,29 +391,30 @@ plot.sample_grid_search <- function(x, ..., what = "ICU") {
             "IOxGetDie1", "IOxGetDie2", "IOxNotGetLive1", "IOxNotGetLive2",
             "IOxNotGetDie1", "IOxNotGetDie2", "IMVGetLive1", "IMVGetLive2",
             "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
-            "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")]) - 1L
+            "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
     ylab <- "Cumulative Cases"
-    particles <- vapply(seq_len(dim(x$trajectories)[3]), function(y) {
-      rowSums(x$trajectories[,index,y], na.rm = TRUE)},
-      FUN.VALUE = numeric(dim(x$trajectories)[1]))
+    particles <- vapply(seq_len(dim(x$output)[3]), function(y) {
+      rowSums(x$output[,index,y], na.rm = TRUE)},
+      FUN.VALUE = numeric(dim(x$output)[1]))
     plot_particles(particles, ylab = ylab)
-    points(as.Date(x$inputs$data$date), cumsum(x$inputs$data$cases / x$inputs$pars_obs$phi_cases), pch = 19)
+    points(as.Date(x$scan_results$inputs$data$date),
+           cumsum(x$scan_results$nputs$data$cases / x$scan_results$inputs$pars_obs$phi_cases), pch = 19)
 
   }
 
   else if(what == "deaths") {
 
-    index <- c(idx$D) - 1L
+    index <- c(idx$D)
     ylab <- "Deaths"
     xlab <- "R0"
-    particles <- vapply(seq_len(dim(x$trajectories)[3]), function(y) {
-      out <- c(0,diff(rowSums(x$trajectories[,index,y], na.rm = TRUE)))
-      names(out)[1] <- rownames(x$trajectories)[1]
+    particles <- vapply(seq_len(dim(x$output)[3]), function(y) {
+      out <- c(0,diff(rowSums(x$output[,index,y], na.rm = TRUE)))
+      names(out)[1] <- rownames(x$output)[1]
       out},
-      FUN.VALUE = numeric(dim(x$trajectories)[1]))
+      FUN.VALUE = numeric(dim(x$output)[1]))
     plot_particles(particles, ylab = ylab)
-    points(as.Date(x$inputs$data$date),
-           x$inputs$data$deaths/ x$inputs$pars_obs$phi_death, pch = 19)
+    points(as.Date(x$scan_results$inputs$data$date),
+           x$scan_results$inputs$data$deaths/ x$scan_results$inputs$pars_obs$phi_death, pch = 19)
 
   } else {
 

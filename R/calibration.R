@@ -99,7 +99,7 @@ calibrate <- function(deaths,
                                 ...)
 
   # get model run outputs
-  t <- seq(from = 1, to = r$parameters$time_period / r$parameters$dt)
+  t <- r$output[,"step",1]
   nt <- length(t)
 
   # get the index for looking up D and R
@@ -172,7 +172,7 @@ calibrate <- function(deaths,
 #'   \code{\link{explicit_model}} (default) this will be
 #'   \code{parameters_explicit_SEEIR}.
 #'
-#' @inheritParams run_explicit_SEEIR_model
+#' @inheritParams parameters_explicit_SEEIR
 #' @inheritParams scan_R0_date
 #'
 #' @export
@@ -190,15 +190,17 @@ calibrate_particle <- function(data,
                                forecast = 0,
                                n_particles = 100,
                                reporting_fraction = 1,
-                               R0_change = NULL,
                                date_R0_change = NULL,
-                               contact_matrix_set = NULL,
-                               date_contact_matrix_set = NULL,
+                               R0_change = NULL,
                                date_ICU_bed_capacity_change = NULL,
+                               ICU_bed_capacity = NULL,
                                date_hosp_bed_capacity_change = NULL,
-                               replicates = 100,
+                               hosp_bed_capacity = NULL,
+                               date_contact_matrix_set_change = NULL,
+                               contact_matrix_set = NULL,
                                country = NULL,
                                population = NULL,
+                               replicates = 100,
                                ...) {
 
   # Asserts on arguments
@@ -222,33 +224,39 @@ calibrate_particle <- function(data,
     if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_R0_chage is greater than the last date in data")
     }
+    assert_same_length(R0_change, date_R0_change)
+  }
+  if(!is.null(date_contact_matrix_set_change)) {
+    assert_date(date_contact_matrix_set_change)
+    if(as.Date(tail(date_contact_matrix_set_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
     }
-  if(!is.null(date_contact_matrix_set)) {
-    assert_date(date_contact_matrix_set)
-    if(as.Date(tail(date_contact_matrix_set,1)) > as.Date(tail(data$date, 1))) {
-      stop("Last date in date_contact_matrix_set is greater than the last date in data")
-    }
-    }
+    assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
+  }
   if(!is.null(date_ICU_bed_capacity_change)) {
     assert_date(date_ICU_bed_capacity_change)
     if(as.Date(tail(date_ICU_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_ICU_bed_capacity_change is greater than the last date in data")
     }
-    }
+    assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
+  }
   if(!is.null(date_hosp_bed_capacity_change)) {
     assert_date(date_hosp_bed_capacity_change)
     if(as.Date(tail(date_hosp_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_hosp_bed_capacity_change is greater than the last date in data")
     }
-    }
+    assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
+  }
 
   # adjust for reporting fraction
   data$deaths <- (data$deaths/reporting_fraction)
 
   # build model parameters
   model_params <- squire_model$parameter_func(country = country,
-                                              contact_matrix_set = contact_matrix_set,
                                               population = population,
+                                              contact_matrix_set = contact_matrix_set,
+                                              hosp_bed_capacity = hosp_bed_capacity,
+                                              ICU_bed_capacity = ICU_bed_capacity,
                                               ...)
 
   # construct scan
@@ -262,7 +270,7 @@ calibrate_particle <- function(data,
                                model_params = model_params,
                                R0_change = R0_change,
                                date_R0_change = date_R0_change,
-                               date_contact_matrix_set = date_contact_matrix_set,
+                               date_contact_matrix_set_change = date_contact_matrix_set_change,
                                date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                                date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
                                squire_model = squire_model,
@@ -272,7 +280,7 @@ calibrate_particle <- function(data,
   res <- sample_grid_scan(scan_results = scan_results,
                           n_sample_pairs = replicates,
                           n_particles = n_particles,
-                          forecast_days = forecast,
+                          forecast_days = forecast + 1, # one because we will need the extra day to work out the difference for incidence
                           full_output = TRUE)
 
   # create a fake run object and fill in the required elements
@@ -288,6 +296,11 @@ calibrate_particle <- function(data,
   dimnames(res$output) <- list(dimnames(res$output)[[1]], dimnames(r$output)[[2]], NULL)
   r$output <- res$output
 
+  # and adjust the time as before
+  for(i in seq_len(replicates)) {
+    r$output[,"time",i] <- r$output[,"time",i] - which(rownames(r$output) == as.Date(max(data$date)))
+  }
+
   # second let's recreate the output
   r$model <- res$inputs$model$odin_model(
     user = res$inputs$model_params, unused_user_action = "ignore"
@@ -296,7 +309,7 @@ calibrate_particle <- function(data,
   # we will add the interventions here so that we now what times are needed for projection
   r$interventions <- list(R0_change = R0_change,
                           date_R0_change = date_R0_change,
-                          date_contact_matrix_set = date_contact_matrix_set,
+                          date_contact_matrix_set_change = date_contact_matrix_set_change,
                           date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                           date_hosp_bed_capacity_change = date_hosp_bed_capacity_change)
 
@@ -323,33 +336,33 @@ calibrate_particle <- function(data,
 #' @return List of time/dated squire simulations
 #'
 fit_model <- function(data = NULL,
-                              deaths = NULL,
-                              R0_min = NULL,
-                              R0_max = NULL,
-                              R0_step = NULL,
-                              first_start_date = NULL,
-                              last_start_date = NULL,
-                              day_step = NULL,
-                              squire_model = explicit_model(),
-                              pars_obs = NULL,
-                              forecast = 0,
-                              n_particles = 100,
-                              reporting_fraction = 1,
-                              R0_change = NULL,
-                              date_R0_change = NULL,
-                              date_contact_matrix_set = NULL,
-                              date_ICU_bed_capacity_change = NULL,
-                              date_hosp_bed_capacity_change = NULL,
-                              replicates = 100,
-                              country = NULL,
-                              population = NULL,
-                              contact_matrix_set = NULL,
-                              seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
-                              min_seeding_cases = 5,
-                              max_seeding_cases = 50,
-                              R0 = 3,
-                              R0_scan = NULL,
-                              ...) {
+                      deaths = NULL,
+                      R0_min = NULL,
+                      R0_max = NULL,
+                      R0_step = NULL,
+                      first_start_date = NULL,
+                      last_start_date = NULL,
+                      day_step = NULL,
+                      squire_model = explicit_model(),
+                      pars_obs = NULL,
+                      forecast = 0,
+                      n_particles = 100,
+                      reporting_fraction = 1,
+                      R0_change = NULL,
+                      date_R0_change = NULL,
+                      date_contact_matrix_set_change = NULL,
+                      date_ICU_bed_capacity_change = NULL,
+                      date_hosp_bed_capacity_change = NULL,
+                      replicates = 100,
+                      country = NULL,
+                      population = NULL,
+                      contact_matrix_set = NULL,
+                      seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
+                      min_seeding_cases = 5,
+                      max_seeding_cases = 50,
+                      R0 = 3,
+                      R0_scan = NULL,
+                      ...) {
 
 
   if(is.null(deaths) && is.null(data)) {
@@ -393,7 +406,7 @@ fit_model <- function(data = NULL,
                        R0_change = R0_change,
                        date_R0_change = date_R0_change,
                        contact_matrix_set = contact_matrix_set,
-                       date_contact_matrix_set = date_contact_matrix_set,
+                       date_contact_matrix_set_change = date_contact_matrix_set_change,
                        date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                        date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
                        replicates = replicates,

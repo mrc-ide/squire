@@ -54,6 +54,11 @@ squire_simulation_plot_prep <- function(x,
     pd$x <- round(pd$x, ceiling(log10(1/x$parameters$dt)))
   }
 
+  # remove any NA rows (due to different start dates)
+  if(sum(is.na(pd$t))>0) {
+  pd <- pd[-which(is.na(pd$t)),]
+  }
+
   # Format summary data
   pds <- pd %>%
     dplyr::group_by(.data$x, .data$compartment) %>%

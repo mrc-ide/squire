@@ -183,7 +183,11 @@ projections <- function(r,
 
   # what are the remaining time points
   t_steps <- lapply(state_pos, function(x) {
-    tail(seq_len(ds[1]), ds[1] - x)
+    if(diff(r$output[1:2,"step",1]) != 1) {
+      round(tail(seq_len(ds[1]), ds[1] - x)/r$parameters$dt)
+    } else {
+      tail(seq_len(ds[1]), ds[1] - x)
+    }
   })
 
   # final values of R0, contacts, and beds
@@ -275,7 +279,13 @@ projections <- function(r,
     r$model$set_user(ICU_beds = ICU_bed_capacity)
 
     # run the model
-    r$model$run(step = seq_len(length(t_steps[[x]])),
+    if(diff(r$output[1:2,"step",1]) != 1) {
+      step <- c(0,round(seq_len(length(t_steps[[x]]))/r$parameters$dt))
+    } else {
+    step <- seq_len(length(t_steps[[x]]))
+    }
+
+    r$model$run(step = step,
                 y = as.numeric(r$output[state_pos[x], initials, x, drop=TRUE]),
                 use_names = TRUE,
                 replicate = 1)
@@ -284,7 +294,11 @@ projections <- function(r,
 
   ## collect results
   for(i in seq_len(ds[3])) {
-    r$output[t_steps[[i]], -1, i] <- out[[i]][, -1, 1]
+    if(diff(r$output[1:2,"step",1]) != 1) {
+      r$output[t_steps[[i]]*r$parameters$dt, -1, i] <- out[[i]][-1, -1, 1]
+    } else {
+      r$output[t_steps[[i]], -1, i] <- out[[i]][, -1, 1]
+    }
   }
 
   ## append projections
@@ -302,6 +316,7 @@ projections <- function(r,
 #' @param scenarios Character vector describing the different scenarios.
 #' @param add_parms_to_scenarios Logical. Should the parameters used for the
 #'   projection runs be added to scenarios. Default = TRUE
+#' @param date_0 Date of time 0, if specified a date column will be added
 #' @inheritParams plot.squire_simulation
 #' @param ... additional arguments passed to \code{\link{format_output}}
 #'
@@ -315,6 +330,7 @@ projection_plotting <- function(r_list,
                                 ci = TRUE,
                                 q = c(0.025, 0.975),
                                 summary_f = mean,
+                                date_0 = Sys.Date(),
                                 x_var = "t", ...) {
 
 
@@ -330,7 +346,7 @@ projection_plotting <- function(r_list,
                     var_select = var_select,
                     x_var = x_var, q = q,
                     summary_f = summary_f,
-                    date_0 = Sys.Date())
+                    date_0 = date_0)
 
   if (add_parms_to_scenarios) {
     parms <- lapply(r_list,projection_inputs)
@@ -354,8 +370,8 @@ projection_plotting <- function(r_list,
     p <- p + ggplot2::geom_line(data = pd,
                                 ggplot2::aes(x = .data$x,
                                              y = .data$y,
-                                             col = .data$compartment,
-                                             linetype = .data$Scenario,
+                                             col = .data$Scenario,
+                                             linetype = .data$compartment,
                                              group = interaction(.data$compartment,
                                                                  .data$replicate,
                                                                  .data$Scenario)),
@@ -368,8 +384,8 @@ projection_plotting <- function(r_list,
     }
     p <- p + ggplot2::geom_line(data = pds,
                                 ggplot2::aes(x = .data$x, y = .data$y,
-                                             col = .data$compartment,
-                                             linetype = .data$Scenario))
+                                             col = .data$Scenario,
+                                             linetype = .data$compartment))
   }
 
   if(ci){
@@ -380,8 +396,8 @@ projection_plotting <- function(r_list,
                                   ggplot2::aes(x = .data$x,
                                                ymin = .data$ymin,
                                                ymax = .data$ymax,
-                                               fill = .data$compartment,
-                                               linetype = .data$Scenario),
+                                               fill = .data$Scenario,
+                                               linetype = .data$compartment),
                                   alpha = 0.25, col = "black")
   }
 
@@ -405,51 +421,59 @@ t0_variables <- function(r) {
 
   dims <- dim(r$output)
 
+  # is this the outputs of a grid scan
   if("scan_results" %in% names(r)) {
 
-    if(!is.null(r$interventions$R0_change)) {
-    R0 <- tail(r$replicate_parameters$R0 * r$interventions$R0_change, 1)
-    } else {
-      Ro <- r$replicate_parameters$R0
-    }
+    # grab the final R0, contact matrix and bed capacity.
+    ret <- lapply(seq_len(dims[3]), function(x) {
 
+      if(!is.null(r$interventions$R0_change)) {
+        R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change, 1)
+      } else {
+        R0 <- r$replicate_parameters$R0[x]
+      }
+      contact_matrix_set <- tail(r$parameters$contact_matrix_set,1)
 
-    ret <- list(
-      R0 = R0,
-      contact_matrix_set = contact_matrix_set,
-      hosp_bed_capacity = hosp_bed_capacity,
-      ICU_bed_capacity = ICU_bed_capacity
-    )
+      hosp_bed_capacity <- tail(r$parameters$hosp_bed_capacity,1)
+      ICU_bed_capacity <- tail(r$parameters$ICU_bed_capacity,1)
+
+      return(list(
+        R0 = R0,
+        contact_matrix_set = contact_matrix_set,
+        hosp_bed_capacity = hosp_bed_capacity,
+        ICU_bed_capacity = ICU_bed_capacity))
+    })
 
   } else {
 
-  # what state time point do we want
-  state_pos <- vapply(seq_len(dims[3]), function(x) {
-    which(r$output[,"time",x] == 0)
-  }, FUN.VALUE = numeric(1))
+    # what state time point do we want
+    state_pos <- vapply(seq_len(dims[3]), function(x) {
+      which(r$output[,"time",x] == 0)
+    }, FUN.VALUE = numeric(1))
 
-  ret <- lapply(seq_len(dims[3]), function(i) {
+    # build list of the final variables that change
+    ret <- lapply(seq_len(dims[3]), function(i) {
 
-    last <- tail(which(r$parameters$tt_R0 < state_pos[i]), 1)
-    R0 <- r$parameters$R0[last]
+      last <- tail(which(r$parameters$tt_R0 < state_pos[i]), 1)
+      R0 <- r$parameters$R0[last]
 
-    last <- tail(which(r$parameters$tt_contact_matrix < state_pos[i]), 1)
-    contact_matrix_set <- r$parameters$contact_matrix_set[last]
+      last <- tail(which(r$parameters$tt_contact_matrix < state_pos[i]), 1)
+      contact_matrix_set <- r$parameters$contact_matrix_set[last]
 
-    last <- tail(which(r$parameters$tt_hosp_beds < state_pos[i]), 1)
-    hosp_bed_capacity <- r$parameters$hosp_bed_capacity[last]
+      last <- tail(which(r$parameters$tt_hosp_beds < state_pos[i]), 1)
+      hosp_bed_capacity <- r$parameters$hosp_bed_capacity[last]
 
-    last <- tail(which(r$parameters$tt_ICU_beds < state_pos[i]), 1)
-    ICU_bed_capacity <- r$parameters$ICU_bed_capacity[last]
+      last <- tail(which(r$parameters$tt_ICU_beds < state_pos[i]), 1)
+      ICU_bed_capacity <- r$parameters$ICU_bed_capacity[last]
 
-    return(list(
-      R0 = R0,
-      contact_matrix_set = contact_matrix_set,
-      hosp_bed_capacity = hosp_bed_capacity,
-      ICU_bed_capacity = ICU_bed_capacity
-    ))
+      return(list(
+        R0 = R0,
+        contact_matrix_set = contact_matrix_set,
+        hosp_bed_capacity = hosp_bed_capacity,
+        ICU_bed_capacity = ICU_bed_capacity
+      ))
 
-  })
+    })
 
   }
 

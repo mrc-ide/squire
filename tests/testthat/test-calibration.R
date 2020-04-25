@@ -65,7 +65,7 @@ test_that("calibrate particle works", {
   day_step = 1
   R0_change = int_unique$change
   date_R0_change = as.Date(int_unique$dates_change)
-  date_contact_matrix_set = NULL
+  date_contact_matrix_set_change = NULL
   squire_model = explicit_model()
   pars_obs = NULL
   n_particles = 10

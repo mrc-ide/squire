@@ -23,17 +23,17 @@ collapse_age <- function(d){
 collapse_for_report <- function(d){
 
   if ("date" %in% names(d)) {
-  d %>%
-    dplyr::mutate(group = dplyr::case_when(
-      grepl("IMV", .data$compartment) ~ "ICU",
-      grepl("IOx", .data$compartment) ~ "hospital",
-      .data$compartment == "n_E2_I" ~ "infections",
-      .data$compartment == "delta_D" ~ "deaths",
-      TRUE ~ .data$compartment)) %>%
-    dplyr::group_by(.data$group, .data$t, .data$date, .data$replicate) %>%
-    dplyr::summarise(y = sum(.data$y)) %>%
-    dplyr::ungroup() %>%
-    dplyr::rename(compartment = .data$group)
+    d %>%
+      dplyr::mutate(group = dplyr::case_when(
+        grepl("IMV", .data$compartment) ~ "ICU",
+        grepl("IOx", .data$compartment) ~ "hospital",
+        .data$compartment == "n_E2_I" ~ "infections",
+        .data$compartment == "delta_D" ~ "deaths",
+        TRUE ~ .data$compartment)) %>%
+      dplyr::group_by(.data$group, .data$t, .data$date, .data$replicate) %>%
+      dplyr::summarise(y = sum(.data$y)) %>%
+      dplyr::ungroup() %>%
+      dplyr::rename(compartment = .data$group)
   } else {
     d %>%
       dplyr::mutate(group = dplyr::case_when(
@@ -46,7 +46,7 @@ collapse_for_report <- function(d){
       dplyr::summarise(y = sum(.data$y)) %>%
       dplyr::ungroup() %>%
       dplyr::rename(compartment = .data$group)
-}
+  }
 
 }
 #' Format model output as data.frame
@@ -83,6 +83,41 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   single_compartments <- c("S", "IMild", "R", "D", "n_E2_I", "n_E2_ICase1", "n_E2_IMild", "delta_D")
   multi_compartments <- c("E", "ICase", "IOxGetLive", "IOxGetDie", "IOxNotGetLive", "IOxNotGetDie",
                           "IMVGetLive", "IMVGetDie", "IMVNotGetLive", "IMVNotGetDie", "IRec")
+  all_case_compartments <- unlist(index[c("IMild", "ICase1", "ICase2", "IOxGetLive1", "IOxGetLive2",
+                                          "IOxGetDie1", "IOxGetDie2", "IOxNotGetLive1", "IOxNotGetLive2",
+                                          "IOxNotGetDie1", "IOxNotGetDie2", "IMVGetLive1", "IMVGetLive2",
+                                          "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
+                                          "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
+
+  # are the steps not 1 apart? if so we need to sum the incident variables (infecions/deaths)
+  if(diff(x$output[1:2,"step",1]) != 1) {
+
+    # assign the infections
+    for(i in seq_along(x$parameters$population)) {
+      collect <- vapply(1:x$parameters$replicates, function(j) {
+        pos <- seq(i,length(all_case_compartments), by = length(x$parameters$population))
+        pos <- all_case_compartments[pos]
+        diff(rowSums(x$output[,pos,j]))
+      }, FUN.VALUE = numeric(nt-1))
+      x$output[seq_len(nt-1),index$n_E2_I[i],] <- collect
+    }
+
+    # assign the deaths
+    for(i in seq_along(x$parameters$population)) {
+      collect <- vapply(1:x$parameters$replicates, function(j) {
+        pos <- seq(i, length(index$D), by = length(x$parameters$population))
+        pos <- index$D[pos]
+        diff(x$output[,pos,j])
+      }, FUN.VALUE = numeric(nt-1))
+      x$output[seq_len(nt-1),index$delta_D[i],] <- collect
+    }
+
+    # remove the last time point as the infections and deaths will not have been
+    # calculated for these
+    x$output <- x$output[-nt , , , drop=FALSE]
+    nt <- nt-1
+  }
+
 
   # Summary Values and Relevant Compartments
   summary_variables <- c("deaths", "infections", "hospital_occupancy", "ICU_occupancy", "hospital_demand", "ICU_demand")

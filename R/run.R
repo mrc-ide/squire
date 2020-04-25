@@ -146,7 +146,9 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' @param beta_set Alternative parameterisation via beta rather than R0.
 #'   Default = NULL, which causes beta to be estimated from R0
 #' @param time_period Length of simulation. Default = 365
-#' @param dt Time Step. Default = 0.5
+#' @param dt Time Step. Default = 0.1
+#' @param day_return Logical, do we want to return outut after each day rather
+#'   than each dt. Default = FALSE
 #' @param replicates  Number of replicates. Default = 10
 #' @param seeding_cases Initial number of cases seeding the epidemic
 #' @param seed Random seed used for simulations. Deafult = runif(1, 0, 10000)
@@ -225,6 +227,7 @@ run_explicit_SEEIR_model <- function(
   # initial state, duration, reps
   time_period = 365,
   dt = 0.1,
+  day_return = FALSE,
   replicates = 10,
   init = NULL,
   seed = stats::runif(1, 0, 100000000),
@@ -476,6 +479,13 @@ run_explicit_SEEIR_model <- function(
   # Running the Model
   mod <- explicit_SEIR(user = pars, unused_user_action = "ignore")
   t <- seq(from = 1, to = time_period/dt)
+
+  # if we ar doing day return then proceed in steps of day length
+  # We also will do an extra day so we know the numebr of infections/deaths
+  # that would happen in the last day
+  if (day_return) {
+    t <- round(seq(1/dt, length(t)+(1/dt), by=1/dt))
+  }
   results <- mod$run(t, replicate = replicates)
 
   # Summarise inputs
