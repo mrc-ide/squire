@@ -57,6 +57,8 @@ and \code{particle_filter_data()}}
 
 \item{pars_obs}{list of parameters to use for the comparison function.}
 
+\item{forecast}{Number of days to forecast forward. Default = 0}
+
 \item{n_particles}{Number of particles. Positive Integer. Default = 100}
 
 \item{reporting_fraction}{Reporting fraction. Numeric for what proportion of

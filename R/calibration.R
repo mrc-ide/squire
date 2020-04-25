@@ -168,6 +168,7 @@ calibrate <- function(deaths,
 #'   the total deaths the reported deaths represent. E.g. 0.5 results in
 #'   the model calibrating to twice the deaths provided by \code{data$deaths}
 #' @param replicates Replicates to be run. Default = 100
+#' @param forecast Number of days to forecast forward. Default = 0
 #' @param ... Further aguments for the model parameter function. If using the
 #'   \code{\link{explicit_model}} (default) this will be
 #'   \code{parameters_explicit_SEEIR}.
