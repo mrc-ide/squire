@@ -84,8 +84,8 @@ no_constraints_overall <- a_max_ICU %>%
   group_by(setting, time_in_lockdown) %>%
   filter(max_capacity == min(max_capacity))
 
-saveRDS(no_constraints_overall, "no_constraints_overall_df.rds")
-no_constraints_overall <- readRDS("no_constraints_overall_df.rds")
+saveRDS(no_constraints_overall, "new_no_constraints_overall_df.rds")
+no_constraints_overall <- readRDS("new_no_constraints_overall_df.rds")
 
 x <- no_constraints_overall %>%
   filter(!(setting == "HIC" & threshold == "ICU_inc5000"),
@@ -166,8 +166,8 @@ constraints_overall <- b_max_ICU %>%
   group_by(setting, time_in_lockdown) %>%
   filter(max_capacity == min(max_capacity))
 
-saveRDS(constraints_overall, "constraints_overall_df.rds")
-constraints_overall <- readRDS("constraints_overall_df.rds")
+saveRDS(constraints_overall, "new_constraints_overall_df.rds")
+constraints_overall <- readRDS("new_constraints_overall_df.rds")
 
 y <- constraints_overall %>%
   filter(!(setting == "HIC" & threshold == "ICU_inc2500"),

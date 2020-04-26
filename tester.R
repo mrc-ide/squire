@@ -1,9 +1,12 @@
 library(tidyverse)
 x <- run_explicit_SEEIR_model(country = "United Kingdom",
-                              R0 = 2.4, dt = 0.001,
-                              hosp_bed_capacity = 100000000,
-                              ICU_bed_capacity = 100000000,
+                              R0 = 2.4, dt = 0.005,
                               replicates = 1)
+
+deaths <- format_output(x, var_select = "deaths")
+deaths <- deaths %>%
+  group_by(replicate) %>%
+  summarise(death = sum(y))
 
 index <- squire:::odin_index(x$model)
 
@@ -32,22 +35,6 @@ imv_get$age_group <- factor(imv_get$age_group)
 ggplot(imv_get, aes(x = t, y = y, col = age_group)) +
   geom_line() +
   guides(colour = "none")
-
-x <- rbind(imv, imv_get) %>%
-  spread(compartment, y) %>%
-  mutate(overall = IMVGetDie + IMVNotGetDie) %>%
-  mutate(prop = ifelse(overall == 0, 0, IMVNotGetDie/overall))
-ggplot(x, aes(x = t, y = prop, col = age_group)) +
-  geom_line()
-
-
-
-imv <- imv %>%
-  group_by(replicate) %>%
-  summarise(imv = sum(y))
-
-
-
 
 deaths <- format_output(x, var_select = "deaths")
 deaths <- deaths %>%
