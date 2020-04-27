@@ -50,7 +50,7 @@ run_particle_filter <- function(data,
   if (!(return %in% c("full", "ll", "sample", "single"))) {
     stop("return argument must be full, ll, sample or single")
   }
-  if (as.Date(data$date[1], "%Y-%m-%d") < as.Date(model_start_date, "%Y-%m-%d")) {
+  if (as.Date(data$date[data$deaths > 0][1], "%Y-%m-%d") < as.Date(model_start_date, "%Y-%m-%d")) {
     stop("Model start date is later than data start date")
   }
   if (!save_particles && return == "sample") {
@@ -393,7 +393,7 @@ particle_filter_data <- function(data, start_date, steps_per_day) {
     stop("'date' must be strictly increasing")
   }
   start_date <- as.Date(start_date)
-  if (start_date >= data$date[[1]]) {
+  if (start_date >= as.Date(data$date[data$deaths > 0][1], "%Y-%m-%d")) {
     stop("'start_date' must be less than the first date in data")
   }
 
@@ -462,6 +462,13 @@ intervention_dates_for_odin <- function(dates,
 interventions_unique <- function(df, x = "C") {
 
   assert_dataframe(df)
+
+  # if it's an empty data frame just retrun NULLs for no intervention
+  if(nrow(df) == 0){
+    return(list(dates_change = NULL,
+                tt = NULL,
+                change = NULL))
+  } else {
   if (!"date" %in% names(df)) {
     stop("df needs column 'date'")
   }
@@ -476,6 +483,7 @@ interventions_unique <- function(df, x = "C") {
   return(list(dates_change = dates_change,
               tt = tt,
               change = change))
+  }
 }
 
 

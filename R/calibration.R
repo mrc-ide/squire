@@ -215,7 +215,6 @@ calibrate_particle <- function(data,
   assert_numeric(day_step)
   assert_numeric(n_particles)
   assert_numeric(reporting_fraction)
-  assert_numeric(R0_change)
   assert_custom_class(squire_model, "squire_model")
   assert_bounded(reporting_fraction, 0, 1, inclusive_left = FALSE, inclusive_right = TRUE)
 
@@ -299,8 +298,14 @@ calibrate_particle <- function(data,
 
   # and adjust the time as before
   full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
+  saved_full <- r$output[,"time",full_row]
   for(i in seq_len(replicates)) {
-    r$output[,"time",i] <- r$output[,"time",i] - which(rownames(r$output) == as.Date(max(data$date))) + 1L
+    na_pos <- which(is.na(r$output[,"time",i]))
+    full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
+    if(length(na_pos) > 0) {
+      full_to_place[na_pos] <- NA
+    }
+    r$output[,"time",i] <- full_to_place
   }
 
   # second let's recreate the output

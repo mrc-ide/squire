@@ -131,6 +131,15 @@ scan_R0_date <- function(
   prob_matrix <- exp(mat_log_ll)
   renorm_mat_LL <- prob_matrix/sum(prob_matrix)
 
+  # occasionally the likelihoods are so low that this creates NAs so just decrease
+  drop <- 0.9
+  while(any(is.na(renorm_mat_LL))) {
+    prob_matrix <- exp(mat_log_ll*drop)
+    renorm_mat_LL <- prob_matrix/sum(prob_matrix)
+    drop <- drop^2
+  }
+
+
   results <- list(x = R0_1D,
                   y = date_list,
                   mat_log_ll = mat_log_ll,
@@ -311,6 +320,7 @@ sample_grid_scan <- function(scan_results,
   ## Particle filter outputs
   ## Sample one particle
   # traces <- purrr::pmap(
+  message("Sampling from grid...")
   traces <- furrr::future_pmap(
     .l = param_grid,
     .f = R0_date_particle_filter,

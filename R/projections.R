@@ -183,7 +183,7 @@ projections <- function(r,
 
   # what are the remaining time points
   t_steps <- lapply(state_pos, function(x) {
-    if(diff(tail(r$output[,1,1],2)) != 1) {
+    if(diff(tail(r$output[,"step",1],2)) != 1) {
       round(tail(seq_len(ds[1]), ds[1] - x)/r$parameters$dt)
     } else {
       tail(seq_len(ds[1]), ds[1] - x)
@@ -294,7 +294,7 @@ projections <- function(r,
 
   ## collect results
   for(i in seq_len(ds[3])) {
-    if(diff(tail(r$output[,1,1],2)) != 1) {
+    if(diff(tail(r$output[,"step",1],2)) != 1) {
       r$output[t_steps[[i]]*r$parameters$dt, -1, i] <- out[[i]][-1, -1, 1]
     } else {
       r$output[t_steps[[i]], -1, i] <- out[[i]][, -1, 1]
