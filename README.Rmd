@@ -41,7 +41,7 @@ If you are new to squire, the best place to start is below, where we detail how 
 
 <img src="https://raw.githubusercontent.com/mrc-ide/squire/master/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style = "border: none; float: center;" width = "600px">
 
-squire uses an age-structured SEIR model, with the infectious class divided into different stages reflecting progression through different disese severity pathways. These compartments are:  
+squire uses an age-structured SEIR model, with the infectious class divided into different stages reflecting progression through different disease severity pathways. These compartments are:  
 * S = Susceptibles  
 * E = Exposed (Latent Infection)  
 * I<sub>Mild</sub> = Mild Infections (Not Requiring Hospitalisation)  
@@ -99,7 +99,7 @@ library(squire)
 ### 1. Running the model using baseline parameters and no control interventions  
 
 The full model is referred to as the **explicit_SEEIR** model, with hospital
-pathways explicltly exploring whether individuals will require a general 
+pathways explicitly exploring whether individuals will require a general 
 hospital bed providing oxygen or an ICU bed that provides ventilation. 
 
 To run the model we need to provide at least one of the following arguments:
