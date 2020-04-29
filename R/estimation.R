@@ -98,7 +98,7 @@ scan_R0_date <- function(
   #
   ## Particle filter outputs, extracting log-likelihoods
   message("Running Grid Search...")
-  #pf_run_ll <- purrr::pmap_dbl(
+  # pf_run_ll <- purrr::pmap_dbl(
   pf_run_ll <- furrr::future_pmap_dbl(
     .l = param_grid,
     .f = R0_date_particle_filter,
@@ -114,8 +114,8 @@ scan_R0_date <- function(
     n_particles = n_particles,
     forecast_days = 0,
     save_particles = FALSE,
-    return = "ll",
-    .progress = TRUE
+    .progress = TRUE,
+    return = "ll"
   )
 
   ## Construct a matrix with start_date as columns, and beta as rows
@@ -205,16 +205,16 @@ R0_date_particle_filter <- function(R0,
     tt_ICU_beds <- 0
   } else {
     tt_ICU_beds <- c(0, intervention_dates_for_odin(dates = date_ICU_bed_capacity_change,
-                                                          start_date = start_date,
-                                                          steps_per_day = 1/model_params$dt))
+                                                    start_date = start_date,
+                                                    steps_per_day = 1/model_params$dt))
   }
 
   if (is.null(date_hosp_bed_capacity_change)) {
     tt_hosp_beds <- 0
   } else {
     tt_hosp_beds <- c(0, intervention_dates_for_odin(dates = date_hosp_bed_capacity_change,
-                                                          start_date = start_date,
-                                                          steps_per_day = 1/model_params$dt))
+                                                     start_date = start_date,
+                                                     steps_per_day = 1/model_params$dt))
   }
 
   # Second create the new R0s for the R0
@@ -377,19 +377,68 @@ sample_grid_scan <- function(scan_results,
 
 
 #' @export
-plot.squire_scan <- function(x, ..., what = "likelihood") {
+plot.squire_scan <- function(x, what = "likelihood", log = FALSE) {
+
   if (what == "likelihood") {
-    graphics::image(x=x$x, y=x$y, z=x$mat_log_ll,
-                    xlab="beta", ylab="Start date", main = "Log-likelihood")
+
+    # create df
+    df <- reshape2::melt(x$mat_log_ll, c("x", "y"), value.name = "z")
+    df$x <- x$x
+    df$y <- sort(rep(x$y, length(x$x)))
+
+    # make plot
+    gg <- ggplot2::ggplot(data=df, ggplot2::aes(x=x,y=y,fill=-z)) +
+      ggplot2::geom_tile(color = "white") +
+      ggplot2::xlab("R0") +
+      ggplot2::ylab("Date") +
+      ggplot2::scale_x_continuous(expand = c(0, 0)) +
+      ggplot2::scale_y_date(expand = c(0, 0)) +
+      ggplot2::scale_fill_gradient(name = "-Log L.") +
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        panel.grid = ggplot2::element_blank(),
+        panel.border = ggplot2::element_blank(),
+        plot.title = ggplot2::element_text(hjust = 0.5)) +
+      ggplot2::ggtitle("Likelihood")
+
+    if(log) {
+      gg <- gg + ggplot2::scale_fill_gradient( name = "-Log L.", trans = 'log' )
+    }
+
+
   } else if (what == "probability") {
-    graphics::image(x=x$x, y=x$y, z=x$renorm_mat_LL,
-                    xlab="beta", ylab="Start date", main = "Probability")
+
+    # create df
+    df <- reshape2::melt(x$renorm_mat_LL, c("x", "y"), value.name = "z")
+    df$x <- x$x
+    df$y <- sort(rep(x$y, length(x$x)))
+
+    # make plot
+    gg <- ggplot2::ggplot(data=df, ggplot2::aes(x=x,y=y,fill=z)) +
+      ggplot2::geom_tile(color = "white") +
+      ggplot2::xlab("R0") +
+      ggplot2::ylab("Date") +
+      ggplot2::scale_x_continuous(expand = c(0, 0)) +
+      ggplot2::scale_fill_gradient(name = "Probability", low = "#56B1F7", high = "#132B43") +
+      ggplot2::scale_y_date( expand = c(0, 0)) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        panel.grid = ggplot2::element_blank(),
+                     panel.border = ggplot2::element_blank(),
+                     plot.title = ggplot2::element_text(hjust = 0.5)) +
+      ggplot2::ggtitle("Probability")
+
+    if(log) {
+      gg <- gg + ggplot2::scale_fill_gradient(name = "Probability", trans = 'log',
+                                               low = "#56B1F7", high = "#132B43")
+    }
   }
+  return(gg)
 }
 
 
 #' @export
-plot.sample_grid_search <- function(x, ..., what = "ICU") {
+plot_sample_grid_search <- function(x, what = "deaths") {
 
   idx <- odin_index(x$model)
 
@@ -406,9 +455,17 @@ plot.sample_grid_search <- function(x, ..., what = "ICU") {
     particles <- vapply(seq_len(dim(x$output)[3]), function(y) {
       rowSums(x$output[,index,y], na.rm = TRUE)},
       FUN.VALUE = numeric(dim(x$output)[1]))
-    plot_particles(particles, ylab = ylab)
-    points(as.Date(x$scan_results$inputs$data$date),
-           cumsum(x$scan_results$nputs$data$cases / x$scan_results$inputs$pars_obs$phi_cases), pch = 19)
+    quants <- as.data.frame(t(apply(particles, 1, quantile, c(0.025, 0.975))))
+    quants$date <- rownames(quants)
+    names(quants)[1:2] <- c("ymin","ymax")
+
+    base_plot <- plot(x, "infections", ci = FALSE, replicates = TRUE, x_var = "date",
+                      date_0 = max(out$scan_results$inputs$data$date))
+    base_plot <- base_plot +
+      ggplot2::geom_line(ggplot2::aes(y=ymin, x=as.Date(date)), quants, linetype="dashed") +
+      ggplot2::geom_line(ggplot2::aes(y=ymax, x=as.Date(date)), quants, linetype="dashed") +
+      ggplot2::geom_point(ggplot2::aes(y=cases/out$scan_results$inputs$pars_obs$phi_cases,
+                                       x=as.Date(date)), out$scan_results$inputs$data)
 
   }
 
@@ -422,15 +479,30 @@ plot.sample_grid_search <- function(x, ..., what = "ICU") {
       names(out)[1] <- rownames(x$output)[1]
       out},
       FUN.VALUE = numeric(dim(x$output)[1]))
-    plot_particles(particles, ylab = ylab)
-    points(as.Date(x$scan_results$inputs$data$date),
-           x$scan_results$inputs$data$deaths/ x$scan_results$inputs$pars_obs$phi_death, pch = 19)
+    quants <- as.data.frame(t(apply(particles, 1, quantile, c(0.025, 0.975))))
+    quants$date <- rownames(quants)
+    names(quants)[1:2] <- c("ymin","ymax")
+
+    base_plot <- plot(x, "deaths", ci = FALSE, replicates = TRUE, x_var = "date",
+                      date_0 = max(out$scan_results$inputs$data$date))
+    base_plot <- base_plot +
+      ggplot2::geom_line(ggplot2::aes(y=ymin, x=as.Date(date)), quants, linetype="dashed") +
+      ggplot2::geom_line(ggplot2::aes(y=ymax, x=as.Date(date)), quants, linetype="dashed") +
+      ggplot2::geom_point(ggplot2::aes(y=deaths/out$scan_results$inputs$pars_obs$phi_death,
+                                       x=as.Date(date)), out$scan_results$inputs$data)
 
   } else {
 
     stop("Requested what must be one of 'ICU', 'deaths'")
 
   }
+
+  base_plot <-  base_plot +
+    ggplot2::ylab(ylab) +
+    ggplot2::xlab(xlab) +
+    ggplot2::theme(legend.position = "none")
+  return(base_plot)
+
 
 }
 

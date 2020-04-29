@@ -407,8 +407,7 @@ projection_plotting <- function(r_list,
     ggplot2::scale_fill_discrete(guide = FALSE) +
     ggplot2::xlab("Time") +
     ggplot2::ylab("N") +
-    ggplot2::theme_bw() +
-    ggplot2::guides(col = ggplot2::guide_legend(ncol = 2))
+    ggplot2::theme_bw()
 
   return(p)
 

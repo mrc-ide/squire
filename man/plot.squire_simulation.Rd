@@ -13,11 +13,12 @@
   q = c(0.025, 0.975),
   summary_f = mean,
   x_var = "t",
+  particle_fit = FALSE,
   ...
 )
 }
 \arguments{
-\item{x}{An iccm_simulation object}
+\item{x}{An squire_simulation object}
 
 \item{var_select}{Vector of variable names to plot (default is all)}
 
@@ -35,6 +36,10 @@ passed to the \code{fun} argument of \code{\link[ggplot2]{stat_summary}}}
 \item{x_var}{X variable to use for plotting (default is \code{"t"},
 but can be set to, \code{"date"}, if \code{date_0} provided), which will
 cause the date to be plotted rather than time.}
+
+\item{particle_fit}{If the squire_simulation provided is the result of
+running the particle filter, do we want to just plot the fit. Default =
+FALSE}
 
 \item{...}{additional arguments affecting the plot produced.}
 }

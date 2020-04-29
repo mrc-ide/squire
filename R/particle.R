@@ -230,7 +230,8 @@ particle_filter <- function(data, model, compare, n_particles,
 
       ## Storage for all particles:
       if (full_output) {
-        particles[(data$day_start[t] + 2L):(data$day_end[t] + 1L), , ] <- state[-1 , , ] #minus first row as return_initial=FALSE doesn't work
+        # minus first row as return_initial=FALSE doesn't work correctly in dde difeq_replicate
+        particles[(data$day_start[t] + 2L):(data$day_end[t] + 1L), , ] <- state[-1 , , ]
         state <- state[length(step),i_state , , drop = TRUE]
       } else {
         particles[(data$day_start[t] + 2L):(data$day_end[t] + 1L), , ] <- state
@@ -393,13 +394,13 @@ particle_filter_data <- function(data, start_date, steps_per_day) {
     stop("'date' must be strictly increasing")
   }
   start_date <- as.Date(start_date)
-  if (start_date >= as.Date(data$date[data$deaths > 0][1], "%Y-%m-%d")) {
+  if (start_date >= as.Date(data$date[1], "%Y-%m-%d")) {
     stop("'start_date' must be less than the first date in data")
   }
 
   ## Then for each timestep we work out the start and end date
   ret <- data
-  ret$day_start <- as.integer(data$date - start_date - 1L)
+  ret$day_start <- as.integer(data$date - start_date)
   ret$day_end <- as.integer(c(ret$day_start[2:nrow(ret)], ret$day_start[nrow(ret)] + 1L))
 
   d0 <- ret[1, ]
@@ -477,11 +478,9 @@ interventions_unique <- function(df, x = "C") {
   }
 
   dates_change <- head(df[cumsum(rle(df[[x]])$lengths)+1,]$date, -1)
-  tt <- seq_along(dates_change) - 1L
   change <- head(df[cumsum(rle(df[[x]])$lengths)+1,][[x]], -1)
 
-  return(list(dates_change = dates_change,
-              tt = tt,
+  return(list(dates_change = as.Date(as.character(dates_change)),
               change = change))
   }
 }
