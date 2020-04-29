@@ -211,6 +211,7 @@ calibrate_particle <- function(data,
   assert_numeric(R0_step)
   assert_date(first_start_date)
   assert_date(last_start_date)
+  assert_date(data$date)
   assert_numeric(day_step)
   assert_numeric(day_step)
   assert_numeric(n_particles)
@@ -219,6 +220,11 @@ calibrate_particle <- function(data,
   assert_bounded(reporting_fraction, 0, 1, inclusive_left = FALSE, inclusive_right = TRUE)
   assert_in("date", names(data))
   assert_in("deaths", names(data))
+
+  # check grid params are okay
+  if (as.Date(last_start_date) >= as.Date(data$date[1])) {
+    stop("'last_start_date' must be earlier than the first date in data")
+  }
 
   # checks that dates are not in the future compared to our data
   if(!is.null(date_R0_change)) {

@@ -401,18 +401,7 @@ plot(out, particle_fit = TRUE)
 That is a much better fit. 
 
 Any parameter that you could provide to `run_explicit_SEEIR_model` can be passed to `calibrate_particle`. This
-includes time varying arguments such as `contact_matrix_set`, `ICU_bed_capacity` and `hosp_bed_capacity`. To incorporate these into model fitting correctly, the date at which these change must be provided (similarly to how `date_R0_change` was provided above) using `date_ICU_bed_capacity_change`, `ICU_bed_capacity` and `date_hosp_bed_capacity_change` respecitvely. 
-
-```{r calibration, message=FALSE, warning=FALSE}
-calibration <- calibrate(country = "Afghanistan", deaths = max(df$deaths), 
-                         reporting_fraction = 1,
-                         seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
-                         min_seeding_cases = 5, max_seeding_cases = 50,
-                         replicates = 10, dt = 0.25)
-
-plot(calibration, var_select = "infections", date_0 = Sys.Date())
-
-```
+includes time varying arguments such as `contact_matrix_set`, `ICU_bed_capacity` and `hosp_bed_capacity`. To incorporate these into model fitting correctly, the date at which these change must be provided (similarly to how `date_R0_change` was provided above) using `date_ICU_bed_capacity_change`, `date_ICU_bed_capacity_change` and `date_hosp_bed_capacity_change` respecitvely. 
 
 (N.B. Given the potentially long running time for the grid search, the model state is returned at the end of every day rather than every time step (provided by `dt`). As a result model outputs such as `n_E2_I` (number of infections in a time step) and `delta_D` (number of deaths in a time step) reflect the outputs in the last time step rather than in all the time steps in the last day. The plotting functions and `format_output` provided in `squire` handle this correctly and work out the correct number for these in the last day.)
 

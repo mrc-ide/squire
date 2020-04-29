@@ -98,8 +98,10 @@ scan_R0_date <- function(
   #
   ## Particle filter outputs, extracting log-likelihoods
   message("Running Grid Search...")
-  # pf_run_ll <- purrr::pmap_dbl(
-  pf_run_ll <- furrr::future_pmap_dbl(
+
+  if (Sys.getenv("SQUIRE_PARALLEL_DEBUG") == "TRUE") {
+
+  pf_run_ll <- purrr::pmap_dbl(
     .l = param_grid,
     .f = R0_date_particle_filter,
     squire_model = squire_model,
@@ -114,9 +116,29 @@ scan_R0_date <- function(
     n_particles = n_particles,
     forecast_days = 0,
     save_particles = FALSE,
-    .progress = TRUE,
-    return = "ll"
-  )
+    return = "ll")
+
+  } else {
+
+    pf_run_ll <- furrr::future_pmap_dbl(
+      .l = param_grid,
+      .f = R0_date_particle_filter,
+      squire_model = squire_model,
+      model_params = model_params,
+      data = data,
+      R0_change = R0_change,
+      date_R0_change = date_R0_change,
+      date_contact_matrix_set_change = date_contact_matrix_set_change,
+      date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+      date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
+      pars_obs = pars_obs,
+      n_particles = n_particles,
+      forecast_days = 0,
+      save_particles = FALSE,
+      .progress = TRUE,
+      return = "ll")
+
+  }
 
   ## Construct a matrix with start_date as columns, and beta as rows
   ## order of return is set by order passed to expand.grid, above
@@ -188,33 +210,33 @@ R0_date_particle_filter <- function(R0,
   if (is.null(date_R0_change)) {
     tt_beta <- 0
   } else {
-    tt_beta <- c(0, intervention_dates_for_odin(dates = date_R0_change,
+    tt_beta <- unique(c(0, intervention_dates_for_odin(dates = date_R0_change,
                                                 start_date = start_date,
-                                                steps_per_day = 1/model_params$dt))
+                                                steps_per_day = 1/model_params$dt)))
   }
 
   if (is.null(date_contact_matrix_set_change)) {
     tt_contact_matrix <- 0
   } else {
-    tt_contact_matrix <- c(0, intervention_dates_for_odin(dates = date_contact_matrix_set_change,
+    tt_contact_matrix <- unique(c(0, intervention_dates_for_odin(dates = date_contact_matrix_set_change,
                                                           start_date = start_date,
-                                                          steps_per_day = 1/model_params$dt))
+                                                          steps_per_day = 1/model_params$dt)))
   }
 
   if (is.null(date_ICU_bed_capacity_change)) {
     tt_ICU_beds <- 0
   } else {
-    tt_ICU_beds <- c(0, intervention_dates_for_odin(dates = date_ICU_bed_capacity_change,
+    tt_ICU_beds <- unique(c(0, intervention_dates_for_odin(dates = date_ICU_bed_capacity_change,
                                                     start_date = start_date,
-                                                    steps_per_day = 1/model_params$dt))
+                                                    steps_per_day = 1/model_params$dt)))
   }
 
   if (is.null(date_hosp_bed_capacity_change)) {
     tt_hosp_beds <- 0
   } else {
-    tt_hosp_beds <- c(0, intervention_dates_for_odin(dates = date_hosp_bed_capacity_change,
+    tt_hosp_beds <- unique(c(0, intervention_dates_for_odin(dates = date_hosp_bed_capacity_change,
                                                      start_date = start_date,
-                                                     steps_per_day = 1/model_params$dt))
+                                                     steps_per_day = 1/model_params$dt)))
   }
 
   # Second create the new R0s for the R0
@@ -318,9 +340,31 @@ sample_grid_scan <- function(scan_results,
   # Multi-core futures with furrr (parallel purrr)
 
   ## Particle filter outputs
-  ## Sample one particle
+
   # traces <- purrr::pmap(
   message("Sampling from grid...")
+
+  if (Sys.getenv("SQUIRE_PARALLEL_DEBUG") == "TRUE") {
+    traces <- purrr::pmap(
+      .l = param_grid,
+      .f = R0_date_particle_filter,
+      squire_model = squire_model,
+      model_params = model_params,
+      data = data,
+      R0_change = scan_results$inputs$interventions$R0_change,
+      date_R0_change = scan_results$inputs$interventions$date_R0_change,
+      date_contact_matrix_set_change = scan_results$inputs$interventions$date_contact_matrix_set_change,
+      date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
+      date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
+      pars_obs = pars_obs,
+      n_particles = n_particles,
+      forecast_days = forecast_days,
+      full_output = full_output,
+      save_particles = TRUE,
+      return = "sample",
+      .progress = TRUE
+    )
+  } else {
   traces <- furrr::future_pmap(
     .l = param_grid,
     .f = R0_date_particle_filter,
@@ -340,7 +384,7 @@ sample_grid_scan <- function(scan_results,
     return = "sample",
     .progress = TRUE
   )
-
+  }
   # collapse into an array of trajectories
   # the trajectories are different lengths in terms of dates
   # so we will fill the arrays with NAs where needed
