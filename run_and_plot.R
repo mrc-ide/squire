@@ -222,7 +222,7 @@ d <- ggplot(HIC_z, aes(x = time, y = median)) +
   geom_line(aes(y = HIC_icu * 2), linetype = "dashed", size = 0.5)
 
 
-no_constraints_overall <- readRDS("new_no_constraints_overall_df.rds")
+no_constraints_overall <- readRDS("no_constraints_overall_df.rds")
 x <- no_constraints_overall %>%
   filter(!(setting == "HIC" & threshold == "ICU_inc5000"),
          !(setting == "UMIC" & threshold == "ICU_inc1200"),
@@ -245,7 +245,7 @@ e <- ggplot(x, aes(x = time_in_lockdown, y = max_capacity, col = setting)) +
   guides(colour = "none")
 
 
-constraints_overall <- readRDS("new_constraints_overall_df.rds")
+constraints_overall <- readRDS("constraints_overall_df.rds")
 y <- constraints_overall %>%
   filter(!(setting == "HIC" & threshold == "ICU_inc2500"),
          !(setting == "HIC" & threshold == "ICU_inc4000"),

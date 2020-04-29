@@ -13,7 +13,7 @@ trigger_thresholds <- c(1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120,
                         20000, 30000, 40000, 50000, 75000, 100000, 150000)
 
 # Defining Parameters Used in All Model Runs
-replicates <- 75
+replicates <- 60
 R0 <- c(3, 3)
 tt_R0 <- c(0, 50)
 suppression_reduction <- 0.25
@@ -71,15 +71,13 @@ a_total_deaths <- tidyr::gather(a_total_deaths, threshold, deaths, -setting)
 no_constraints_overall <- a_max_ICU %>%
   left_join(a_lockdown_time, by = c("setting", "threshold")) %>%
   left_join(a_total_deaths, by = c("setting", "threshold")) %>%
-  mutate(setting = factor(setting, levels = c("LIC", "LMIC",
-                                              "UMIC", "HIC"))) %>%
-  mutate(threshold = factor(threshold,
-                            levels = paste0("ICU_inc", as.integer(trigger_thresholds)))) %>%
+  mutate(setting = factor(setting, levels = c("LIC", "LMIC", "UMIC", "HIC"))) %>%
+  mutate(threshold = factor(threshold, levels = paste0("ICU_inc", as.integer(trigger_thresholds)))) %>%
   group_by(setting, time_in_lockdown) %>%
   filter(max_capacity == min(max_capacity))
 
-saveRDS(no_constraints_overall, "new_no_constraints_overall_df.rds")
-no_constraints_overall <- readRDS("new_no_constraints_overall_df.rds")
+saveRDS(no_constraints_overall, "no_constraints_overall_df.rds")
+no_constraints_overall <- readRDS("no_constraints_overall_df.rds")
 
 x <- no_constraints_overall %>%
   filter(!(setting == "HIC" & threshold == "ICU_inc5000"),
@@ -134,7 +132,6 @@ for (i in 1:length(countries)) {
     b_max_ICU_req[i, j] <- get_max_ICU_req(x)
     b_time_in_lockdown[i, j] <- get_time_in_lockdown(x)
     b_deaths[i, j] <- get_total_deaths(x)
-    #b_list[[i]][[j]] <- x
     print(j)
   }
 }
@@ -153,15 +150,13 @@ b_total_deaths <- gather(b_total_deaths, threshold, deaths, -setting)
 constraints_overall <- b_max_ICU %>%
   left_join(b_lockdown_time, by = c("setting", "threshold")) %>%
   left_join(b_total_deaths, by = c("setting", "threshold")) %>%
-  mutate(setting = factor(setting, levels = c("LIC_poor", "LIC", "LMIC_poor",
-                                              "LMIC", "UMIC", "HIC"))) %>%
-  mutate(threshold = factor(threshold,
-                            levels = paste0("ICU_inc", as.integer(trigger_thresholds)))) %>%
+  mutate(setting = factor(setting, levels = c("LIC_poor", "LIC", "LMIC_poor", "LMIC", "UMIC", "HIC"))) %>%
+  mutate(threshold = factor(threshold, levels = paste0("ICU_inc", as.integer(trigger_thresholds)))) %>%
   group_by(setting, time_in_lockdown) %>%
   filter(max_capacity == min(max_capacity))
 
-saveRDS(constraints_overall, "new_constraints_overall_df.rds")
-constraints_overall <- readRDS("new_constraints_overall_df.rds")
+saveRDS(constraints_overall, "constraints_overall_df.rds")
+constraints_overall <- readRDS("constraints_overall_df.rds")
 
 y <- constraints_overall %>%
   filter(!(setting == "HIC" & threshold == "ICU_inc2500"),
