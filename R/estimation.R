@@ -361,8 +361,7 @@ sample_grid_scan <- function(scan_results,
       forecast_days = forecast_days,
       full_output = full_output,
       save_particles = TRUE,
-      return = "sample",
-      .progress = TRUE
+      return = "sample"
     )
   } else {
   traces <- furrr::future_pmap(
