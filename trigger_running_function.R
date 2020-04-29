@@ -27,7 +27,7 @@ run_trigger_threshold <- function(country, population, income_strata,
   }
   if (is.null(ICU_bed_capacity)) {
     ICU_bed_capacity <- income_strata_healthcare_capacity$ICU_beds[income_group_index]
-    ICU_bed_capacity <- ICU_bed_capacity * sum(pop)/1000
+    ICU_bed_capacity <- ICU_bed_capacity * sum(population)/1000
   }
   # print(hospital_bed_capacity)
   # print(ICU_bed_capacity)
@@ -38,14 +38,32 @@ run_trigger_threshold <- function(country, population, income_strata,
                                   contact_matrix_set = contact_matrix_set,
                                   tt_R0 = tt_R0, R0 = R0, dt = dt,
                                   replicates = replicates, time_period = 550,
-                                  ICU_bed_capacity = ICU_bed_capacity, hosp_bed_capacity = hospital_bed_capacity)
+                                  ICU_bed_capacity = ICU_bed_capacity, hosp_bed_capacity = hospital_bed_capacity,
+                                  dur_get_ox_survive = 9.5,
+                                  dur_get_ox_die = 7.6,
+                                  dur_not_get_ox_survive =  9.5,
+                                  dur_not_get_ox_die = 7.6,
+                                  dur_get_mv_survive = 11.3,
+                                  dur_get_mv_die =  10.1,
+                                  dur_not_get_mv_survive = 11.3,
+                                  dur_not_get_mv_die = 10.1,
+                                  dur_rec = 3.4)
   } else if (poorer_outcomes == TRUE) {
     r <- run_explicit_SEEIR_model(population = population,
                                   contact_matrix_set = contact_matrix_set,
                                   tt_R0 = tt_R0, R0 = R0, dt = dt,
                                   replicates = replicates, time_period = 550,
                                   ICU_bed_capacity = ICU_bed_capacity, hosp_bed_capacity = hospital_bed_capacity,
-                                  prob_non_severe_death_treatment = c(rep(0.25, 16), 0.5804312))
+                                  prob_non_severe_death_treatment = c(rep(0.25, 16), 0.5804312),
+                                  dur_get_ox_survive = 9.5,
+                                  dur_get_ox_die = 7.6,
+                                  dur_not_get_ox_survive =  9.5,
+                                  dur_not_get_ox_die = 7.6,
+                                  dur_get_mv_survive = 11.3,
+                                  dur_get_mv_die =  10.1,
+                                  dur_not_get_mv_survive = 11.3,
+                                  dur_not_get_mv_die = 10.1,
+                                  dur_rec = 3.4)
   }
 
   # Prepping Model Outputs for Iterative Rerunning to Suppression Threshold Triggers
@@ -133,7 +151,7 @@ run_trigger_threshold <- function(country, population, income_strata,
 
 
 get_time_in_lockdown <- function(trigger_output) {
-  time_in_lockdown <- trigger_output$time_in_lockdown
+  time_in_lockdown <- trigger_output$time_in_lockdown[1:5500, ]
   length_output <- length(time_in_lockdown[, 1])
   replicates <- dim(time_in_lockdown)[2]
   overall_time_in_lockdown <- apply(time_in_lockdown, 2, sum)
@@ -196,7 +214,7 @@ realistic_run_trigger_threshold <- function(country, population, income_strata,
   }
   if (is.null(ICU_bed_capacity)) {
     ICU_bed_capacity <- income_strata_healthcare_capacity$ICU_beds[income_group_index]
-    ICU_bed_capacity <- ICU_bed_capacity * sum(pop)/1000
+    ICU_bed_capacity <- ICU_bed_capacity * sum(population)/1000
   }
   # print(hospital_bed_capacity)
   # print(ICU_bed_capacity)
@@ -207,14 +225,32 @@ realistic_run_trigger_threshold <- function(country, population, income_strata,
                                   contact_matrix_set = contact_matrix_set,
                                   tt_R0 = tt_R0, R0 = R0, dt = dt,
                                   replicates = replicates, time_period = 550,
-                                  ICU_bed_capacity = ICU_bed_capacity, hosp_bed_capacity = hospital_bed_capacity)
+                                  ICU_bed_capacity = ICU_bed_capacity, hosp_bed_capacity = hospital_bed_capacity,
+                                  dur_get_ox_survive = 9.5,
+                                  dur_get_ox_die = 7.6,
+                                  dur_not_get_ox_survive =  9.5,
+                                  dur_not_get_ox_die = 7.6,
+                                  dur_get_mv_survive = 11.3,
+                                  dur_get_mv_die =  10.1,
+                                  dur_not_get_mv_survive = 11.3,
+                                  dur_not_get_mv_die = 10.1,
+                                  dur_rec = 3.4)
   } else if (poorer_outcomes == TRUE) {
     r <- run_explicit_SEEIR_model(population = population,
                                   contact_matrix_set = contact_matrix_set,
                                   tt_R0 = tt_R0, R0 = R0, dt = dt,
                                   replicates = replicates, time_period = 550,
                                   ICU_bed_capacity = ICU_bed_capacity, hosp_bed_capacity = hospital_bed_capacity,
-                                  prob_non_severe_death_treatment = c(rep(0.25, 16), 0.5804312))
+                                  prob_non_severe_death_treatment = c(rep(0.25, 16), 0.5804312),
+                                  dur_get_ox_survive = 9.5,
+                                  dur_get_ox_die = 7.6,
+                                  dur_not_get_ox_survive =  9.5,
+                                  dur_not_get_ox_die = 7.6,
+                                  dur_get_mv_survive = 11.3,
+                                  dur_get_mv_die =  10.1,
+                                  dur_not_get_mv_survive = 11.3,
+                                  dur_not_get_mv_die = 10.1,
+                                  dur_rec = 3.4)
   }
 
   # Prepping Model Outputs for Iterative Rerunning to Suppression Threshold Triggers
@@ -246,6 +282,7 @@ realistic_run_trigger_threshold <- function(country, population, income_strata,
           time_in_lockdown[startpoint:endpoint, k] <- 1
         }
       }
+      print(round(median(trigger_times * dt)))
     } else {
       req <- out[, index$total_number_requiring_IMV, ]
       trigger_times <- lapply(seq_along(trigger_times), function(x){
@@ -299,3 +336,21 @@ realistic_run_trigger_threshold <- function(country, population, income_strata,
               time_in_lockdown = time_in_lockdown,
               index = index))
 }
+
+
+process_output <- function(output, index) {
+  time <- output$model_output[, index$time, 1]
+  y <- lapply(seq_along(1:dim(output$model_output)[3]), function(p) {
+    output$model_output[, index$total_number_requiring_IMV, p]
+  })
+  y <- do.call(cbind, y)
+  lockdown <- round(apply(output$time_in_lockdown[1:5500, ], 1, median))
+  z <- data.frame(time = time, y = y) %>%
+    gather(replicate, incidence, -time) %>%
+    group_by(time) %>%
+    summarise(median = median(incidence),
+              lower = quantile(incidence, 0.025),
+              upper = quantile(incidence, 0.975))
+  return(z)
+}
+

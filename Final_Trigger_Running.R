@@ -3,29 +3,23 @@ library(tidyverse); library(zoo)
 
 # Sourcing Functions for Running Model With Threshold Based Triggers
 source("trigger_running_function.R")
+load("data/income_strata_healthcare_capacity.rda")
 
 # Trigger Thresholds to Use During Model Running
 trigger_thresholds <- c(1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120,
-                        140, 160, 180, 200, 250, 300, 350, 420, 500, 600, 700,
-                        850, 1000, 1200, 1500, 2000, 2500,
-                        3000, 4000, 5000, 6000, 7000, 8000, 10000, 20000,
-                        30000, 40000, 50000, 75000, 100000, 150000)
+                        140, 160, 180, 200, 235, 270, 300, 335, 370, 400, 450, 500,
+                        600, 700, 800, 900, 1000, 1250, 1500, 1750, 2000, 2250, 2500,
+                        2750, 3000, 3500, 4000, 4500, 5000, 6000, 7000, 8000, 10000,
+                        20000, 30000, 40000, 50000, 75000, 100000, 150000)
 
 # Defining Parameters Used in All Model Runs
-replicates <- 100
+replicates <- 75
 R0 <- c(3, 3)
 tt_R0 <- c(0, 50)
-suppression_reduction <- 0.15
+suppression_reduction <- 0.25
 suppression_duration <- 30
 mitigation_reduction <- 1
-max_lockdowns <- 15
-income_strata_healthcare_capacity <- squire::income_strata_healthcare_capacity
-
-# Income Strata ICU Capacity
-LIC_icu <- (1.5 * 50000000 * 1.25/1000)/100
-LMIC_icu <- (2 * 50000000 * 2/1000)/100
-UMIC_icu <- (3 * 50000000 * 2.5/1000)/100
-HIC_icu <- (3.5 * 50000000 * 4.5/1000)/100
+max_lockdowns <- 20
 
 ### 1. Running Without Capacity Constraints to Examine Time In Suppression vs Capacity Required
 ###     -> For Runs Where We Have an Initial Suppression Based On Known Timings for Income Strata
@@ -173,6 +167,8 @@ y <- constraints_overall %>%
   filter(!(setting == "HIC" & threshold == "ICU_inc2500"),
          !(setting == "HIC" & threshold == "ICU_inc4000"),
          !(setting == "HIC" & threshold == "ICU_inc180"),
+         !(setting == "HIC" & threshold == "ICU_inc160"),
+         !(setting == "HIC" & threshold == "ICU_inc250"),
          !(setting == "UMIC" & threshold == "ICU_inc1200"),
          !(setting == "UMIC" & threshold == "ICU_inc1500"),
          !(setting == "UMIC" & threshold == "ICU_inc120"),
@@ -194,12 +190,13 @@ y <- constraints_overall %>%
          !(setting == "LIC" & threshold == "ICU_inc120"),
          !(setting == "LIC" & threshold == "ICU_inc600"))
 
-b <- ggplot(constraints_overall, aes(x = time_in_lockdown, y = deaths, col = setting)) +
+b <- ggplot(y, aes(x = time_in_lockdown, y = deaths, col = setting)) +
   geom_path(size = 2, aes(linetype = setting)) +
   scale_colour_manual(labels = c("Low Income Poor", "Low Income", "Lower Middle Income Poor",
                                  "Lower Middle Income", "Upper Middle Income", "High Income"),
                       values = c("#fcb15b", "#B7C0EE", "#FB7171", "#7067CF", "#362E91", "#241F60"),
                       name = "Income Strata") +
+  xlim(c(0, 0.65)) +
   scale_linetype_manual(values = c(5, 1, 5, 1, 1, 1)) +
   guides(colour = guide_legend(override.aes = list(size = 4))) +
   theme_bw() +
