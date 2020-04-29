@@ -53,11 +53,10 @@ collapse_for_report <- function(d){
 #' Format deterministic model output as data.frame
 #'
 #' @param x squire_simulation object
-#' @param date_0 Date of time 0, if specified a date column will be added
 #'
 #' @return Formatted long data.frame
 #' @export
-format_deterministic_output <- function(x, date_0 = NULL) {
+format_deterministic_output <- function(x) {
   index <- odin_index(x$model)
 
   hospital_demand = c(
@@ -114,11 +113,6 @@ format_deterministic_output <- function(x, date_0 = NULL) {
     function(i) cols[[i]], character(1)
   )
 
-  # replacting time with date if date_0 is provided
-  if(!is.null(date_0)){
-    stopifnot(inherits(date_0, "Date"))
-    out$date <- as.Date(out$t + date_0, format = "%d/%m/%y")
-  }
   out
 }
 
