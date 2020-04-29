@@ -1,3 +1,41 @@
+test_that("deterministic output format works", {
+  pop <- get_population("Afghanistan")
+  m <- get_mixing_matrix("Afghanistan")
+  model_output <- run_deterministic_SEIR_model(
+    pop$n, m, c(0, 50), c(3, 3/2), 2, 100000, 1000000)
+
+  # reset output
+  model_output$output[,2:dim(model_output$output)[[2]]] <- 0
+
+  # mock deaths
+  model_output$output[1, c('D[2]')] <- 2
+  model_output$output[2, c('D[10]')] <- 2
+  model_output$output[2, c('D[16]')] <- 5
+
+  # mock infections
+  model_output$output[1, c('IMild[17]')] <- 4
+  model_output$output[2, c('IMild[2]', 'ICase1[5]')] <- 5
+
+  # mock beds
+  model_output$output[1, c('IOxGetLive1[10]')] <- 2
+  model_output$output[2, c('IOxGetLive2[7]', 'IOxNotGetLive2[3]')] <- 3
+
+  # mock icu
+  model_output$output[1, c('IMVGetLive1[10]')] <- 1
+  model_output$output[2, c('IMVGetLive2[7]', 'IMVNotGetLive2[3]')] <- 2
+
+  actual <- format_deterministic_output(model_output)
+  vars <- c('deaths','infections','hospital_demand','ICU_demand')
+  expected <- data.frame(
+    t = rep(c(0, 1), length(vars)),
+    compartment = rep(vars, each = 2),
+    value = c(2, 5, 4, 10, 2, 6, 1, 4),
+    stringsAsFactors = FALSE
+  )
+  rownames(actual) <- seq_len(8)
+  expect_mapequal(actual, expected)
+})
+
 test_that("output format works", {
   pop = get_population("Afghanistan", simple_SEIR = TRUE)
   set.seed(123)
