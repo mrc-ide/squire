@@ -38,13 +38,13 @@ simple_model <- function() {
     compare_output(model, pars_obs, data, type=model_class)
   }
 
-  explicit_model <- list(odin_model = simple_SEIR,
+  simple_model <- list(odin_model = simple_SEIR,
                          generate_beta_func = beta_est_simple,
                          parameter_func = parameters_simple_SEEIR,
                          run_func = run_simple_SEEIR_model,
                          compare_model = compare_model)
-  class(explicit_model) <- c(model_class, "squire_model")
-  explicit_model
+  class(simple_model) <- c(model_class, "squire_model")
+  simple_model
 
 }
 

@@ -302,21 +302,21 @@ z
 
 ### 4.  Calibrating the Model to Observed Deaths Data
 
-The model can be simply calibrated to time series of deaths reported in settings. This can be done using the `calibrate_particle` function. For example, let's use the time series of deaths in Algeria up to the 22nd April 2020: 
+The model can be simply calibrated to time series of deaths reported in settings. This can be done using the `calibrate` function. For example, let's use the time series of deaths in Algeria up to the 22nd April 2020: 
 
 ```{r example data}
 df <- read.csv(squire:::squire_file("extdata/example_DZA.csv"), stringsAsFactors = FALSE)
 head(df)
 ```
 
-We can calibrate the model to this data. This calibration will infer the most likely start date of the epidemic and the R0 at the start of the epidemic. Calibration occurs by scanning across a range of possible R0 values and start dates. Fitting works using a particle filter, which can be parallelised using `future::plan(future::multiprocess())` before running `calibrate_particle`. 
+We can calibrate the model to this data. This calibration will infer the most likely start date of the epidemic and the R0 at the start of the epidemic. Calibration occurs by scanning across a range of possible R0 values and start dates. Fitting works using a particle filter, which can be parallelised using `future::plan(future::multiprocess())` before running `calibrate`. 
 
 ```{r calibration particle, warning=FALSE, message = FALSE}
 # set up for parallelisation
 future::plan(future::multiprocess())
 
 # Fit model
-out <- calibrate_particle(
+out <- calibrate(
       data = df,
       R0_min = 2,
       R0_max = 4,
@@ -330,14 +330,14 @@ out <- calibrate_particle(
     )
 
 ```
-`calibrate_particle` returns the same output as `run_explicit_SEEIR_model`, with the first
+`calibrate` returns the same output as `run_explicit_SEEIR_model`, with the first
 three elements in `out` being the simulation outputs, the model and model parameters. Note that simulation replicates are aligned to the maximum date in the data provided, and as a result we can use the same plotting functions as before: 
 
 ```{r plot particle deaths}
 plot(out, "deaths", date_0 = max(df$date), x_var = "date")
 ```
 
-With default parameters, `calibrate_particle` will simulate up the maximum date in the data 
+With default parameters, `calibrate` will simulate up the maximum date in the data 
 provided. The fit to this data can be shown using the plotting function and specifying `particle_fit`
 to be `TRUE`
 
@@ -360,7 +360,7 @@ plot(out$scan_results, what = "probability")
 ```
 
 The reason for the poor fits to the data shown earlier is because Algeria has implemented
-interventions prior to today. These can also be incorporated into `calibrate_particle`. 
+interventions prior to today. These can also be incorporated into `calibrate`. 
 For example, we can grab the assumed changes to transmission fased on government intervention
 for Algeria.
 
@@ -370,12 +370,12 @@ int_unique <- squire:::interventions_unique(interventions)
 int_unique
 ```
 
-We can then provide these to `calibrate_particle` as the dates (`date_R0_change`) and relative reductions
+We can then provide these to `calibrate` as the dates (`date_R0_change`) and relative reductions
 to R0 (`R0_change`). We will also specify for model fits to be continued for 14 days into the future with
 `forceast = 14`:
 
 ```{r particle with ints, warning=FALSE, message=FALSE}
-out <- calibrate_particle(
+out <- calibrate(
       data = df,
       R0_min = 2,
       R0_max = 4,
@@ -400,7 +400,7 @@ plot(out, particle_fit = TRUE)
 
 That is a much better fit. 
 
-Any parameter that you could provide to `run_explicit_SEEIR_model` can be passed to `calibrate_particle`. This
+Any parameter that you could provide to `run_explicit_SEEIR_model` can be passed to `calibrate`. This
 includes time varying arguments such as `contact_matrix_set`, `ICU_bed_capacity` and `hosp_bed_capacity`. To incorporate these into model fitting correctly, the date at which these change must be provided (similarly to how `date_R0_change` was provided above) using `date_ICU_bed_capacity_change`, `date_ICU_bed_capacity_change` and `date_hosp_bed_capacity_change` respecitvely. 
 
 (N.B. Given the potentially long running time for the grid search, the model state is returned at the end of every day rather than every time step (provided by `dt`). As a result model outputs such as `n_E2_I` (number of infections in a time step) and `delta_D` (number of deaths in a time step) reflect the outputs in the last time step rather than in all the time steps in the last day. The plotting functions and `format_output` provided in `squire` handle this correctly and work out the correct number for these in the last day.)
@@ -414,7 +414,7 @@ First let's calibrate to this data with no interventions in place (there are lik
 ```{r particle gin, message=FALSE, warning=FALSE}
 df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
 
-out <- calibrate_particle(
+out <- calibrate(
       data = df,
       R0_min = 2.5,
       R0_max = 4,
@@ -443,14 +443,14 @@ The fit is good and captures the stuttering chains at the beginning of the epide
 plot(out, "deaths")
 ```
 
-We can now use the output of `calibrate_particle` to explore different scenario projections using `projections`. For example, to contast this unmitigated epidemic against a mitigation scenario with a 50% reduction in R0 today and a further 30% in 2 weeks time:
+We can now use the output of `calibrate` to explore different scenario projections using `projections`. For example, to contast this unmitigated epidemic against a mitigation scenario with a 50% reduction in R0 today and a further 30% in 2 weeks time:
 
 ```{r projection}
 # create our projections
 p <- projections(r = out, R0_change = c(0.5, 0.2), tt_R0 = c(0, 14))
 ```
 
-The output generated from `projections` is the same class and structure as from `calibrate_particle` and can be plotted against the unmitigated scenario using `projection_plotting`:
+The output generated from `projections` is the same class and structure as from `calibrate` and can be plotted against the unmitigated scenario using `projection_plotting`:
 
 ```{r projection plotting}
 ggproj <- projection_plotting(r_list = list(out,p),

@@ -300,9 +300,9 @@ particle_filter <- function(data, model, compare, n_particles,
   ret
 }
 
-#' Compare the model to ICU data for use with the particle filter
+#' Compare the model to death data for use with the particle filter
 #'
-#' @title Compare model to ICU data
+#' @title Compare model to death data
 #'
 #' @param model An \code{odin_model} object
 #'
@@ -314,7 +314,11 @@ particle_filter <- function(data, model, compare, n_particles,
 #'   \code{explicit_SEIR} but as more models come online we can use
 #'   this parameter to control the type of comparison function generated.
 #'
-compare_output <- function(model, pars_obs, data, type="explicit_SEIR") {
+compare_output <- function(model, pars_obs, data, type="explicit_SEEIR_model") {
+
+  if (type == "simple_SEEIR_model") {
+    stop("Particle filter deffault compare function does not work with simple")
+  }
 
   index <- odin_index(model)
 

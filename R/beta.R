@@ -90,11 +90,11 @@ beta_est <- function(squire_model, model_params, R0) {
   assert_custom_class(model_params, "squire_parameters")
   assert_pos(R0)
 
-  mat <- process_contact_matrix_scaled_age(model_params$contact_matrix_set[[1]],
-                                           model_params$population)
-
   # Calculate beta
   if (class(squire_model)[1] == "explicit_SEEIR_model") {
+
+    mat <- process_contact_matrix_scaled_age(model_params$contact_matrix_set[[1]],
+                                             model_params$population)
 
     assert_custom_class(model_params, "explicit_SEEIR_parameters")
     new_beta <- squire_model$generate_beta_func(dur_IMild = 1/model_params$gamma_IMild,
@@ -105,8 +105,11 @@ beta_est <- function(squire_model, model_params, R0) {
 
   } else if (class(squire_model)[1] == "simple_SEEIR_model") {
 
+    mat <- process_contact_matrix(model_params$contact_matrix_set[[1]],
+                                             model_params$population)
+
     assert_custom_class(model_params, "simple_SEEIR_parameters")
-    new_beta <- squire_model$generate_beta_func(dur_I = 1/model_params$dur_I,
+    new_beta <- squire_model$generate_beta_func(duration_infectiousness = 1/model_params$gamma_I,
                                                 mixing_matrix = mat,
                                                 R0 = R0)
 

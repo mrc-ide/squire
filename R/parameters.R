@@ -61,11 +61,20 @@ parameters_simple_SEEIR <- function(R0 = 3,
   matrices_set <- matrix_set(contact_matrix_set, population)
 
   # Collate Parameters Into List
-  pars <- list(S0 = init$S, E0 = init$E, E02 = init$E2, I0 = init$I, R0 = init$R,
-               gamma_E = gamma_E, gamma_I = gamma_I,
-               tt_beta = tt_R0, beta_set = beta_set,
+  pars <- list(S0 = init$S,
+               E0 = init$E,
+               E02 = init$E2,
+               I0 = init$I,
+               R0 = init$R,
+               gamma_E = gamma_E,
+               gamma_I = gamma_I,
+               tt_beta = tt_R0,
+               beta_set = beta_set,
                N_age = length(population),
-               tt_matrix = tt_contact_matrix, mix_mat_set = matrices_set,
+               tt_matrix = tt_contact_matrix,
+               mix_mat_set = matrices_set,
+               contact_matrix_set = contact_matrix_set,
+               population = population,
                dt = dt)
 
   class(pars) <- c("simple_SEEIR_parameters", "squire_parameters")

@@ -245,7 +245,6 @@ assert_date <- function(x,
     }
   }
 
-  return(TRUE)
 }
 
 

@@ -50,3 +50,22 @@ test_that("beta_explicit input check work", {
                "mixing_matrix must not contain NAs")
 
 })
+
+
+test_that("best_est works for both models", {
+
+  mod_simp <- simple_model()
+  beta <- beta_est(squire_model = mod_simp,
+                   model_params = mod_simp$parameter_func(
+                     population = get_population("Angola", simple_SEIR = TRUE)$n,
+                     contact_matrix_set = contact_matrices[1]),
+                   R0 = 3)
+  expect_true(beta - 0.1095709 < 0.001)
+
+  mod_exp <- explicit_model()
+  beta <- beta_est(squire_model = mod_exp,
+                   model_params = mod_exp$parameter_func("Angola"),
+                   R0 = 3)
+  expect_true(beta - 0.1242782 < 0.001)
+
+})
