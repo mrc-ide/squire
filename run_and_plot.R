@@ -247,31 +247,78 @@ e <- ggplot(x, aes(x = time_in_lockdown, y = max_capacity, col = setting)) +
 
 constraints_overall <- readRDS("constraints_overall_df.rds")
 y <- constraints_overall %>%
-  filter(!(setting == "HIC" & threshold == "ICU_inc2500"),
-         !(setting == "HIC" & threshold == "ICU_inc4000"),
-         !(setting == "HIC" & threshold == "ICU_inc180"),
-         !(setting == "HIC" & threshold == "ICU_inc160"),
-         !(setting == "HIC" & threshold == "ICU_inc250"),
-         !(setting == "UMIC" & threshold == "ICU_inc1200"),
-         !(setting == "UMIC" & threshold == "ICU_inc1500"),
-         !(setting == "UMIC" & threshold == "ICU_inc120"),
-         !(setting == "UMIC" & threshold == "ICU_inc30"),
-         !(setting == "UMIC" & threshold == "ICU_inc250"),
-         !(setting == "LMIC_poor" & threshold == "ICU_inc1200"),
-         !(setting == "LMIC_poor" & threshold == "ICU_inc500"),
-         !(setting == "LMIC_poor" & threshold == "ICU_inc200"),
-         !(setting == "LMIC_poor" & threshold == "ICU_inc850"),
-         !(setting == "LMIC_poor" & threshold == "ICU_inc100"),
-         !(setting == "LMIC_poor" & threshold == "ICU_inc90"),
-         !(setting == "LIC_poor" & threshold == "ICU_inc120"),
-         !(setting == "LIC_poor" & threshold == "ICU_inc600"),
-         !(setting == "LIC_poor" & threshold == "ICU_inc2500"),
-         !(setting == "LMIC" & threshold == "ICU_inc1200"),
-         !(setting == "LMIC" & threshold == "ICU_inc850"),
-         !(setting == "LMIC" & threshold == "ICU_inc200"),
+  filter(!(setting == "LMIC" & threshold == "ICU_inc50"),
+         !(setting == "LMIC" & threshold == "ICU_inc120"),
+         !(setting == "LMIC" & threshold == "ICU_inc800"),
+         !(setting == "LMIC" & threshold == "ICU_inc1000"),
+         !(setting == "LMIC" & threshold == "ICU_inc2250"),
+         !(setting == "LMIC" & threshold == "ICU_inc370"),
+         !(setting == "LMIC" & threshold == "ICU_inc270"),
          !(setting == "LMIC" & threshold == "ICU_inc500"),
-         !(setting == "LIC" & threshold == "ICU_inc120"),
-         !(setting == "LIC" & threshold == "ICU_inc600"))
+         !(setting == "LMIC" & threshold == "ICU_inc600"),
+         !(setting == "LMIC" & threshold == "ICU_inc180"),
+         !(setting == "LMIC" & threshold == "ICU_inc90"),
+         !(setting == "LIC" & threshold == "ICU_inc70"),
+         !(setting == "LIC" & threshold == "ICU_inc160"),
+         !(setting == "LIC" & threshold == "ICU_inc80"),
+         !(setting == "LIC" & threshold == "ICU_inc100"),
+         !(setting == "LIC" & threshold == "ICU_inc700"),
+         !(setting == "LIC" & threshold == "ICU_inc450"),
+         !(setting == "LIC" & threshold == "ICU_inc270"),
+         !(setting == "LIC" & threshold == "ICU_inc370"),
+         !(setting == "LIC" & threshold == "ICU_inc140"),
+         !(setting == "LIC" & threshold == "ICU_inc200"),
+         !(setting == "LIC" & threshold == "ICU_inc600"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc70"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc90"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc80"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc100"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc140"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc800"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc600"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc700"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc370"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc450"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc270"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc200"),
+         !(setting == "LIC_poor" & threshold == "ICU_inc335"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc50"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc90"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc60"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc200"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc100"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc180"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc270"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc370"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc500"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc600"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc800"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc1000"),
+         !(setting == "LMIC_poor" & threshold == "ICU_inc2250"),
+         !(setting == "UMIC" & threshold == "ICU_inc60"),
+         !(setting == "UMIC" & threshold == "ICU_inc20"),
+         !(setting == "UMIC" & threshold == "ICU_inc70"),
+         !(setting == "UMIC" & threshold == "ICU_inc1500"),
+         !(setting == "UMIC" & threshold == "ICU_inc140"),
+         !(setting == "UMIC" & threshold == "ICU_inc235"),
+         !(setting == "UMIC" & threshold == "ICU_inc370"),
+         !(setting == "UMIC" & threshold == "ICU_inc450"),
+         !(setting == "UMIC" & threshold == "ICU_inc800"),
+         !(setting == "UMIC" & threshold == "ICU_inc2000"),
+         !(setting == "UMIC" & threshold == "ICU_inc500"),
+         !(setting == "HIC" & threshold == "ICU_inc180"),
+         !(setting == "HIC" & threshold == "ICU_inc270"),
+         !(setting == "HIC" & threshold == "ICU_inc70"),
+         !(setting == "HIC" & threshold == "ICU_inc180"),
+         !(setting == "HIC" & threshold == "ICU_inc80"),
+         !(setting == "HIC" & threshold == "ICU_inc90"),
+         !(setting == "HIC" & threshold == "ICU_inc335"),
+         !(setting == "HIC" & threshold == "ICU_inc200"),
+         !(setting == "HIC" & threshold == "ICU_inc300"),
+         !(setting == "HIC" & threshold == "ICU_inc700"),
+         !(setting == "HIC" & threshold == "ICU_inc900"),
+         !(setting == "HIC" & threshold == "ICU_inc1250"),
+         !(setting == "HIC" & threshold == "ICU_inc1750"))
 
 f <- ggplot(y, aes(x = time_in_lockdown, y = 1000 *deaths/50000000, col = setting)) +
   geom_path(size = 2, aes(linetype = setting)) +
@@ -282,7 +329,7 @@ f <- ggplot(y, aes(x = time_in_lockdown, y = 1000 *deaths/50000000, col = settin
   scale_linetype_manual(values = c(5, 1, 5, 1, 1, 1)) +
   guides(colour = guide_legend(override.aes = list(size = 4))) +
   theme_bw() +
-  xlim(c(0, 0.65)) +
+  xlim(c(0, 0.8)) +
   labs(y = "Deaths Per 1000 Population", x = "Proportion of Time in Lockdown") +
   guides(linetype = "none", colour = "none")
 
@@ -295,4 +342,141 @@ BBFFFF"
 
 e + f + a + b + c + d +
   plot_layout(design = layout)
+
+# Running for LIC but for the initial illustrative plot
+income_strata <- "LIC"
+trigger_threshold <- 33
+country <- "Madagascar"
+raw_death_trigger <- 0
+death_triggers <- round(50 * raw_death_trigger)
+pop <- get_population(country)
+pop <- (50000000/sum(pop$n)) * pop$n
+contact_matrix <- squire::get_mixing_matrix("Madagascar")
+
+med_LIC <- run_trigger_threshold(country = country, population = pop,
+                                 replicates = replicates,
+                                 income_strata = income_strata,
+                                 trigger_threshold = trigger_threshold,
+                                 suppression_reduction = suppression_reduction[2],
+                                 suppression_duration = suppression_duration,
+                                 mitigation_reduction = mitigation_reduction,
+                                 R0 = R0, tt_R0 = tt_R0,
+                                 max_lockdowns = max_lockdowns,
+                                 hospital_bed_capacity = 10000000,
+                                 ICU_bed_capacity = 10000000,
+                                 income_strata_healthcare_capacity = income_strata_healthcare_capacity,
+                                 poorer_outcomes = FALSE)
+
+high_LIC <- run_trigger_threshold(country = country, population = pop,
+                                  replicates = replicates,
+                                  income_strata = income_strata,
+                                  trigger_threshold = trigger_threshold,
+                                  suppression_reduction = suppression_reduction[3],
+                                  suppression_duration = suppression_duration,
+                                  mitigation_reduction = mitigation_reduction,
+                                  R0 = R0, tt_R0 = tt_R0,
+                                  max_lockdowns = max_lockdowns,
+                                  hospital_bed_capacity = 10000000,
+                                  ICU_bed_capacity = 10000000,
+                                  income_strata_healthcare_capacity = income_strata_healthcare_capacity,
+                                  poorer_outcomes = FALSE)
+
+mid <- process_output(med_LIC)
+mid_time <- round(apply(med_LIC$time_in_lockdown[1:5500, ], 1, median))
+mid$scenario <- "mid"
+
+high <- process_output(high_LIC)
+high_time <- round(apply(high_LIC$time_in_lockdown[1:5500, ], 1, median))
+high$scenario <- "high"
+
+overall <- rbind(mid, high) %>%
+  cbind(lockdown = c(mid_time, high_time)) %>%
+  filter(time > 25 & time < 120)
+
+g <- ggplot(overall, aes(x = time, y = median, colour = scenario)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lower, ymax = upper, fill = scenario), alpha = 0.2, colour = NA) +
+  scale_colour_manual(values = c("red", "green")) +
+  scale_fill_manual(values = c("red", "green")) +
+  geom_line(aes(x = 50, y = lockdown * 500), colour = "black") +
+  geom_line(aes(x = 94, y = lockdown * 500), colour = "green") +
+  geom_line(aes(x = 109, y = lockdown * 500), colour = "red") +
+  theme_bw()
+
+# Illustrative Plot Part 2
+replicates <- 20
+income_strata <- "LIC"
+trigger_threshold <- 30
+country <- "Madagascar"
+raw_death_trigger <- 0
+death_triggers <- round(50 * raw_death_trigger)
+pop <- get_population(country)
+pop <- (50000000/sum(pop$n)) * pop$n
+contact_matrix <- squire::get_mixing_matrix("Madagascar")
+
+low_thresh_LIC <- run_trigger_threshold(country = country, population = pop,
+                                        replicates = replicates,
+                                        income_strata = income_strata,
+                                        trigger_threshold = trigger_threshold,
+                                        suppression_reduction = suppression_reduction[2],
+                                        suppression_duration = suppression_duration,
+                                        mitigation_reduction = mitigation_reduction,
+                                        R0 = R0, tt_R0 = tt_R0,
+                                        max_lockdowns = max_lockdowns,
+                                        hospital_bed_capacity = 10000000,
+                                        ICU_bed_capacity = 10000000,
+                                        income_strata_healthcare_capacity = income_strata_healthcare_capacity,
+                                        poorer_outcomes = FALSE)
+
+trigger_threshold <- 500
+high_thresh_LIC <- run_trigger_threshold(country = country, population = pop,
+                                         replicates = replicates,
+                                         income_strata = income_strata,
+                                         trigger_threshold = trigger_threshold,
+                                         suppression_reduction = suppression_reduction[2],
+                                         suppression_duration = suppression_duration,
+                                         mitigation_reduction = mitigation_reduction,
+                                         R0 = R0, tt_R0 = tt_R0,
+                                         max_lockdowns = max_lockdowns,
+                                         hospital_bed_capacity = 10000000,
+                                         ICU_bed_capacity = 10000000,
+                                         income_strata_healthcare_capacity = income_strata_healthcare_capacity,
+                                         poorer_outcomes = FALSE)
+
+low_thresh <- process_output(low_thresh_LIC)
+low_thresh$scenario <- "low"
+low_thresh_time <- round(apply(low_thresh_LIC$time_in_lockdown[1:5500, ], 1, median))
+
+high_thresh <- process_output(high_thresh_LIC)
+high_thresh$scenario <- "high"
+high_thresh_time <- round(apply(high_thresh_LIC$time_in_lockdown[1:5500, ], 1, median))
+
+h <- ggplot(low_thresh, aes(x = time, y = median)) +
+  geom_line(colour = "#5B85AA") +
+  labs(x = "Time (Days)")
+geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#5B85AA", alpha = 0.2, colour = NA) +
+  theme_bw()
+
+i <- ggplot(high_thresh, aes(x = time, y = median)) +
+  geom_line(colour = "#F46036") +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#F46036", alpha = 0.2, colour = NA) +
+  theme_bw()
+
+layout <- "GGGHHH
+           GGGIII
+           AACCCC
+           AADDDD
+           BBEEEE
+           BBFFFF"
+
+layout <- "AAABBB
+           AAACCC
+           DDEEEE
+           DDFFFF
+           GGHHHH
+           GGIIII"
+
+g + h + i + e + f + a + b + c + d +
+  plot_layout(design = layout)
+
 

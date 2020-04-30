@@ -126,13 +126,12 @@ high_thresh_time <- round(apply(high_thresh_LIC$time_in_lockdown[1:5500, ], 1, m
 
 a <- ggplot(low_thresh, aes(x = time, y = median)) +
   geom_line(colour = "#5B85AA") +
-  labs(x = "Time (Days)") +
+  labs(x = "Time (Days)")
   geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#5B85AA", alpha = 0.2, colour = NA) +
   theme_bw()
 
 b <- ggplot(high_thresh, aes(x = time, y = median)) +
   geom_line(colour = "#F46036") +
-  labs(x = "Time (Days)") +
   geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#F46036", alpha = 0.2, colour = NA) +
   theme_bw()
 
