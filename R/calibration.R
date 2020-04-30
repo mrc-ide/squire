@@ -225,6 +225,14 @@ calibrate_particle <- function(data,
   if (as.Date(last_start_date) >= as.Date(data$date[1])) {
     stop("'last_start_date' must be earlier than the first date in data")
   }
+  if (as.Date(first_start_date) >= as.Date(last_start_date)) {
+    stop("'last_start_date' must be greater than 'first_start_date'")
+  }
+  # if (!all(as.Date(last_start_date) <
+  #          as.Date(c(date_R0_change, date_ICU_bed_capacity_change,
+  #                    date_hosp_bed_capacity_change, date_contact_matrix_set_change)))) {
+  #   stop("'last_start_date' must be less than all date changes")
+  # }
 
   # checks that dates are not in the future compared to our data
   if(!is.null(date_R0_change)) {

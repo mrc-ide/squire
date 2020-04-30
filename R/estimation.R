@@ -503,12 +503,12 @@ plot_sample_grid_search <- function(x, what = "deaths") {
     names(quants)[1:2] <- c("ymin","ymax")
 
     base_plot <- plot(x, "infections", ci = FALSE, replicates = TRUE, x_var = "date",
-                      date_0 = max(out$scan_results$inputs$data$date))
+                      date_0 = max(x$scan_results$inputs$data$date))
     base_plot <- base_plot +
       ggplot2::geom_line(ggplot2::aes(y=ymin, x=as.Date(date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=ymax, x=as.Date(date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=cases/out$scan_results$inputs$pars_obs$phi_cases,
-                                       x=as.Date(date)), out$scan_results$inputs$data)
+      ggplot2::geom_point(ggplot2::aes(y=cases/x$scan_results$inputs$pars_obs$phi_cases,
+                                       x=as.Date(date)), x$scan_results$inputs$data)
 
   }
 
@@ -527,12 +527,12 @@ plot_sample_grid_search <- function(x, what = "deaths") {
     names(quants)[1:2] <- c("ymin","ymax")
 
     base_plot <- plot(x, "deaths", ci = FALSE, replicates = TRUE, x_var = "date",
-                      date_0 = max(out$scan_results$inputs$data$date))
+                      date_0 = max(x$scan_results$inputs$data$date))
     base_plot <- base_plot +
       ggplot2::geom_line(ggplot2::aes(y=ymin, x=as.Date(date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=ymax, x=as.Date(date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=deaths/out$scan_results$inputs$pars_obs$phi_death,
-                                       x=as.Date(date)), out$scan_results$inputs$data)
+      ggplot2::geom_point(ggplot2::aes(y=deaths/x$scan_results$inputs$pars_obs$phi_death,
+                                       x=as.Date(date)), x$scan_results$inputs$data)
 
   } else {
 
