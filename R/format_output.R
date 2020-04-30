@@ -49,6 +49,73 @@ collapse_for_report <- function(d){
   }
 
 }
+
+#' Format deterministic model output as data.frame
+#'
+#' @param x squire_simulation object
+#'
+#' @return Formatted long data.frame
+#' @export
+format_deterministic_output <- function(x) {
+  index <- odin_index(x$model)
+
+  hospital_demand = c(
+    "IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2",
+    "IRec1", "IRec2","IOxNotGetLive1","IOxNotGetLive2","IOxNotGetDie1",
+    "IOxNotGetDie2")
+  ICU_demand = c(
+    "IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2",
+    "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2")
+
+  diff_variable_compartments <- list(
+    deaths = "D"
+  )
+
+  summary_variable_compartments <- list(
+    infections = c("IMild", "ICase1", "ICase2"),
+    hospital_demand = hospital_demand,
+    ICU_demand = ICU_demand
+  )
+
+  diff_data <- vapply(
+    diff_variable_compartments,
+    function(compartments) {
+      c(
+        sum(x$output[1,unlist(index[compartments])]),
+        diff(rowSums(x$output[,unlist(index[compartments])]))
+      )
+    },
+    numeric(dim(x$output)[[1]])
+  )
+
+  sum_data <- vapply(
+    summary_variable_compartments,
+    function(compartments) {
+      rowSums(x$output[,unlist(index[compartments])])
+    },
+    numeric(dim(x$output)[[1]])
+  )
+
+  aggregated <- cbind(x$output[, 't'], diff_data, sum_data)
+  colnames(aggregated)[[1]] <- 't'
+  wide_df <- as.data.frame(aggregated)
+  cols <- names(wide_df)[names(wide_df) != 't']
+  out <- reshape(
+    wide_df,
+    cols,
+    idvar = 't',
+    timevar = 'compartment',
+    direction = 'long',
+    v.names = 'value'
+  )
+  out$compartment <- vapply(
+    out$compartment,
+    function(i) cols[[i]], character(1)
+  )
+
+  out
+}
+
 #' Format model output as data.frame
 #'
 #' @param x squire_simulation object
@@ -80,14 +147,16 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   all_names_simp <- gsub("\\[.*?]", "", all_names)
 
   # Multi/Single Compartment Variables
-  single_compartments <- c("S", "IMild", "R", "D", "n_E2_I", "n_E2_ICase1", "n_E2_IMild", "delta_D")
+  single_compartments <- c("S", "IMild", "R", "D", "n_E2_I",
+                           "n_E2_ICase1", "n_E2_IMild", "delta_D")
   multi_compartments <- c("E", "ICase", "IOxGetLive", "IOxGetDie", "IOxNotGetLive", "IOxNotGetDie",
                           "IMVGetLive", "IMVGetDie", "IMVNotGetLive", "IMVNotGetDie", "IRec")
-  all_case_compartments <- unlist(index[c("IMild", "ICase1", "ICase2", "IOxGetLive1", "IOxGetLive2",
-                                          "IOxGetDie1", "IOxGetDie2", "IOxNotGetLive1", "IOxNotGetLive2",
-                                          "IOxNotGetDie1", "IOxNotGetDie2", "IMVGetLive1", "IMVGetLive2",
-                                          "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
-                                          "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
+  all_case_compartments <- unlist(
+    index[c("IMild", "ICase1", "ICase2", "IOxGetLive1", "IOxGetLive2",
+            "IOxGetDie1", "IOxGetDie2", "IOxNotGetLive1", "IOxNotGetLive2",
+            "IOxNotGetDie1", "IOxNotGetDie2", "IMVGetLive1", "IMVGetLive2",
+            "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
+            "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
 
   # are the steps not 1 apart? if so we need to sum the incident variables (infecions/deaths)
   if(diff(tail(x$output[,"step",1],2)) != 1) {
@@ -120,15 +189,18 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
 
 
   # Summary Values and Relevant Compartments
-  summary_variables <- c("deaths", "infections", "hospital_occupancy", "ICU_occupancy", "hospital_demand", "ICU_demand")
-  summary_variable_compartments <- list(deaths = "delta_D",
-                                        infections = "n_E2_I",
-                                        hospital_occupancy = c("IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2", "IRec1", "IRec2"),
-                                        ICU_occupancy = c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2"),
-                                        hospital_demand = c("IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2", "IRec1", "IRec2",
-                                                            "IOxNotGetLive1","IOxNotGetLive2","IOxNotGetDie1","IOxNotGetDie2"),
-                                        ICU_demand = c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2",
-                                                       "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2"))
+  summary_variables <- c("deaths", "infections", "hospital_occupancy",
+                         "ICU_occupancy", "hospital_demand", "ICU_demand")
+  summary_variable_compartments <- list(
+    deaths = "delta_D",
+    infections = "n_E2_I",
+    hospital_occupancy = c("IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2", "IRec1", "IRec2"),
+    ICU_occupancy = c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2"),
+    hospital_demand = c("IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2", "IRec1", "IRec2",
+                        "IOxNotGetLive1","IOxNotGetLive2","IOxNotGetDie1","IOxNotGetDie2"),
+    ICU_demand = c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2",
+                   "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2")
+  )
 
   # Check var_select contains only variables described above
   if(sum(!(var_select %in% c(single_compartments, multi_compartments, summary_variables))) > 0) {
