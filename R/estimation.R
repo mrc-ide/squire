@@ -418,19 +418,25 @@ sample_grid_scan <- function(scan_results,
 
 }
 
-
+#' squire scan plot
+#'
+#' @param x An squire_scan object
+#' @param what What scan outputs are we plotting of "likelihood" vs "probability"
+#' @param log Should the axes by plotted on log scale
+#' @param ... additional arguments affecting the plot produced.
+#'
 #' @export
-plot.squire_scan <- function(x, what = "likelihood", log = FALSE) {
+plot.squire_scan <- function(x, ..., what = "likelihood", log = FALSE) {
 
   if (what == "likelihood") {
 
     # create df
-    df <- reshape2::melt(x$mat_log_ll, c("x", "y"), value.name = "z")
+    df <- data.frame("z" = as.numeric(x$mat_log_ll))
     df$x <- x$x
     df$y <- sort(rep(x$y, length(x$x)))
 
     # make plot
-    gg <- ggplot2::ggplot(data=df, ggplot2::aes(x=x,y=y,fill=-z)) +
+    gg <- ggplot2::ggplot(data=df, ggplot2::aes(x=.data$x,y=.data$y,fill=-.data$z)) +
       ggplot2::geom_tile(color = "white") +
       ggplot2::xlab("R0") +
       ggplot2::ylab("Date") +
@@ -452,12 +458,12 @@ plot.squire_scan <- function(x, what = "likelihood", log = FALSE) {
   } else if (what == "probability") {
 
     # create df
-    df <- reshape2::melt(x$renorm_mat_LL, c("x", "y"), value.name = "z")
+    df <- data.frame("z" = as.numeric(x$mat_log_ll))
     df$x <- x$x
     df$y <- sort(rep(x$y, length(x$x)))
 
     # make plot
-    gg <- ggplot2::ggplot(data=df, ggplot2::aes(x=x,y=y,fill=z)) +
+    gg <- ggplot2::ggplot(data=df, ggplot2::aes(x=.data$x,y=.data$y,fill=.data$z)) +
       ggplot2::geom_tile(color = "white") +
       ggplot2::xlab("R0") +
       ggplot2::ylab("Date") +
@@ -480,7 +486,7 @@ plot.squire_scan <- function(x, what = "likelihood", log = FALSE) {
 }
 
 
-#' @export
+#' @noRd
 plot_sample_grid_search <- function(x, what = "deaths") {
 
   idx <- odin_index(x$model)
@@ -505,10 +511,10 @@ plot_sample_grid_search <- function(x, what = "deaths") {
     base_plot <- plot(x, "infections", ci = FALSE, replicates = TRUE, x_var = "date",
                       date_0 = max(x$scan_results$inputs$data$date))
     base_plot <- base_plot +
-      ggplot2::geom_line(ggplot2::aes(y=ymin, x=as.Date(date)), quants, linetype="dashed") +
-      ggplot2::geom_line(ggplot2::aes(y=ymax, x=as.Date(date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=cases/x$scan_results$inputs$pars_obs$phi_cases,
-                                       x=as.Date(date)), x$scan_results$inputs$data)
+      ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
+      ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
+      ggplot2::geom_point(ggplot2::aes(y=.data$cases/x$scan_results$inputs$pars_obs$phi_cases,
+                                       x=as.Date(.data$date)), x$scan_results$inputs$data)
 
   }
 
@@ -529,10 +535,10 @@ plot_sample_grid_search <- function(x, what = "deaths") {
     base_plot <- plot(x, "deaths", ci = FALSE, replicates = TRUE, x_var = "date",
                       date_0 = max(x$scan_results$inputs$data$date))
     base_plot <- base_plot +
-      ggplot2::geom_line(ggplot2::aes(y=ymin, x=as.Date(date)), quants, linetype="dashed") +
-      ggplot2::geom_line(ggplot2::aes(y=ymax, x=as.Date(date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=deaths/x$scan_results$inputs$pars_obs$phi_death,
-                                       x=as.Date(date)), x$scan_results$inputs$data)
+      ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
+      ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
+      ggplot2::geom_point(ggplot2::aes(y=.data$deaths/x$scan_results$inputs$pars_obs$phi_death,
+                                       x=as.Date(.data$date)), x$scan_results$inputs$data)
 
   } else {
 
