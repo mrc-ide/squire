@@ -77,7 +77,7 @@ run_simple_SEEIR_model <- function(R0 = 3,
                                   time_period=time_period)
 
   # Running the Model
-  mod <- simple_SEIR(user = pars)
+  mod <- simple_SEIR(user = pars, unused_user_action = "ignore")
   t <- seq(from = 1, to = time_period/dt)
   results <- mod$run(t, replicate = replicates)
 

@@ -50,7 +50,7 @@ test_that("projection works", {
   expect_gt(sum(rowSums(p1$output[,index$D,1])), sum(rowSums(p2$output[,index$D,1])))
 
   out <- format_output(p2, "infections")
-  expect_gt(mean(out$y[out$t==19]), mean(out$y[out$t==41]))
+  expect_gt(mean(out$y[out$t==19]), mean(out$y[out$t==40]))
 
   # arg checks
   p3 <- projections(t1)

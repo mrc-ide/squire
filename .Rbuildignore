@@ -12,4 +12,5 @@
 man/figures
 images
 scripts
+det_check
 ^.*\.covrignore$

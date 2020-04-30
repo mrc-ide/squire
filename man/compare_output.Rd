@@ -2,9 +2,9 @@
 % Please edit documentation in R/particle.R
 \name{compare_output}
 \alias{compare_output}
-\title{Compare model to ICU data}
+\title{Compare model to death data}
 \usage{
-compare_output(model, pars_obs, data, type = "explicit_SEIR")
+compare_output(model, pars_obs, data, type = "explicit_SEEIR_model")
 }
 \arguments{
 \item{model}{An \code{odin_model} object}
@@ -18,5 +18,5 @@ compare_output(model, pars_obs, data, type = "explicit_SEIR")
 this parameter to control the type of comparison function generated.}
 }
 \description{
-Compare the model to ICU data for use with the particle filter
+Compare the model to death data for use with the particle filter
 }

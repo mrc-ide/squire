@@ -404,7 +404,7 @@ particle_filter_data <- function(data, start_date, steps_per_day) {
 
   ## Then for each timestep we work out the start and end date
   ret <- data
-  ret$day_start <- as.integer(data$date - start_date)
+  ret$day_start <- as.integer(data$date - start_date - 1L)
   ret$day_end <- as.integer(c(ret$day_start[2:nrow(ret)], ret$day_start[nrow(ret)] + 1L))
 
   d0 <- ret[1, ]

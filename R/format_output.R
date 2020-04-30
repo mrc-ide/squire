@@ -100,7 +100,7 @@ format_deterministic_output <- function(x) {
   colnames(aggregated)[[1]] <- 't'
   wide_df <- as.data.frame(aggregated)
   cols <- names(wide_df)[names(wide_df) != 't']
-  out <- reshape(
+  out <- stats::reshape(
     wide_df,
     cols,
     idvar = 't',
@@ -168,7 +168,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
         pos <- all_case_compartments[pos]
         diff(rowSums(x$output[,pos,j]))
       }, FUN.VALUE = numeric(nt-1))
-      x$output[seq_len(nt-1),index$n_E2_I[i],] <- collect
+      x$output[1+seq_len(nt-1),index$n_E2_I[i],] <- collect
     }
 
     # assign the deaths
@@ -178,13 +178,9 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
         pos <- index$D[pos]
         diff(x$output[,pos,j])
       }, FUN.VALUE = numeric(nt-1))
-      x$output[seq_len(nt-1),index$delta_D[i],] <- collect
+      x$output[1+seq_len(nt-1),index$delta_D[i],] <- collect
     }
 
-    # remove the last time point as the infections and deaths will not have been
-    # calculated for these
-    x$output <- x$output[-nt , , , drop=FALSE]
-    nt <- nt-1
   }
 
 

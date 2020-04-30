@@ -49,7 +49,6 @@ calibrate <- function(data,
   assert_date(last_start_date)
   assert_date(data$date)
   assert_numeric(day_step)
-  assert_numeric(day_step)
   assert_numeric(n_particles)
   assert_numeric(reporting_fraction)
   assert_custom_class(squire_model, "squire_model")
@@ -64,17 +63,14 @@ calibrate <- function(data,
   if (as.Date(first_start_date) >= as.Date(last_start_date)) {
     stop("'last_start_date' must be greater than 'first_start_date'")
   }
-  # if (!all(as.Date(last_start_date) <
-  #          as.Date(c(date_R0_change, date_ICU_bed_capacity_change,
-  #                    date_hosp_bed_capacity_change, date_contact_matrix_set_change)))) {
-  #   stop("'last_start_date' must be less than all date changes")
-  # }
-
   # checks that dates are not in the future compared to our data
   if(!is.null(date_R0_change)) {
     assert_date(date_R0_change)
     if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
-      stop("Last date in date_R0_chage is greater than the last date in data")
+      stop("Last date in date_R0_change is greater than the last date in data")
+    }
+    if(as.Date(last_start_date) >= as.Date(head(date_R0_change, 1))) {
+      stop("Last date in date_R0_change is earlier than last_start_date")
     }
     assert_same_length(R0_change, date_R0_change)
   }
@@ -83,6 +79,9 @@ calibrate <- function(data,
     if(as.Date(tail(date_contact_matrix_set_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
     }
+    if(as.Date(last_start_date) >= as.Date(head(date_contact_matrix_set_change, 1))) {
+      stop("Last date in date_contact_matrix_set_change is earlier than last_start_date")
+    }
     assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
   }
   if(!is.null(date_ICU_bed_capacity_change)) {
@@ -90,12 +89,18 @@ calibrate <- function(data,
     if(as.Date(tail(date_ICU_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_ICU_bed_capacity_change is greater than the last date in data")
     }
+    if(as.Date(last_start_date) >= as.Date(head(date_ICU_bed_capacity_change, 1))) {
+      stop("Last date in date_ICU_bed_capacity_change is earlier than last_start_date")
+    }
     assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
   }
   if(!is.null(date_hosp_bed_capacity_change)) {
     assert_date(date_hosp_bed_capacity_change)
     if(as.Date(tail(date_hosp_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_hosp_bed_capacity_change is greater than the last date in data")
+    }
+    if(as.Date(last_start_date) >= as.Date(head(date_hosp_bed_capacity_change, 1))) {
+      stop("Last date in date_hosp_bed_capacity_change is earlier than last_start_date")
     }
     assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
   }
@@ -135,7 +140,7 @@ calibrate <- function(data,
   res <- sample_grid_scan(scan_results = scan_results,
                           n_sample_pairs = replicates,
                           n_particles = n_particles,
-                          forecast_days = forecast + 1, # one because we will need the extra day to work out the difference for incidence
+                          forecast_days = forecast ,
                           full_output = TRUE)
 
   # create a fake run object and fill in the required elements
@@ -184,6 +189,7 @@ calibrate <- function(data,
 
   # and fix the replicates
   r$parameters$replicates <- replicates
+  r$parameters$time_period <- diff(range(r$output[,"time",]))
 
   return(r)
 }

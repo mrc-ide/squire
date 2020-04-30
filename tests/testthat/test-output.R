@@ -153,19 +153,54 @@ test_that("squire object check and summary", {
 
 test_that("t correct in format_outputs",{
 
-  r <- calibrate(country = "Afghanistan", deaths = 6,
-                 reporting_fraction = 1, dt=0.5, replicates = 3,
-                 time_period = 365)
-  get <- format_output(r, var_select = "E", reduce_age = FALSE, combine_compartments = TRUE,
-                       date_0 = Sys.Date())
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  replicates = 2
+  R0_min = 2.6
+  R0_max = 2.6
+  R0_step = 0.1
+  first_start_date = "2020-02-01"
+  last_start_date = "2020-02-02"
+  day_step = 1
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  pars_obs = NULL
+  n_particles = 10
 
-  expect_equal(length(get$compartment), 1/0.5 * 17 * r$parameters$replicates * r$parameters$time_period)
+  r <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    replicates = replicates,
+    country = country,
+    forecast = 0
+  )
+
+  get <- format_output(r, var_select = "E", reduce_age = FALSE, combine_compartments = TRUE,
+                       date_0 = max(data$date))
+
+  expect_equal(length(get$compartment), 17 * r$parameters$replicates * nrow(r$output))
   expect_named(get, c("replicate", "age_group", "compartment", "t", "y", "date"))
 
   get <- format_output(r, var_select = "E", reduce_age = TRUE, combine_compartments = TRUE,
-                       date_0 = Sys.Date())
+                       date_0 = max(data$date))
 
-  expect_equal(length(get$compartment), 1/0.5 * r$parameters$replicates * r$parameters$time_period)
+  expect_equal(length(get$compartment),  r$parameters$replicates * nrow(r$output))
   expect_named(get, c("replicate", "compartment", "t", "y", "date"))
 
 })
@@ -173,31 +208,54 @@ test_that("t correct in format_outputs",{
 
 test_that("calibrate_output_parsing vs format_output",{
 
-  m1 <- calibrate(country = "Afghanistan", deaths = 6,
-                       reporting_fraction = 1, dt=0.5, replicates = 3,
-                       time_period = 365)
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  replicates = 2
+  R0_min = 2.6
+  R0_max = 2.6
+  R0_step = 0.1
+  first_start_date = "2020-02-01"
+  last_start_date = "2020-02-02"
+  day_step = 1
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  pars_obs = NULL
+  n_particles = 10
+
+  m1 <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    replicates = replicates,
+    country = country,
+    forecast = 0
+  )
 
   o1 <- format_output(m1, c("R","deaths","infections","hospital_demand","ICU_demand"))
-  g2 <- calibrate_output_parsing(m1)
-  expect_identical(o1$y[o1$replicate == 1 & o1$compartment == "ICU_demand"],
-                   g2$y[g2$replicate == 1 & g2$compartment == "ICU_demand"])
-
 
   index <- odin_index(m1$model)
   mv <- unlist(index[c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2",
                            "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2")])
-  expect_true(identical(rowSums(m1$output[,mv,1]),
+  expect_true(identical(as.numeric(rowSums(m1$output[,mv,1])),
                         o1$y[o1$replicate == 1 & o1$compartment == "ICU_demand"]))
 
-  expect_true(identical(rowSums(m1$output[,mv,2]),
+  expect_true(identical(as.numeric(rowSums(m1$output[,mv,2])),
                         o1$y[o1$replicate == 2 & o1$compartment == "ICU_demand"]))
-
-  expect_true(identical(rowSums(m1$output[,mv,1]),
-                        g2$y[g2$replicate == 1 & g2$compartment == "ICU_demand"]))
-
-  expect_true(identical(rowSums(m1$output[,mv,2]),
-                        g2$y[g2$replicate == 2 & g2$compartment == "ICU_demand"]))
-
 
 
 })
