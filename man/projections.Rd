@@ -7,6 +7,7 @@ matrices or bed availability}
 \usage{
 projections(
   r,
+  time_period = NULL,
   R0 = NULL,
   R0_change = NULL,
   tt_R0 = 0,
@@ -23,6 +24,10 @@ projections(
 }
 \arguments{
 \item{r}{Calibrated \code{{squire_simulation}} object.}
+
+\item{time_period}{How many days is the projection. Deafult = NULL, which will
+carry the projection forward from t = 0 in the calibration (i.e. the number
+of days set in calibrate using forecast)}
 
 \item{R0}{Numeric vector for R0 from t = 0 in the calibration.
 E.g. \code{R0 = c(2, 1)}. Default = NULL, which will use \code{R0_change}

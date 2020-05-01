@@ -58,17 +58,20 @@ get_population <-  function(country = NULL, iso3c = NULL, simple_SEIR = FALSE){
 #' Get mixing matrix
 #'
 #' @param country Country name
+#' @param iso3c ISO 3C Country Code
 #'
 #' @return Age mixing matrix
 #' @export
-get_mixing_matrix <-  function(country){
-  if(!country %in% unique(squire::population$country)){
-    stop("Country not found")
+get_mixing_matrix <-  function(country = NULL, iso3c = NULL){
+
+  if(!is.null(country) && !is.null(iso3c)) {
+    message("Both iso3c and country were provided. Country will be used")
+    iso3c <- NULL
   }
 
-  pop <- get_population(country)
+  pop <- get_population(country, iso3c)
 
-  mm <- squire::population$matrix[match(country, squire::population$country)]
+  mm <- pop$matrix[1]
   mm <- squire::contact_matrices[[mm]]
 
   return(mm)

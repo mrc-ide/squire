@@ -1,20 +1,20 @@
 test_that("beta input check work", {
   mm <- matrix(runif(4), ncol = 2)
-  expect_error(beta_est("A", mm, 1),
+  expect_error(beta_est_simple("A", mm, 1),
                "duration_infectiousness must be a positive numeric value")
-  expect_error(beta_est(1:2, mm, 1),
+  expect_error(beta_est_simple(1:2, mm, 1),
                "duration_infectiousness must be of length = 1")
-  expect_error(beta_est(-1, mm, 1),
+  expect_error(beta_est_simple(-1, mm, 1),
                "duration_infectiousness must be a positive numeric value")
 
-  expect_error(beta_est(1, mm, "A"),
+  expect_error(beta_est_simple(1, mm, "A"),
                "R0 must be a positive numeric value")
-  expect_error(beta_est(1, mm, -1),
+  expect_error(beta_est_simple(1, mm, -1),
                "R0 must be a positive numeric value")
 
-  expect_error(beta_est(1, "A", 1),
+  expect_error(beta_est_simple(1, "A", 1),
                "mixing_matrix must be a matrix")
-  expect_error(beta_est(1, data.frame(a = 1:2, b = 1:2), 1),
+  expect_error(beta_est_simple(1, data.frame(a = 1:2, b = 1:2), 1),
                "mixing_matrix must be a matrix")
 })
 
@@ -48,5 +48,24 @@ test_that("beta_explicit input check work", {
                                  prob_hosp = c(0.2,0.2),
                                  mixing_matrix = mm_na, R0 = 2),
                "mixing_matrix must not contain NAs")
+
+})
+
+
+test_that("best_est works for both models", {
+
+  mod_simp <- simple_model()
+  beta <- beta_est(squire_model = mod_simp,
+                   model_params = mod_simp$parameter_func(
+                     population = get_population("Angola", simple_SEIR = TRUE)$n,
+                     contact_matrix_set = contact_matrices[1]),
+                   R0 = 3)
+  expect_true(beta - 0.1095709 < 0.001)
+
+  mod_exp <- explicit_model()
+  beta <- beta_est(squire_model = mod_exp,
+                   model_params = mod_exp$parameter_func("Angola"),
+                   R0 = 3)
+  expect_true(beta - 0.1242782 < 0.001)
 
 })

@@ -275,3 +275,12 @@ test_that("run deterministic parameterises model correctly", {
   expect_equal(output$parameters$hosp_bed_capacity, 100000)
   expect_equal(output$parameters$ICU_bed_capacity, 1000000)
 })
+
+
+test_that("run day_return", {
+
+  tp <- 10
+  r <- run_explicit_SEEIR_model("Angola",replicates = 1, day_return = TRUE, time_period = tp)
+  expect_true(nrow(r$output) == tp+1)
+
+})

@@ -8,6 +8,9 @@
 #' requested, the simulation will use parameters chosen for the calibration run.
 #'
 #' @param r Calibrated \code{{squire_simulation}} object.
+#' @param time_period How many days is the projection. Deafult = NULL, which will
+#'   carry the projection forward from t = 0 in the calibration (i.e. the number
+#'   of days set in calibrate using forecast)
 #' @param R0 Numeric vector for R0 from t = 0 in the calibration.
 #'   E.g. \code{R0 = c(2, 1)}. Default = NULL, which will use \code{R0_change}
 #'   to alter R0 if provided.
@@ -53,6 +56,7 @@
 #'
 #' @export
 projections <- function(r,
+                        time_period = NULL,
                         R0 = NULL,
                         R0_change = NULL,
                         tt_R0 = 0,
@@ -183,8 +187,33 @@ projections <- function(r,
 
   # what are the remaining time points
   t_steps <- lapply(state_pos, function(x) {
-    tail(seq_len(ds[1]), ds[1] - x)
+    r$output[which(r$output[,1,1] > r$output[x,1,1]),1 ,1]
   })
+
+  # do we need to do more than just the remaining time from calibrate
+  if (!is.null(time_period)) {
+
+    t_diff <- diff(tail(r$output[,1,1],2))
+    t_start <- r$output[(r$output[,"time",1]==0),1,1]+t_diff
+    t_initial <- unique(stats::na.omit(r$output[1,1,]))
+
+    t_steps <- lapply(t_steps, function(x) {
+      seq(t_start, t_start - t_diff + time_period/r$parameters$dt, t_diff)
+    })
+    steps <- seq(t_initial, max(t_steps[[1]]), t_diff)
+
+    arr_new <- array(NA, dim = c((max(t_steps[[1]])/(t_diff)) + (1-t_initial),
+                                 ncol(r$output), dim(r$output)[3]))
+    arr_new[seq_len(nrow(r$output)),,] <- r$output
+    rownms <- rownames(r$output)
+    colnms <- colnames(r$output)
+    if(!is.null(rownms)) {
+      rownames(arr_new) <- as.character(as.Date(rownms[1]) + seq_len(nrow(arr_new)) - 1L)
+    }
+    r$output <- arr_new
+    r$output[,1,] <- matrix(rep(steps,r$parameters$replicates), ncol = r$parameters$replicates)
+    colnames(r$output) <- colnms
+  }
 
   # final values of R0, contacts, and beds
   finals <- t0_variables(r)
@@ -211,6 +240,9 @@ projections <- function(r,
     # second if contact_matrix_set is not provided we use the last contact_matrix_set
     if (is.null(contact_matrix_set)) {
       contact_matrix_set <- finals[[x]]$contact_matrix_set
+      baseline_contact_matrix_set <- contact_matrix_set[1]
+    } else {
+      baseline_contact_matrix_set <- contact_matrix_set[1]
     }
 
     # are we modifying it
@@ -220,13 +252,14 @@ projections <- function(r,
           contact_matrix_set[[1]]
         })
       }
+      baseline_contact_matrix_set <- contact_matrix_set[1]
       contact_matrix_set <- lapply(
         seq_len(length(contact_matrix_set_change)),
         function(x){
           contact_matrix_set[[x]]*contact_matrix_set_change[x]
         })
     }
-    baseline_contact_matrix_set <- contact_matrix_set[1]
+
 
     # third if hosp_bed_capacity is not provided we use the last hosp_bed_capacity
     if (is.null(hosp_bed_capacity)) {
@@ -264,6 +297,13 @@ projections <- function(r,
                                 r$parameters$population),
                               R0 = R0)
 
+    # Is the model still valid
+    if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {
+      r$model <- r$scan_results$inputs$model$odin_model(
+        user = r$scan_results$inputs$model_params,
+        unused_user_action = "ignore")
+    }
+
     # change these user params
     r$model$set_user(tt_beta = round(tt_R0/r$parameters$dt))
     r$model$set_user(beta_set = beta)
@@ -275,7 +315,13 @@ projections <- function(r,
     r$model$set_user(ICU_beds = ICU_bed_capacity)
 
     # run the model
-    r$model$run(step = seq_len(length(t_steps[[x]])),
+    if(diff(tail(r$output[,1,1],2)) != 1) {
+      step <- c(0,round(seq_len(length(t_steps[[x]]))/r$parameters$dt))
+    } else {
+      step <- seq_len(length(t_steps[[x]]))
+    }
+
+    r$model$run(step = step,
                 y = as.numeric(r$output[state_pos[x], initials, x, drop=TRUE]),
                 use_names = TRUE,
                 replicate = 1)
@@ -284,7 +330,11 @@ projections <- function(r,
 
   ## collect results
   for(i in seq_len(ds[3])) {
-    r$output[t_steps[[i]], -1, i] <- out[[i]][, -1, 1]
+    if(diff(tail(r$output[,"step",1],2)) != 1) {
+      r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][-1, -1, 1]
+    } else {
+      r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][, -1, 1]
+    }
   }
 
   ## append projections
@@ -302,6 +352,7 @@ projections <- function(r,
 #' @param scenarios Character vector describing the different scenarios.
 #' @param add_parms_to_scenarios Logical. Should the parameters used for the
 #'   projection runs be added to scenarios. Default = TRUE
+#' @param date_0 Date of time 0, if specified a date column will be added
 #' @inheritParams plot.squire_simulation
 #' @param ... additional arguments passed to \code{\link{format_output}}
 #'
@@ -315,6 +366,7 @@ projection_plotting <- function(r_list,
                                 ci = TRUE,
                                 q = c(0.025, 0.975),
                                 summary_f = mean,
+                                date_0 = Sys.Date(),
                                 x_var = "t", ...) {
 
 
@@ -330,7 +382,7 @@ projection_plotting <- function(r_list,
                     var_select = var_select,
                     x_var = x_var, q = q,
                     summary_f = summary_f,
-                    date_0 = Sys.Date())
+                    date_0 = date_0)
 
   if (add_parms_to_scenarios) {
     parms <- lapply(r_list,projection_inputs)
@@ -354,8 +406,8 @@ projection_plotting <- function(r_list,
     p <- p + ggplot2::geom_line(data = pd,
                                 ggplot2::aes(x = .data$x,
                                              y = .data$y,
-                                             col = .data$compartment,
-                                             linetype = .data$Scenario,
+                                             col = .data$Scenario,
+                                             linetype = .data$compartment,
                                              group = interaction(.data$compartment,
                                                                  .data$replicate,
                                                                  .data$Scenario)),
@@ -368,8 +420,8 @@ projection_plotting <- function(r_list,
     }
     p <- p + ggplot2::geom_line(data = pds,
                                 ggplot2::aes(x = .data$x, y = .data$y,
-                                             col = .data$compartment,
-                                             linetype = .data$Scenario))
+                                             col = .data$Scenario,
+                                             linetype = .data$compartment))
   }
 
   if(ci){
@@ -380,8 +432,8 @@ projection_plotting <- function(r_list,
                                   ggplot2::aes(x = .data$x,
                                                ymin = .data$ymin,
                                                ymax = .data$ymax,
-                                               fill = .data$compartment,
-                                               linetype = .data$Scenario),
+                                               fill = .data$Scenario,
+                                               linetype = .data$compartment),
                                   alpha = 0.25, col = "black")
   }
 
@@ -391,11 +443,76 @@ projection_plotting <- function(r_list,
     ggplot2::scale_fill_discrete(guide = FALSE) +
     ggplot2::xlab("Time") +
     ggplot2::ylab("N") +
-    ggplot2::theme_bw() +
-    ggplot2::guides(col = ggplot2::guide_legend(ncol = 2))
+    ggplot2::theme_bw()
 
   return(p)
 
+
+}
+
+## Final time varying variables at t = 0 in calibrate
+#' @noRd
+t0_variables <- function(r) {
+
+  dims <- dim(r$output)
+
+  # is this the outputs of a grid scan
+  if("scan_results" %in% names(r)) {
+
+    # grab the final R0, contact matrix and bed capacity.
+    ret <- lapply(seq_len(dims[3]), function(x) {
+
+      if(!is.null(r$interventions$R0_change)) {
+        R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change, 1)
+      } else {
+        R0 <- r$replicate_parameters$R0[x]
+      }
+      contact_matrix_set <- tail(r$parameters$contact_matrix_set,1)
+
+      hosp_bed_capacity <- tail(r$parameters$hosp_bed_capacity,1)
+      ICU_bed_capacity <- tail(r$parameters$ICU_bed_capacity,1)
+
+      return(list(
+        R0 = R0,
+        contact_matrix_set = contact_matrix_set,
+        hosp_bed_capacity = hosp_bed_capacity,
+        ICU_bed_capacity = ICU_bed_capacity))
+    })
+
+  } else {
+
+    # what state time point do we want
+    state_pos <- vapply(seq_len(dims[3]), function(x) {
+      which(r$output[,"time",x] == 0)
+    }, FUN.VALUE = numeric(1))
+
+    # build list of the final variables that change
+    ret <- lapply(seq_len(dims[3]), function(i) {
+
+      last <- tail(which(r$parameters$tt_R0 < state_pos[i]), 1)
+      R0 <- r$parameters$R0[last]
+
+      last <- tail(which(r$parameters$tt_contact_matrix < state_pos[i]), 1)
+      contact_matrix_set <- r$parameters$contact_matrix_set[last]
+
+      last <- tail(which(r$parameters$tt_hosp_beds < state_pos[i]), 1)
+      hosp_bed_capacity <- r$parameters$hosp_bed_capacity[last]
+
+      last <- tail(which(r$parameters$tt_ICU_beds < state_pos[i]), 1)
+      ICU_bed_capacity <- r$parameters$ICU_bed_capacity[last]
+
+      return(list(
+        R0 = R0,
+        contact_matrix_set = contact_matrix_set,
+        hosp_bed_capacity = hosp_bed_capacity,
+        ICU_bed_capacity = ICU_bed_capacity
+      ))
+
+    })
+
+  }
+
+  return(ret)
 
 }
 
@@ -407,11 +524,11 @@ projection_inputs <- function(p3){
     return("(No interventions)")
   } else {
 
-    pos <- seq_along(p3$projection_args)[-1]
+    pos <- seq_along(p3$projection_args)[-(1:2)]
     nms <- p3$projection_args[pos]
 
     cat_f <- function(x, c = ""){
-      if(!is.null(x[[1]])) {
+      if(!is.null(x[[1]]) && (is.null(x[[3]]) || is.null(x[[2]]))) {
         paste0(c, names(x[1]), ": ", paste0(x[[1]], collapse = ", "), " @ t = ", paste0(x[[3]], collapse = ", "))
       } else if(!is.null(x[[2]])) {
         paste0(c, names(x[2]), ": ", paste0(x[[2]]*100,"%",collapse=", "), " @ t = ", paste0(x[[3]], collapse = ", "))
@@ -423,7 +540,7 @@ projection_inputs <- function(p3){
     paste0("\n",cat_f(nms[1:3], "("),
            cat_f(nms[4:6],", "),
            cat_f(nms[7:9],", "),
-           cat_f(nms[10:12],", "),")")
+           cat_f(nms[10:12],")"))
 
   }
 }

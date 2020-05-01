@@ -54,6 +54,11 @@ squire_simulation_plot_prep <- function(x,
     pd$x <- round(pd$x, ceiling(log10(1/x$parameters$dt)))
   }
 
+  # remove any NA rows (due to different start dates)
+  if(sum(is.na(pd$t) | is.na(pd$y))>0) {
+  pd <- pd[-which(is.na(pd$t) | is.na(pd$y)),]
+  }
+
   # Format summary data
   pds <- pd %>%
     dplyr::group_by(.data$x, .data$compartment) %>%
@@ -67,7 +72,7 @@ squire_simulation_plot_prep <- function(x,
 
 #' squire simulation plot
 #'
-#' @param x An iccm_simulation object
+#' @param x An squire_simulation object
 #' @param replicates Plot replicates
 #' @param summarise Logical, add summary line
 #' @param ci logical add confidence interval ribbon
@@ -78,6 +83,9 @@ squire_simulation_plot_prep <- function(x,
 #' @param x_var X variable to use for plotting (default is \code{"t"},
 #'   but can be set to, \code{"date"}, if \code{date_0} provided), which will
 #'   cause the date to be plotted rather than time.
+#' @param particle_fit If the squire_simulation provided is the result of
+#'   running the particle filter, do we want to just plot the fit. Default =
+#'   FALSE
 #' @param ... additional arguments affecting the plot produced.
 #'
 #' @export
@@ -87,8 +95,14 @@ plot.squire_simulation <- function(x, var_select = NULL,
                                    ci = TRUE,
                                    q = c(0.025, 0.975),
                                    summary_f = mean,
-                                   x_var = "t", ...){
+                                   x_var = "t",
+                                   particle_fit = FALSE,
+                                   ...){
 
+  # are we just wanting to plot the fit to data
+  if (particle_fit) {
+    return(plot_sample_grid_search(x, ...))
+  }
 
   # summarise accordingly
   pds <- squire_simulation_plot_prep(x = x,

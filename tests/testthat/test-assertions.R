@@ -244,6 +244,19 @@ test_that("assert_list working correctly", {
 })
 
 #------------------------------------------------
+test_that("assert_date working correctly", {
+
+  expect_true(assert_date(Sys.Date()))
+  expect_true(assert_date(as.character(Sys.Date())))
+
+  expect_error(assert_date(NULL))
+  expect_error(assert_date(5))
+  expect_error(assert_date("jibebers"))
+
+})
+
+
+#------------------------------------------------
 test_that("assert_dataframe working correctly", {
   expect_true(assert_dataframe(data.frame(x = 1:5)))
 

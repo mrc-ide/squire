@@ -2,7 +2,7 @@
 % Please edit documentation in R/check.R
 \name{init_check_explicit}
 \alias{init_check_explicit}
-\title{Check and set up initial values for explict model}
+\title{Check and set up initial values for explicit model}
 \usage{
 init_check_explicit(init, population, seeding_cases = 20)
 }
@@ -18,5 +18,5 @@ which will cause population to be sourced from \code{country}}
 Checked initial values data.frame
 }
 \description{
-Check and set up initial values for explict model
+Check and set up initial values for explicit model
 }

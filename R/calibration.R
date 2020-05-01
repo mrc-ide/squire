@@ -1,220 +1,287 @@
-#' Calibrate deaths
+#' Calibrate via particle filter grid search using time series of deaths
 #'
-#' @param deaths Number of observed deaths
-#' @param R0 R0 to be passed to \code{\link{run_explicit_SEEIR_model}}.
-#'   Default = 3
-#' @param R0_scan Vector or R0 values to sample from to introduce uncertainty
-#'   in predictions. Default = NULL, which will not scan. If provided, the first
-#'   value in \code{R0} will be drawn from \code{R0_scan}
-#' @param replicates Replicates to be passed to
-#'   \code{\link{run_explicit_SEEIR_model}}. Default = 100
 #' @param reporting_fraction Reporting fraction. Numeric for what proportion of
 #'   the total deaths the reported deaths represent. E.g. 0.5 results in
-#'   the model calibrating to twice the deaths provided by \code{deaths}
-#' @param seeding_age_groups Age groups for seeding
-#' @param min_seeding_cases Minimum seeding cases
-#' @param max_seeding_cases Maximum seeding cases
-#' @param ... Further aguments for \code{run_explicit_SEEIR_model()}
-#' @inheritParams run_explicit_SEEIR_model
+#'   the model calibrating to twice the deaths provided by \code{data$deaths}
+#' @param replicates Replicates to be run. Default = 100
+#' @param forecast Number of days to forecast forward. Default = 0
+#' @param baseline_hosp_bed_capacity The starting number of hospital beds before
+#'   the epidemic started. Default = NULL, which will use the hospital beds data
+#'   for the country provided. If no country is provided then this is 5/1000 of
+#'   the population
+#' @param hosp_bed_capacity Number of hospital beds at each date specified in
+#'   \code{date_hosp_bed_capacity_change}. Must be same length as
+#'   \code{date_hosp_bed_capacity_change}.
+#' @param baseline_ICU_bed_capacity The starting number of ICU beds before
+#'   the epidemic started. Default = NULL, which will use the hospital beds data
+#'   for the country provided. If no country is provided then this is 3/100 of
+#'   hospital beds
+#' @param ICU_bed_capacity Number of ICU beds at each date specified in
+#'   \code{date_ICU_bed_capacity_change}. Must be same length as
+#'   \code{date_ICU_bed_capacity_change}.
+#' @param baseline_contact_matrix The starting contact matrix prior to any changes
+#'   due to interventions or otherwise. Default = NULL, which will use the contact
+#'   matrix associated with the coutnry provided.
+#' @param contact_matrix_set List of contact matrices to be used from the dates
+#'   provided in \code{date_contact_matrix_set_change}.Must be same length as
+#'   \code{date_contact_matrix_set_change}
+#' @param ... Further aguments for the model parameter function. If using the
+#'   \code{\link{explicit_model}} (default) this will be
+#'   \code{parameters_explicit_SEEIR}.
+#'
+#' @inheritParams parameters_explicit_SEEIR
+#' @inheritParams scan_R0_date
 #'
 #' @export
-#' @return List of time adjusted squire_simulations
-calibrate <- function(deaths,
+#' @return List of dated squire simulations
+#'
+calibrate <- function(data,
+                      R0_min,
+                      R0_max,
+                      R0_step,
+                      first_start_date,
+                      last_start_date,
+                      day_step,
+                      squire_model = explicit_model(),
+                      pars_obs = NULL,
+                      forecast = 0,
+                      n_particles = 100,
                       reporting_fraction = 1,
+                      replicates = 100,
+                      date_R0_change = NULL,
+                      R0_change = NULL,
+                      date_ICU_bed_capacity_change = NULL,
+                      baseline_ICU_bed_capacity = NULL,
+                      ICU_bed_capacity = NULL,
+                      date_hosp_bed_capacity_change = NULL,
+                      baseline_hosp_bed_capacity = NULL,
+                      hosp_bed_capacity = NULL,
+                      date_contact_matrix_set_change = NULL,
+                      baseline_contact_matrix = NULL,
+                      contact_matrix_set = NULL,
                       country = NULL,
                       population = NULL,
-                      contact_matrix_set = NULL,
-                      seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
-                      min_seeding_cases = 5,
-                      max_seeding_cases = 50,
-                      R0 = 3,
-                      R0_scan = NULL,
-                      replicates = 100,
                       ...) {
 
-
-  # argument checks
-  assert_numeric(deaths)
+  # Asserts on arguments
+  assert_dataframe(data)
+  assert_numeric(R0_min)
+  assert_numeric(R0_max)
+  assert_numeric(R0_step)
+  assert_date(first_start_date)
+  assert_date(last_start_date)
+  assert_date(data$date)
+  assert_numeric(day_step)
+  assert_numeric(n_particles)
   assert_numeric(reporting_fraction)
-  assert_bounded(reporting_fraction, 0, 1)
-  assert_greq(deaths, 1)
-  assert_gr(R0[1], 1)
-
-  # Handle country population args
-  cpm <- parse_country_population_mixing_matrix(country = country,
-                                                population = population,
-                                                contact_matrix_set = contact_matrix_set)
-  country <- cpm$country
-  population <- cpm$population
-  contact_matrix_set <- cpm$contact_matrix_set
-
-  # getting indices for relevant age groups where seeding cases occurred
-  age_groups <- c("0-5", "5-10", "10-15", "15-20", "20-25", "25-30", "30-35",
-                  "35-40", "40-45", "45-50", "50-55", "55-60", "60-65", "65-70",
-                  "70-75", "75-80", "80+")
-  if (!all(seeding_age_groups %in% age_groups)) {
-    stop("inputted age groups not valid")
+  assert_custom_class(squire_model, "squire_model")
+  assert_bounded(reporting_fraction, 0, 1, inclusive_left = FALSE, inclusive_right = TRUE)
+  assert_in("date", names(data))
+  assert_in("deaths", names(data))
+  assert_same_length(R0_change, date_R0_change)
+  if(!is.null(contact_matrix_set)) {
+    assert_list(contact_matrix_set)
   }
-  age_group_indices <- which(age_groups %in% seeding_age_groups)
-  num_age_groups <- length(age_group_indices)
+  assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
+  assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
+  assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
+
+  # check grid params are okay
+  if (as.Date(last_start_date) >= as.Date(data$date[1])-1) {
+    stop("'last_start_date' must be at least 2 days before the first date in data")
+  }
+  if (as.Date(first_start_date) >= as.Date(last_start_date)) {
+    stop("'last_start_date' must be greater than 'first_start_date'")
+  }
+
+  # checks that dates are not in the future compared to our data
+  if(!is.null(date_R0_change)) {
+    assert_date(date_R0_change)
+    if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_R0_change is greater than the last date in data")
+    }
+    if(as.Date(last_start_date) >= as.Date(head(date_R0_change, 1))) {
+      stop("First date in date_R0_change is earlier than last_start_date")
+    }
+  }
+
+  # handle contact matrix changes
+  if(!is.null(date_contact_matrix_set_change)) {
+
+    assert_date(date_contact_matrix_set_change)
+    assert_list(contact_matrix_set)
+
+    if(is.null(baseline_contact_matrix)) {
+      stop("baseline_contact_matrix can't be NULL if date_contact_matrix_set_change is provided")
+    }
+    if(as.Date(tail(date_contact_matrix_set_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
+    }
+    if(as.Date(last_start_date) >= as.Date(head(date_contact_matrix_set_change, 1))) {
+      stop("First date in date_contact_matrix_set_change is earlier than last_start_date")
+    }
+
+    # Get in correct format
+    if(is.matrix(baseline_contact_matrix)) {
+      baseline_contact_matrix <- list(baseline_contact_matrix)
+    }
+
+    tt_contact_matrix <- c(0, seq_len(length(date_contact_matrix_set_change)))
+    contact_matrix_set <- append(baseline_contact_matrix, contact_matrix_set)
+
+  } else {
+    tt_contact_matrix <- 0
+    contact_matrix_set <- NULL
+  }
+
+  # handle ICU changes
+  if(!is.null(date_ICU_bed_capacity_change)) {
+
+    assert_date(date_ICU_bed_capacity_change)
+    assert_vector(ICU_bed_capacity)
+    assert_numeric(ICU_bed_capacity)
+
+    if(is.null(baseline_ICU_bed_capacity)) {
+      stop("baseline_ICU_bed_capacity can't be NULL if date_ICU_bed_capacity_change is provided")
+    }
+    assert_numeric(baseline_ICU_bed_capacity)
+    if(as.Date(tail(date_ICU_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_ICU_bed_capacity_change is greater than the last date in data")
+    }
+    if(as.Date(last_start_date) >= as.Date(head(date_ICU_bed_capacity_change, 1))) {
+      stop("First date in date_ICU_bed_capacity_change is earlier than last_start_date")
+    }
+
+    tt_ICU_beds <- c(0, seq_len(length(date_ICU_bed_capacity_change)))
+    ICU_bed_capacity <- c(baseline_ICU_bed_capacity, ICU_bed_capacity)
+
+  } else {
+    tt_ICU_beds <- 0
+    ICU_bed_capacity <- NULL
+  }
+
+  # handle hosp bed changed
+  if(!is.null(date_hosp_bed_capacity_change)) {
+
+    assert_date(date_hosp_bed_capacity_change)
+    assert_vector(hosp_bed_capacity)
+    assert_numeric(hosp_bed_capacity)
+
+    if(is.null(baseline_hosp_bed_capacity)) {
+      stop("baseline_hosp_bed_capacity can't be NULL if date_hosp_bed_capacity_change is provided")
+    }
+    assert_numeric(baseline_hosp_bed_capacity)
+    if(as.Date(tail(date_hosp_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_hosp_bed_capacity_change is greater than the last date in data")
+    }
+    if(as.Date(last_start_date) >= as.Date(head(date_hosp_bed_capacity_change, 1))) {
+      stop("First date in date_hosp_bed_capacity_change is earlier than last_start_date")
+    }
+
+    tt_hosp_beds <- c(0, seq_len(length(date_hosp_bed_capacity_change)))
+    hosp_bed_capacity <- c(baseline_hosp_bed_capacity, hosp_bed_capacity)
+
+  } else {
+    tt_hosp_beds <- 0
+    hosp_bed_capacity <- NULL
+  }
+
+  # make the date definitely a date
+  data$date <- as.Date(as.character(data$date))
 
   # adjust for reporting fraction
-  true_deaths <- deaths / reporting_fraction
+  data$deaths <- (data$deaths/reporting_fraction)
 
-  # generating the seeding cases for each of the replicates
-  E1_0 <- lapply(seq_len(replicates), function(x) {
-    seeding_cases <- rep(0, length.out = length(population))
-    raw_seeding_cases <- round(stats::runif(n = 1, min = min_seeding_cases, max = max_seeding_cases))
-    seeding_cases[age_group_indices] <- as.vector(stats::rmultinom(1,
-                                                            size = raw_seeding_cases,
-                                                            prob = rep(1/num_age_groups,
-                                                                       num_age_groups)))
-    seeding_cases
-  })
+  # build model parameters
+  model_params <- squire_model$parameter_func(country = country,
+                                              population = population,
+                                              contact_matrix_set = contact_matrix_set,
+                                              tt_contact_matrix = tt_contact_matrix,
+                                              hosp_bed_capacity = hosp_bed_capacity,
+                                              tt_hosp_beds = tt_hosp_beds,
+                                              ICU_bed_capacity = ICU_bed_capacity,
+                                              tt_ICU_beds = tt_ICU_beds,
+                                              ...)
 
-  # sample our R0_scan
-  if (!is.null(R0_scan)) {
+  # construct scan
+  scan_results <- scan_R0_date(R0_min = R0_min,
+                               R0_max = R0_max,
+                               R0_step = R0_step,
+                               first_start_date = first_start_date,
+                               last_start_date = last_start_date,
+                               day_step = day_step,
+                               data = data,
+                               model_params = model_params,
+                               R0_change = R0_change,
+                               date_R0_change = date_R0_change,
+                               date_contact_matrix_set_change = date_contact_matrix_set_change,
+                               date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+                               date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
+                               squire_model = squire_model,
+                               n_particles = n_particles)
 
-    # check is numeric
-    assert_numeric(R0_scan)
+  # carry out sims drawn from the grid
+  res <- sample_grid_scan(scan_results = scan_results,
+                          n_sample_pairs = replicates,
+                          n_particles = n_particles,
+                          forecast_days = forecast ,
+                          full_output = TRUE)
 
-    # sample for R0_scan
-    if (length(R0_scan) == 1) {
-      R0_scan <- rep(R0_scan, replicates)
-    } else {
-      R0_scan <- sample(R0_scan, replicates, TRUE)
+  # create a fake run object and fill in the required elements
+  r <- squire_model$run_func(country = country,
+                             contact_matrix_set = contact_matrix_set,
+                             tt_contact_matrix = tt_contact_matrix,
+                             hosp_bed_capacity = hosp_bed_capacity,
+                             tt_hosp_beds = tt_hosp_beds,
+                             ICU_bed_capacity = ICU_bed_capacity,
+                             tt_ICU_beds = tt_ICU_beds,
+                             population = population,
+                             replicates = 1,
+                             time_period = max(tt_contact_matrix,tt_hosp_beds,tt_ICU_beds,1),
+                             ...)
+
+  # first let's create the output
+  names(res)[names(res) == "trajectories"] <- "output"
+  dimnames(res$output) <- list(dimnames(res$output)[[1]], dimnames(r$output)[[2]], NULL)
+  r$output <- res$output
+
+  # and adjust the time as before
+  full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
+  saved_full <- r$output[,"time",full_row]
+  for(i in seq_len(replicates)) {
+    na_pos <- which(is.na(r$output[,"time",i]))
+    full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
+    if(length(na_pos) > 0) {
+      full_to_place[na_pos] <- NA
     }
-
-    R0[1] <- R0_scan[1]
-  } else {
-    R0_scan <- rep(R0[1], replicates)
+    r$output[,"time",i] <- full_to_place
   }
 
+  # second let's recreate the output
+  r$model <- res$inputs$model$odin_model(
+    user = res$inputs$model_params, unused_user_action = "ignore"
+  )
 
-  # run model with fixed day step (to match up with daily deaths)
-  r <- run_explicit_SEEIR_model(population = population,
-                                contact_matrix_set = contact_matrix_set,
-                                replicates = 1,
-                                R0 = R0,
-                                ...)
+  # we will add the interventions here so that we now what times are needed for projection
+  r$interventions <- list(R0_change = R0_change,
+                          date_R0_change = date_R0_change,
+                          date_contact_matrix_set_change = date_contact_matrix_set_change,
+                          contact_matrix_set = contact_matrix_set,
+                          date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+                          ICU_bed_capacity = ICU_bed_capacity,
+                          date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
+                          hosp_bed_capacity = hosp_bed_capacity)
 
-  # get model run outputs
-  t <- seq(from = 1, to = r$parameters$time_period / r$parameters$dt)
-  nt <- length(t)
 
-  # get the index for looking up D and R
-  index <- odin_index(r$model)
+  # as well as adding the scan_results so it's easy to draw from the scan again in the future
+  r$scan_results <- scan_results
 
-  # check that this reached the deaths
-  while (sum(r$output[nt, index$D, 1]) < deaths) {
-    r <- run_explicit_SEEIR_model(population = population,
-                                  contact_matrix_set = contact_matrix_set,
-                                  replicates = 1,
-                                  R0 = R0,
-                                  ...)
-  }
+  # and add the parameters that changed between each simulation, i.e. drawn from gris
+  r$replicate_parameters <- res$param_grid
 
-  # assign to our results
-  out <- list()
-  out[[1]] <- r
-
-  # what is the beta for updating in each rep
-  beta <- r$model$contents()$beta_set
-
-  # running and storing the model output for each of the different initial seeding cases
-  for(i in 2:replicates) {
-    r$model$set_user(E1_0 = E1_0[[i]])
-    beta[1] <- beta_est_explicit(dur_IMild = r$parameters$dur_IMild,
-                      dur_ICase = r$parameters$dur_ICase,
-                      prob_hosp = r$parameters$prob_hosp,
-                      mixing_matrix =  process_contact_matrix_scaled_age(r$parameters$contact_matrix_set[[1]], r$parameters$population),
-                      R0 = R0_scan[i])
-    r$model$set_user(beta_set = beta)
-    r$output <- r$model$run(t, replicate = 1)
-    while (sum(r$output[nt, index$D, 1]) < deaths) {
-      r$output <- r$model$run(t, replicate = 1)
-    }
-    out[[i]] <- r
-  }
-
-  # Get deaths timepoint
-  deaths_sim <- lapply(out, format_output, var_select = "D")
-  times <- sapply(deaths_sim, function(x){
-    x$t[x$y >= true_deaths][1]
-  })
-
-  # Adjust time
-  for(i in 1:length(out)){
-    out[[i]]$output[,"time",] <- out[[i]]$output[,"time",] - times[i]
-  }
-
-  outarray <- array(NA, dim = c(nrow(out[[1]]$output), ncol(out[[1]]$output), replicates))
-  for(i in 1:length(out)){
-    outarray[,,i] <- out[[i]]$output
-  }
-  colnames(outarray) <- names(r$output[1,,1])
-  r$output <- outarray
+  # and fix the replicates
   r$parameters$replicates <- replicates
-  r$parameters$R0_scan <- R0_scan
+  r$parameters$time_period <- diff(range(r$output[,"time",]))
 
   return(r)
-}
-
-
-## Index locations of outputs in odin model
-#' @noRd
-odin_index <- function(model) {
-  n_out <- environment(model$initialize)$private$n_out %||% 0
-  n_state <- length(model$initial())
-  model$transform_variables(seq_len(1L + n_state + n_out))
-}
-
-## Take odin state and calculate sum across ages in a replicate and vectorise
-#' @noRd
-odin_sv <- function(state, replicates, nt, reduce_age = TRUE) {
-  if (reduce_age) {
-    as.numeric(vapply(seq_len(replicates), function(x) {
-      rowSums(state[,,x])
-    }, FUN.VALUE = double(nt)))
-  } else { # note: whole age-group results for single replicate produced, then next age-group etc
-    as.numeric(vapply(seq_len(replicates), function(x) {
-      state[, , x]
-    }, FUN.VALUE = rep(double(nt), dim(state)[2])))
-  }
-}
-
-## Final time varying variables at t = 0 in calibrate
-#' @noRd
-t0_variables <- function(r) {
-
-  dims <- dim(r$output)
-
-  # what state time point do we want
-  state_pos <- vapply(seq_len(dims[3]), function(x) {
-    which(r$output[,"time",x] == 0)
-  }, FUN.VALUE = numeric(1))
-
-  lapply(seq_len(dims[3]), function(i) {
-
-    last <- tail(which(r$parameters$tt_R0 < state_pos[i]), 1)
-    R0 <- r$parameters$R0[last]
-
-    last <- tail(which(r$parameters$tt_contact_matrix < state_pos[i]), 1)
-    contact_matrix_set <- r$parameters$contact_matrix_set[last]
-
-    last <- tail(which(r$parameters$tt_hosp_beds < state_pos[i]), 1)
-    hosp_bed_capacity <- r$parameters$hosp_bed_capacity[last]
-
-    last <- tail(which(r$parameters$tt_ICU_beds < state_pos[i]), 1)
-    ICU_bed_capacity <- r$parameters$ICU_bed_capacity[last]
-
-    return(list(
-      R0 = R0,
-      contact_matrix_set = contact_matrix_set,
-      hosp_bed_capacity = hosp_bed_capacity,
-      ICU_bed_capacity = ICU_bed_capacity
-    ))
-
-  })
-
 }

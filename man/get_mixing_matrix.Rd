@@ -4,10 +4,12 @@
 \alias{get_mixing_matrix}
 \title{Get mixing matrix}
 \usage{
-get_mixing_matrix(country)
+get_mixing_matrix(country = NULL, iso3c = NULL)
 }
 \arguments{
 \item{country}{Country name}
+
+\item{iso3c}{ISO 3C Country Code}
 }
 \value{
 Age mixing matrix

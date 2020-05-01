@@ -1,3 +1,14 @@
+# squire 0.4.0
+
+* `calibrate` now uses particle filter. See README for examples (#12)
+  * Dates are to be provided for timings of interventions before today (#44, #17)
+  * Custom populations, contact matrices and bed capacity allowed (#73, #80, #28, #16)
+  * Increased modularity for new models (#62, #61, #49)
+  * Returns lieklihood of different baseline R0s and start dates (#14)
+* `get_mixing_matrix` takes iso3c (#84)
+* Number of plotting enhancement (#72, #69)
+* Parameter references vignette and website update (#13, #1, #5, #78)
+
 # squire 0.3.0
 
 * `projection` function for doing scenario projections

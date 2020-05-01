@@ -2,29 +2,110 @@
 % Please edit documentation in R/calibration.R
 \name{calibrate}
 \alias{calibrate}
-\title{Calibrate deaths}
+\title{Calibrate via particle filter grid search using time series of deaths}
 \usage{
 calibrate(
-  deaths,
+  data,
+  R0_min,
+  R0_max,
+  R0_step,
+  first_start_date,
+  last_start_date,
+  day_step,
+  squire_model = explicit_model(),
+  pars_obs = NULL,
+  forecast = 0,
+  n_particles = 100,
   reporting_fraction = 1,
+  replicates = 100,
+  date_R0_change = NULL,
+  R0_change = NULL,
+  date_ICU_bed_capacity_change = NULL,
+  baseline_ICU_bed_capacity = NULL,
+  ICU_bed_capacity = NULL,
+  date_hosp_bed_capacity_change = NULL,
+  baseline_hosp_bed_capacity = NULL,
+  hosp_bed_capacity = NULL,
+  date_contact_matrix_set_change = NULL,
+  baseline_contact_matrix = NULL,
+  contact_matrix_set = NULL,
   country = NULL,
   population = NULL,
-  contact_matrix_set = NULL,
-  seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
-  min_seeding_cases = 5,
-  max_seeding_cases = 50,
-  R0 = 3,
-  R0_scan = NULL,
-  replicates = 100,
   ...
 )
 }
 \arguments{
-\item{deaths}{Number of observed deaths}
+\item{data}{Deaths data to fit to. See \code{example_deaths.csv}
+and \code{particle_filter_data()}}
+
+\item{R0_min}{Minimum value of R0 in the search}
+
+\item{R0_max}{Maximum value of R0 in the search}
+
+\item{R0_step}{Step to increment R0 between min and max}
+
+\item{first_start_date}{Earliest start date as 'yyyy-mm-dd'}
+
+\item{last_start_date}{Latest start date as 'yyyy-mm-dd'}
+
+\item{day_step}{Step to increment date in days}
+
+\item{squire_model}{A squire model. Default = \code{explicit_SEIR()}}
+
+\item{pars_obs}{list of parameters to use for the comparison function.}
+
+\item{forecast}{Number of days to forecast forward. Default = 0}
+
+\item{n_particles}{Number of particles. Positive Integer. Default = 100}
 
 \item{reporting_fraction}{Reporting fraction. Numeric for what proportion of
 the total deaths the reported deaths represent. E.g. 0.5 results in
-the model calibrating to twice the deaths provided by \code{deaths}}
+the model calibrating to twice the deaths provided by \code{data$deaths}}
+
+\item{replicates}{Replicates to be run. Default = 100}
+
+\item{date_R0_change}{Calendar dates at which R0_change occurs.
+Defaut = NULL, i.e. no change in R0}
+
+\item{R0_change}{Numeric vector for relative changes in R0. Default = NULL,
+i.e. no change in R0}
+
+\item{date_ICU_bed_capacity_change}{Calendar dates at which ICU bed
+capacity changes set in \code{model_params} change.
+Defaut = NULL, i.e. no change}
+
+\item{baseline_ICU_bed_capacity}{The starting number of ICU beds before
+the epidemic started. Default = NULL, which will use the hospital beds data
+for the country provided. If no country is provided then this is 3/100 of
+hospital beds}
+
+\item{ICU_bed_capacity}{Number of ICU beds at each date specified in
+\code{date_ICU_bed_capacity_change}. Must be same length as
+\code{date_ICU_bed_capacity_change}.}
+
+\item{date_hosp_bed_capacity_change}{Calendar dates at which hospital bed
+capacity changes set in \code{model_params} change.
+Defaut = NULL, i.e. no change}
+
+\item{baseline_hosp_bed_capacity}{The starting number of hospital beds before
+the epidemic started. Default = NULL, which will use the hospital beds data
+for the country provided. If no country is provided then this is 5/1000 of
+the population}
+
+\item{hosp_bed_capacity}{Number of hospital beds at each date specified in
+\code{date_hosp_bed_capacity_change}. Must be same length as
+\code{date_hosp_bed_capacity_change}.}
+
+\item{date_contact_matrix_set_change}{Calendar dates at which the contact matrices
+set in \code{model_params} change. Defaut = NULL, i.e. no change}
+
+\item{baseline_contact_matrix}{The starting contact matrix prior to any changes
+due to interventions or otherwise. Default = NULL, which will use the contact
+matrix associated with the coutnry provided.}
+
+\item{contact_matrix_set}{List of contact matrices to be used from the dates
+provided in \code{date_contact_matrix_set_change}.Must be same length as
+\code{date_contact_matrix_set_change}}
 
 \item{country}{Character for country beign simulated. WIll be used to
 generate \code{population} and \code{contact_matrix_set} if
@@ -34,30 +115,13 @@ unprovided. Either \code{country} or \code{population} and
 \item{population}{Population vector (for each age group). Default = NULL,
 which will cause population to be sourced from \code{country}}
 
-\item{contact_matrix_set}{Contact matrices used in simulation. Default =
-NULL, which will generate this based on the \code{country}.}
-
-\item{seeding_age_groups}{Age groups for seeding}
-
-\item{min_seeding_cases}{Minimum seeding cases}
-
-\item{max_seeding_cases}{Maximum seeding cases}
-
-\item{R0}{R0 to be passed to \code{\link{run_explicit_SEEIR_model}}.
-Default = 3}
-
-\item{R0_scan}{Vector or R0 values to sample from to introduce uncertainty
-in predictions. Default = NULL, which will not scan. If provided, the first
-value in \code{R0} will be drawn from \code{R0_scan}}
-
-\item{replicates}{Replicates to be passed to
-\code{\link{run_explicit_SEEIR_model}}. Default = 100}
-
-\item{...}{Further aguments for \code{run_explicit_SEEIR_model()}}
+\item{...}{Further aguments for the model parameter function. If using the
+\code{\link{explicit_model}} (default) this will be
+\code{parameters_explicit_SEEIR}.}
 }
 \value{
-List of time adjusted squire_simulations
+List of dated squire simulations
 }
 \description{
-Calibrate deaths
+Calibrate via particle filter grid search using time series of deaths
 }

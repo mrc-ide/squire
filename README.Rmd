@@ -25,6 +25,16 @@ knitr::opts_chunk$set(
 
 squire enables users to simulate models of SARS-CoV-2 epidemics. This is done using an age-structured SEIR model that also explicitly considers healthcare capacity and disease severity. 
 
+## IMPORTANT NOTES
+
+:warning: This code is released with no support. Please submit any questions or bugs as [issues](https://github.com/mrc-ide/squire/issues) and we will try to address them as quickly as possible.
+
+:warning: This model is in active development and so parameter name and behaviours, and output file formats will change without notice.
+
+:warning: The model is stochastic. Multiple runs with different seeds should be undertaken to see average behaviour.
+
+:warning: As with any mathematical model, it is easy to misconfigure inputs and therefore get meaningless outputs. Please contact the authors if you intend to publish results using `squire`.
+
 ## Overview
 
 squire is a package enabling users to quickly and easily generate calibrated estimates of SARS-CoV-2 epidemic trajectories under different control scenarios. It consists of the following:
@@ -302,130 +312,277 @@ z
 
 ### 4.  Calibrating the Model to Observed Deaths Data
 
-The model can be simply calibrated to the cumulative time series of deaths reported in settings. This can be done using the `calibrate` function. For example, let's generate some dummy time series data and calibrate to it:
+The model can be simply calibrated to time series of deaths reported in settings. This can be done using the `calibrate` function. For example, let's use the time series of deaths in Algeria up to the 22nd April 2020: 
 
 ```{r example data}
-df <- squire:::death_data_format(reporting_quality = 1)
-df
+df <- read.csv(squire:::squire_file("extdata/example_DZA.csv"), stringsAsFactors = FALSE)
+head(df)
 ```
 
-Then to calibrate to this dummy data and visualise the full epidemic curve, we do the following. Note that simulation replicates are aligned to the current death total and the outputs are returned as a `squire_simulation` object. 
+We can calibrate the model to this data. This calibration will infer the most likely start date of the epidemic and the R0 at the start of the epidemic. Calibration occurs by scanning across a range of possible R0 values and start dates. Fitting works using a particle filter, which can be parallelised using `future::plan(future::multiprocess())` before running `calibrate`. 
 
-```{r calibration}
-calibration <- calibrate(country = "Afghanistan", deaths = max(df$deaths), 
-                         reporting_fraction = 1,
-                         seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
-                         min_seeding_cases = 5, max_seeding_cases = 50,
-                         replicates = 10, dt = 0.25)
+```{r calibration particle, warning=FALSE, message = FALSE}
+# set up for parallelisation
+future::plan(future::multiprocess())
 
-plot(calibration, var_select = "infections", date_0 = Sys.Date())
-
-```
-
-In the above, we visualise the full epidemic curve, but to examine short term model estimates of the epidemic trajectory (e.g. up to 14 days ahead), we can do the following: 
-
-```{r deaths over time}
-
-x <- format_output(calibration, var_select = "infections", date_0 = Sys.Date())
-x <- x %>%
-  mutate(replicate = factor(replicate)) %>%
-  filter(t < 14)
-ggplot(x, aes(x = date, y = y, col = replicate)) +
-  geom_line() + ylab("Case Incidence") + xlab("Date") +
-  theme(legend.position = "none")
-
+# Fit model
+out <- calibrate(
+      data = df,
+      R0_min = 2,
+      R0_max = 4,
+      R0_step = 0.5,
+      first_start_date = "2020-02-10",
+      last_start_date = "2020-02-22",
+      day_step = 4,
+      replicates = 10,
+      n_particles = 20,
+      country = "Algeria"
+    )
 
 ```
+`calibrate` returns the same output as `run_explicit_SEEIR_model`, with the first
+three elements in `out` being the simulation outputs, the model and model parameters. Note that simulation replicates are aligned to the maximum date in the data provided, and as a result we can use the same plotting functions as before: 
+
+```{r plot particle deaths}
+plot(out, "deaths", date_0 = max(df$date), x_var = "date")
+```
+
+With default parameters, `calibrate` will simulate up the maximum date in the data 
+provided. The fit to this data can be shown using the plotting function and specifying `particle_fit`
+to be `TRUE`
+
+```{r particle fit no ints}
+plot(out, particle_fit = TRUE)
+```
+
+We can see that this is not the best fit, capturing only the beginning of the data points. We can also diagnose
+the fitting further by looking at the `scan_results` of the grid search.
+
+```{r show grid fits}
+plot(out$scan_results)
+```
+
+This grid shows the negative log likeihood for each parameter pair. We can also plot the 
+related probability for each pair as follows:
+
+```{r show grid fits probs}
+plot(out$scan_results, what = "probability")
+```
+
+The reason for the poor fits to the data shown earlier is because Algeria has implemented
+interventions prior to today. These can also be incorporated into `calibrate`. 
+For example, we can grab the assumed changes to transmission fased on government intervention
+for Algeria.
+
+```{r dza interventions}
+interventions <- read.csv(squire:::squire_file("extdata/example_DZA_intervention.csv"))
+int_unique <- squire:::interventions_unique(interventions)
+int_unique
+```
+
+We can then provide these to `calibrate` as the dates (`date_R0_change`) and relative reductions
+to R0 (`R0_change`). We will also specify for model fits to be continued for 14 days into the future with
+`forceast = 14`:
+
+```{r particle with ints, warning=FALSE, message=FALSE}
+out <- calibrate(
+      data = df,
+      R0_min = 2,
+      R0_max = 4,
+      R0_step = 0.5,
+      first_start_date = "2020-02-10",
+      last_start_date = "2020-02-22",
+      day_step = 4,
+      replicates = 10,
+      n_particles = 20,
+      forecast = 14,
+      R0_change = int_unique$change,
+      date_R0_change = int_unique$dates_change,
+      country = "Algeria"
+    )
+```
+
+Let's see if that is any better.
+
+```{r particle fit ints}
+plot(out, particle_fit = TRUE)
+```
+
+That is a much better fit. 
+
+Any parameter that you could provide to `run_explicit_SEEIR_model` can be passed to `calibrate`. This
+includes time varying arguments such as `contact_matrix_set`, `ICU_bed_capacity` and `hosp_bed_capacity`. To incorporate these into model fitting correctly, the date at which these change must be provided (similarly to how `date_R0_change` was provided above) using `date_ICU_bed_capacity_change`, `date_ICU_bed_capacity_change` and `date_hosp_bed_capacity_change` respecitvely. In addition, the user must provide a baseline value for these, i.e. the contact matrix and bed capacity at the beginning of the epidemic:
+
+```{r particle with ints of all kinds, warning=FALSE, message=FALSE}
+out <- calibrate(
+      data = df,
+      R0_min = 2,
+      R0_max = 4,
+      R0_step = 0.5,
+      first_start_date = "2020-02-10",
+      last_start_date = "2020-02-22",
+      day_step = 4,
+      replicates = 10,
+      n_particles = 20,
+      forecast = 14,
+      R0_change = int_unique$change,
+      date_R0_change = int_unique$dates_change,
+      baseline_contact_matrix = get_mixing_matrix("Algeria"),
+      contact_matrix_set = list(get_mixing_matrix("Algeria")*0.9),
+      date_contact_matrix_set_change = "2020-03-16",
+      baseline_hosp_bed_capacity = squire:::get_hosp_bed_capacity("Algeria"),
+      hosp_bed_capacity = squire:::get_hosp_bed_capacity("Algeria")*c(1.1,1.2),
+      date_hosp_bed_capacity_change = c("2020-04-02", "2020-04-08"),
+      baseline_ICU_bed_capacity = squire:::get_ICU_bed_capacity("Algeria"),
+      ICU_bed_capacity = squire:::get_ICU_bed_capacity("Algeria")*c(1.05),
+      date_ICU_bed_capacity_change = c("2020-04-10"),
+      country = "Algeria"
+    )
+```
+
+(N.B. Given the potentially long running time for the grid search, the model state is returned at the end of every day rather than every time step (provided by `dt`). As a result model outputs such as `n_E2_I` (number of infections in a time step) and `delta_D` (number of deaths in a time step) reflect the outputs in the last time step rather than in all the time steps in the last day. The plotting functions and `format_output` provided in `squire` handle this correctly and work out the correct number for these in the last day.)
 
 ### 5. Conducting scenario projections to fitted data
 
-Once you have calibrated the model to death data, it is possible to then implement mitigation strategies forwards in time from the point of calibration. This is achieved using the `projection` function. For example, to contrast an unmitigated epidemic against a mitigation scenario with a 20% reduction in R0 today and a further 40% in 20 days time:
+Once you have calibrated the model to death data, it is possible to then implement mitigation strategies forwards in time from the point of calibration. This is achieved using the `projections` function. For example, let's consider a country that as of 28th April 2020 is yet to experience an epidemic take off but may be about to. Guinea reported its first COVID-19 death on 16th April 2020 and has reported 7 deaths by the 28th April 2020 according to data from the [European CDC](https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide).
+
+First let's calibrate to this data with no interventions in place (there are likely some interventions in place but nothing major, such as a lockdown, has been implemented by 2020-04-28) and simulate forward for 180 days:
+
+```{r particle gin, message=FALSE, warning=FALSE}
+df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
+
+out <- calibrate(
+      data = df,
+      R0_min = 2.5,
+      R0_max = 4,
+      R0_step = 0.5,
+      first_start_date = "2020-03-10",
+      last_start_date = "2020-03-25",
+      day_step = 5,
+      replicates = 10,
+      n_particles = 20,
+      forecast = 180,
+      country = "Guinea"
+    )
+```
+
+Firstly, let's plot the fit up to the current day
+
+```{r particle gin plots, message=FALSE, warning=FALSE}
+plot(out, particle_fit = TRUE) + 
+    ggplot2::xlim(as.Date(c("2020-04-10","2020-04-28"))) + 
+    ggplot2::ylim(c(0,10))
+```
+
+The fit is good and captures the stuttering chains at the beginning of the epidemic. However, if we plot the forecasted deaths we can see the epidemic is likely to take off:
+
+```{r particle gin forecast}
+plot(out, "deaths")
+```
+
+We can now use the output of `calibrate` to explore different scenario projections using `projections`. For example, to contast this unmitigated epidemic against a mitigation scenario with a 50% reduction in R0 today and a further 30% in 2 weeks time:
 
 ```{r projection}
-
-# first calibrate
-t1 <- calibrate(country = "Angola", 
-                deaths = 5,
-                  reporting_fraction = 1,
-                  dt = 0.2,
-                  time_period = 200,
-                  replicates = 25,
-                  R0_scan = c(3,4,5))
-
 # create our projections
-p2 <- projections(r = t1, R0_change = c(0.8, 0.4), tt_R0 = c(0, 20))
+p <- projections(r = out, R0_change = c(0.5, 0.2), tt_R0 = c(0, 14))
 ```
 
 The output generated from `projections` is the same class and structure as from `calibrate` and can be plotted against the unmitigated scenario using `projection_plotting`:
 
 ```{r projection plotting}
-ggproj <- projection_plotting(r_list = list(t1,p2),
+ggproj <- projection_plotting(r_list = list(out,p),
                     scenarios = c("Unmitigated","Mitigation"),
                     var_select = c("ICU_occupancy", "ICU_demand"),
                     add_parms_to_scenarios = TRUE,ci = FALSE,summarise = TRUE)
 
 # and lets add in the ICU capacity
-ggproj + ggplot2::geom_hline(yintercept = t1$parameters$ICU_bed_capacity)
+ggproj + ggplot2::geom_hline(yintercept = out$parameters$ICU_bed_capacity)
 ```
 
-We can see above that the intervention introduced was sufficient to prevent ICU demand (in red) from exceeding the supply, whereas in the unmitigated strategy this did occur.
+We can see above that the intervention introduced is nearly sufficient to prevent ICU demand (solid line red) from exceeding the supply, whereas in the unmitigated strategy this did occur.
 
-We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 50% today before relaxing it to 80% in 20 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with `add_parms_to_scenarios = FALSE`):
+We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 75% in a week before relaxing it to 80% in 20 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with `add_parms_to_scenarios = FALSE`):
 
 ```{r projection relative beds}
-
-# first calibrate
-t1 <- calibrate(country = "Angola", 
-                deaths = 5,
-                  reporting_fraction = 1,
-                  dt = 0.2,
-                  time_period = 200,
-                  replicates = 25,
-                  R0_scan = c(3,4,5))
-
 # create our projections
-p2 <- projections(r = t1, 
-                  contact_matrix_set_change = c(0.5, 0.8), 
-                  tt_contact_matrix = c(0, 20), 
-                  hosp_bed_capacity_change = c(1, 1.2),
+p <- projections(r = out, 
+                  contact_matrix_set_change = c(1, 0.25, 0.8), 
+                  tt_contact_matrix = c(0, 7, 30), 
+                  hosp_bed_capacity_change = c(1, 3),
                   tt_hosp_beds = c(0, 30),
-                  ICU_bed_capacity_change = c(1, 1.2),
+                  ICU_bed_capacity_change = c(1, 3),
                   tt_ICU_beds = c(0,30))
 
-projection_plotting(r_list = list(t1,p2),
+projection_plotting(r_list = list(out, p),
                     scenarios = c("Unmitigated","Mitigation"),
                     var_select = c("ICU_occupancy", "ICU_demand","deaths"),
                     add_parms_to_scenarios = FALSE,
-                    ci = FALSE,summarise = TRUE)
+                    ci = FALSE,summarise = TRUE) + 
+ggplot2::geom_hline(yintercept = out$parameters$ICU_bed_capacity)
 ```
 
-Above we can see that the increase in bed causes the mitigation strategy to plateau at a higher bed occupancy, however, not high enough to meet the demand. However, despite this the the peak in daily deaths is lower, which in turn causes a noticable decrease in total deaths:
+Above we can see that the increase in bed causes the mitigation strategy to plateau at a higher bed occupancy, however, not high enough to meet the demand. However, the impacts to the contact matrix and beds have caused both a shift and a decrease in the daily deaths, which in turn causes a noticable decrease in total deaths:
 
 ```{r total deaths projection}
-projection_plotting(r_list = list(t1,p2),
+projection_plotting(r_list = list(out,p),
                     scenarios = c("Unmitigated","Mitigation"),
                     var_select = c("D"),
                     add_parms_to_scenarios = FALSE,
                     ci = FALSE,summarise = TRUE)
 ```
 
-Lastly, rather than using relative changes to the interventions, we can provide absolute measures. For example, to change the R0 to 2 today and add 5000 ICU beds in 40 days time: 
+Rather than using relative changes to the interventions, we can provide absolute measures. For example, to change the R0 to 2 today and add 500 ICU beds in 40 days time: 
 
 ```{r projection plotting absolute}
-
 # what is the current capacity
-icu <- tail(t1$parameters$ICU_bed_capacity,1)
+icu <- tail(out$parameters$ICU_bed_capacity,1)
 
 # create our projections
-p2 <- projections(r = t1, 
+p <- projections(r = out, 
                   R0 = 2,
                   tt_R0 = 0,
-                  ICU_bed_capacity = c(icu, icu + 5000),
+                  ICU_bed_capacity = c(icu, icu + 500),
                   tt_ICU_beds = c(0,40))
 
-projection_plotting(r_list = list(t1,p2),
+projection_plotting(r_list = list(out,p),
                     scenarios = c("Unmitigated","Mitigation"),
                     var_select = c("ICU_occupancy", "ICU_demand","deaths"),
                     add_parms_to_scenarios = FALSE,
                     ci = FALSE,summarise = TRUE)
+```
+
+Lastly, in order to run simulations for longer than the number set in `calibrate(forecast = x)`, we can use the argument `time_period` to set the numbers of days that `projections` should simulate for. For example, we could redo our calibration and have it only run up the current day:
+
+```{r particle gin alt, message=FALSE, warning=FALSE}
+df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
+
+out <- calibrate(
+      data = df,
+      R0_min = 2.5,
+      R0_max = 4,
+      R0_step = 0.5,
+      first_start_date = "2020-03-10",
+      last_start_date = "2020-03-25",
+      day_step = 5,
+      replicates = 10,
+      n_particles = 20,
+      forecast = 0,
+      country = "Guinea"
+    )
+
+plot(out, particle_fit = TRUE)
+```
+
+We can now use this to project 90 days forwards with the current level of interventions, as well as a projection of 90 days with a 50% reduction in R0:
+
+```{r particle gin alt proj, message=FALSE, warning=FALSE}
+p_no_change <- projections(out, time_period = 90)
+p_change <- projections(out, R0_change = 0.5, tt_R0 = 0, time_period = 90)
+
+projection_plotting(list(p_no_change, p_change), 
+                    scenarios = c("No Change", "50% R0"), 
+                    add_parms_to_scenarios = FALSE,
+                    var_select = "deaths",
+                    date_0 = max(df$date), 
+                    x_var = "date")
 ```
