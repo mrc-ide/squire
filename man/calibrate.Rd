@@ -21,10 +21,13 @@ calibrate(
   date_R0_change = NULL,
   R0_change = NULL,
   date_ICU_bed_capacity_change = NULL,
+  baseline_ICU_bed_capacity = NULL,
   ICU_bed_capacity = NULL,
   date_hosp_bed_capacity_change = NULL,
+  baseline_hosp_bed_capacity = NULL,
   hosp_bed_capacity = NULL,
   date_contact_matrix_set_change = NULL,
+  baseline_contact_matrix = NULL,
   contact_matrix_set = NULL,
   country = NULL,
   population = NULL,
@@ -71,19 +74,38 @@ i.e. no change in R0}
 capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
 
-\item{ICU_bed_capacity}{ICU bed capacity. Can be single number of vector if capacity time-varies.}
+\item{baseline_ICU_bed_capacity}{The starting number of ICU beds before
+the epidemic started. Default = NULL, which will use the hospital beds data
+for the country provided. If no country is provided then this is 3/100 of
+hospital beds}
+
+\item{ICU_bed_capacity}{Number of ICU beds at each date specified in
+\code{date_ICU_bed_capacity_change}. Must be same length as
+\code{date_ICU_bed_capacity_change}.}
 
 \item{date_hosp_bed_capacity_change}{Calendar dates at which hospital bed
 capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
 
-\item{hosp_bed_capacity}{General bed capacity. Can be single number of vector if capacity time-varies.}
+\item{baseline_hosp_bed_capacity}{The starting number of hospital beds before
+the epidemic started. Default = NULL, which will use the hospital beds data
+for the country provided. If no country is provided then this is 5/1000 of
+the population}
+
+\item{hosp_bed_capacity}{Number of hospital beds at each date specified in
+\code{date_hosp_bed_capacity_change}. Must be same length as
+\code{date_hosp_bed_capacity_change}.}
 
 \item{date_contact_matrix_set_change}{Calendar dates at which the contact matrices
 set in \code{model_params} change. Defaut = NULL, i.e. no change}
 
-\item{contact_matrix_set}{Contact matrices used in simulation. Default =
-NULL, which will generate this based on the \code{country}.}
+\item{baseline_contact_matrix}{The starting contact matrix prior to any changes
+due to interventions or otherwise. Default = NULL, which will use the contact
+matrix associated with the coutnry provided.}
+
+\item{contact_matrix_set}{List of contact matrices to be used from the dates
+provided in \code{date_contact_matrix_set_change}.Must be same length as
+\code{date_contact_matrix_set_change}}
 
 \item{country}{Character for country beign simulated. WIll be used to
 generate \code{population} and \code{contact_matrix_set} if

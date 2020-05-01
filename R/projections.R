@@ -235,6 +235,9 @@ projections <- function(r,
     # second if contact_matrix_set is not provided we use the last contact_matrix_set
     if (is.null(contact_matrix_set)) {
       contact_matrix_set <- finals[[x]]$contact_matrix_set
+      baseline_contact_matrix_set <- contact_matrix_set[1]
+    } else {
+      baseline_contact_matrix_set <- contact_matrix_set[1]
     }
 
     # are we modifying it
@@ -244,13 +247,14 @@ projections <- function(r,
           contact_matrix_set[[1]]
         })
       }
+      baseline_contact_matrix_set <- contact_matrix_set[1]
       contact_matrix_set <- lapply(
         seq_len(length(contact_matrix_set_change)),
         function(x){
           contact_matrix_set[[x]]*contact_matrix_set_change[x]
         })
     }
-    baseline_contact_matrix_set <- contact_matrix_set[1]
+
 
     # third if hosp_bed_capacity is not provided we use the last hosp_bed_capacity
     if (is.null(hosp_bed_capacity)) {

@@ -148,6 +148,25 @@ test_that("calibrate particle works", {
     forecast = 0
   ))
 
+  expect_error(out <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    contact_matrix_set = list(contact_matrices[[1]]),
+    date_contact_matrix_set_change = date_R0_change[1],
+    replicates = replicates,
+    country = country,
+    forecast = 0
+  ), "baseline_contact_matrix can")
+
   out <- calibrate(
     data = data,
     R0_min = R0_min,
@@ -160,7 +179,8 @@ test_that("calibrate particle works", {
     pars_obs = pars_obs,
     n_particles = n_particles,
     reporting_fraction = reporting_fraction,
-    contact_matrix_set = contact_matrices[1],
+    baseline_contact_matrix = contact_matrices[[1]],
+    contact_matrix_set = list(contact_matrices[[1]]),
     date_contact_matrix_set_change = date_R0_change[1],
     replicates = replicates,
     country = country,
@@ -225,6 +245,25 @@ test_that("calibrate particle works", {
     forecast = 0
   ))
 
+  expect_error(out <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    hosp_bed_capacity = 10,
+    date_hosp_bed_capacity_change = date_R0_change[1],
+    replicates = replicates,
+    country = country,
+    forecast = 0
+  ), "baseline_hosp_bed_capacity can")
+
   out <- calibrate(
     data = data,
     R0_min = R0_min,
@@ -237,12 +276,15 @@ test_that("calibrate particle works", {
     pars_obs = pars_obs,
     n_particles = n_particles,
     reporting_fraction = reporting_fraction,
-    hosp_bed_capacity = 100,
+    baseline_hosp_bed_capacity = 5,
+    hosp_bed_capacity = 10,
     date_hosp_bed_capacity_change = date_R0_change[1],
     replicates = replicates,
     country = country,
     forecast = 0
   )
+
+
 
   # DATE CHECKS DATE_ICU
   expect_error(out <- calibrate(
@@ -283,6 +325,25 @@ test_that("calibrate particle works", {
     forecast = 0
   ))
 
+  expect_error(out <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    ICU_bed_capacity = 10,
+    date_ICU_bed_capacity_change = date_R0_change[1],
+    replicates = replicates,
+    country = country,
+    forecast = 0
+  ), "baseline_ICU_bed_capacity can")
+
   out <- calibrate(
     data = data,
     R0_min = R0_min,
@@ -295,13 +356,13 @@ test_that("calibrate particle works", {
     pars_obs = pars_obs,
     n_particles = n_particles,
     reporting_fraction = reporting_fraction,
-    ICU_bed_capacity = 100,
+    baseline_ICU_bed_capacity = 5,
+    ICU_bed_capacity = 10,
     date_ICU_bed_capacity_change = date_R0_change[1],
     replicates = replicates,
     country = country,
     forecast = 0
   )
-
 
 })
 

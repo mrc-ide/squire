@@ -212,7 +212,7 @@ R0_date_particle_filter <- function(R0,
   } else {
     tt_beta <- unique(c(0, intervention_dates_for_odin(dates = date_R0_change,
                                                 start_date = start_date,
-                                                steps_per_day = 1/model_params$dt)))
+                                                steps_per_day = round(1/model_params$dt))))
   }
 
   if (is.null(date_contact_matrix_set_change)) {
@@ -220,7 +220,7 @@ R0_date_particle_filter <- function(R0,
   } else {
     tt_contact_matrix <- unique(c(0, intervention_dates_for_odin(dates = date_contact_matrix_set_change,
                                                           start_date = start_date,
-                                                          steps_per_day = 1/model_params$dt)))
+                                                          steps_per_day = round(1/model_params$dt))))
   }
 
   if (is.null(date_ICU_bed_capacity_change)) {
@@ -228,7 +228,7 @@ R0_date_particle_filter <- function(R0,
   } else {
     tt_ICU_beds <- unique(c(0, intervention_dates_for_odin(dates = date_ICU_bed_capacity_change,
                                                     start_date = start_date,
-                                                    steps_per_day = 1/model_params$dt)))
+                                                    steps_per_day = round(1/model_params$dt))))
   }
 
   if (is.null(date_hosp_bed_capacity_change)) {
@@ -236,7 +236,7 @@ R0_date_particle_filter <- function(R0,
   } else {
     tt_hosp_beds <- unique(c(0, intervention_dates_for_odin(dates = date_hosp_bed_capacity_change,
                                                      start_date = start_date,
-                                                     steps_per_day = 1/model_params$dt)))
+                                                     steps_per_day = round(1/model_params$dt))))
   }
 
   # Second create the new R0s for the R0
@@ -253,6 +253,8 @@ R0_date_particle_filter <- function(R0,
   model_params$beta_set <- beta_set
   model_params$tt_beta <- tt_beta
   model_params$tt_contact_matrix <- tt_contact_matrix
+  model_params$tt_ICU_beds <- tt_ICU_beds
+  model_params$tt_hosp_beds <- tt_hosp_beds
 
   # run the particle filter
   X <- run_particle_filter(data = data,

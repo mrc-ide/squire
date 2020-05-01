@@ -5,6 +5,26 @@
 #'   the model calibrating to twice the deaths provided by \code{data$deaths}
 #' @param replicates Replicates to be run. Default = 100
 #' @param forecast Number of days to forecast forward. Default = 0
+#' @param baseline_hosp_bed_capacity The starting number of hospital beds before
+#'   the epidemic started. Default = NULL, which will use the hospital beds data
+#'   for the country provided. If no country is provided then this is 5/1000 of
+#'   the population
+#' @param hosp_bed_capacity Number of hospital beds at each date specified in
+#'   \code{date_hosp_bed_capacity_change}. Must be same length as
+#'   \code{date_hosp_bed_capacity_change}.
+#' @param baseline_ICU_bed_capacity The starting number of ICU beds before
+#'   the epidemic started. Default = NULL, which will use the hospital beds data
+#'   for the country provided. If no country is provided then this is 3/100 of
+#'   hospital beds
+#' @param ICU_bed_capacity Number of ICU beds at each date specified in
+#'   \code{date_ICU_bed_capacity_change}. Must be same length as
+#'   \code{date_ICU_bed_capacity_change}.
+#' @param baseline_contact_matrix The starting contact matrix prior to any changes
+#'   due to interventions or otherwise. Default = NULL, which will use the contact
+#'   matrix associated with the coutnry provided.
+#' @param contact_matrix_set List of contact matrices to be used from the dates
+#'   provided in \code{date_contact_matrix_set_change}.Must be same length as
+#'   \code{date_contact_matrix_set_change}
 #' @param ... Further aguments for the model parameter function. If using the
 #'   \code{\link{explicit_model}} (default) this will be
 #'   \code{parameters_explicit_SEEIR}.
@@ -31,10 +51,13 @@ calibrate <- function(data,
                       date_R0_change = NULL,
                       R0_change = NULL,
                       date_ICU_bed_capacity_change = NULL,
+                      baseline_ICU_bed_capacity = NULL,
                       ICU_bed_capacity = NULL,
                       date_hosp_bed_capacity_change = NULL,
+                      baseline_hosp_bed_capacity = NULL,
                       hosp_bed_capacity = NULL,
                       date_contact_matrix_set_change = NULL,
+                      baseline_contact_matrix = NULL,
                       contact_matrix_set = NULL,
                       country = NULL,
                       population = NULL,
@@ -55,6 +78,10 @@ calibrate <- function(data,
   assert_bounded(reporting_fraction, 0, 1, inclusive_left = FALSE, inclusive_right = TRUE)
   assert_in("date", names(data))
   assert_in("deaths", names(data))
+  assert_same_length(R0_change, date_R0_change)
+  assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
+  assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
+  assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
 
   # check grid params are okay
   if (as.Date(last_start_date) >= as.Date(data$date[1])) {
@@ -63,6 +90,7 @@ calibrate <- function(data,
   if (as.Date(first_start_date) >= as.Date(last_start_date)) {
     stop("'last_start_date' must be greater than 'first_start_date'")
   }
+
   # checks that dates are not in the future compared to our data
   if(!is.null(date_R0_change)) {
     assert_date(date_R0_change)
@@ -72,37 +100,87 @@ calibrate <- function(data,
     if(as.Date(last_start_date) >= as.Date(head(date_R0_change, 1))) {
       stop("First date in date_R0_change is earlier than last_start_date")
     }
-    assert_same_length(R0_change, date_R0_change)
   }
+
+  # handle contact matrix changes
   if(!is.null(date_contact_matrix_set_change)) {
+
     assert_date(date_contact_matrix_set_change)
+    assert_list(contact_matrix_set)
+
+    if(is.null(baseline_contact_matrix)) {
+      stop("baseline_contact_matrix can't be NULL if date_contact_matrix_set_change is provided")
+    }
     if(as.Date(tail(date_contact_matrix_set_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
     }
     if(as.Date(last_start_date) >= as.Date(head(date_contact_matrix_set_change, 1))) {
       stop("First date in date_contact_matrix_set_change is earlier than last_start_date")
     }
-    assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
+
+    # Get in correct format
+    if(is.matrix(baseline_contact_matrix)) {
+      baseline_contact_matrix <- list(baseline_contact_matrix)
+    }
+
+    tt_contact_matrix <- c(0, seq_len(length(date_contact_matrix_set_change)))
+    contact_matrix_set <- append(baseline_contact_matrix, contact_matrix_set)
+
+  } else {
+    tt_contact_matrix <- 0
+    contact_matrix_set <- NULL
   }
+
+  # handle ICU changes
   if(!is.null(date_ICU_bed_capacity_change)) {
+
     assert_date(date_ICU_bed_capacity_change)
+    assert_vector(ICU_bed_capacity)
+    assert_numeric(ICU_bed_capacity)
+
+    if(is.null(baseline_ICU_bed_capacity)) {
+      stop("baseline_ICU_bed_capacity can't be NULL if date_ICU_bed_capacity_change is provided")
+    }
+    assert_numeric(baseline_ICU_bed_capacity)
     if(as.Date(tail(date_ICU_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_ICU_bed_capacity_change is greater than the last date in data")
     }
     if(as.Date(last_start_date) >= as.Date(head(date_ICU_bed_capacity_change, 1))) {
       stop("First date in date_ICU_bed_capacity_change is earlier than last_start_date")
     }
-    assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
+
+    tt_ICU_beds <- c(0, seq_len(length(date_ICU_bed_capacity_change)))
+    ICU_bed_capacity <- c(baseline_ICU_bed_capacity, ICU_bed_capacity)
+
+  } else {
+    tt_ICU_beds <- 0
+    ICU_bed_capacity <- NULL
   }
+
+  # handle hosp bed changed
   if(!is.null(date_hosp_bed_capacity_change)) {
+
     assert_date(date_hosp_bed_capacity_change)
+    assert_vector(hosp_bed_capacity)
+    assert_numeric(hosp_bed_capacity)
+
+    if(is.null(baseline_hosp_bed_capacity)) {
+      stop("baseline_hosp_bed_capacity can't be NULL if date_hosp_bed_capacity_change is provided")
+    }
+    assert_numeric(baseline_hosp_bed_capacity)
     if(as.Date(tail(date_hosp_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_hosp_bed_capacity_change is greater than the last date in data")
     }
     if(as.Date(last_start_date) >= as.Date(head(date_hosp_bed_capacity_change, 1))) {
       stop("First date in date_hosp_bed_capacity_change is earlier than last_start_date")
     }
-    assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
+
+    tt_hosp_beds <- c(0, seq_len(length(date_hosp_bed_capacity_change)))
+    hosp_bed_capacity <- c(baseline_hosp_bed_capacity, hosp_bed_capacity)
+
+  } else {
+    tt_hosp_beds <- 0
+    hosp_bed_capacity <- NULL
   }
 
   # make the date definitely a date
@@ -115,8 +193,11 @@ calibrate <- function(data,
   model_params <- squire_model$parameter_func(country = country,
                                               population = population,
                                               contact_matrix_set = contact_matrix_set,
+                                              tt_contact_matrix = tt_contact_matrix,
                                               hosp_bed_capacity = hosp_bed_capacity,
+                                              tt_hosp_beds = tt_hosp_beds,
                                               ICU_bed_capacity = ICU_bed_capacity,
+                                              tt_ICU_beds = tt_ICU_beds,
                                               ...)
 
   # construct scan
@@ -146,9 +227,14 @@ calibrate <- function(data,
   # create a fake run object and fill in the required elements
   r <- squire_model$run_func(country = country,
                              contact_matrix_set = contact_matrix_set,
+                             tt_contact_matrix = tt_contact_matrix,
+                             hosp_bed_capacity = hosp_bed_capacity,
+                             tt_hosp_beds = tt_hosp_beds,
+                             ICU_bed_capacity = ICU_bed_capacity,
+                             tt_ICU_beds = tt_ICU_beds,
                              population = population,
                              replicates = 1,
-                             time_period = 1,
+                             time_period = max(tt_contact_matrix,tt_hosp_beds,tt_ICU_beds,1),
                              ...)
 
   # first let's create the output
@@ -177,8 +263,11 @@ calibrate <- function(data,
   r$interventions <- list(R0_change = R0_change,
                           date_R0_change = date_R0_change,
                           date_contact_matrix_set_change = date_contact_matrix_set_change,
+                          contact_matrix_set = contact_matrix_set,
                           date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
-                          date_hosp_bed_capacity_change = date_hosp_bed_capacity_change)
+                          ICU_bed_capacity = ICU_bed_capacity,
+                          date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
+                          hosp_bed_capacity = hosp_bed_capacity)
 
 
   # as well as adding the scan_results so it's easy to draw from the scan again in the future

@@ -47,23 +47,3 @@ simple_model <- function() {
   simple_model
 
 }
-
-
-
-# Loads a model by its name
-# Must be in inst/odin
-load_odin_model <- function(x) {
-  if (inherits(x, "squire_model")) {
-    return(x)
-  }
-  path <- system.file("odin", package = "squire", mustWork = TRUE)
-  possible <- sub("\\.json$", "", dir(path, pattern = "\\.json$"))
-  if (x %in% possible) {
-    env <- asNamespace("explicit_SEIR")
-    model <- get(x, envir = env, mode = "function", inherits = FALSE)
-  } else {
-    stop("Unknown model: ", x)
-  }
-
-  model
-}

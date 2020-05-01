@@ -85,6 +85,28 @@ parameters_simple_SEEIR <- function(R0 = 3,
 
 
 
+# Get ICU bed capacity
+#' @noRd
+get_ICU_bed_capacity <- function(country) {
+
+    beds <- get_healthcare_capacity(country)
+    ICU_beds <- beds$ICU_beds
+    population <- get_population(country)$n
+    ICU_bed_capacity <- round(ICU_beds * sum(population)/1000)
+    ICU_bed_capacity
+
+}
+
+# Get hospital bed capacity
+#' @noRd
+get_hosp_bed_capacity <- function(country = NULL) {
+
+    beds <- get_healthcare_capacity(country)
+    population <- get_population(country)$n
+    hosp_beds <- beds$hosp_beds
+    hosp_bed_capacity <- round(hosp_beds * sum(population)/1000)
+
+}
 # -----------------------------------------------------------------------------
 #' Parmaters for explicit SEEIR model
 #'
@@ -149,8 +171,8 @@ parameters_simple_SEEIR <- function(R0 = 3,
 #' @param dur_not_get_mv_die Mean duration without ventilation given
 #'   death. Default = 1
 #' @param dur_rec Duration of recovery after coming off ventilation. Default = 2
-#' @param hosp_bed_capacity General bed capacity. Can be single number of vector if capacity time-varies.
-#' @param ICU_bed_capacity ICU bed capacity. Can be single number of vector if capacity time-varies.
+#' @param hosp_bed_capacity General bed capacity. Can be single number or vector if capacity time-varies.
+#' @param ICU_bed_capacity ICU bed capacity. Can be single number or vector if capacity time-varies.
 #' @param tt_hosp_beds Times at which hospital bed capacity changes (Default = 0 = doesn't change)
 #' @param tt_ICU_beds Times at which ICU bed capacity changes (Default = 0 = doesn't change)
 #'

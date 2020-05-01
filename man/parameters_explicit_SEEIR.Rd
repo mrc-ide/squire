@@ -131,9 +131,9 @@ death. Default = 1}
 
 \item{dur_rec}{Duration of recovery after coming off ventilation. Default = 2}
 
-\item{hosp_bed_capacity}{General bed capacity. Can be single number of vector if capacity time-varies.}
+\item{hosp_bed_capacity}{General bed capacity. Can be single number or vector if capacity time-varies.}
 
-\item{ICU_bed_capacity}{ICU bed capacity. Can be single number of vector if capacity time-varies.}
+\item{ICU_bed_capacity}{ICU bed capacity. Can be single number or vector if capacity time-varies.}
 
 \item{tt_hosp_beds}{Times at which hospital bed capacity changes (Default = 0 = doesn't change)}
 
