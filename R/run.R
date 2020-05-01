@@ -333,16 +333,22 @@ run_deterministic_SEIR_model <- function(
   hosp_bed_capacity,
   ICU_bed_capacity
   ) {
-  m <- process_contact_matrix_scaled_age(contact_matrix, population)
-  dur_R <- 2.09
-  dur_hosp <- 5
-  beta <- vapply(
-    R0_set,
-    function(R0) beta_est_explicit(dur_R, dur_hosp, probs$prob_hosp, m, R0),
-    numeric(1)
+
+  default_params <- parameters_explicit_SEEIR(
+    population = population,
+    tt_contact_matrix = 0,
+    contact_matrix_set = contact_matrix,
+    R0 = R0_set,
+    tt_R0 = tt_R0,
+    dt = 1,
+    init = NULL,
+    seeding_cases = NULL,
+    hosp_bed_capacity = hosp_bed_capacity,
+    ICU_bed_capacity = ICU_bed_capacity,
+    tt_hosp_beds = 0,
+    tt_ICU_beds = 0
   )
-  mm <- t(t(m) / population)
-  mix_mat_set <- aperm(array(c(mm), dim = c(dim(mm), 1)), c(3, 1, 2))
+
   seed <- c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0)
 
   pars <- list(
@@ -373,31 +379,31 @@ run_deterministic_SEIR_model <- function(
     IRec2_0 = rep(0, length(population)),
     R_0 = rep(0, length(population)),
     D_0 = rep(0, length(population)),
-    gamma_E = (2 * 1/4.58),
-    gamma_R = (1/dur_R),
-    gamma_hosp = (2 * 1/dur_hosp),
-    gamma_get_ox_survive = (2 * 1/6),
-    gamma_get_ox_die = (2 * 1/3.5),
-    gamma_not_get_ox_survive = (2 * 1/9),
-    gamma_not_get_ox_die = (0.5 * 2 * 1/9),
-    gamma_get_mv_survive = (2 * 1/5.5),
-    gamma_get_mv_die = (2 * 1/4),
-    gamma_not_get_mv_survive = (2 * 1/12),
-    gamma_not_get_mv_die = (2 * 1/1),
-    gamma_rec = (2 * 1/6),
-    prob_hosp = probs$prob_hosp,
-    prob_severe = probs$prob_severe,
-    prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
-    prob_non_severe_death_no_treatment = probs$prob_non_severe_death_no_treatment,
-    prob_severe_death_treatment = probs$prob_severe_death_treatment,
-    prob_severe_death_no_treatment = probs$prob_severe_death_no_treatment,
-    p_dist = probs$p_dist,
+    gamma_E = default_params$gamma_E,
+    gamma_R = default_params$gamma_IMild,
+    gamma_hosp = default_params$gamma_ICase,
+    gamma_get_ox_survive = default_params$gamma_get_ox_survive,
+    gamma_get_ox_die = default_params$gamma_get_ox_die,
+    gamma_not_get_ox_survive = default_params$gamma_not_get_ox_survive,
+    gamma_not_get_ox_die = default_params$gamma_not_get_ox_die,
+    gamma_get_mv_survive = default_params$gamma_get_mv_survive,
+    gamma_get_mv_die = default_params$gamma_get_mv_die,
+    gamma_not_get_mv_survive = default_params$gamma_not_get_mv_survive,
+    gamma_not_get_mv_die = default_params$gamma_not_get_mv_die,
+    gamma_rec = default_params$gamma_rec,
+    prob_hosp = default_params$prob_hosp,
+    prob_severe = default_params$prob_severe,
+    prob_non_severe_death_treatment = default_params$prob_non_severe_death_treatment,
+    prob_non_severe_death_no_treatment = default_params$prob_non_severe_death_no_treatment,
+    prob_severe_death_treatment = default_params$prob_severe_death_treatment,
+    prob_severe_death_no_treatment = default_params$prob_severe_death_no_treatment,
+    p_dist = default_params$p_dist,
     hosp_bed_capacity = hosp_bed_capacity,
     ICU_bed_capacity = ICU_bed_capacity,
-    tt_matrix = c(0),
-    mix_mat_set = mix_mat_set,
-    tt_beta = tt_R0,
-    beta_set = beta
+    tt_matrix = default_params$tt_matrix,
+    mix_mat_set = default_params$mix_mat_set,
+    tt_beta = default_params$tt_beta,
+    beta_set = default_params$beta_set
   )
 
   mod <- explicit_SEIR_deterministic(user = pars)
