@@ -21,6 +21,8 @@ test_that("lmic getter works", {
 test_that("mixing matrix getter works", {
   expect_error(get_mixing_matrix("moon"))
   out <- get_mixing_matrix("Angola")
+  out <- get_mixing_matrix(iso3c = "AGO")
+  expect_message(out <- get_mixing_matrix(country = "Angola", iso3c = "AGO"))
   expect_is(out, "matrix")
   expect_equal(nrow(out), 16)
   expect_equal(ncol(out), 16)

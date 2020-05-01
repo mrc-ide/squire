@@ -48,7 +48,6 @@
 #' @return List of R0 and start date grid values, and
 #'   normalised probabilities at each point
 #'
-#' @export
 #' @import furrr
 scan_R0_date <- function(
   R0_min,
@@ -297,7 +296,6 @@ R0_date_particle_filter <- function(R0,
 #'   \code{scan_results} grid and the third dimension (inputs) is a list of
 #'   model inputs.
 #'
-#' @export
 #' @import furrr
 #' @importFrom utils tail
 sample_grid_scan <- function(scan_results,

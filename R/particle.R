@@ -31,7 +31,6 @@
 #'
 #' @return Results from particle filter
 #'
-#' @export
 run_particle_filter <- function(data,
                                 squire_model,
                                 model_params,
@@ -132,8 +131,6 @@ run_particle_filter <- function(data,
 #'
 #' @param save_end_states Logical, indicating whether we should save all
 #'  particles at the final time point for which we have data
-#'
-#' @export
 #'
 particle_filter <- function(data, model, compare, n_particles,
                             forecast_days = 0, save_particles = FALSE,
@@ -385,7 +382,6 @@ compare_output <- function(model, pars_obs, data, type="explicit_SEEIR_model") {
 #'
 #' @param steps_per_day The number of steps per day
 #'
-#' @export
 particle_filter_data <- function(data, start_date, steps_per_day) {
   if (!inherits(data, "data.frame")) {
     stop("Expected a data.frame for 'data'")

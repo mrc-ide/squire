@@ -192,12 +192,17 @@ projections <- function(r,
 
   # do we need to do more than just the remaining time from calibrate
   if (!is.null(time_period)) {
-    t_steps <- lapply(t_steps, function(x) {
-      seq(x[1], x[1] - (x[2]-x[1]) + time_period/r$parameters$dt, x[2]-x[1])
-    })
-    steps <- seq(r$output[1,1,1], max(t_steps[[1]]), (t_steps[[1]][2]-t_steps[[1]][1]))
 
-    arr_new <- array(NA, dim = c((max(t_steps[[1]])/(t_steps[[1]][2] - t_steps[[1]][1])) + (1-r$output[1,1,1]),
+    t_diff <- diff(tail(r$output[,1,1],2))
+    t_start <- r$output[(r$output[,"time",1]==0),1,1]+t_diff
+    t_initial <- unique(stats::na.omit(r$output[1,1,]))
+
+    t_steps <- lapply(t_steps, function(x) {
+      seq(t_start, t_start - t_diff + time_period/r$parameters$dt, t_diff)
+    })
+    steps <- seq(t_initial, max(t_steps[[1]]), t_diff)
+
+    arr_new <- array(NA, dim = c((max(t_steps[[1]])/(t_diff)) + (1-t_initial),
                                  ncol(r$output), dim(r$output)[3]))
     arr_new[seq_len(nrow(r$output)),,] <- r$output
     rownms <- rownames(r$output)
@@ -519,11 +524,11 @@ projection_inputs <- function(p3){
     return("(No interventions)")
   } else {
 
-    pos <- seq_along(p3$projection_args)[-1]
+    pos <- seq_along(p3$projection_args)[-(1:2)]
     nms <- p3$projection_args[pos]
 
     cat_f <- function(x, c = ""){
-      if(!is.null(x[[1]])) {
+      if(!is.null(x[[1]]) && (is.null(x[[3]]) || is.null(x[[2]]))) {
         paste0(c, names(x[1]), ": ", paste0(x[[1]], collapse = ", "), " @ t = ", paste0(x[[3]], collapse = ", "))
       } else if(!is.null(x[[2]])) {
         paste0(c, names(x[2]), ": ", paste0(x[[2]]*100,"%",collapse=", "), " @ t = ", paste0(x[[3]], collapse = ", "))
@@ -535,7 +540,7 @@ projection_inputs <- function(p3){
     paste0("\n",cat_f(nms[1:3], "("),
            cat_f(nms[4:6],", "),
            cat_f(nms[7:9],", "),
-           cat_f(nms[10:12],", "),")")
+           cat_f(nms[10:12],")"))
 
   }
 }

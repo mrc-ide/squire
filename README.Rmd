@@ -25,6 +25,16 @@ knitr::opts_chunk$set(
 
 squire enables users to simulate models of SARS-CoV-2 epidemics. This is done using an age-structured SEIR model that also explicitly considers healthcare capacity and disease severity. 
 
+## IMPORTANT NOTES
+
+:warning: This code is released with no support. Please submit any questions or bugs as [issues](https://github.com/mrc-ide/squire/issues) and we will try to address them as quickly as possible.
+
+:warning: This model is in active development and so parameter name and behaviours, and output file formats will change without notice.
+
+:warning: The model is stochastic. Multiple runs with different seeds should be undertaken to see average behaviour.
+
+:warning: As with any mathematical model, it is easy to misconfigure inputs and therefore get meaningless outputs. Please contact the authors if you intend to publish results using `squire`.
+
 ## Overview
 
 squire is a package enabling users to quickly and easily generate calibrated estimates of SARS-CoV-2 epidemic trajectories under different control scenarios. It consists of the following:
@@ -322,8 +332,8 @@ out <- calibrate(
       R0_max = 4,
       R0_step = 0.5,
       first_start_date = "2020-02-10",
-      last_start_date = "2020-02-25",
-      day_step = 5,
+      last_start_date = "2020-02-22",
+      day_step = 4,
       replicates = 10,
       n_particles = 20,
       country = "Algeria"
@@ -381,8 +391,8 @@ out <- calibrate(
       R0_max = 4,
       R0_step = 0.5,
       first_start_date = "2020-02-10",
-      last_start_date = "2020-02-25",
-      day_step = 5,
+      last_start_date = "2020-02-22",
+      day_step = 4,
       replicates = 10,
       n_particles = 20,
       forecast = 14,
@@ -401,7 +411,34 @@ plot(out, particle_fit = TRUE)
 That is a much better fit. 
 
 Any parameter that you could provide to `run_explicit_SEEIR_model` can be passed to `calibrate`. This
-includes time varying arguments such as `contact_matrix_set`, `ICU_bed_capacity` and `hosp_bed_capacity`. To incorporate these into model fitting correctly, the date at which these change must be provided (similarly to how `date_R0_change` was provided above) using `date_ICU_bed_capacity_change`, `date_ICU_bed_capacity_change` and `date_hosp_bed_capacity_change` respecitvely. 
+includes time varying arguments such as `contact_matrix_set`, `ICU_bed_capacity` and `hosp_bed_capacity`. To incorporate these into model fitting correctly, the date at which these change must be provided (similarly to how `date_R0_change` was provided above) using `date_ICU_bed_capacity_change`, `date_ICU_bed_capacity_change` and `date_hosp_bed_capacity_change` respecitvely. In addition, the user must provide a baseline value for these, i.e. the contact matrix and bed capacity at the beginning of the epidemic:
+
+```{r particle with ints of all kinds, warning=FALSE, message=FALSE}
+out <- calibrate(
+      data = df,
+      R0_min = 2,
+      R0_max = 4,
+      R0_step = 0.5,
+      first_start_date = "2020-02-10",
+      last_start_date = "2020-02-22",
+      day_step = 4,
+      replicates = 10,
+      n_particles = 20,
+      forecast = 14,
+      R0_change = int_unique$change,
+      date_R0_change = int_unique$dates_change,
+      baseline_contact_matrix = get_mixing_matrix("Algeria"),
+      contact_matrix_set = list(get_mixing_matrix("Algeria")*0.9),
+      date_contact_matrix_set_change = "2020-03-16",
+      baseline_hosp_bed_capacity = squire:::get_hosp_bed_capacity("Algeria"),
+      hosp_bed_capacity = squire:::get_hosp_bed_capacity("Algeria")*c(1.1,1.2),
+      date_hosp_bed_capacity_change = c("2020-04-02", "2020-04-08"),
+      baseline_ICU_bed_capacity = squire:::get_ICU_bed_capacity("Algeria"),
+      ICU_bed_capacity = squire:::get_ICU_bed_capacity("Algeria")*c(1.05),
+      date_ICU_bed_capacity_change = c("2020-04-10"),
+      country = "Algeria"
+    )
+```
 
 (N.B. Given the potentially long running time for the grid search, the model state is returned at the end of every day rather than every time step (provided by `dt`). As a result model outputs such as `n_E2_I` (number of infections in a time step) and `delta_D` (number of deaths in a time step) reflect the outputs in the last time step rather than in all the time steps in the last day. The plotting functions and `format_output` provided in `squire` handle this correctly and work out the correct number for these in the last day.)
 
@@ -409,7 +446,7 @@ includes time varying arguments such as `contact_matrix_set`, `ICU_bed_capacity`
 
 Once you have calibrated the model to death data, it is possible to then implement mitigation strategies forwards in time from the point of calibration. This is achieved using the `projections` function. For example, let's consider a country that as of 28th April 2020 is yet to experience an epidemic take off but may be about to. Guinea reported its first COVID-19 death on 16th April 2020 and has reported 7 deaths by the 28th April 2020 according to data from the [European CDC](https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide).
 
-First let's calibrate to this data with no interventions in place (there are likely some interventions in place but nothing major, such as a lockdown has been implemented by 2020-04-28) and simulate forward for 180 days:
+First let's calibrate to this data with no interventions in place (there are likely some interventions in place but nothing major, such as a lockdown, has been implemented by 2020-04-28) and simulate forward for 180 days:
 
 ```{r particle gin, message=FALSE, warning=FALSE}
 df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
@@ -494,7 +531,7 @@ projection_plotting(r_list = list(out,p),
                     ci = FALSE,summarise = TRUE)
 ```
 
-Lastly, rather than using relative changes to the interventions, we can provide absolute measures. For example, to change the R0 to 2 today and add 500 ICU beds in 40 days time: 
+Rather than using relative changes to the interventions, we can provide absolute measures. For example, to change the R0 to 2 today and add 500 ICU beds in 40 days time: 
 
 ```{r projection plotting absolute}
 # what is the current capacity
@@ -512,4 +549,40 @@ projection_plotting(r_list = list(out,p),
                     var_select = c("ICU_occupancy", "ICU_demand","deaths"),
                     add_parms_to_scenarios = FALSE,
                     ci = FALSE,summarise = TRUE)
+```
+
+Lastly, in order to run simulations for longer than the number set in `calibrate(forecast = x)`, we can use the argument `time_period` to set the numbers of days that `projections` should simulate for. For example, we could redo our calibration and have it only run up the current day:
+
+```{r particle gin, message=FALSE, warning=FALSE}
+df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
+
+out <- calibrate(
+      data = df,
+      R0_min = 2.5,
+      R0_max = 4,
+      R0_step = 0.5,
+      first_start_date = "2020-03-10",
+      last_start_date = "2020-03-25",
+      day_step = 5,
+      replicates = 10,
+      n_particles = 20,
+      forecast = 0,
+      country = "Guinea"
+    )
+
+plot(out, particle_fit = TRUE)
+```
+
+We can now use this to project 90 days forwards with the current level of interventions, as well as a projection of 90 days with a 50% reduction in R0:
+
+```{r particle gin, message=FALSE, warning=FALSE}
+p_no_change <- projections(out, time_period = 90)
+p_change <- projections(out, R0_change = 0.5, tt_R0 = 0, time_period = 90)
+
+projection_plotting(list(p_no_change, p_change), 
+                    scenarios = c("No Change", "50% R0"), 
+                    add_parms_to_scenarios = FALSE,
+                    var_select = "deaths",
+                    date_0 = max(df$date), 
+                    x_var = "date")
 ```

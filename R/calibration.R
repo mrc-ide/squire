@@ -79,13 +79,16 @@ calibrate <- function(data,
   assert_in("date", names(data))
   assert_in("deaths", names(data))
   assert_same_length(R0_change, date_R0_change)
+  if(!is.null(contact_matrix_set)) {
+    assert_list(contact_matrix_set)
+  }
   assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
   assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
   assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
 
   # check grid params are okay
-  if (as.Date(last_start_date) >= as.Date(data$date[1])) {
-    stop("'last_start_date' must be earlier than the first date in data")
+  if (as.Date(last_start_date) >= as.Date(data$date[1])-1) {
+    stop("'last_start_date' must be at least 2 days before the first date in data")
   }
   if (as.Date(first_start_date) >= as.Date(last_start_date)) {
     stop("'last_start_date' must be greater than 'first_start_date'")

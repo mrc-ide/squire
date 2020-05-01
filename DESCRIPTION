@@ -1,7 +1,7 @@
 Package: squire
 Type: Package
 Title: SEIR transmission model of COVID-19
-Version: 0.3.1
+Version: 0.4.0
 Authors@R: c(
   person("Patrick", "Walker", email = "patrick.walker06@imperial.ac.uk", role = c("aut")),
   person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut", "cre")),
@@ -18,7 +18,9 @@ LazyData: true
 Suggests: 
     testthat (>= 2.1.0),
     covr,
-    readxl
+    readxl,
+    knitr,
+    rmarkdown
 RoxygenNote: 7.1.0
 Imports: 
     odin,
@@ -33,3 +35,4 @@ Imports:
     methods,
     ggplot2
 Depends: R (>= 3.1.0)
+VignetteBuilder: knitr

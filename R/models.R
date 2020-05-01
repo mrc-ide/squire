@@ -1,11 +1,11 @@
-##' Create an explicit model
-##'
-##' @title Explicit SEEIR model creation.
-##'
-##' We will use this structure to ensure that model fitting is flexible in the
-##' future as more models are added
-##'
-##' @export
+#' Create an explicit model
+#'
+#' @title Explicit SEEIR model creation.
+#'
+#' We will use this structure to ensure that model fitting is flexible in the
+#' future as more models are added
+#'
+#' @export
 explicit_model <- function() {
 
   model_class <- "explicit_SEEIR_model"
@@ -23,14 +23,13 @@ explicit_model <- function() {
 
 }
 
-##' Create a simple  model
-##'
-##' @title Simple SEEIR model creation.
-##'
-##' We will use this structure to ensure that model fitting is flexible in the
-##' future as more models are added
-##'
-##' @export
+#' Create a simple  model
+#'
+#' @title Simple SEEIR model creation.
+#'
+#' We will use this structure to ensure that model fitting is flexible in the
+#' future as more models are added
+#'
 simple_model <- function() {
 
   model_class <- "simple_SEEIR_model"
