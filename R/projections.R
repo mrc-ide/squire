@@ -8,6 +8,9 @@
 #' requested, the simulation will use parameters chosen for the calibration run.
 #'
 #' @param r Calibrated \code{{squire_simulation}} object.
+#' @param time_period How many days is the projection. Deafult = NULL, which will
+#'   carry the projection forward from t = 0 in the calibration (i.e. the number
+#'   of days set in calibrate using forecast)
 #' @param R0 Numeric vector for R0 from t = 0 in the calibration.
 #'   E.g. \code{R0 = c(2, 1)}. Default = NULL, which will use \code{R0_change}
 #'   to alter R0 if provided.
@@ -53,6 +56,7 @@
 #'
 #' @export
 projections <- function(r,
+                        time_period = NULL,
                         R0 = NULL,
                         R0_change = NULL,
                         tt_R0 = 0,
@@ -183,12 +187,28 @@ projections <- function(r,
 
   # what are the remaining time points
   t_steps <- lapply(state_pos, function(x) {
-    if(diff(tail(r$output[,"step",1],2)) != 1) {
-      round(tail(seq_len(ds[1]), ds[1] - x)/r$parameters$dt)
-    } else {
-      tail(seq_len(ds[1]), ds[1] - x)
-    }
+    r$output[which(r$output[,1,1] > r$output[x,1,1]),1 ,1]
   })
+
+  # do we need to do more than just the remaining time from calibrate
+  if (!is.null(time_period)) {
+    t_steps <- lapply(t_steps, function(x) {
+      seq(x[1], x[1] - (x[2]-x[1]) + time_period/r$parameters$dt, x[2]-x[1])
+    })
+    steps <- seq(r$output[1,1,1], max(t_steps[[1]]), (t_steps[[1]][2]-t_steps[[1]][1]))
+
+    arr_new <- array(NA, dim = c((max(t_steps[[1]])/(t_steps[[1]][2] - t_steps[[1]][1])) + (1-r$output[1,1,1]),
+                                 ncol(r$output), dim(r$output)[3]))
+    arr_new[seq_len(nrow(r$output)),,] <- r$output
+    rownms <- rownames(r$output)
+    colnms <- colnames(r$output)
+    if(!is.null(rownms)) {
+      rownames(arr_new) <- as.character(as.Date(rownms[1]) + seq_len(nrow(arr_new)) - 1L)
+    }
+    r$output <- arr_new
+    r$output[,1,] <- matrix(rep(steps,r$parameters$replicates), ncol = r$parameters$replicates)
+    colnames(r$output) <- colnms
+  }
 
   # final values of R0, contacts, and beds
   finals <- t0_variables(r)
@@ -268,6 +288,13 @@ projections <- function(r,
                                 r$parameters$population),
                               R0 = R0)
 
+    # Is the model still valid
+    if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {
+      r$model <- r$scan_results$inputs$model$odin_model(
+        user = r$scan_results$inputs$model_params,
+        unused_user_action = "ignore")
+    }
+
     # change these user params
     r$model$set_user(tt_beta = round(tt_R0/r$parameters$dt))
     r$model$set_user(beta_set = beta)
@@ -282,7 +309,7 @@ projections <- function(r,
     if(diff(tail(r$output[,1,1],2)) != 1) {
       step <- c(0,round(seq_len(length(t_steps[[x]]))/r$parameters$dt))
     } else {
-    step <- seq_len(length(t_steps[[x]]))
+      step <- seq_len(length(t_steps[[x]]))
     }
 
     r$model$run(step = step,
@@ -295,9 +322,9 @@ projections <- function(r,
   ## collect results
   for(i in seq_len(ds[3])) {
     if(diff(tail(r$output[,"step",1],2)) != 1) {
-      r$output[t_steps[[i]]*r$parameters$dt, -1, i] <- out[[i]][-1, -1, 1]
+      r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][-1, -1, 1]
     } else {
-      r$output[t_steps[[i]], -1, i] <- out[[i]][, -1, 1]
+      r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][, -1, 1]
     }
   }
 

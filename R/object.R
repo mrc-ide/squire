@@ -55,8 +55,8 @@ squire_simulation_plot_prep <- function(x,
   }
 
   # remove any NA rows (due to different start dates)
-  if(sum(is.na(pd$t))>0) {
-  pd <- pd[-which(is.na(pd$t)),]
+  if(sum(is.na(pd$t) | is.na(pd$y))>0) {
+  pd <- pd[-which(is.na(pd$t) | is.na(pd$y)),]
   }
 
   # Format summary data

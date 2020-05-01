@@ -47,15 +47,15 @@ test_that("output format works", {
                         contact_matrix_set=contact_matrices[[1]])
   o1 <- format_output_simple_model(r1)
   o2 <- format_output_simple_model(r1, reduce_age = FALSE)
-  o3 <- collapse_for_report(format_output_simple_model(r1, reduce_age = FALSE))
   o4 <- format_output_simple_model(r1, var_select = "E")
-  o5 <- format_output_simple_model(r1, var_select = "E", date_0 = Sys.Date())
+  o5 <- format_output_simple_model(r1, var_select = "I")
+  o6 <- format_output_simple_model(r1, var_select = "E", date_0 = Sys.Date())
 
   expect_type(o1, "list")
   expect_type(o2, "list")
-  expect_type(o3, "list")
   expect_type(o4, "list")
   expect_type(o5, "list")
+  expect_type(o6, "list")
 
   pop <- get_population("Afghanistan", simple_SEIR = FALSE)
   m1 <- run_explicit_SEEIR_model(R0 = 2,
@@ -68,7 +68,6 @@ test_that("output format works", {
   o1 <- format_output(m1)
   expect_true(all(table(o1$compartment) == 100))
   o2 <- format_output(m1, reduce_age = FALSE)
-  o3 <- collapse_for_report(format_output(m1, reduce_age = FALSE))
   o4 <- format_output(m1, reduce_age = FALSE, date_0 = Sys.Date())
   o5 <- format_output(m1, var_select = c("E", "ICase"))
   o6 <- format_output(m1, var_select = c("E", "IMild"))
@@ -78,7 +77,6 @@ test_that("output format works", {
 
   expect_type(o1, "list")
   expect_type(o2, "list")
-  expect_type(o3, "list")
   expect_type(o4, "list")
   expect_type(o5, "list")
   expect_type(o6, "list")
@@ -88,7 +86,6 @@ test_that("output format works", {
 
   expect_named(o1, c("replicate", "compartment", "t", "y"))
   expect_named(o2, c("replicate", "age_group", "compartment", "t",  "y"))
-  expect_named(o3, c("compartment", "t", "replicate", "y"))
   expect_true(all(c("hospital","ICU","IMild","deaths") %in% unique(o3$compartment)))
   expect_named(o4, c("replicate", "age_group", "compartment", "t", "y", "date"))
   expect_named(o5, c("replicate", "compartment", "t", "y"))

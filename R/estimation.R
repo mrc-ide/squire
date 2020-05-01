@@ -501,6 +501,7 @@ plot_sample_grid_search <- function(x, what = "deaths") {
             "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
             "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
     ylab <- "Cumulative Cases"
+    xlab <- "Date"
     particles <- vapply(seq_len(dim(x$output)[3]), function(y) {
       rowSums(x$output[,index,y], na.rm = TRUE)},
       FUN.VALUE = numeric(dim(x$output)[1]))
@@ -522,7 +523,7 @@ plot_sample_grid_search <- function(x, what = "deaths") {
 
     index <- c(idx$D)
     ylab <- "Deaths"
-    xlab <- "R0"
+    xlab <- "Date"
     particles <- vapply(seq_len(dim(x$output)[3]), function(y) {
       out <- c(0,diff(rowSums(x$output[,index,y], na.rm = TRUE)))
       names(out)[1] <- rownames(x$output)[1]
@@ -542,7 +543,7 @@ plot_sample_grid_search <- function(x, what = "deaths") {
 
   } else {
 
-    stop("Requested what must be one of 'ICU', 'deaths'")
+    stop("Requested what must be one of 'cases', 'deaths'")
 
   }
 

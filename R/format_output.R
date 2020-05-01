@@ -1,55 +1,3 @@
-#' Collapse age groups in output
-#'
-#' Sums over age groups for each compartment
-#'
-#' @param d output data.frame
-#'
-#' @return Output data.frame
-collapse_age <- function(d){
-  d %>%
-    dplyr::group_by(.data$compartment, .data$t, .data$replicate) %>%
-    dplyr::summarise(y =  sum(.data$y)) %>%
-    dplyr::ungroup()
-}
-
-#' Collapse compartments for reporting major reporters of epidemic
-#'
-#' Sums over simplified groups (ICU demand, ICU occupance, hospital demand,
-#' hospital occupancy, infections, deaths)
-#'
-#' @param d output data.frame
-#'
-#' @return Output data.frame
-collapse_for_report <- function(d){
-
-  if ("date" %in% names(d)) {
-    d %>%
-      dplyr::mutate(group = dplyr::case_when(
-        grepl("IMV", .data$compartment) ~ "ICU",
-        grepl("IOx", .data$compartment) ~ "hospital",
-        .data$compartment == "n_E2_I" ~ "infections",
-        .data$compartment == "delta_D" ~ "deaths",
-        TRUE ~ .data$compartment)) %>%
-      dplyr::group_by(.data$group, .data$t, .data$date, .data$replicate) %>%
-      dplyr::summarise(y = sum(.data$y)) %>%
-      dplyr::ungroup() %>%
-      dplyr::rename(compartment = .data$group)
-  } else {
-    d %>%
-      dplyr::mutate(group = dplyr::case_when(
-        grepl("IMV", .data$compartment) ~ "ICU",
-        grepl("IOx", .data$compartment) ~ "hospital",
-        .data$compartment == "n_E2_I" ~ "infections",
-        .data$compartment == "delta_D" ~ "deaths",
-        TRUE ~ .data$compartment)) %>%
-      dplyr::group_by(.data$group, .data$t, .data$replicate) %>%
-      dplyr::summarise(y = sum(.data$y)) %>%
-      dplyr::ungroup() %>%
-      dplyr::rename(compartment = .data$group)
-  }
-
-}
-
 #' Format deterministic model output as data.frame
 #'
 #' @param x squire_simulation object
@@ -478,21 +426,6 @@ extract_ICU_occ <- function(x, reduce_age = TRUE, date_0 = NULL){
     dplyr::group_by(.data$t, .data$replicate) %>%
     dplyr::summarise(y = sum(.data$y))
   output$replicate <- factor(output$replicate)
-
-  return(output)
-}
-
-#' Extract report summaries
-#'
-#' @param x squire_simulation object
-#' @param date_0 Date of time 0, if specified a date column will be added
-#'
-#' @return Formatted long data.frame
-#' @export
-extract_report_summaries <- function(x, date_0 = NULL){
-  output <- format_output(x, reduce_age = TRUE, combine_compartments = FALSE,
-                          date_0 = date_0)
-  output <- collapse_for_report(output)
 
   return(output)
 }

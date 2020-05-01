@@ -4,6 +4,15 @@
 }
 
 #' @noRd
+is_ptr_null <- function(pointer){
+a <- attributes(pointer)
+attributes(pointer) <- NULL
+out <- identical(pointer, new("externalptr"))
+attributes(pointer) <- a
+return(out)
+}
+
+#' @noRd
 squire_file <- function(path) {
   system.file(path, package = "squire", mustWork = TRUE)
 }

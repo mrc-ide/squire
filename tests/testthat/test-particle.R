@@ -31,9 +31,68 @@ test_that("particle works", {
                              forecast_days = 0,
                              save_particles = FALSE,
                              return = "full")
-
   expect_true(names(out) == "log_likelihood")
   expect_lt(out$log_likelihood , 0)
+
+  out <- run_particle_filter(data = data,
+                             model_params = model_params,
+                             squire_model = explicit_model(),
+                             model_start_date = model_start_date,
+                             obs_params = list(phi_cases = 0.1,
+                                               k_cases = 2,
+                                               phi_death = 1,
+                                               k_death = 2,
+                                               exp_noise = 1e6),
+                             n_particles = 5,
+                             forecast_days = 0,
+                             save_particles = FALSE,
+                             return = "ll")
+  expect_is(out, "numeric")
+
+  expect_message(out <- run_particle_filter(data = data,
+                             model_params = model_params,
+                             squire_model = explicit_model(),
+                             model_start_date = model_start_date,
+                             obs_params = list(phi_cases = 0.1,
+                                               k_cases = 2,
+                                               phi_death = 1,
+                                               k_death = 2,
+                                               exp_noise = 1e6),
+                             n_particles = 5,
+                             forecast_days = 0,
+                             save_particles = FALSE,
+                             return = "sample"))
+  expect_is(out, "matrix")
+
+  out <- run_particle_filter(data = data,
+                             model_params = model_params,
+                             squire_model = explicit_model(),
+                             model_start_date = model_start_date,
+                             obs_params = list(phi_cases = 0.1,
+                                               k_cases = 2,
+                                               phi_death = 1,
+                                               k_death = 2,
+                                               exp_noise = 1e6),
+                             n_particles = 5,
+                             forecast_days = 0,
+                             save_particles = FALSE,
+                             return = "single")
+  expect_named(out, c("log_likelihood", "sample_state"))
+
+  expect_error(out <- run_particle_filter(data = data,
+                                            model_params = model_params,
+                                            squire_model = explicit_model(),
+                                            model_start_date = model_start_date,
+                                            obs_params = list(phi_cases = 0.1,
+                                                              k_cases = 2,
+                                                              phi_death = 1,
+                                                              k_death = 2,
+                                                              exp_noise = 1e6),
+                                            n_particles = 5,
+                                            forecast_days = 0,
+                                            save_particles = TRUE,
+                                            return = "single"))
+
 
 
   expect_error(out <- run_particle_filter(data = data,
@@ -65,6 +124,23 @@ test_that("particle works", {
                              forecast_days = 0,
                              save_particles = TRUE,
                              return = "full")
+  expect_error(
+    run_particle_filter(data = data,
+                        model_params = parameters_simple_SEEIR(
+                          population = get_population("Algeria",simple_SEIR = TRUE)$n,
+                          contact_matrix_set = contact_matrices[[1]]),
+                        squire_model = simple_model(),
+                        model_start_date = "2020-02-10",
+                        obs_params = list(phi_cases = 0.1,
+                                          k_cases = 2,
+                                          phi_death = 1,
+                                          k_death = 2,
+                                          exp_noise = 1e6),
+                        n_particles = 5,
+                        forecast_days = 0,
+                        save_particles = TRUE,
+                        return = "full"),
+    "compare function does not work with simple")
 
   expect_true(all(names(out) == c("log_likelihood","states")))
   expect_lt(out$log_likelihood , 0)
@@ -118,4 +194,83 @@ test_that("particle_filter error cases", {
   expect_error(
     particle_filter(d, mod, compare, 100, forecast_days = -1),
     "forecast_days must be positive")
+  expect_error(
+    particle_filter(d, mod, compare, 100, forecast_days = 1, save_particles = TRUE, save_end_states = TRUE),
+    "Can not have both save_particles")
+})
+
+test_that("run_particle_filter error cases", {
+
+  data <- read.csv(squire_file("extdata/example.csv"))
+
+  model_start_date <- "2020-02-01"
+  dt <- 1
+
+  data <- data[order(data$date), ]
+  data <- data[data$deaths>0 | data$cases>0,]
+
+  model_params <- parameters_explicit_SEEIR(country = "Algeria",
+                                            seeding_cases = 5,
+                                            dt=dt)
+
+  index <- odin_index(explicit_SEIR(user = model_params,
+                                    unused_user_action = "ignore"))
+
+  set.seed(123)
+  expect_error(run_particle_filter(data = data,
+                                   model_params = model_params,
+                                   squire_model = explicit_model(),
+                                   model_start_date = model_start_date,
+                                   obs_params = list(phi_cases = 0.1,
+                                                     k_cases = 2,
+                                                     phi_death = 1,
+                                                     k_death = 2,
+                                                     exp_noise = 1e6),
+                                   n_particles = 5,
+                                   forecast_days = 0,
+                                   save_particles = FALSE,
+                                   return = "jingle_bells"))
+
+  expect_error(run_particle_filter(data = data,
+                                   model_params = model_params,
+                                   squire_model = explicit_model(),
+                                   model_start_date = "2990-02-01",
+                                   obs_params = list(phi_cases = 0.1,
+                                                     k_cases = 2,
+                                                     phi_death = 1,
+                                                     k_death = 2,
+                                                     exp_noise = 1e6),
+                                   n_particles = 5,
+                                   forecast_days = 0,
+                                   save_particles = FALSE,
+                                   return = "ll"))
+
+  expect_error(run_(data.frame("datedsasd"="2020-04-10","ads"=0.05)))
+  expect_error(particle_filter_data("go_away_covid"))
+  expect_error(particle_filter_data(data.frame("date"=c("2020-03-10","2020-03-09"))))
+  expect_error(particle_filter_data(data.frame("date"=c("2020-03-10","2020-03-11")),start_date = "2020-03-13"))
+
+})
+
+
+test_that("particle_filter_data error cases", {
+
+  expect_error(particle_filter_data(data.frame("datedsasd"="2020-04-10","ads"=0.05)))
+  expect_error(particle_filter_data("go_away_covid"))
+  expect_error(particle_filter_data(data.frame("date"=c("2020-03-10","2020-03-09"))))
+  expect_error(particle_filter_data(data.frame("date"=c("2020-03-10","2020-03-11")),start_date = "2020-03-13"))
+
+})
+
+test_that("interventions_unique error cases", {
+
+  get <- interventions_unique(data.frame())
+  expect_is(get,"list")
+  expect_null(get$dates_change)
+
+  expect_error(interventions_unique(data.frame("datedsasd"="2020-04-10","ads"=0.05)))
+  expect_error(interventions_unique(data.frame("date"="2020-04-10","C"=0.05),x = "F"))
+
+  expect_error(intervention_dates_for_odin("2020-02-10", "2020-02-21", 4))
+  expect_error(intervention_dates_for_odin(c("2020-03-10","2020-03-09"), "2020-02-21", 4))
 })

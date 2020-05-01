@@ -12,6 +12,11 @@ test_that("population getter works", {
   expect_equal(out, out2)
 })
 
+test_that("lmic getter works", {
+  expect_vector(get_lmic_countries())
+  expect_true("Zambia" %in% get_lmic_countries())
+  expect_false("France" %in% get_lmic_countries())
+})
 
 test_that("mixing matrix getter works", {
   expect_error(get_mixing_matrix("moon"))

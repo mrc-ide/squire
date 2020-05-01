@@ -70,7 +70,7 @@ calibrate <- function(data,
       stop("Last date in date_R0_change is greater than the last date in data")
     }
     if(as.Date(last_start_date) >= as.Date(head(date_R0_change, 1))) {
-      stop("Last date in date_R0_change is earlier than last_start_date")
+      stop("First date in date_R0_change is earlier than last_start_date")
     }
     assert_same_length(R0_change, date_R0_change)
   }
@@ -80,7 +80,7 @@ calibrate <- function(data,
       stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
     }
     if(as.Date(last_start_date) >= as.Date(head(date_contact_matrix_set_change, 1))) {
-      stop("Last date in date_contact_matrix_set_change is earlier than last_start_date")
+      stop("First date in date_contact_matrix_set_change is earlier than last_start_date")
     }
     assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
   }
@@ -90,7 +90,7 @@ calibrate <- function(data,
       stop("Last date in date_ICU_bed_capacity_change is greater than the last date in data")
     }
     if(as.Date(last_start_date) >= as.Date(head(date_ICU_bed_capacity_change, 1))) {
-      stop("Last date in date_ICU_bed_capacity_change is earlier than last_start_date")
+      stop("First date in date_ICU_bed_capacity_change is earlier than last_start_date")
     }
     assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
   }
@@ -100,7 +100,7 @@ calibrate <- function(data,
       stop("Last date in date_hosp_bed_capacity_change is greater than the last date in data")
     }
     if(as.Date(last_start_date) >= as.Date(head(date_hosp_bed_capacity_change, 1))) {
-      stop("Last date in date_hosp_bed_capacity_change is earlier than last_start_date")
+      stop("First date in date_hosp_bed_capacity_change is earlier than last_start_date")
     }
     assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
   }
