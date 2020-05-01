@@ -131,7 +131,7 @@ calibrate <- function(data,
 
   } else {
     tt_contact_matrix <- 0
-    contact_matrix_set <- NULL
+    contact_matrix_set <- baseline_contact_matrix
   }
 
   # handle ICU changes
@@ -157,7 +157,7 @@ calibrate <- function(data,
 
   } else {
     tt_ICU_beds <- 0
-    ICU_bed_capacity <- NULL
+    ICU_bed_capacity <- baseline_ICU_bed_capacity
   }
 
   # handle hosp bed changed
@@ -183,7 +183,7 @@ calibrate <- function(data,
 
   } else {
     tt_hosp_beds <- 0
-    hosp_bed_capacity <- NULL
+    hosp_bed_capacity <- baseline_hosp_bed_capacity
   }
 
   # make the date definitely a date
