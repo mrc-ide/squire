@@ -1,3 +1,7 @@
+# squire 0.4.1
+
+* Patch for passing in user defined population and matrices
+
 # squire 0.4.0
 
 * `calibrate` now uses particle filter. See README for examples (#12)
