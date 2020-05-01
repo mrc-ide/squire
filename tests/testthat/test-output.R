@@ -86,7 +86,6 @@ test_that("output format works", {
 
   expect_named(o1, c("replicate", "compartment", "t", "y"))
   expect_named(o2, c("replicate", "age_group", "compartment", "t",  "y"))
-  expect_true(all(c("hospital","ICU","IMild","deaths") %in% unique(o3$compartment)))
   expect_named(o4, c("replicate", "age_group", "compartment", "t", "y", "date"))
   expect_named(o5, c("replicate", "compartment", "t", "y"))
   expect_named(o6, c("replicate", "compartment", "t", "y"))

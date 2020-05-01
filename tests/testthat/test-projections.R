@@ -172,6 +172,7 @@ test_that("projection plotting", {
   t1$model$.__enclos_env__$private$ptr <- new("externalptr")
   set.seed(123)
   p2_copy <- projections(r = t1, R0_change = c(0.5, 0.2), tt_R0 = c(0, 20))
+  index <- odin_index(p2_copy$model)
   expect_true(all(p2_copy$output[nrow(p2_copy$output),index$S,1] ==
                     p2$output[nrow(p2_copy$output),index$S,1]))
 })

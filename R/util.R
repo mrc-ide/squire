@@ -5,11 +5,11 @@
 
 #' @noRd
 is_ptr_null <- function(pointer){
-a <- attributes(pointer)
-attributes(pointer) <- NULL
-out <- identical(pointer, new("externalptr"))
-attributes(pointer) <- a
-return(out)
+  a <- attributes(pointer)
+  attributes(pointer) <- NULL
+  out <- identical(pointer, methods::new("externalptr"))
+  attributes(pointer) <- a
+  return(out)
 }
 
 #' @noRd
