@@ -20,6 +20,22 @@ squire enables users to simulate models of SARS-CoV-2 epidemics. This is
 done using an age-structured SEIR model that also explicitly considers
 healthcare capacity and disease severity.
 
+## IMPORTANT NOTES
+
+:warning: This code is released with no support. Please submit any
+questions or bugs as [issues](https://github.com/mrc-ide/squire/issues)
+and we will try to address them as quickly as possible.
+
+:warning: This model is in active development and so parameter name and
+behaviours, and output file formats will change without notice.
+
+:warning: The model is stochastic. Multiple runs with different seeds
+should be undertaken to see average behaviour.
+
+:warning: As with any mathematical model, it is easy to misconfigure
+inputs and therefore get meaningless outputs. Please contact the authors
+if you intend to publish results using `squire`.
+
 ## Overview
 
 squire is a package enabling users to quickly and easily generate
@@ -48,7 +64,7 @@ interventions.
 
 squire uses an age-structured SEIR model, with the infectious class
 divided into different stages reflecting progression through different
-disese severity pathways. These compartments are:  
+disease severity pathways. These compartments are:  
 \* S = Susceptibles  
 \* E = Exposed (Latent Infection)  
 \* I<sub>Mild</sub> = Mild Infections (Not Requiring Hospitalisation)  
@@ -207,9 +223,9 @@ head(output)
 #> 1         1 E             0.1    20
 #> 2         1 E             0.2    20
 #> 3         1 E             0.3    20
-#> 4         1 E             0.4    20
-#> 5         1 E             0.5    20
-#> 6         1 E             0.6    20
+#> 4         1 E             0.4    19
+#> 5         1 E             0.5    19
+#> 6         1 E             0.6    19
 ```
 
 If we wanted age-disaggregated data, we could set `reduce_age` to
@@ -417,9 +433,8 @@ z
 ### 4\. Calibrating the Model to Observed Deaths Data
 
 The model can be simply calibrated to time series of deaths reported in
-settings. This can be done using the `calibrate_particle` function. For
-example, let’s use the time series of deaths in Algeria up to the 22nd
-April
+settings. This can be done using the `calibrate` function. For example,
+let’s use the time series of deaths in Algeria up to the 22nd April
 2020:
 
 ``` r
@@ -439,36 +454,35 @@ most likely start date of the epidemic and the R0 at the start of the
 epidemic. Calibration occurs by scanning across a range of possible R0
 values and start dates. Fitting works using a particle filter, which can
 be parallelised using `future::plan(future::multiprocess())` before
-running `calibrate_particle`.
+running `calibrate`.
 
 ``` r
 # set up for parallelisation
 future::plan(future::multiprocess())
 
 # Fit model
-out <- calibrate_particle(
+out <- calibrate(
       data = df,
       R0_min = 2,
       R0_max = 4,
       R0_step = 0.5,
       first_start_date = "2020-02-10",
-      last_start_date = "2020-02-25",
-      day_step = 5,
+      last_start_date = "2020-02-22",
+      day_step = 4,
       replicates = 10,
       n_particles = 20,
       country = "Algeria"
     )
-#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
+#>  Progress: ──────────────────────────────────────────────────────────────────────────────────────────────────────                    100% Progress: ──────────────────────────────────────────────────────────────────────────────────────────────────────                    100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────        100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 #> 
-#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
+#>  Progress: ────────────────────────────────────────────────────────────────────────────────────                                      100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
 
-`calibrate_particle` returns the same output as
-`run_explicit_SEEIR_model`, with the first three elements in `out` being
-the simulation outputs, the model and model parameters. Note that
-simulation replicates are aligned to the maximum date in the data
-provided, and as a result we can use the same plotting functions as
-before:
+`calibrate` returns the same output as `run_explicit_SEEIR_model`, with
+the first three elements in `out` being the simulation outputs, the
+model and model parameters. Note that simulation replicates are aligned
+to the maximum date in the data provided, and as a result we can use the
+same plotting functions as before:
 
 ``` r
 plot(out, "deaths", date_0 = max(df$date), x_var = "date")
@@ -476,9 +490,9 @@ plot(out, "deaths", date_0 = max(df$date), x_var = "date")
 
 <img src="man/figures/README-plot particle deaths-1.png" width="100%" />
 
-With default parameters, `calibrate_particle` will simulate up the
-maximum date in the data provided. The fit to this data can be shown
-using the plotting function and specifying `particle_fit` to be `TRUE`
+With default parameters, `calibrate` will simulate up the maximum date
+in the data provided. The fit to this data can be shown using the
+plotting function and specifying `particle_fit` to be `TRUE`
 
 ``` r
 plot(out, particle_fit = TRUE)
@@ -507,8 +521,8 @@ plot(out$scan_results, what = "probability")
 
 The reason for the poor fits to the data shown earlier is because
 Algeria has implemented interventions prior to today. These can also be
-incorporated into `calibrate_particle`. For example, we can grab the
-assumed changes to transmission fased on government intervention for
+incorporated into `calibrate`. For example, we can grab the assumed
+changes to transmission fased on government intervention for
 Algeria.
 
 ``` r
@@ -522,20 +536,20 @@ int_unique
 #> [1] 0.900 0.850 0.550 0.225
 ```
 
-We can then provide these to `calibrate_particle` as the dates
-(`date_R0_change`) and relative reductions to R0 (`R0_change`). We will
-also specify for model fits to be continued for 14 days into the future
-with `forceast = 14`:
+We can then provide these to `calibrate` as the dates (`date_R0_change`)
+and relative reductions to R0 (`R0_change`). We will also specify for
+model fits to be continued for 14 days into the future with `forceast
+= 14`:
 
 ``` r
-out <- calibrate_particle(
+out <- calibrate(
       data = df,
       R0_min = 2,
       R0_max = 4,
       R0_step = 0.5,
       first_start_date = "2020-02-10",
-      last_start_date = "2020-02-25",
-      day_step = 5,
+      last_start_date = "2020-02-22",
+      day_step = 4,
       replicates = 10,
       n_particles = 20,
       forecast = 14,
@@ -543,9 +557,9 @@ out <- calibrate_particle(
       date_R0_change = int_unique$dates_change,
       country = "Algeria"
     )
-#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
+#>  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 #> 
-#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
+#>  Progress: ────────────────────────────────────────────────────────────────────────                                                  100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
 
 Let’s see if that is any better.
@@ -559,26 +573,45 @@ plot(out, particle_fit = TRUE)
 That is a much better fit.
 
 Any parameter that you could provide to `run_explicit_SEEIR_model` can
-be passed to `calibrate_particle`. This includes time varying arguments
-such as `contact_matrix_set`, `ICU_bed_capacity` and
-`hosp_bed_capacity`. To incorporate these into model fitting correctly,
-the date at which these change must be provided (similarly to how
-`date_R0_change` was provided above) using
-`date_ICU_bed_capacity_change`, `ICU_bed_capacity` and
-`date_hosp_bed_capacity_change`
-respecitvely.
+be passed to `calibrate`. This includes time varying arguments such as
+`contact_matrix_set`, `ICU_bed_capacity` and `hosp_bed_capacity`. To
+incorporate these into model fitting correctly, the date at which these
+change must be provided (similarly to how `date_R0_change` was provided
+above) using `date_ICU_bed_capacity_change`,
+`date_ICU_bed_capacity_change` and `date_hosp_bed_capacity_change`
+respecitvely. In addition, the user must provide a baseline value for
+these, i.e. the contact matrix and bed capacity at the beginning of the
+epidemic:
 
 ``` r
-calibration <- calibrate(country = "Afghanistan", deaths = max(df$deaths), 
-                         reporting_fraction = 1,
-                         seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
-                         min_seeding_cases = 5, max_seeding_cases = 50,
-                         replicates = 10, dt = 0.25)
-
-plot(calibration, var_select = "infections", date_0 = Sys.Date())
+out <- calibrate(
+      data = df,
+      R0_min = 2,
+      R0_max = 4,
+      R0_step = 0.5,
+      first_start_date = "2020-02-10",
+      last_start_date = "2020-02-22",
+      day_step = 4,
+      replicates = 10,
+      n_particles = 20,
+      forecast = 14,
+      R0_change = int_unique$change,
+      date_R0_change = int_unique$dates_change,
+      baseline_contact_matrix = get_mixing_matrix("Algeria"),
+      contact_matrix_set = list(get_mixing_matrix("Algeria")*0.9),
+      date_contact_matrix_set_change = "2020-03-16",
+      baseline_hosp_bed_capacity = squire:::get_hosp_bed_capacity("Algeria"),
+      hosp_bed_capacity = squire:::get_hosp_bed_capacity("Algeria")*c(1.1,1.2),
+      date_hosp_bed_capacity_change = c("2020-04-02", "2020-04-08"),
+      baseline_ICU_bed_capacity = squire:::get_ICU_bed_capacity("Algeria"),
+      ICU_bed_capacity = squire:::get_ICU_bed_capacity("Algeria")*c(1.05),
+      date_ICU_bed_capacity_change = c("2020-04-10"),
+      country = "Algeria"
+    )
+#>  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────        100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
+#> 
+#>  Progress: ────────────────────────────────────────────────────────────────────────────────────                                      100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
-
-<img src="man/figures/README-calibration-1.png" width="100%" />
 
 (N.B. Given the potentially long running time for the grid search, the
 model state is returned at the end of every day rather than every time
@@ -602,14 +635,14 @@ CDC](https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geogra
 
 First let’s calibrate to this data with no interventions in place (there
 are likely some interventions in place but nothing major, such as a
-lockdown has been implemented by 2020-04-28) and simulate forward for
+lockdown, has been implemented by 2020-04-28) and simulate forward for
 180
 days:
 
 ``` r
 df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
 
-out <- calibrate_particle(
+out <- calibrate(
       data = df,
       R0_min = 2.5,
       R0_max = 4,
@@ -622,9 +655,9 @@ out <- calibrate_particle(
       forecast = 180,
       country = "Guinea"
     )
-#>  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
+#>  Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 #> 
-#>  Progress: ────────────────────────                                                                                                   100% Progress: ─────────────────────────────────────────────────────────────────────────                                                  100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
+#>  Progress:                                                                                                                           100% Progress: ────────────────────────────────────                                                                                      100% Progress: ────────────────────────────────────────────────────────────────────────                                                  100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
 
 Firstly, let’s plot the fit up to the current day
@@ -648,8 +681,8 @@ plot(out, "deaths")
 
 <img src="man/figures/README-particle gin forecast-1.png" width="100%" />
 
-We can now use the output of `calibrate_particle` to explore different
-scenario projections using `projections`. For example, to contast this
+We can now use the output of `calibrate` to explore different scenario
+projections using `projections`. For example, to contast this
 unmitigated epidemic against a mitigation scenario with a 50% reduction
 in R0 today and a further 30% in 2 weeks time:
 
@@ -659,8 +692,8 @@ p <- projections(r = out, R0_change = c(0.5, 0.2), tt_R0 = c(0, 14))
 ```
 
 The output generated from `projections` is the same class and structure
-as from `calibrate_particle` and can be plotted against the unmitigated
-scenario using `projection_plotting`:
+as from `calibrate` and can be plotted against the unmitigated scenario
+using `projection_plotting`:
 
 ``` r
 ggproj <- projection_plotting(r_list = list(out,p),
@@ -721,9 +754,9 @@ projection_plotting(r_list = list(out,p),
 
 <img src="man/figures/README-total deaths projection-1.png" width="100%" />
 
-Lastly, rather than using relative changes to the interventions, we can
-provide absolute measures. For example, to change the R0 to 2 today and
-add 500 ICU beds in 40 days time:
+Rather than using relative changes to the interventions, we can provide
+absolute measures. For example, to change the R0 to 2 today and add 500
+ICU beds in 40 days time:
 
 ``` r
 # what is the current capacity
@@ -744,3 +777,52 @@ projection_plotting(r_list = list(out,p),
 ```
 
 <img src="man/figures/README-projection plotting absolute-1.png" width="100%" />
+
+Lastly, in order to run simulations for longer than the number set in
+`calibrate(forecast = x)`, we can use the argument `time_period` to set
+the numbers of days that `projections` should simulate for. For example,
+we could redo our calibration and have it only run up the current
+day:
+
+``` r
+df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
+
+out <- calibrate(
+      data = df,
+      R0_min = 2.5,
+      R0_max = 4,
+      R0_step = 0.5,
+      first_start_date = "2020-03-10",
+      last_start_date = "2020-03-25",
+      day_step = 5,
+      replicates = 10,
+      n_particles = 20,
+      forecast = 0,
+      country = "Guinea"
+    )
+#>  Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
+#> 
+#>  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
+
+plot(out, particle_fit = TRUE)
+```
+
+<img src="man/figures/README-particle gin alt-1.png" width="100%" />
+
+We can now use this to project 90 days forwards with the current level
+of interventions, as well as a projection of 90 days with a 50%
+reduction in R0:
+
+``` r
+p_no_change <- projections(out, time_period = 90)
+p_change <- projections(out, R0_change = 0.5, tt_R0 = 0, time_period = 90)
+
+projection_plotting(list(p_no_change, p_change), 
+                    scenarios = c("No Change", "50% R0"), 
+                    add_parms_to_scenarios = FALSE,
+                    var_select = "deaths",
+                    date_0 = max(df$date), 
+                    x_var = "date")
+```
+
+<img src="man/figures/README-particle gin alt proj-1.png" width="100%" />

@@ -51,7 +51,7 @@ If you are new to squire, the best place to start is below, where we detail how 
 
 <img src="https://raw.githubusercontent.com/mrc-ide/squire/master/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style = "border: none; float: center;" width = "600px">
 
-squire uses an age-structured SEIR model, with the infectious class divided into different stages reflecting progression through different disese severity pathways. These compartments are:  
+squire uses an age-structured SEIR model, with the infectious class divided into different stages reflecting progression through different disease severity pathways. These compartments are:  
 * S = Susceptibles  
 * E = Exposed (Latent Infection)  
 * I<sub>Mild</sub> = Mild Infections (Not Requiring Hospitalisation)  
@@ -553,7 +553,7 @@ projection_plotting(r_list = list(out,p),
 
 Lastly, in order to run simulations for longer than the number set in `calibrate(forecast = x)`, we can use the argument `time_period` to set the numbers of days that `projections` should simulate for. For example, we could redo our calibration and have it only run up the current day:
 
-```{r particle gin, message=FALSE, warning=FALSE}
+```{r particle gin alt, message=FALSE, warning=FALSE}
 df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
 
 out <- calibrate(
@@ -575,7 +575,7 @@ plot(out, particle_fit = TRUE)
 
 We can now use this to project 90 days forwards with the current level of interventions, as well as a projection of 90 days with a 50% reduction in R0:
 
-```{r particle gin, message=FALSE, warning=FALSE}
+```{r particle gin alt proj, message=FALSE, warning=FALSE}
 p_no_change <- projections(out, time_period = 90)
 p_change <- projections(out, R0_change = 0.5, tt_R0 = 0, time_period = 90)
 
