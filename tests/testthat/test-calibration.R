@@ -24,23 +24,23 @@ test_that("calibrate particle works", {
 
   set.seed(93L)
   out <- calibrate(
-      data = data,
-      R0_min = R0_min,
-      R0_max = R0_max,
-      R0_step = R0_step,
-      first_start_date = first_start_date,
-      last_start_date = last_start_date,
-      day_step = day_step,
-      squire_model = squire_model,
-      pars_obs = pars_obs,
-      n_particles = n_particles,
-      reporting_fraction = reporting_fraction,
-      R0_change = R0_change,
-      date_R0_change = date_R0_change,
-      replicates = replicates,
-      country = country,
-      forecast = 0
-    )
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    replicates = replicates,
+    country = country,
+    forecast = 0
+  )
   expect_named(out, c("output","parameters","model","interventions","scan_results","replicate_parameters"))
   expect_s3_class(plot(out$scan_results, log = TRUE), "gg")
   expect_s3_class(plot(out$scan_results), "gg")
@@ -462,7 +462,10 @@ test_that("calibrate user pop and contact", {
     forecast = 0
   )
 
-  expect_true(identical(out$scan_results$inputs$model_params$contact_matrix_set[[1]],
-            mat))
+  expect_true(
+    identical(out$scan_results$inputs$model_params$contact_matrix_set[[1]], mat)
+  )
+
+})
 
 
