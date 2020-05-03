@@ -71,7 +71,7 @@ calibrate <- function(data,
   assert_date(first_start_date)
   assert_date(last_start_date)
   assert_date(data$date)
-  assert_numeric(day_step)
+  assert_pos_int(day_step)
   assert_numeric(n_particles)
   assert_numeric(reporting_fraction)
   assert_custom_class(squire_model, "squire_model")

@@ -1,3 +1,7 @@
+# squire 0.4.2
+
+* Patch for `plot.scan_results` where log likelihood was being plotted for both
+
 # squire 0.4.1
 
 * Patch for passing in user defined population and matrices
