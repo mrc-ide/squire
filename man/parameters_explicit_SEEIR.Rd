@@ -64,7 +64,7 @@ Default = NULL, which causes beta to be estimated from R0}
 
 \item{time_period}{Length of simulation. Default = 365}
 
-\item{dt}{Time Step. Default = 0.5}
+\item{dt}{Time Step. Default = 0.1}
 
 \item{init}{Data.frame of initial conditions. Default = NULL}
 
