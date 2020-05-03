@@ -274,3 +274,13 @@ test_that("run day_return", {
   expect_true(nrow(r$output) == tp+1)
 
 })
+
+test_that("default probs", {
+
+  probs <- default_probs()
+  expect_named(probs,
+               c("prob_hosp","prob_severe","prob_non_severe_death_treatment",
+                 "prob_non_severe_death_no_treatment","prob_severe_death_treatment",
+                 "prob_severe_death_no_treatment","p_dist"))
+
+})

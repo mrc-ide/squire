@@ -78,6 +78,9 @@ projections <- function(r,
   ## assertion checks on parameters
   # ----------------------------------------------------------------------------
   assert_custom_class(r, "squire_simulation")
+  if (inherits(out$scan_results$inputs$model, "deterministic")) {
+    stop("projections unlikely to work with deterministic squire model currently")
+  }
   assert_pos_int(tt_R0)
   if(!0 %in% tt_R0) {
     stop("tt_R0 must start with 0")
