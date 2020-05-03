@@ -109,7 +109,7 @@ library(squire)
 ### 1. Running the model using baseline parameters and no control interventions  
 
 The full model is referred to as the **explicit_SEEIR** model, with hospital
-pathways explicltly exploring whether individuals will require a general 
+pathways explicitly exploring whether individuals will require a general 
 hospital bed providing oxygen or an ICU bed that provides ventilation. 
 
 To run the model we need to provide at least one of the following arguments:
