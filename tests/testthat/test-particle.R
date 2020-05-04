@@ -274,3 +274,54 @@ test_that("interventions_unique error cases", {
   expect_error(intervention_dates_for_odin("2020-02-10", "2020-02-21", 4))
   expect_error(intervention_dates_for_odin(c("2020-03-10","2020-03-09"), "2020-02-21", 4))
 })
+
+test_that("run_deterministic_comparison error cases", {
+
+data <- read.csv(squire_file("extdata/example.csv"))
+model_start_date <- "2020-02-01"
+dt <- 1
+
+data <- data[order(data$date), ]
+data <- data[data$deaths>0 | data$cases>0,]
+
+mod <- deterministic_model()
+
+model_params <- mod$parameter_func(country = "Algeria",
+                                          seeding_cases = 5,
+                                          dt=dt)
+
+index <- odin_index(explicit_SEIR_deterministic(user = model_params,
+                                  unused_user_action = "ignore"))
+
+set.seed(123)
+expect_error(out <- run_particle_filter(data = data,
+                           model_params = model_params,
+                           squire_model = mod,
+                           model_start_date = model_start_date,
+                           obs_params = list(phi_cases = 0.1,
+                                             k_cases = 2,
+                                             phi_death = 1,
+                                             k_death = 2,
+                                             exp_noise = 1e6),
+                           n_particles = 5,
+                           forecast_days = 0,
+                           save_particles = FALSE,
+                           return = "twaddle"),
+             "return argument must be full, ll, sample or single")
+
+expect_error(out <- run_particle_filter(data = data,
+                                        model_params = model_params,
+                                        squire_model = mod,
+                                        model_start_date = max(as.Date(as.character(data$date)))+1,
+                                        obs_params = list(phi_cases = 0.1,
+                                                          k_cases = 2,
+                                                          phi_death = 1,
+                                                          k_death = 2,
+                                                          exp_noise = 1e6),
+                                        n_particles = 5,
+                                        forecast_days = 0,
+                                        save_particles = FALSE,
+                                        return = "ll"),
+             "Model start date is later than data start date")
+
+})
