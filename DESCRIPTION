@@ -24,6 +24,7 @@ Suggests:
 RoxygenNote: 7.1.0
 Imports: 
     odin,
+    odin.js,
     dde (>= 1.0.2),
     dplyr,
     tidyr,
@@ -36,4 +37,6 @@ Imports:
     ggplot2
 Depends: R (>= 3.1.0)
 VignetteBuilder: knitr
-Remotes: mrc-ide/dde
+Remotes:
+    mrc-ide/dde,
+    mrc-ide/odin.js

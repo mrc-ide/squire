@@ -12,6 +12,7 @@ run_deterministic_SEIR_model(
   time_period,
   hosp_bed_capacity,
   ICU_bed_capacity,
+  mod_gen = explicit_SEIR_deterministic,
   ...
 )
 }
@@ -31,6 +32,9 @@ which will cause population to be sourced from \code{country}}
 
 \item{ICU_bed_capacity}{ICU bed capacity. Can be single number of vector if capacity time-varies.}
 
+\item{mod_gen}{An odin model generation function. Default:
+`explicit_SEIR_deterministic`}
+
 \item{...}{Other arguments to pass to \code{\link{parameters_explicit_SEEIR}}}
 }
 \value{
@@ -43,7 +47,7 @@ Run the deterministic explicit SEIR model
 \dontrun{
 pop <- get_population("Afghanistan")
 m <- get_mixing_matrix("Afghanistan")
-run_deterministic_SEIR_model(pop$n, m, [0, 50], [3, 3/2], 365, 100000,
+run_deterministic_SEIR_model(pop$n, m, c(0, 50), c(3, 3/2), 365, 100000,
 1000000)
 }
 }
