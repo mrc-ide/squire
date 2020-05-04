@@ -24,23 +24,23 @@ test_that("calibrate particle works", {
 
   set.seed(93L)
   out <- calibrate(
-      data = data,
-      R0_min = R0_min,
-      R0_max = R0_max,
-      R0_step = R0_step,
-      first_start_date = first_start_date,
-      last_start_date = last_start_date,
-      day_step = day_step,
-      squire_model = squire_model,
-      pars_obs = pars_obs,
-      n_particles = n_particles,
-      reporting_fraction = reporting_fraction,
-      R0_change = R0_change,
-      date_R0_change = date_R0_change,
-      replicates = replicates,
-      country = country,
-      forecast = 0
-    )
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    replicates = replicates,
+    country = country,
+    forecast = 0
+  )
   expect_named(out, c("output","parameters","model","interventions","scan_results","replicate_parameters"))
   expect_s3_class(plot(out$scan_results, log = TRUE), "gg")
   expect_s3_class(plot(out$scan_results), "gg")
@@ -421,7 +421,6 @@ test_that("calibrate non future works", {
 #------------------------------------------------
 test_that("calibrate deterministic", {
 
-
   data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
   interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
   int_unique <- interventions_unique(interventions)
@@ -462,5 +461,53 @@ out <- calibrate(
 
 expect_true(inherits(out$scan_results$inputs$model, "deterministic"))
 expect_error(get <- projections(out), "unlikely to work with deterministic")
+
+})
+
+test_that("calibrate user pop and contact", {
+
+  pop <- get_population("Nigeria")
+  mat <- get_mixing_matrix("Nigeria")*0.9
+
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  replicates = 2
+  R0_min = 2.6
+  R0_max = 2.6
+  R0_step = 0.1
+  first_start_date = "2020-02-01"
+  last_start_date = "2020-02-02"
+  day_step = 1
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  pars_obs = NULL
+  n_particles = 2
+
+  out <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    baseline_contact_matrix = mat,
+    replicates = replicates,
+    population = pop$n,
+    forecast = 0
+  )
+
+  expect_true(
+    identical(out$scan_results$inputs$model_params$contact_matrix_set[[1]], mat)
+  )
 
 })

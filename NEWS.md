@@ -1,3 +1,16 @@
+# squire 0.4.3
+
+* `calibrate` can now take `squire:::deterministic_model()` as model type.
+* Output of above does not work with plotting or projections yet. 
+
+# squire 0.4.2
+
+* Patch for `plot.scan_results` where log likelihood was being plotted for both
+
+# squire 0.4.1
+
+* Patch for passing in user defined population and matrices
+
 # squire 0.4.0
 
 * `calibrate` now uses particle filter. See README for examples (#12)
