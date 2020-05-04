@@ -44,3 +44,15 @@ test_that("healthcare capacity getter getter works", {
 
   expect_error(get_healthcare_capacity("Reunion"))
 })
+
+test_that("ICU and hosp bed direct work", {
+
+  expect_error(get_ICU_bed_capacity("moon"))
+  out <- get_ICU_bed_capacity("Angola")
+  expect_equal(out, 604L)
+
+  expect_error(get_hosp_bed_capacity("moon"))
+  out <- get_hosp_bed_capacity("Angola")
+  expect_equal(out, 30211L)
+
+})
