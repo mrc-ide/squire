@@ -447,12 +447,12 @@ intervention_dates_for_odin <- function(dates,
   dates <- as.Date(dates)
 
   # checks on timings
-    if (any(start_date >= dates)) {
-      stop("'start_date' must be less than the first date in dates")
-    }
-    if (any(diff(dates) <= 0)) {
-      stop("dates must be strictly increasing")
-    }
+  if (any(start_date >= dates)) {
+    stop("'start_date' must be less than the first date in dates")
+  }
+  if (any(diff(dates) <= 0)) {
+    stop("dates must be strictly increasing")
+  }
 
   tt <- round((as.numeric(dates - start_date)) * steps_per_day)
   return(tt)
@@ -470,18 +470,18 @@ interventions_unique <- function(df, x = "C") {
                 tt = NULL,
                 change = NULL))
   } else {
-  if (!"date" %in% names(df)) {
-    stop("df needs column 'date'")
-  }
-  if (!x %in% names(df)) {
-    stop(sprintf("df has no column %s", x))
-  }
+    if (!"date" %in% names(df)) {
+      stop("df needs column 'date'")
+    }
+    if (!x %in% names(df)) {
+      stop(sprintf("df has no column %s", x))
+    }
 
-  dates_change <- head(df[cumsum(rle(df[[x]])$lengths)+1,]$date, -1)
-  change <- head(df[cumsum(rle(df[[x]])$lengths)+1,][[x]], -1)
+    dates_change <- head(df[cumsum(rle(df[[x]])$lengths)+1,]$date, -1)
+    change <- head(df[cumsum(rle(df[[x]])$lengths)+1,][[x]], -1)
 
-  return(list(dates_change = as.Date(as.character(dates_change)),
-              change = change))
+    return(list(dates_change = as.Date(as.character(dates_change)),
+                change = change))
   }
 }
 
@@ -563,4 +563,101 @@ scale_log_weights <- function(log_weights) {
     average <- log(mean(weights)) + max_log_weights
   }
   list(weights = weights, average = average)
+}
+
+
+
+#' Create a deterministic model and compare to data
+#'
+#' @title Run Deterministic model comparison
+#'
+#' @param data to fit to.
+#'
+#' @param squire_model A squire model to use
+#'
+#' @param model_params Squire model parameters. Created from a call to one of
+##'   the \code{parameters_<type>_model} functions.
+#'
+#' @param model_start_date Date to run model simulations from
+#'
+#' @param obs_params List of parameters used for comparing
+#'   model to data
+#'
+#' @param forecast_days Days ahead to include in output
+#'
+#' @param save_history Whether to save full history. Default = FALSE
+#'
+#' @param return Set return depending on what is needed. 'full' and "sample" gives
+#'   the entire output, 'll' gives the log-likelihood
+#'
+#' @return Results from particle filter
+#'
+run_deterministic_comparison <- function(data,
+                                         squire_model,
+                                         model_params,
+                                         model_start_date = "2020-02-02",
+                                         obs_params = list(phi_cases = 0.1,
+                                                           k_cases = 2,
+                                                           phi_death = 1,
+                                                           k_death = 2,
+                                                           exp_noise = 1e6),
+                                         forecast_days = 0,
+                                         save_history = FALSE,
+                                         return = "ll") {
+
+  # parameter checks
+  if (!(return %in% c("full", "ll", "sample"))) {
+    stop("return argument must be full, ll, sample")
+  }
+  if (as.Date(data$date[data$deaths > 0][1], "%Y-%m-%d") < as.Date(model_start_date, "%Y-%m-%d")) {
+    stop("Model start date is later than data start date")
+  }
+
+  # convert data into particle-filter form
+  data <- particle_filter_data(data = data,
+                               start_date = model_start_date,
+                               steps_per_day = round(1 / model_params$dt))
+
+  model_params$tt_beta <- round(model_params$tt_beta*model_params$dt)
+  model_params$tt_contact_matrix <- round(model_params$tt_contact_matrix*model_params$dt)
+  model_params$tt_hosp_beds <- round(model_params$tt_hosp_beds*model_params$dt)
+  model_params$tt_ICU_beds <- round(model_params$tt_ICU_beds*model_params$dt)
+
+  #set up model
+  model_func <- squire_model$odin_model(user = model_params,
+                                        unused_user_action = "ignore")
+
+  # steps for the deterministic
+  steps <- c(0, data$day_end)
+  fore_steps <- seq(data$day_end[nrow(data)], length.out = forecast_days + 1L)
+  steps <- unique(c(steps,fore_steps))
+
+  # model run
+  out <- model_func$run(t = seq(0, tail(steps,1), 1))
+  index <- odin_index(model_func)
+
+  # get deaths for comparison
+  Ds <- diff(rowSums(out[,index$D]))
+  Ds <- Ds[data$day_end[-1]]
+  deaths <- data$deaths[-1]
+
+  ll <- ll_nbinom(deaths, Ds, obs_params$phi_death, obs_params$k_death, obs_params$exp_noise)
+  log_likelihood <- sum(ll)
+
+  # start the return object creation with likelihoods and other return options
+  ret <- list(log_likelihood = log_likelihood)
+    if (save_history) {
+      date <- data$date[[1]] + seq_len(nrow(out)) - 1L
+      rownames(out) <- as.character(date)
+      attr(out, "date") <- date
+      ret$states <- out
+    }
+
+  if (return == "ll") {
+    ret <- ret$log_likelihood
+  } else if (return == "full" || return == "sample") {
+    ret <- ret$states
+  }
+
+  ret
 }

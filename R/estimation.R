@@ -256,6 +256,9 @@ R0_date_particle_filter <- function(R0,
   model_params$tt_hosp_beds <- tt_hosp_beds
 
   # run the particle filter
+
+  if (inherits(squire_model, "stochastic")) {
+
   X <- run_particle_filter(data = data,
                            squire_model = squire_model,
                            model_params = model_params,
@@ -266,6 +269,19 @@ R0_date_particle_filter <- function(R0,
                            full_output = full_output,
                            save_particles = save_particles,
                            return = return)
+
+  } else {
+
+    X <- run_deterministic_comparison(data = data,
+                             squire_model = squire_model,
+                             model_params = model_params,
+                             model_start_date = start_date,
+                             obs_params = pars_obs,
+                             forecast_days = forecast_days,
+                             save_history = save_particles,
+                             return = return)
+
+  }
 
   X
 }
