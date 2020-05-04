@@ -325,3 +325,12 @@ expect_error(out <- run_particle_filter(data = data,
              "Model start date is later than data start date")
 
 })
+
+test_that("run_deterministic_comparison error cases", {
+
+df <- data.frame("state" = "Osun","date" = "2020-04-26","deaths"=2,"cases"=2,stringsAsFactors = FALSE)
+get <- particle_filter_data(df, start_date = "2020-04-23", 20)
+expect_true(nrow(get) == 2)
+expect_true(all(get$step_end == c(40,60)))
+
+})

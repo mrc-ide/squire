@@ -1,3 +1,7 @@
+# squire 0.4.5
+
+* Patch for `particle_filter_data` when only 1 row of data is provided
+
 # squire 0.4.4
 
 * Patch for `calibrate` to ensure correct dt values provided
