@@ -126,7 +126,7 @@ get_hosp_bed_capacity <- function(country = NULL) {
 #' @param beta_set Alternative parameterisation via beta rather than R0.
 #'   Default = NULL, which causes beta to be estimated from R0
 #' @param time_period Length of simulation. Default = 365
-#' @param dt Time Step. Default = 0.5
+#' @param dt Time Step. Default = 0.1
 #' @param init Data.frame of initial conditions. Default = NULL
 #' @param seeding_cases Initial number of cases seeding the epidemic
 #' @param prob_hosp probability of hospitalisation by age.

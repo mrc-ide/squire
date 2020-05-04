@@ -31,6 +31,7 @@ calibrate(
   contact_matrix_set = NULL,
   country = NULL,
   population = NULL,
+  dt = 0.1,
   ...
 )
 }
@@ -114,6 +115,8 @@ unprovided. Either \code{country} or \code{population} and
 
 \item{population}{Population vector (for each age group). Default = NULL,
 which will cause population to be sourced from \code{country}}
+
+\item{dt}{Time Step. Default = 0.1}
 
 \item{...}{Further aguments for the model parameter function. If using the
 \code{\link{explicit_model}} (default) this will be

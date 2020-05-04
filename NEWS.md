@@ -1,3 +1,7 @@
+# squire 0.4.4
+
+* Patch for `calibrate` to ensure correct dt values provided
+
 # squire 0.4.3
 
 * `calibrate` can now take `squire:::deterministic_model()` as model type.

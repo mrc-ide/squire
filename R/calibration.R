@@ -61,6 +61,7 @@ calibrate <- function(data,
                       contact_matrix_set = NULL,
                       country = NULL,
                       population = NULL,
+                      dt = 0.1,
                       ...) {
 
   # Asserts on arguments
@@ -85,6 +86,10 @@ calibrate <- function(data,
   assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
   assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
   assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
+  assert_numeric(dt)
+  if ( ((1/dt) %% 1) != 0) {
+    stop("1 / dt must result in an integer for calibration to work")
+  }
 
   # check grid params are okay
   if (as.Date(last_start_date) >= as.Date(data$date[1])-1) {
