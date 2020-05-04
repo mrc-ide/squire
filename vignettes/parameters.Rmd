@@ -1,5 +1,5 @@
 ---
-title: "parameters"
+title: "Model Parameters"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{parameters}
@@ -13,8 +13,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-
-# Model Parameters
 
 The parameter table below summarises the current best estimates incorporated in `squire`. These will be updated when new information becomes available. 
 
