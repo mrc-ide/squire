@@ -12,6 +12,14 @@ trigger_thresholds <- c(1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120,
                         2750, 3000, 3500, 4000, 4500, 5000, 6000, 7000, 8000, 10000,
                         20000, 30000, 40000, 50000, 75000, 100000, 150000)
 
+# Loading in ICU Capacity
+load("data/income_strata_healthcare_capacity.rda")
+ICU <- income_strata_healthcare_capacity$ICU_beds
+LIC_icu <- (ICU[1] * 50000000 /1000) / 2
+LMIC_icu <- (ICU[2] * 50000000 /1000) / 2
+UMIC_icu <- (ICU[3] * 50000000 /1000) / 2
+HIC_icu <- (ICU[4] * 50000000 /1000) / 2
+
 # Defining Parameters Used in All Model Runs
 replicates <- 60
 R0 <- c(3, 3)
@@ -80,10 +88,18 @@ saveRDS(no_constraints_overall, "no_constraints_overall_df.rds")
 no_constraints_overall <- readRDS("no_constraints_overall_df.rds")
 
 x <- no_constraints_overall %>%
-  filter(!(setting == "HIC" & threshold == "ICU_inc5000"),
-         !(setting == "UMIC" & threshold == "ICU_inc1200"),
+  filter(!(setting == "LIC" & threshold == "ICU_inc200"),
+         !(setting == "LIC" & threshold == "ICU_inc270"),
+         !(setting == "LIC" & threshold == "ICU_inc500"),
+         !(setting == "LIC" & threshold == "ICU_inc800"),
+         !(setting == "LMIC" & threshold == "ICU_inc335"),
          !(setting == "LMIC" & threshold == "ICU_inc2500"),
-         !(setting == "LMIC" & threshold == "ICU_inc700"))
+         !(setting == "UMIC" & threshold == "ICU_inc400"),
+         !(setting == "UMIC" & threshold == "ICU_inc800"),
+         !(setting == "UMIC" & threshold == "ICU_inc3000"),
+         !(setting == "HIC" & threshold == "ICU_inc700"))
+ggplot(x, aes(x = time_in_lockdown, y = max_capacity, col = setting)) +
+  geom_path(size = 2)
 
 a <- ggplot(x, aes(x = time_in_lockdown, y = max_capacity, col = setting)) +
   geom_path(size = 2) +
@@ -91,7 +107,7 @@ a <- ggplot(x, aes(x = time_in_lockdown, y = max_capacity, col = setting)) +
                       values = c("#B7C0EE", "#7067CF", "#362E91", "#241F60"),
                       name = "Income Strata") +
   guides(colour = guide_legend(override.aes = list(size = 4))) +
-  xlim(c(0, 0.65)) +
+  xlim(c(0, 0.8)) +
   geom_point(aes(x = 0.57, y = LIC_icu), colour = "#B7C0EE", size = 5) +
   geom_point(aes(x = 0.5, y = LMIC_icu), colour = "#7067CF", size = 5) +
   geom_point(aes(x = 0.45, y = UMIC_icu), colour = "#362E91", size = 5) +

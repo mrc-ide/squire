@@ -11,7 +11,7 @@ mitigation_reduction <- 1
 max_lockdowns <- 15
 R0 <- c(3, 3)
 tt_R0 <- c(0, 50)
-replicates <- 100
+replicates <- 60
 r <- run_explicit_SEEIR_model("United Kingdom")
 index <-  squire:::odin_index(r$model)
 

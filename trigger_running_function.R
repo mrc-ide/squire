@@ -95,6 +95,7 @@ run_trigger_threshold <- function(country, population, income_strata,
           time_in_lockdown[startpoint:endpoint, k] <- 1
         }
       }
+      print(round(median(trigger_times * dt)))
     } else {
       req <- out[, index$total_number_requiring_IMV, ]
       trigger_times <- lapply(seq_along(trigger_times), function(x){
@@ -341,7 +342,7 @@ realistic_run_trigger_threshold <- function(country, population, income_strata,
 process_output <- function(output, index) {
   time <- output$model_output[, index$time, 1]
   y <- lapply(seq_along(1:dim(output$model_output)[3]), function(p) {
-    output$model_output[, index$total_number_requiring_IMV, p]
+    output$model_output[, index$total_ICU_req, p]
   })
   y <- do.call(cbind, y)
   lockdown <- round(apply(output$time_in_lockdown[1:5500, ], 1, median))

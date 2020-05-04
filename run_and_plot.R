@@ -19,13 +19,13 @@ mitigation_reduction <- 1
 max_lockdowns <- 15
 R0 <- c(3, 3)
 tt_R0 <- c(0, 50)
-replicates <- 30
+replicates <- 50
 r <- run_explicit_SEEIR_model("United Kingdom")
 index <-  squire:::odin_index(r$model)
 
 # Running for LIC
 income_strata <- "LIC"
-trigger_threshold <- 33
+trigger_threshold <- 22
 country <- "Madagascar"
 raw_death_trigger <- 0
 death_triggers <- round(50 * raw_death_trigger)
@@ -68,7 +68,7 @@ LIC_max <- LIC_icu
 a <- ggplot(LIC_z, aes(x = time, y = median)) +
   geom_ribbon(aes(ymin = 0, ymax = LIC_lockdown * LIC_max * 2), alpha = 0.1) +
   geom_line(col = "#B7C0EE", size = 1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.7, fill = "#B7C0EE") +
+  #geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.7, fill = "#B7C0EE") +
   theme_bw() +
   xlab("") +
   geom_line(aes(y = LIC_icu), linetype = "dashed", size = 0.5) +
@@ -77,7 +77,7 @@ a <- ggplot(LIC_z, aes(x = time, y = median)) +
 
 # Running for LMIC
 income_strata <- "LMIC"
-trigger_threshold <- 67
+trigger_threshold <- 39
 country <- "Nicaragua"
 raw_death_trigger <- 0
 death_triggers <- round(50 * raw_death_trigger)
@@ -117,7 +117,7 @@ LMIC_max <- LMIC_icu
 b <- ggplot(LMIC_z, aes(x = time, y = median)) +
   geom_ribbon(aes(ymin = 0, ymax = LMIC_lockdown * LMIC_max * 2), alpha = 0.1) +
   geom_line(col = "#7067CF", size = 1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.7, fill = "#7067CF") +
+  #geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.7, fill = "#7067CF") +
   theme_bw() +
   xlab("") +
   geom_line(aes(y = LMIC_icu), linetype = "dashed", size = 0.5) +
@@ -126,7 +126,7 @@ b <- ggplot(LMIC_z, aes(x = time, y = median)) +
 
 # Running for UMIC
 income_strata <- "UMIC"
-trigger_threshold <- 159
+trigger_threshold <- 100
 country <- "Grenada"
 raw_death_trigger <- 3/50
 death_triggers <- round(50 * raw_death_trigger)
@@ -166,7 +166,7 @@ UMIC_max <- UMIC_icu
 c <- ggplot(UMIC_z, aes(x = time, y = median)) +
   geom_ribbon(aes(ymin = 0, ymax = UMIC_lockdown * UMIC_max * 2), alpha = 0.1) +
   geom_line(col = "#362E91", size = 1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.7, fill = "#362E91") +
+  #geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.7, fill = "#362E91") +
   theme_bw() +
   xlab("") +
   geom_line(aes(y = UMIC_icu), linetype = "dashed", size = 0.5) +
@@ -175,7 +175,7 @@ c <- ggplot(UMIC_z, aes(x = time, y = median)) +
 
 # Running for HIC
 income_strata <- "HIC"
-trigger_threshold <- 342
+trigger_threshold <- 211
 country <- "Malta"
 raw_death_trigger <- 8/50
 death_triggers <- round(50 * raw_death_trigger)
@@ -215,7 +215,7 @@ HIC_max <- HIC_icu
 d <- ggplot(HIC_z, aes(x = time, y = median)) +
   geom_ribbon(aes(ymin = 0, ymax = HIC_lockdown * HIC_max * 2), alpha = 0.1) +
   geom_line(col = "#241F60", size = 1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.7, fill = "#241F60") +
+  #geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.7, fill = "#241F60") +
   theme_bw() +
   xlab("") +
   geom_line(aes(y = HIC_icu), linetype = "dashed", size = 0.5) +
@@ -224,10 +224,16 @@ d <- ggplot(HIC_z, aes(x = time, y = median)) +
 
 no_constraints_overall <- readRDS("no_constraints_overall_df.rds")
 x <- no_constraints_overall %>%
-  filter(!(setting == "HIC" & threshold == "ICU_inc5000"),
-         !(setting == "UMIC" & threshold == "ICU_inc1200"),
+  filter(!(setting == "LIC" & threshold == "ICU_inc200"),
+         !(setting == "LIC" & threshold == "ICU_inc270"),
+         !(setting == "LIC" & threshold == "ICU_inc500"),
+         !(setting == "LIC" & threshold == "ICU_inc800"),
+         !(setting == "LMIC" & threshold == "ICU_inc335"),
          !(setting == "LMIC" & threshold == "ICU_inc2500"),
-         !(setting == "LMIC" & threshold == "ICU_inc700"))
+         !(setting == "UMIC" & threshold == "ICU_inc400"),
+         !(setting == "UMIC" & threshold == "ICU_inc800"),
+         !(setting == "UMIC" & threshold == "ICU_inc3000"),
+         !(setting == "HIC" & threshold == "ICU_inc700"))
 
 e <- ggplot(x, aes(x = time_in_lockdown, y = max_capacity, col = setting)) +
   geom_path(size = 2) +
@@ -235,7 +241,7 @@ e <- ggplot(x, aes(x = time_in_lockdown, y = max_capacity, col = setting)) +
                       values = c("#B7C0EE", "#7067CF", "#362E91", "#241F60"),
                       name = "Income Strata") +
   guides(colour = guide_legend(override.aes = list(size = 4))) +
-  xlim(c(0, 0.65)) +
+  xlim(c(0, 0.8)) +
   geom_point(aes(x = time_LIC, y = LIC_icu), colour = "#B7C0EE", size = 5) +
   geom_point(aes(x = time_LIMC, y = LMIC_icu), colour = "#7067CF", size = 5) +
   geom_point(aes(x = time_UMIC, y = UMIC_icu), colour = "#362E91", size = 5) +
@@ -345,13 +351,14 @@ e + f + a + b + c + d +
 
 # Running for LIC but for the initial illustrative plot
 income_strata <- "LIC"
-trigger_threshold <- 33
+trigger_threshold <- 30
 country <- "Madagascar"
 raw_death_trigger <- 0
 death_triggers <- round(50 * raw_death_trigger)
 pop <- get_population(country)
 pop <- (50000000/sum(pop$n)) * pop$n
 contact_matrix <- squire::get_mixing_matrix("Madagascar")
+suppression_reduction <- c(0.25, 0.15, 0.05)
 
 med_LIC <- run_trigger_threshold(country = country, population = pop,
                                  replicates = replicates,
@@ -381,27 +388,37 @@ high_LIC <- run_trigger_threshold(country = country, population = pop,
                                   income_strata_healthcare_capacity = income_strata_healthcare_capacity,
                                   poorer_outcomes = FALSE)
 
-mid <- process_output(med_LIC)
+mid <- process_output(med_LIC, index)
 mid_time <- round(apply(med_LIC$time_in_lockdown[1:5500, ], 1, median))
 mid$scenario <- "mid"
 
-high <- process_output(high_LIC)
+high <- process_output(high_LIC, index)
 high_time <- round(apply(high_LIC$time_in_lockdown[1:5500, ], 1, median))
 high$scenario <- "high"
 
+first_mid <- mid_time
+first_mid[800:5500] <- 0
+first_high <- high_time
+first_high[800:5500] <- 0
+first_lockdown <- c(first_mid, first_high)
+
 overall <- rbind(mid, high) %>%
-  cbind(lockdown = c(mid_time, high_time)) %>%
+  cbind(lockdown = first_lockdown) %>%
   filter(time > 25 & time < 120)
 
 g <- ggplot(overall, aes(x = time, y = median, colour = scenario)) +
-  geom_line() +
+  geom_ribbon(aes(ymin = rep(0, length(lockdown)), ymax = lockdown * max(overall$upper)),
+              fill = "grey", alpha = 0.2, colour = NA) +
+  geom_line(size = 1) +
   geom_ribbon(aes(ymin = lower, ymax = upper, fill = scenario), alpha = 0.2, colour = NA) +
-  scale_colour_manual(values = c("red", "green")) +
-  scale_fill_manual(values = c("red", "green")) +
-  geom_line(aes(x = 50, y = lockdown * 500), colour = "black") +
-  geom_line(aes(x = 94, y = lockdown * 500), colour = "green") +
-  geom_line(aes(x = 109, y = lockdown * 500), colour = "red") +
-  theme_bw()
+  scale_colour_manual(values = c("#95A78D", "#C8C6AF")) +
+  scale_fill_manual(values = c("#95A78D", "#C8C6AF")) +
+  geom_line(aes(x = 94, y = lockdown * max(overall$upper)),
+            size = 1, colour = "#C8C6AF") +
+  geom_line(aes(x = 109, y = lockdown * max(overall$upper)),
+            size = 1, colour = "#95A78D") +
+  theme_bw() +
+  theme(legend.position = "none")
 
 # Illustrative Plot Part 2
 replicates <- 20
@@ -443,38 +460,38 @@ high_thresh_LIC <- run_trigger_threshold(country = country, population = pop,
                                          income_strata_healthcare_capacity = income_strata_healthcare_capacity,
                                          poorer_outcomes = FALSE)
 
-low_thresh <- process_output(low_thresh_LIC)
+low_thresh <- process_output(low_thresh_LIC, index)
 low_thresh$scenario <- "low"
 low_thresh_time <- round(apply(low_thresh_LIC$time_in_lockdown[1:5500, ], 1, median))
 
-high_thresh <- process_output(high_thresh_LIC)
+high_thresh <- process_output(high_thresh_LIC, index)
 high_thresh$scenario <- "high"
 high_thresh_time <- round(apply(high_thresh_LIC$time_in_lockdown[1:5500, ], 1, median))
 
 h <- ggplot(low_thresh, aes(x = time, y = median)) +
-  geom_line(colour = "#5B85AA") +
-  labs(x = "Time (Days)")
-geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#5B85AA", alpha = 0.2, colour = NA) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#C884A5", alpha = 0.2, colour = NA) +
+  geom_line(colour = "#C884A5") +
+  geom_ribbon(aes(ymin = 0, ymax = low_thresh_time * 600), alpha = 0.1) +
+  labs(x = "") +
   theme_bw()
 
 i <- ggplot(high_thresh, aes(x = time, y = median)) +
-  geom_line(colour = "#F46036") +
-  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#F46036", alpha = 0.2, colour = NA) +
+  geom_ribbon(aes(ymin = 0, ymax = high_thresh_time * 7800), alpha = 0.1) +
+  geom_line(colour = "#EB55A2") +
+  labs(x = "") +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#EB55A2", alpha = 0.2, colour = NA) +
   theme_bw()
-
-layout <- "GGGHHH
-           GGGIII
-           AACCCC
-           AADDDD
-           BBEEEE
-           BBFFFF"
 
 layout <- "AAABBB
            AAACCC
-           DDEEEE
            DDFFFF
-           GGHHHH
-           GGIIII"
+           DDFFFF
+           DDGGGG
+           DDGGGG
+           EEHHHH
+           EEHHHH
+           EEIIII
+           EEIIII"
 
 g + h + i + e + f + a + b + c + d +
   plot_layout(design = layout)
