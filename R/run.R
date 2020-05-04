@@ -313,6 +313,7 @@ run_explicit_SEEIR_model <- function(
 #' @param time_period Length of simulation. Default = 365
 #' @param hosp_bed_capacity General bed capacity. Can be single number of vector if capacity time-varies.
 #' @param ICU_bed_capacity ICU bed capacity. Can be single number of vector if capacity time-varies.
+#' @param ... Other arguments to pass to \code{\link{parameters_explicit_SEEIR}}
 #'
 #' @return Simulation output
 #' @export
@@ -331,7 +332,8 @@ run_deterministic_SEIR_model <- function(
   R0_set,
   time_period,
   hosp_bed_capacity,
-  ICU_bed_capacity
+  ICU_bed_capacity,
+  ...
   ) {
 
   default_params <- parameters_explicit_SEEIR(
@@ -346,7 +348,8 @@ run_deterministic_SEIR_model <- function(
     hosp_bed_capacity = hosp_bed_capacity,
     ICU_bed_capacity = ICU_bed_capacity,
     tt_hosp_beds = 0,
-    tt_ICU_beds = 0
+    tt_ICU_beds = 0,
+    ...
   )
 
   seed <- c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0)

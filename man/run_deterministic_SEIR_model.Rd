@@ -11,7 +11,8 @@ run_deterministic_SEIR_model(
   R0_set,
   time_period,
   hosp_bed_capacity,
-  ICU_bed_capacity
+  ICU_bed_capacity,
+  ...
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ which will cause population to be sourced from \code{country}}
 \item{hosp_bed_capacity}{General bed capacity. Can be single number of vector if capacity time-varies.}
 
 \item{ICU_bed_capacity}{ICU bed capacity. Can be single number of vector if capacity time-varies.}
+
+\item{...}{Other arguments to pass to \code{\link{parameters_explicit_SEEIR}}}
 }
 \value{
 Simulation output
