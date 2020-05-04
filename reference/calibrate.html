@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calibrate deaths — calibrate • squire</title>
+<title>Calibrate via particle filter grid search using time series of deaths — calibrate • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Calibrate deaths — calibrate" />
-<meta property="og:description" content="Calibrate deaths" />
+<meta property="og:title" content="Calibrate via particle filter grid search using time series of deaths — calibrate" />
+<meta property="og:description" content="Calibrate via particle filter grid search using time series of deaths" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
       </span>
     </div>
 
@@ -83,6 +83,9 @@
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/parameters.html">Parameters</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -111,27 +114,42 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Calibrate deaths</h1>
+    <h1>Calibrate via particle filter grid search using time series of deaths</h1>
     
     <div class="hidden name"><code>calibrate.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Calibrate deaths</p>
+    <p>Calibrate via particle filter grid search using time series of deaths</p>
     </div>
 
     <pre class="usage"><span class='fu'>calibrate</span>(
-  <span class='no'>deaths</span>,
+  <span class='no'>data</span>,
+  <span class='no'>R0_min</span>,
+  <span class='no'>R0_max</span>,
+  <span class='no'>R0_step</span>,
+  <span class='no'>first_start_date</span>,
+  <span class='no'>last_start_date</span>,
+  <span class='no'>day_step</span>,
+  <span class='kw'>squire_model</span> <span class='kw'>=</span> <span class='fu'><a href='explicit_model.html'>explicit_model</a></span>(),
+  <span class='kw'>pars_obs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>forecast</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>n_particles</span> <span class='kw'>=</span> <span class='fl'>100</span>,
   <span class='kw'>reporting_fraction</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>date_R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>date_ICU_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>baseline_ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>date_hosp_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>baseline_hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>date_contact_matrix_set_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>baseline_contact_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>country</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>seeding_age_groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"35-40"</span>, <span class='st'>"40-45"</span>, <span class='st'>"45-50"</span>, <span class='st'>"50-55"</span>),
-  <span class='kw'>min_seeding_cases</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>max_seeding_cases</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>R0_scan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -139,14 +157,124 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>deaths</th>
-      <td><p>Number of observed deaths</p></td>
+      <th>data</th>
+      <td><p>Deaths data to fit to. See <code>example_deaths.csv</code>
+and <code><a href='particle_filter_data.html'>particle_filter_data()</a></code></p></td>
+    </tr>
+    <tr>
+      <th>R0_min</th>
+      <td><p>Minimum value of R0 in the search</p></td>
+    </tr>
+    <tr>
+      <th>R0_max</th>
+      <td><p>Maximum value of R0 in the search</p></td>
+    </tr>
+    <tr>
+      <th>R0_step</th>
+      <td><p>Step to increment R0 between min and max</p></td>
+    </tr>
+    <tr>
+      <th>first_start_date</th>
+      <td><p>Earliest start date as 'yyyy-mm-dd'</p></td>
+    </tr>
+    <tr>
+      <th>last_start_date</th>
+      <td><p>Latest start date as 'yyyy-mm-dd'</p></td>
+    </tr>
+    <tr>
+      <th>day_step</th>
+      <td><p>Step to increment date in days</p></td>
+    </tr>
+    <tr>
+      <th>squire_model</th>
+      <td><p>A squire model. Default = <code>explicit_SEIR()</code></p></td>
+    </tr>
+    <tr>
+      <th>pars_obs</th>
+      <td><p>list of parameters to use for the comparison function.</p></td>
+    </tr>
+    <tr>
+      <th>forecast</th>
+      <td><p>Number of days to forecast forward. Default = 0</p></td>
+    </tr>
+    <tr>
+      <th>n_particles</th>
+      <td><p>Number of particles. Positive Integer. Default = 100</p></td>
     </tr>
     <tr>
       <th>reporting_fraction</th>
       <td><p>Reporting fraction. Numeric for what proportion of
 the total deaths the reported deaths represent. E.g. 0.5 results in
-the model calibrating to twice the deaths provided by <code>deaths</code></p></td>
+the model calibrating to twice the deaths provided by <code>data$deaths</code></p></td>
+    </tr>
+    <tr>
+      <th>replicates</th>
+      <td><p>Replicates to be run. Default = 100</p></td>
+    </tr>
+    <tr>
+      <th>date_R0_change</th>
+      <td><p>Calendar dates at which R0_change occurs.
+Defaut = NULL, i.e. no change in R0</p></td>
+    </tr>
+    <tr>
+      <th>R0_change</th>
+      <td><p>Numeric vector for relative changes in R0. Default = NULL,
+i.e. no change in R0</p></td>
+    </tr>
+    <tr>
+      <th>date_ICU_bed_capacity_change</th>
+      <td><p>Calendar dates at which ICU bed
+capacity changes set in <code>model_params</code> change.
+Defaut = NULL, i.e. no change</p></td>
+    </tr>
+    <tr>
+      <th>baseline_ICU_bed_capacity</th>
+      <td><p>The starting number of ICU beds before
+the epidemic started. Default = NULL, which will use the hospital beds data
+for the country provided. If no country is provided then this is 3/100 of
+hospital beds</p></td>
+    </tr>
+    <tr>
+      <th>ICU_bed_capacity</th>
+      <td><p>Number of ICU beds at each date specified in
+<code>date_ICU_bed_capacity_change</code>. Must be same length as
+<code>date_ICU_bed_capacity_change</code>.</p></td>
+    </tr>
+    <tr>
+      <th>date_hosp_bed_capacity_change</th>
+      <td><p>Calendar dates at which hospital bed
+capacity changes set in <code>model_params</code> change.
+Defaut = NULL, i.e. no change</p></td>
+    </tr>
+    <tr>
+      <th>baseline_hosp_bed_capacity</th>
+      <td><p>The starting number of hospital beds before
+the epidemic started. Default = NULL, which will use the hospital beds data
+for the country provided. If no country is provided then this is 5/1000 of
+the population</p></td>
+    </tr>
+    <tr>
+      <th>hosp_bed_capacity</th>
+      <td><p>Number of hospital beds at each date specified in
+<code>date_hosp_bed_capacity_change</code>. Must be same length as
+<code>date_hosp_bed_capacity_change</code>.</p></td>
+    </tr>
+    <tr>
+      <th>date_contact_matrix_set_change</th>
+      <td><p>Calendar dates at which the contact matrices
+set in <code>model_params</code> change. Defaut = NULL, i.e. no change</p></td>
+    </tr>
+    <tr>
+      <th>baseline_contact_matrix</th>
+      <td><p>The starting contact matrix prior to any changes
+due to interventions or otherwise. Default = NULL, which will use the contact
+matrix associated with the coutnry provided.</p></td>
+    </tr>
+    <tr>
+      <th>contact_matrix_set</th>
+      <td><p>List of contact matrices to be used from the dates
+provided in <code>date_contact_matrix_set_change</code>.Must be same length as
+<code>date_contact_matrix_set_change</code></p></td>
     </tr>
     <tr>
       <th>country</th>
@@ -161,47 +289,16 @@ unprovided. Either <code>country</code> or <code>population</code> and
 which will cause population to be sourced from <code>country</code></p></td>
     </tr>
     <tr>
-      <th>contact_matrix_set</th>
-      <td><p>Contact matrices used in simulation. Default =
-NULL, which will generate this based on the <code>country</code>.</p></td>
-    </tr>
-    <tr>
-      <th>seeding_age_groups</th>
-      <td><p>Age groups for seeding</p></td>
-    </tr>
-    <tr>
-      <th>min_seeding_cases</th>
-      <td><p>Minimum seeding cases</p></td>
-    </tr>
-    <tr>
-      <th>max_seeding_cases</th>
-      <td><p>Maximum seeding cases</p></td>
-    </tr>
-    <tr>
-      <th>R0</th>
-      <td><p>R0 to be passed to <code><a href='run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model</a></code>.
-Default = 3</p></td>
-    </tr>
-    <tr>
-      <th>R0_scan</th>
-      <td><p>Vector or R0 values to sample from to introduce uncertainty
-in predictions. Default = NULL, which will not scan. If provided, the first
-value in <code>R0</code> will be drawn from <code>R0_scan</code></p></td>
-    </tr>
-    <tr>
-      <th>replicates</th>
-      <td><p>Replicates to be passed to
-<code><a href='run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model</a></code>. Default = 100</p></td>
-    </tr>
-    <tr>
       <th>...</th>
-      <td><p>Further aguments for <code><a href='run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model()</a></code></p></td>
+      <td><p>Further aguments for the model parameter function. If using the
+<code><a href='explicit_model.html'>explicit_model</a></code> (default) this will be
+<code>parameters_explicit_SEEIR</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List of time adjusted squire_simulations</p>
+    <p>List of dated squire simulations</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

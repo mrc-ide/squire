@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
       </span>
     </div>
 
@@ -45,6 +45,9 @@
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="articles/parameters.html">Parameters</a>
 </li>
 <li>
   <a href="reference/index.html">Reference</a>
@@ -78,6 +81,14 @@
 <!-- badges: start -->
 
 <p>squire enables users to simulate models of SARS-CoV-2 epidemics. This is done using an age-structured SEIR model that also explicitly considers healthcare capacity and disease severity.</p>
+<div id="important-notes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#important-notes" class="anchor"></a>IMPORTANT NOTES</h2>
+<p><span class="emoji" data-emoji="warning">⚠️</span> This code is released with no support. Please submit any questions or bugs as <a href="https://github.com/mrc-ide/squire/issues">issues</a> and we will try to address them as quickly as possible.</p>
+<p><span class="emoji" data-emoji="warning">⚠️</span> This model is in active development and so parameter name and behaviours, and output file formats will change without notice.</p>
+<p><span class="emoji" data-emoji="warning">⚠️</span> The model is stochastic. Multiple runs with different seeds should be undertaken to see average behaviour.</p>
+<p><span class="emoji" data-emoji="warning">⚠️</span> As with any mathematical model, it is easy to misconfigure inputs and therefore get meaningless outputs. Please contact the authors if you intend to publish results using <code>squire</code>.</p>
+</div>
 <div id="overview" class="section level2">
 <h2 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h2>
@@ -96,7 +107,7 @@
 <h3 class="hasAnchor">
 <a href="#overall-structure" class="anchor"></a>Overall Structure</h3>
 <p><img src="https://raw.githubusercontent.com/mrc-ide/squire/master/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style="border: none; float: center;" width="600px"></p>
-<p>squire uses an age-structured SEIR model, with the infectious class divided into different stages reflecting progression through different disese severity pathways. These compartments are:<br>
+<p>squire uses an age-structured SEIR model, with the infectious class divided into different stages reflecting progression through different disease severity pathways. These compartments are:<br>
 * S = Susceptibles<br>
 * E = Exposed (Latent Infection)<br>
 * I<sub>Mild</sub> = Mild Infections (Not Requiring Hospitalisation)<br>
@@ -159,12 +170,12 @@
 <code>parameters</code> - model parameters</li>
 </ul>
 <p><code>squire_simulation</code> objects can be plotted as follows:</p>
-<div class="sourceCode" id="cb6"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>)</pre></div>
+<div class="sourceCode" id="cb6"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">r</span>)</pre></div>
 <p><img src="reference/figures/README-base%20plot-1.png" width="100%"></p>
-<p>This plot will plot each of the compartments of the model output. We can also plot specific compartments using the <code>var_select</code> argument that can be passed to <code><a href="https://rdrr.io/r/graphics/plot.html">plot()</a></code>. Arguments passed to <code>var_select</code> must be one of the variables in the plot above.</p>
-<div class="sourceCode" id="cb7"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"E"</span>, <span class="st">"IMild"</span>))</pre></div>
+<p>This plot will plot each of the compartments of the model output. We can also plot specific compartments using the <code>var_select</code> argument that can be passed to <code><a href="https://rdrr.io/r/base/plot.html">plot()</a></code>. Arguments passed to <code>var_select</code> must be one of the variables in the plot above.</p>
+<div class="sourceCode" id="cb7"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"E"</span>, <span class="st">"IMild"</span>))</pre></div>
 <p><img src="reference/figures/README-subset%20variables%20plot-1.png" width="100%"> Or, you can specify one of <code>deaths</code>, <code>infections</code>, <code>hospital_occupancy</code>, <code>ICU_occupancy</code>, <code>hospital_demand</code> or <code>ICU_demand</code>, and plot these summary metrics that represent the combintion of a number of different compartment e.g:</p>
-<div class="sourceCode" id="cb8"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"deaths"</span>)</pre></div>
+<div class="sourceCode" id="cb8"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"deaths"</span>)</pre></div>
 <p><img src="reference/figures/README-subset%20variables%20plot2-1.png" width="100%"></p>
 <p>All of the plotting above makes uses of the <code>squire</code> function <code>format_output</code> which provides you with a means of manipulating and managing the output from a <code>run_explicit_SEEIR_model</code> call. Using it you can specify the model outputs (e.g. compartments) you want, as well as whether you want that output aggregated over age or not. Here we extract the latent compartment (E). The data columns correspond to the compartment name (<code>compartment</code>), timestep (<code>t</code>), model run number (<code>replicate</code>) and the model output (<code>y</code>).</p>
 <div class="sourceCode" id="cb9"><pre class="r">
@@ -213,7 +224,7 @@
                               <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
                               <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.1</span>,
                               <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">5</span>)
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">r</span>)
 <span class="co">#&gt; Warning in plot.squire_simulation(r): Summary statistic estimated from &lt;10</span>
 <span class="co">#&gt; replicates</span>
 <span class="co">#&gt; Warning in plot.squire_simulation(r): Confidence bounds estimated from &lt;10</span>
@@ -230,7 +241,7 @@
                               <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
                               <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.1</span>,
                               <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">5</span>)
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>)
 <span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Summary</span>
 <span class="co">#&gt; statistic estimated from &lt;10 replicates</span>
 <span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Confidence</span>
@@ -248,7 +259,7 @@
                               <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">220</span>,
                               <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.1</span>,
                               <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">5</span>)
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>)
 <span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Summary</span>
 <span class="co">#&gt; statistic estimated from &lt;10 replicates</span>
 <span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Confidence</span>
@@ -264,7 +275,7 @@
                               <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
                               <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.1</span>,
                               <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">5</span>)
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>)
 <span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Summary</span>
 <span class="co">#&gt; statistic estimated from &lt;10 replicates</span>
 <span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Confidence</span>
@@ -283,8 +294,8 @@
                               <span class="kw">hosp_bed_capacity</span> <span class="kw">=</span> <span class="fl">1000</span>,
                               <span class="kw">ICU_bed_capacity</span> <span class="kw">=</span> <span class="fl">100</span>)
 
-<span class="no">c</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"hospital_occupancy"</span>)
-<span class="no">d</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"ICU_occupancy"</span>)
+<span class="no">c</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"hospital_occupancy"</span>)
+<span class="no">d</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">r</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"ICU_occupancy"</span>)
 <span class="no">c</span> / <span class="no">d</span></pre></div>
 <p><img src="reference/figures/README-change%20healthcare%20capacity-1.png" width="100%"></p>
 </div>
@@ -334,111 +345,228 @@
 <div id="4-calibrating-the-model-to-observed-deaths-data" class="section level3">
 <h3 class="hasAnchor">
 <a href="#4-calibrating-the-model-to-observed-deaths-data" class="anchor"></a>4. Calibrating the Model to Observed Deaths Data</h3>
-<p>The model can be simply calibrated to the cumulative time series of deaths reported in settings. This can be done using the <code>calibrate</code> function. For example, let’s generate some dummy time series data and calibrate to it:</p>
-<div class="sourceCode" id="cb17"><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu"><a href="reference/death_data_format.html">death_data_format</a></span>(<span class="kw">reporting_quality</span> <span class="kw">=</span> <span class="fl">1</span>)
-<span class="no">df</span>
-<span class="co">#&gt;         date deaths cases</span>
-<span class="co">#&gt; 1 2020-04-18      6     7</span>
-<span class="co">#&gt; 2 2020-04-17      5     5</span>
-<span class="co">#&gt; 3 2020-04-16      4     4</span>
-<span class="co">#&gt; 4 2020-04-15      3     3</span></pre></div>
-<p>Then to calibrate to this dummy data and visualise the full epidemic curve, we do the following. Note that simulation replicates are aligned to the current death total and the outputs are returned as a <code>squire_simulation</code> object.</p>
-<div class="sourceCode" id="cb18"><pre class="r"><span class="no">calibration</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(<span class="kw">country</span> <span class="kw">=</span> <span class="st">"Afghanistan"</span>, <span class="kw">deaths</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">df</span>$<span class="no">deaths</span>),
-                         <span class="kw">reporting_fraction</span> <span class="kw">=</span> <span class="fl">1</span>,
-                         <span class="kw">seeding_age_groups</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"35-40"</span>, <span class="st">"40-45"</span>, <span class="st">"45-50"</span>, <span class="st">"50-55"</span>),
-                         <span class="kw">min_seeding_cases</span> <span class="kw">=</span> <span class="fl">5</span>, <span class="kw">max_seeding_cases</span> <span class="kw">=</span> <span class="fl">50</span>,
-                         <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">10</span>, <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.25</span>)
+<p>The model can be simply calibrated to time series of deaths reported in settings. This can be done using the <code>calibrate</code> function. For example, let’s use the time series of deaths in Algeria up to the 22nd April 2020:</p>
+<div class="sourceCode" id="cb17"><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">squire_file</span>(<span class="st">"extdata/example_DZA.csv"</span>), <span class="kw">stringsAsFactors</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">df</span>)
+<span class="co">#&gt;   X                 date deaths cases</span>
+<span class="co">#&gt; 1 1 2020-02-26T00:00:00Z      0     1</span>
+<span class="co">#&gt; 2 2 2020-03-01T00:00:00Z      0     2</span>
+<span class="co">#&gt; 3 3 2020-03-04T00:00:00Z      0     2</span>
+<span class="co">#&gt; 4 4 2020-03-05T00:00:00Z      0     7</span>
+<span class="co">#&gt; 5 5 2020-03-06T00:00:00Z      0     5</span>
+<span class="co">#&gt; 6 6 2020-03-09T00:00:00Z      0     3</span></pre></div>
+<p>We can calibrate the model to this data. This calibration will infer the most likely start date of the epidemic and the R0 at the start of the epidemic. Calibration occurs by scanning across a range of possible R0 values and start dates. Fitting works using a particle filter, which can be parallelised using <code><a href="https://rdrr.io/pkg/future/man/plan.html">future::plan(future::multiprocess())</a></code> before running <code>calibrate</code>.</p>
+<div class="sourceCode" id="cb18"><pre class="r"><span class="co"># set up for parallelisation</span>
+<span class="kw pkg">future</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/future/man/plan.html">plan</a></span>(<span class="kw pkg">future</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/future/man/multiprocess.html">multiprocess</a></span>())
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">calibration</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>, <span class="kw">date_0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span>())</pre></div>
-<p><img src="reference/figures/README-calibration-1.png" width="100%"></p>
-<p>In the above, we visualise the full epidemic curve, but to examine short term model estimates of the epidemic trajectory (e.g. up to 14 days ahead), we can do the following:</p>
-<div class="sourceCode" id="cb19"><pre class="r">
-<span class="no">x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span>(<span class="no">calibration</span>, <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"infections"</span>, <span class="kw">date_0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span>())
-<span class="no">x</span> <span class="kw">&lt;-</span> <span class="no">x</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">replicate</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">replicate</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">t</span> <span class="kw">&lt;</span> <span class="fl">14</span>)
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">x</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">date</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">col</span> <span class="kw">=</span> <span class="no">replicate</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Case Incidence"</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Date"</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"none"</span>)</pre></div>
-<p><img src="reference/figures/README-deaths%20over%20time-1.png" width="100%"></p>
+<span class="co"># Fit model</span>
+<span class="no">out</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(
+      <span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>,
+      <span class="kw">R0_min</span> <span class="kw">=</span> <span class="fl">2</span>,
+      <span class="kw">R0_max</span> <span class="kw">=</span> <span class="fl">4</span>,
+      <span class="kw">R0_step</span> <span class="kw">=</span> <span class="fl">0.5</span>,
+      <span class="kw">first_start_date</span> <span class="kw">=</span> <span class="st">"2020-02-10"</span>,
+      <span class="kw">last_start_date</span> <span class="kw">=</span> <span class="st">"2020-02-22"</span>,
+      <span class="kw">day_step</span> <span class="kw">=</span> <span class="fl">4</span>,
+      <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">10</span>,
+      <span class="kw">n_particles</span> <span class="kw">=</span> <span class="fl">20</span>,
+      <span class="kw">country</span> <span class="kw">=</span> <span class="st">"Algeria"</span>
+    )
+<span class="co">#&gt;  Progress: ──────────────────────────────────────────────────────────────────────────────────────────────────────                    100% Progress: ──────────────────────────────────────────────────────────────────────────────────────────────────────                    100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────        100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;  Progress: ────────────────────────────────────────────────────────────────────────────────────                                      100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span></pre></div>
+<p><code>calibrate</code> returns the same output as <code>run_explicit_SEEIR_model</code>, with the first three elements in <code>out</code> being the simulation outputs, the model and model parameters. Note that simulation replicates are aligned to the maximum date in the data provided, and as a result we can use the same plotting functions as before:</p>
+<div class="sourceCode" id="cb19"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">out</span>, <span class="st">"deaths"</span>, <span class="kw">date_0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">df</span>$<span class="no">date</span>), <span class="kw">x_var</span> <span class="kw">=</span> <span class="st">"date"</span>)</pre></div>
+<p><img src="reference/figures/README-plot%20particle%20deaths-1.png" width="100%"></p>
+<p>With default parameters, <code>calibrate</code> will simulate up the maximum date in the data provided. The fit to this data can be shown using the plotting function and specifying <code>particle_fit</code> to be <code>TRUE</code></p>
+<div class="sourceCode" id="cb20"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">out</span>, <span class="kw">particle_fit</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>
+<p><img src="reference/figures/README-particle%20fit%20no%20ints-1.png" width="100%"></p>
+<p>We can see that this is not the best fit, capturing only the beginning of the data points. We can also diagnose the fitting further by looking at the <code>scan_results</code> of the grid search.</p>
+<div class="sourceCode" id="cb21"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">out</span>$<span class="no">scan_results</span>)</pre></div>
+<p><img src="reference/figures/README-show%20grid%20fits-1.png" width="100%"></p>
+<p>This grid shows the negative log likeihood for each parameter pair. We can also plot the related probability for each pair as follows:</p>
+<div class="sourceCode" id="cb22"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">out</span>$<span class="no">scan_results</span>, <span class="kw">what</span> <span class="kw">=</span> <span class="st">"probability"</span>)</pre></div>
+<p><img src="reference/figures/README-show%20grid%20fits%20probs-1.png" width="100%"></p>
+<p>The reason for the poor fits to the data shown earlier is because Algeria has implemented interventions prior to today. These can also be incorporated into <code>calibrate</code>. For example, we can grab the assumed changes to transmission fased on government intervention for Algeria.</p>
+<div class="sourceCode" id="cb23"><pre class="r"><span class="no">interventions</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">squire_file</span>(<span class="st">"extdata/example_DZA_intervention.csv"</span>))
+<span class="no">int_unique</span> <span class="kw">&lt;-</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">interventions_unique</span>(<span class="no">interventions</span>)
+<span class="no">int_unique</span>
+<span class="co">#&gt; $dates_change</span>
+<span class="co">#&gt; [1] "2020-03-12" "2020-03-18" "2020-03-22" "2020-03-23"</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $change</span>
+<span class="co">#&gt; [1] 0.900 0.850 0.550 0.225</span></pre></div>
+<p>We can then provide these to <code>calibrate</code> as the dates (<code>date_R0_change</code>) and relative reductions to R0 (<code>R0_change</code>). We will also specify for model fits to be continued for 14 days into the future with <code>forceast = 14</code>:</p>
+<div class="sourceCode" id="cb24"><pre class="r"><span class="no">out</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(
+      <span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>,
+      <span class="kw">R0_min</span> <span class="kw">=</span> <span class="fl">2</span>,
+      <span class="kw">R0_max</span> <span class="kw">=</span> <span class="fl">4</span>,
+      <span class="kw">R0_step</span> <span class="kw">=</span> <span class="fl">0.5</span>,
+      <span class="kw">first_start_date</span> <span class="kw">=</span> <span class="st">"2020-02-10"</span>,
+      <span class="kw">last_start_date</span> <span class="kw">=</span> <span class="st">"2020-02-22"</span>,
+      <span class="kw">day_step</span> <span class="kw">=</span> <span class="fl">4</span>,
+      <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">10</span>,
+      <span class="kw">n_particles</span> <span class="kw">=</span> <span class="fl">20</span>,
+      <span class="kw">forecast</span> <span class="kw">=</span> <span class="fl">14</span>,
+      <span class="kw">R0_change</span> <span class="kw">=</span> <span class="no">int_unique</span>$<span class="no">change</span>,
+      <span class="kw">date_R0_change</span> <span class="kw">=</span> <span class="no">int_unique</span>$<span class="no">dates_change</span>,
+      <span class="kw">country</span> <span class="kw">=</span> <span class="st">"Algeria"</span>
+    )
+<span class="co">#&gt;  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;  Progress: ────────────────────────────────────────────────────────────────────────                                                  100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span></pre></div>
+<p>Let’s see if that is any better.</p>
+<div class="sourceCode" id="cb25"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">out</span>, <span class="kw">particle_fit</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>
+<p><img src="reference/figures/README-particle%20fit%20ints-1.png" width="100%"></p>
+<p>That is a much better fit.</p>
+<p>Any parameter that you could provide to <code>run_explicit_SEEIR_model</code> can be passed to <code>calibrate</code>. This includes time varying arguments such as <code>contact_matrix_set</code>, <code>ICU_bed_capacity</code> and <code>hosp_bed_capacity</code>. To incorporate these into model fitting correctly, the date at which these change must be provided (similarly to how <code>date_R0_change</code> was provided above) using <code>date_ICU_bed_capacity_change</code>, <code>date_ICU_bed_capacity_change</code> and <code>date_hosp_bed_capacity_change</code> respecitvely. In addition, the user must provide a baseline value for these, i.e. the contact matrix and bed capacity at the beginning of the epidemic:</p>
+<div class="sourceCode" id="cb26"><pre class="r"><span class="no">out</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(
+      <span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>,
+      <span class="kw">R0_min</span> <span class="kw">=</span> <span class="fl">2</span>,
+      <span class="kw">R0_max</span> <span class="kw">=</span> <span class="fl">4</span>,
+      <span class="kw">R0_step</span> <span class="kw">=</span> <span class="fl">0.5</span>,
+      <span class="kw">first_start_date</span> <span class="kw">=</span> <span class="st">"2020-02-10"</span>,
+      <span class="kw">last_start_date</span> <span class="kw">=</span> <span class="st">"2020-02-22"</span>,
+      <span class="kw">day_step</span> <span class="kw">=</span> <span class="fl">4</span>,
+      <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">10</span>,
+      <span class="kw">n_particles</span> <span class="kw">=</span> <span class="fl">20</span>,
+      <span class="kw">forecast</span> <span class="kw">=</span> <span class="fl">14</span>,
+      <span class="kw">R0_change</span> <span class="kw">=</span> <span class="no">int_unique</span>$<span class="no">change</span>,
+      <span class="kw">date_R0_change</span> <span class="kw">=</span> <span class="no">int_unique</span>$<span class="no">dates_change</span>,
+      <span class="kw">baseline_contact_matrix</span> <span class="kw">=</span> <span class="fu"><a href="reference/get_mixing_matrix.html">get_mixing_matrix</a></span>(<span class="st">"Algeria"</span>),
+      <span class="kw">contact_matrix_set</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="reference/get_mixing_matrix.html">get_mixing_matrix</a></span>(<span class="st">"Algeria"</span>)*<span class="fl">0.9</span>),
+      <span class="kw">date_contact_matrix_set_change</span> <span class="kw">=</span> <span class="st">"2020-03-16"</span>,
+      <span class="kw">baseline_hosp_bed_capacity</span> <span class="kw">=</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">get_hosp_bed_capacity</span>(<span class="st">"Algeria"</span>),
+      <span class="kw">hosp_bed_capacity</span> <span class="kw">=</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">get_hosp_bed_capacity</span>(<span class="st">"Algeria"</span>)*<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1.1</span>,<span class="fl">1.2</span>),
+      <span class="kw">date_hosp_bed_capacity_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"2020-04-02"</span>, <span class="st">"2020-04-08"</span>),
+      <span class="kw">baseline_ICU_bed_capacity</span> <span class="kw">=</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">get_ICU_bed_capacity</span>(<span class="st">"Algeria"</span>),
+      <span class="kw">ICU_bed_capacity</span> <span class="kw">=</span> <span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">get_ICU_bed_capacity</span>(<span class="st">"Algeria"</span>)*<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1.05</span>),
+      <span class="kw">date_ICU_bed_capacity_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"2020-04-10"</span>),
+      <span class="kw">country</span> <span class="kw">=</span> <span class="st">"Algeria"</span>
+    )
+<span class="co">#&gt;  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────        100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;  Progress: ────────────────────────────────────────────────────────────────────────────────────                                      100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span></pre></div>
+<p>(N.B. Given the potentially long running time for the grid search, the model state is returned at the end of every day rather than every time step (provided by <code>dt</code>). As a result model outputs such as <code>n_E2_I</code> (number of infections in a time step) and <code>delta_D</code> (number of deaths in a time step) reflect the outputs in the last time step rather than in all the time steps in the last day. The plotting functions and <code>format_output</code> provided in <code>squire</code> handle this correctly and work out the correct number for these in the last day.)</p>
 </div>
 <div id="5-conducting-scenario-projections-to-fitted-data" class="section level3">
 <h3 class="hasAnchor">
 <a href="#5-conducting-scenario-projections-to-fitted-data" class="anchor"></a>5. Conducting scenario projections to fitted data</h3>
-<p>Once you have calibrated the model to death data, it is possible to then implement mitigation strategies forwards in time from the point of calibration. This is achieved using the <code>projection</code> function. For example, to contrast an unmitigated epidemic against a mitigation scenario with a 20% reduction in R0 today and a further 40% in 20 days time:</p>
-<div class="sourceCode" id="cb20"><pre class="r">
-<span class="co"># first calibrate</span>
-<span class="no">t1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(<span class="kw">country</span> <span class="kw">=</span> <span class="st">"Angola"</span>,
-                <span class="kw">deaths</span> <span class="kw">=</span> <span class="fl">5</span>,
-                  <span class="kw">reporting_fraction</span> <span class="kw">=</span> <span class="fl">1</span>,
-                  <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.2</span>,
-                  <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
-                  <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">25</span>,
-                  <span class="kw">R0_scan</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">5</span>))
+<p>Once you have calibrated the model to death data, it is possible to then implement mitigation strategies forwards in time from the point of calibration. This is achieved using the <code>projections</code> function. For example, let’s consider a country that as of 28th April 2020 is yet to experience an epidemic take off but may be about to. Guinea reported its first COVID-19 death on 16th April 2020 and has reported 7 deaths by the 28th April 2020 according to data from the <a href="https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide">European CDC</a>.</p>
+<p>First let’s calibrate to this data with no interventions in place (there are likely some interventions in place but nothing major, such as a lockdown, has been implemented by 2020-04-28) and simulate forward for 180 days:</p>
+<div class="sourceCode" id="cb27"><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">squire_file</span>(<span class="st">"extdata/example_GIN.csv"</span>), <span class="kw">stringsAsFactors</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
 
-<span class="co"># create our projections</span>
-<span class="no">p2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(<span class="kw">r</span> <span class="kw">=</span> <span class="no">t1</span>, <span class="kw">R0_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.8</span>, <span class="fl">0.4</span>), <span class="kw">tt_R0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">20</span>))</pre></div>
+<span class="no">out</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(
+      <span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>,
+      <span class="kw">R0_min</span> <span class="kw">=</span> <span class="fl">2.5</span>,
+      <span class="kw">R0_max</span> <span class="kw">=</span> <span class="fl">4</span>,
+      <span class="kw">R0_step</span> <span class="kw">=</span> <span class="fl">0.5</span>,
+      <span class="kw">first_start_date</span> <span class="kw">=</span> <span class="st">"2020-03-10"</span>,
+      <span class="kw">last_start_date</span> <span class="kw">=</span> <span class="st">"2020-03-25"</span>,
+      <span class="kw">day_step</span> <span class="kw">=</span> <span class="fl">5</span>,
+      <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">10</span>,
+      <span class="kw">n_particles</span> <span class="kw">=</span> <span class="fl">20</span>,
+      <span class="kw">forecast</span> <span class="kw">=</span> <span class="fl">180</span>,
+      <span class="kw">country</span> <span class="kw">=</span> <span class="st">"Guinea"</span>
+    )
+<span class="co">#&gt;  Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;  Progress:                                                                                                                           100% Progress: ────────────────────────────────────                                                                                      100% Progress: ────────────────────────────────────────────────────────────────────────                                                  100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────                          100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span></pre></div>
+<p>Firstly, let’s plot the fit up to the current day</p>
+<div class="sourceCode" id="cb28"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">out</span>, <span class="kw">particle_fit</span> <span class="kw">=</span> <span class="fl">TRUE</span>) +
+    <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">xlim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"2020-04-10"</span>,<span class="st">"2020-04-28"</span>))) +
+    <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">ylim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>,<span class="fl">10</span>))</pre></div>
+<p><img src="reference/figures/README-particle%20gin%20plots-1.png" width="100%"></p>
+<p>The fit is good and captures the stuttering chains at the beginning of the epidemic. However, if we plot the forecasted deaths we can see the epidemic is likely to take off:</p>
+<div class="sourceCode" id="cb29"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">out</span>, <span class="st">"deaths"</span>)</pre></div>
+<p><img src="reference/figures/README-particle%20gin%20forecast-1.png" width="100%"></p>
+<p>We can now use the output of <code>calibrate</code> to explore different scenario projections using <code>projections</code>. For example, to contast this unmitigated epidemic against a mitigation scenario with a 50% reduction in R0 today and a further 30% in 2 weeks time:</p>
+<div class="sourceCode" id="cb30"><pre class="r"><span class="co"># create our projections</span>
+<span class="no">p</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(<span class="kw">r</span> <span class="kw">=</span> <span class="no">out</span>, <span class="kw">R0_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.5</span>, <span class="fl">0.2</span>), <span class="kw">tt_R0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">14</span>))</pre></div>
 <p>The output generated from <code>projections</code> is the same class and structure as from <code>calibrate</code> and can be plotted against the unmitigated scenario using <code>projection_plotting</code>:</p>
-<div class="sourceCode" id="cb21"><pre class="r"><span class="no">ggproj</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">t1</span>,<span class="no">p2</span>),
+<div class="sourceCode" id="cb31"><pre class="r"><span class="no">ggproj</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">out</span>,<span class="no">p</span>),
                     <span class="kw">scenarios</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Unmitigated"</span>,<span class="st">"Mitigation"</span>),
                     <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ICU_occupancy"</span>, <span class="st">"ICU_demand"</span>),
                     <span class="kw">add_parms_to_scenarios</span> <span class="kw">=</span> <span class="fl">TRUE</span>,<span class="kw">ci</span> <span class="kw">=</span> <span class="fl">FALSE</span>,<span class="kw">summarise</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
 
 <span class="co"># and lets add in the ICU capacity</span>
-<span class="no">ggproj</span> + <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span>(<span class="kw">yintercept</span> <span class="kw">=</span> <span class="no">t1</span>$<span class="no">parameters</span>$<span class="no">ICU_bed_capacity</span>)</pre></div>
+<span class="no">ggproj</span> + <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span>(<span class="kw">yintercept</span> <span class="kw">=</span> <span class="no">out</span>$<span class="no">parameters</span>$<span class="no">ICU_bed_capacity</span>)</pre></div>
 <p><img src="reference/figures/README-projection%20plotting-1.png" width="100%"></p>
-<p>We can see above that the intervention introduced was sufficient to prevent ICU demand (in red) from exceeding the supply, whereas in the unmitigated strategy this did occur.</p>
-<p>We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 50% today before relaxing it to 80% in 20 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with <code>add_parms_to_scenarios = FALSE</code>):</p>
-<div class="sourceCode" id="cb22"><pre class="r">
-<span class="co"># first calibrate</span>
-<span class="no">t1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(<span class="kw">country</span> <span class="kw">=</span> <span class="st">"Angola"</span>,
-                <span class="kw">deaths</span> <span class="kw">=</span> <span class="fl">5</span>,
-                  <span class="kw">reporting_fraction</span> <span class="kw">=</span> <span class="fl">1</span>,
-                  <span class="kw">dt</span> <span class="kw">=</span> <span class="fl">0.2</span>,
-                  <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">200</span>,
-                  <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">25</span>,
-                  <span class="kw">R0_scan</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">5</span>))
-
-<span class="co"># create our projections</span>
-<span class="no">p2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(<span class="kw">r</span> <span class="kw">=</span> <span class="no">t1</span>,
-                  <span class="kw">contact_matrix_set_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.5</span>, <span class="fl">0.8</span>),
-                  <span class="kw">tt_contact_matrix</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">20</span>),
-                  <span class="kw">hosp_bed_capacity_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">1.2</span>),
+<p>We can see above that the intervention introduced is nearly sufficient to prevent ICU demand (solid line red) from exceeding the supply, whereas in the unmitigated strategy this did occur.</p>
+<p>We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 75% in a week before relaxing it to 80% in 20 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with <code>add_parms_to_scenarios = FALSE</code>):</p>
+<div class="sourceCode" id="cb32"><pre class="r"><span class="co"># create our projections</span>
+<span class="no">p</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(<span class="kw">r</span> <span class="kw">=</span> <span class="no">out</span>,
+                  <span class="kw">contact_matrix_set_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">0.25</span>, <span class="fl">0.8</span>),
+                  <span class="kw">tt_contact_matrix</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">7</span>, <span class="fl">30</span>),
+                  <span class="kw">hosp_bed_capacity_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">3</span>),
                   <span class="kw">tt_hosp_beds</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">30</span>),
-                  <span class="kw">ICU_bed_capacity_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">1.2</span>),
+                  <span class="kw">ICU_bed_capacity_change</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">3</span>),
                   <span class="kw">tt_ICU_beds</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>,<span class="fl">30</span>))
 
-<span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">t1</span>,<span class="no">p2</span>),
+<span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">out</span>, <span class="no">p</span>),
                     <span class="kw">scenarios</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Unmitigated"</span>,<span class="st">"Mitigation"</span>),
                     <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ICU_occupancy"</span>, <span class="st">"ICU_demand"</span>,<span class="st">"deaths"</span>),
                     <span class="kw">add_parms_to_scenarios</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
-                    <span class="kw">ci</span> <span class="kw">=</span> <span class="fl">FALSE</span>,<span class="kw">summarise</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>
+                    <span class="kw">ci</span> <span class="kw">=</span> <span class="fl">FALSE</span>,<span class="kw">summarise</span> <span class="kw">=</span> <span class="fl">TRUE</span>) +
+<span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span>(<span class="kw">yintercept</span> <span class="kw">=</span> <span class="no">out</span>$<span class="no">parameters</span>$<span class="no">ICU_bed_capacity</span>)</pre></div>
 <p><img src="reference/figures/README-projection%20relative%20beds-1.png" width="100%"></p>
-<p>Above we can see that the increase in bed causes the mitigation strategy to plateau at a higher bed occupancy, however, not high enough to meet the demand. However, despite this the the peak in daily deaths is lower, which in turn causes a noticable decrease in total deaths:</p>
-<div class="sourceCode" id="cb23"><pre class="r"><span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">t1</span>,<span class="no">p2</span>),
+<p>Above we can see that the increase in bed causes the mitigation strategy to plateau at a higher bed occupancy, however, not high enough to meet the demand. However, the impacts to the contact matrix and beds have caused both a shift and a decrease in the daily deaths, which in turn causes a noticable decrease in total deaths:</p>
+<div class="sourceCode" id="cb33"><pre class="r"><span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">out</span>,<span class="no">p</span>),
                     <span class="kw">scenarios</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Unmitigated"</span>,<span class="st">"Mitigation"</span>),
                     <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"D"</span>),
                     <span class="kw">add_parms_to_scenarios</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
                     <span class="kw">ci</span> <span class="kw">=</span> <span class="fl">FALSE</span>,<span class="kw">summarise</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>
 <p><img src="reference/figures/README-total%20deaths%20projection-1.png" width="100%"></p>
-<p>Lastly, rather than using relative changes to the interventions, we can provide absolute measures. For example, to change the R0 to 2 today and add 5000 ICU beds in 40 days time:</p>
-<div class="sourceCode" id="cb24"><pre class="r">
-<span class="co"># what is the current capacity</span>
-<span class="no">icu</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="no">t1</span>$<span class="no">parameters</span>$<span class="no">ICU_bed_capacity</span>,<span class="fl">1</span>)
+<p>Rather than using relative changes to the interventions, we can provide absolute measures. For example, to change the R0 to 2 today and add 500 ICU beds in 40 days time:</p>
+<div class="sourceCode" id="cb34"><pre class="r"><span class="co"># what is the current capacity</span>
+<span class="no">icu</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="no">out</span>$<span class="no">parameters</span>$<span class="no">ICU_bed_capacity</span>,<span class="fl">1</span>)
 
 <span class="co"># create our projections</span>
-<span class="no">p2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(<span class="kw">r</span> <span class="kw">=</span> <span class="no">t1</span>,
+<span class="no">p</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(<span class="kw">r</span> <span class="kw">=</span> <span class="no">out</span>,
                   <span class="kw">R0</span> <span class="kw">=</span> <span class="fl">2</span>,
                   <span class="kw">tt_R0</span> <span class="kw">=</span> <span class="fl">0</span>,
-                  <span class="kw">ICU_bed_capacity</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">icu</span>, <span class="no">icu</span> + <span class="fl">5000</span>),
+                  <span class="kw">ICU_bed_capacity</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">icu</span>, <span class="no">icu</span> + <span class="fl">500</span>),
                   <span class="kw">tt_ICU_beds</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>,<span class="fl">40</span>))
 
-<span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">t1</span>,<span class="no">p2</span>),
+<span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="kw">r_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">out</span>,<span class="no">p</span>),
                     <span class="kw">scenarios</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Unmitigated"</span>,<span class="st">"Mitigation"</span>),
                     <span class="kw">var_select</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ICU_occupancy"</span>, <span class="st">"ICU_demand"</span>,<span class="st">"deaths"</span>),
                     <span class="kw">add_parms_to_scenarios</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
                     <span class="kw">ci</span> <span class="kw">=</span> <span class="fl">FALSE</span>,<span class="kw">summarise</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>
 <p><img src="reference/figures/README-projection%20plotting%20absolute-1.png" width="100%"></p>
+<p>Lastly, in order to run simulations for longer than the number set in <code><a href="reference/calibrate.html">calibrate(forecast = x)</a></code>, we can use the argument <code>time_period</code> to set the numbers of days that <code>projections</code> should simulate for. For example, we could redo our calibration and have it only run up the current day:</p>
+<div class="sourceCode" id="cb35"><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw pkg">squire</span><span class="kw ns">:::</span><span class="fu">squire_file</span>(<span class="st">"extdata/example_GIN.csv"</span>), <span class="kw">stringsAsFactors</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+
+<span class="no">out</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(
+      <span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>,
+      <span class="kw">R0_min</span> <span class="kw">=</span> <span class="fl">2.5</span>,
+      <span class="kw">R0_max</span> <span class="kw">=</span> <span class="fl">4</span>,
+      <span class="kw">R0_step</span> <span class="kw">=</span> <span class="fl">0.5</span>,
+      <span class="kw">first_start_date</span> <span class="kw">=</span> <span class="st">"2020-03-10"</span>,
+      <span class="kw">last_start_date</span> <span class="kw">=</span> <span class="st">"2020-03-25"</span>,
+      <span class="kw">day_step</span> <span class="kw">=</span> <span class="fl">5</span>,
+      <span class="kw">replicates</span> <span class="kw">=</span> <span class="fl">10</span>,
+      <span class="kw">n_particles</span> <span class="kw">=</span> <span class="fl">20</span>,
+      <span class="kw">forecast</span> <span class="kw">=</span> <span class="fl">0</span>,
+      <span class="kw">country</span> <span class="kw">=</span> <span class="st">"Guinea"</span>
+    )
+<span class="co">#&gt;  Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">out</span>, <span class="kw">particle_fit</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>
+<p><img src="reference/figures/README-particle%20gin%20alt-1.png" width="100%"></p>
+<p>We can now use this to project 90 days forwards with the current level of interventions, as well as a projection of 90 days with a 50% reduction in R0:</p>
+<div class="sourceCode" id="cb36"><pre class="r"><span class="no">p_no_change</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(<span class="no">out</span>, <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">90</span>)
+<span class="no">p_change</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(<span class="no">out</span>, <span class="kw">R0_change</span> <span class="kw">=</span> <span class="fl">0.5</span>, <span class="kw">tt_R0</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">time_period</span> <span class="kw">=</span> <span class="fl">90</span>)
+
+<span class="fu"><a href="reference/projection_plotting.html">projection_plotting</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">p_no_change</span>, <span class="no">p_change</span>),
+                    <span class="kw">scenarios</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"No Change"</span>, <span class="st">"50% R0"</span>),
+                    <span class="kw">add_parms_to_scenarios</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
+                    <span class="kw">var_select</span> <span class="kw">=</span> <span class="st">"deaths"</span>,
+                    <span class="kw">date_0</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">df</span>$<span class="no">date</span>),
+                    <span class="kw">x_var</span> <span class="kw">=</span> <span class="st">"date"</span>)</pre></div>
+<p><img src="reference/figures/README-particle%20gin%20alt%20proj-1.png" width="100%"></p>
 </div>
 </div>
 </div>

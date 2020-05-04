@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
       </span>
     </div>
 
@@ -82,6 +82,9 @@
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/parameters.html">Parameters</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -125,7 +128,7 @@
       <tr>
         <th colspan="2">
           <h2 id="section-running-the-model" class="hasAnchor"><a href="#section-running-the-model" class="anchor"></a>Running the model</h2>
-          <p class="section-desc"><p>Functions for running squire models and calibrating them</p></p>
+          <p class="section-desc"><p>Running squire models and calibrating them</p></p>
         </th>
       </tr>
       
@@ -150,13 +153,20 @@
         <td>
           <p><code><a href="calibrate.html">calibrate()</a></code> </p>
         </td>
-        <td><p>Calibrate deaths</p></td>
+        <td><p>Calibrate via particle filter grid search using time series of deaths</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="projections.html">projections()</a></code> </p>
+        </td>
+        <td><p>Provide projections from calibrated simulations by changing RO, contact
+matrices or bed availability</p></td>
       </tr>
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-country-level-parameters" class="hasAnchor"><a href="#section-country-level-parameters" class="anchor"></a>Country level parameters</h2>
-          <p class="section-desc"><p>Functions for getting country demography and mixing matrices</p></p>
+          <h2 id="section-parameters" class="hasAnchor"><a href="#section-parameters" class="anchor"></a>Parameters</h2>
+          <p class="section-desc"><p>Model parameters and retrieving country demography, healthcare and mixing matrices</p></p>
         </th>
       </tr>
       
@@ -165,6 +175,18 @@
       
       
       <tr>
+        
+        <td>
+          <p><code><a href="parameters_explicit_SEEIR.html">parameters_explicit_SEEIR()</a></code> </p>
+        </td>
+        <td><p>Parmaters for explicit SEEIR model</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="parameters_simple_SEEIR.html">parameters_simple_SEEIR()</a></code> </p>
+        </td>
+        <td><p>Parmeters for the simple SEEIR model</p></td>
+      </tr><tr>
         
         <td>
           <p><code><a href="get_population.html">get_population()</a></code> </p>
@@ -176,6 +198,18 @@
           <p><code><a href="get_mixing_matrix.html">get_mixing_matrix()</a></code> </p>
         </td>
         <td><p>Get mixing matrix</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_lmic_countries.html">get_lmic_countries()</a></code> </p>
+        </td>
+        <td><p>Get supported LMIC countries</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_healthcare_capacity.html">get_healthcare_capacity()</a></code> </p>
+        </td>
+        <td><p>Get healthcare capacity data</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -194,19 +228,19 @@
         <td>
           <p><code><a href="beta_est_explicit.html">beta_est_explicit()</a></code> </p>
         </td>
-        <td><p>Estimate beta parameter</p></td>
+        <td><p>Estimate beta parameter for explicit model</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="beta_est.html">beta_est()</a></code> </p>
         </td>
-        <td><p>Estimate beta parameter</p></td>
+        <td><p>Estimate beta for a squire model using model parameters</p></td>
       </tr>
     </tbody><tbody>
       <tr>
         <th colspan="2">
           <h2 id="section-model-output-summaries" class="hasAnchor"><a href="#section-model-output-summaries" class="anchor"></a>Model output summaries</h2>
-          <p class="section-desc"><p>Functions for summarising the model components</p></p>
+          <p class="section-desc"><p>Functions for summarising the model components and plotting</p></p>
         </th>
       </tr>
       
@@ -214,7 +248,25 @@
     </tbody><tbody>
       
       
-      
+      <tr>
+        
+        <td>
+          <p><code><a href="projection_plotting.html">projection_plotting()</a></code> </p>
+        </td>
+        <td><p>Plot projections against each other</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="format_output.html">format_output()</a></code> </p>
+        </td>
+        <td><p>Format model output as data.frame</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="format_output_simple_model.html">format_output_simple_model()</a></code> </p>
+        </td>
+        <td><p>Format model output from simple as data.frame</p></td>
+      </tr>
     </tbody>
     </table>
   </div>

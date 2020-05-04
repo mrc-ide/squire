@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
       </span>
     </div>
 
@@ -83,6 +83,9 @@
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/parameters.html">Parameters</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -130,6 +133,7 @@
   <span class='kw'>beta_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>time_period</span> <span class='kw'>=</span> <span class='fl'>365</span>,
   <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='kw'>day_return</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>,
   <span class='kw'>init</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>1e+08</span>),
@@ -202,7 +206,12 @@ Default = NULL, which causes beta to be estimated from R0</p></td>
     </tr>
     <tr>
       <th>dt</th>
-      <td><p>Time Step. Default = 0.5</p></td>
+      <td><p>Time Step. Default = 0.1</p></td>
+    </tr>
+    <tr>
+      <th>day_return</th>
+      <td><p>Logical, do we want to return outut after each day rather
+than each dt. Default = FALSE</p></td>
     </tr>
     <tr>
       <th>replicates</th>

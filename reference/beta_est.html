@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Estimate beta parameter — beta_est • squire</title>
+<title>Estimate beta for a squire model using model parameters — beta_est • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Estimate beta parameter — beta_est" />
-<meta property="og:description" content="Estimate beta parameter" />
+<meta property="og:title" content="Estimate beta for a squire model using model parameters — beta_est" />
+<meta property="og:description" content="Estimate beta for a squire model using model parameters" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
       </span>
     </div>
 
@@ -83,6 +83,9 @@
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/parameters.html">Parameters</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -111,27 +114,28 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Estimate beta parameter</h1>
+    <h1>Estimate beta for a squire model using model parameters</h1>
     
     <div class="hidden name"><code>beta_est.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Estimate beta parameter</p>
+    <p>Estimate beta for a squire model using model parameters</p>
     </div>
 
-    <pre class="usage"><span class='fu'>beta_est</span>(<span class='no'>duration_infectiousness</span>, <span class='no'>mixing_matrix</span>, <span class='no'>R0</span>)</pre>
+    <pre class="usage"><span class='fu'>beta_est</span>(<span class='no'>squire_model</span>, <span class='no'>model_params</span>, <span class='no'>R0</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>duration_infectiousness</th>
-      <td><p>Duration of infectiousness (days)</p></td>
+      <th>squire_model</th>
+      <td><p>A squire model. Default = <code>explicit_SEEIR()</code></p></td>
     </tr>
     <tr>
-      <th>mixing_matrix</th>
-      <td><p>Mixing matrix</p></td>
+      <th>model_params</th>
+      <td><p>Squire model parameters, from a call to
+<code>generate_parameters()</code>.</p></td>
     </tr>
     <tr>
       <th>R0</th>

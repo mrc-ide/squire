@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
       </span>
     </div>
 
@@ -82,6 +82,9 @@
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/parameters.html">Parameters</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -114,6 +117,48 @@
       
     </div>
 
+    <div id="squire-043" class="section level1">
+<h1 class="page-header" data-toc-text="0.4.3">
+<a href="#squire-043" class="anchor"></a>squire 0.4.3</h1>
+<ul>
+<li>
+<code>calibrate</code> can now take <code>squire:::deterministic_model()</code> as model type.</li>
+<li>Output of above does not work with plotting or projections yet.</li>
+</ul>
+</div>
+    <div id="squire-042" class="section level1">
+<h1 class="page-header" data-toc-text="0.4.2">
+<a href="#squire-042" class="anchor"></a>squire 0.4.2</h1>
+<ul>
+<li>Patch for <code>plot.scan_results</code> where log likelihood was being plotted for both</li>
+</ul>
+</div>
+    <div id="squire-041" class="section level1">
+<h1 class="page-header" data-toc-text="0.4.1">
+<a href="#squire-041" class="anchor"></a>squire 0.4.1</h1>
+<ul>
+<li>Patch for passing in user defined population and matrices</li>
+</ul>
+</div>
+    <div id="squire-040" class="section level1">
+<h1 class="page-header" data-toc-text="0.4.0">
+<a href="#squire-040" class="anchor"></a>squire 0.4.0</h1>
+<ul>
+<li>
+<code>calibrate</code> now uses particle filter. See README for examples (#12)
+<ul>
+<li>Dates are to be provided for timings of interventions before today (#44, #17)</li>
+<li>Custom populations, contact matrices and bed capacity allowed (#73, #80, #28, #16)</li>
+<li>Increased modularity for new models (#62, #61, #49)</li>
+<li>Returns lieklihood of different baseline R0s and start dates (#14)</li>
+</ul>
+</li>
+<li>
+<code>get_mixing_matrix</code> takes iso3c (#84)</li>
+<li>Number of plotting enhancement (#72, #69)</li>
+<li>Parameter references vignette and website update (#13, #1, #5, #78)</li>
+</ul>
+</div>
     <div id="squire-030" class="section level1">
 <h1 class="page-header" data-toc-text="0.3.0">
 <a href="#squire-030" class="anchor"></a>squire 0.3.0</h1>

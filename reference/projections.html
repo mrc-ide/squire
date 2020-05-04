@@ -75,7 +75,7 @@ matrices or bed availability" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
       </span>
     </div>
 
@@ -86,6 +86,9 @@ matrices or bed availability" />
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/parameters.html">Parameters</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -127,6 +130,7 @@ matrices or bed availability</p>
 
     <pre class="usage"><span class='fu'>projections</span>(
   <span class='no'>r</span>,
+  <span class='kw'>time_period</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>R0</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>tt_R0</span> <span class='kw'>=</span> <span class='fl'>0</span>,
@@ -147,6 +151,12 @@ matrices or bed availability</p>
     <tr>
       <th>r</th>
       <td><p>Calibrated <code>{squire_simulation}</code> object.</p></td>
+    </tr>
+    <tr>
+      <th>time_period</th>
+      <td><p>How many days is the projection. Deafult = NULL, which will
+carry the projection forward from t = 0 in the calibration (i.e. the number
+of days set in calibrate using forecast)</p></td>
     </tr>
     <tr>
       <th>R0</th>

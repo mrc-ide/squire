@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
       </span>
     </div>
 
@@ -83,6 +83,9 @@
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/parameters.html">Parameters</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -127,7 +130,8 @@
   <span class='no'>R0_set</span>,
   <span class='no'>time_period</span>,
   <span class='no'>hosp_bed_capacity</span>,
-  <span class='no'>ICU_bed_capacity</span>
+  <span class='no'>ICU_bed_capacity</span>,
+  <span class='no'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -161,6 +165,10 @@ which will cause population to be sourced from <code>country</code></p></td>
     <tr>
       <th>ICU_bed_capacity</th>
       <td><p>ICU bed capacity. Can be single number of vector if capacity time-varies.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Other arguments to pass to <code><a href='parameters_explicit_SEEIR.html'>parameters_explicit_SEEIR</a></code></p></td>
     </tr>
     </table>
 

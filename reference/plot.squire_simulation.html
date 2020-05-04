@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
       </span>
     </div>
 
@@ -83,6 +83,9 @@
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/parameters.html">Parameters</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -121,7 +124,7 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for squire_simulation</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(
+<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(
   <span class='no'>x</span>,
   <span class='kw'>var_select</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
@@ -130,6 +133,7 @@
   <span class='kw'>q</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.025</span>, <span class='fl'>0.975</span>),
   <span class='kw'>summary_f</span> <span class='kw'>=</span> <span class='no'>mean</span>,
   <span class='kw'>x_var</span> <span class='kw'>=</span> <span class='st'>"t"</span>,
+  <span class='kw'>particle_fit</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -138,7 +142,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>An iccm_simulation object</p></td>
+      <td><p>An squire_simulation object</p></td>
     </tr>
     <tr>
       <th>var_select</th>
@@ -170,6 +174,12 @@ passed to the <code>fun</code> argument of <code><a href='https://ggplot2.tidyve
       <td><p>X variable to use for plotting (default is <code>"t"</code>,
 but can be set to, <code>"date"</code>, if <code>date_0</code> provided), which will
 cause the date to be plotted rather than time.</p></td>
+    </tr>
+    <tr>
+      <th>particle_fit</th>
+      <td><p>If the squire_simulation provided is the result of
+running the particle filter, do we want to just plot the fit. Default =
+FALSE</p></td>
     </tr>
     <tr>
       <th>...</th>
