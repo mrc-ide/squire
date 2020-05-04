@@ -208,6 +208,16 @@ calibrate <- function(data,
                                               tt_ICU_beds = tt_ICU_beds,
                                               ...)
 
+  # intervention list for later
+  interventions <- list(R0_change = R0_change,
+                        date_R0_change = date_R0_change,
+                        date_contact_matrix_set_change = date_contact_matrix_set_change,
+                        contact_matrix_set = contact_matrix_set,
+                        date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+                        ICU_bed_capacity = ICU_bed_capacity,
+                        date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
+                        hosp_bed_capacity = hosp_bed_capacity)
+
   # construct scan
   scan_results <- scan_R0_date(R0_min = R0_min,
                                R0_max = R0_max,
@@ -232,34 +242,42 @@ calibrate <- function(data,
                           forecast_days = forecast ,
                           full_output = TRUE)
 
+  # recreate model output for each type of model(ish)
+  if (inherits(squire_model, "stochastic")) {
+
   # create a fake run object and fill in the required elements
-  r <- squire_model$run_func(country = country,
-                             contact_matrix_set = contact_matrix_set,
-                             tt_contact_matrix = tt_contact_matrix,
-                             hosp_bed_capacity = hosp_bed_capacity,
-                             tt_hosp_beds = tt_hosp_beds,
-                             ICU_bed_capacity = ICU_bed_capacity,
-                             tt_ICU_beds = tt_ICU_beds,
-                             population = population,
-                             replicates = 1,
-                             time_period = max(tt_contact_matrix,tt_hosp_beds,tt_ICU_beds,1),
-                             ...)
+    r <- squire_model$run_func(country = country,
+                               contact_matrix_set = contact_matrix_set,
+                               tt_contact_matrix = tt_contact_matrix,
+                               hosp_bed_capacity = hosp_bed_capacity,
+                               tt_hosp_beds = tt_hosp_beds,
+                               ICU_bed_capacity = ICU_bed_capacity,
+                               tt_ICU_beds = tt_ICU_beds,
+                               population = population,
+                               replicates = 1,
+                               time_period = max(tt_contact_matrix,tt_hosp_beds,tt_ICU_beds,1),
+                               ...)
 
-  # first let's create the output
-  names(res)[names(res) == "trajectories"] <- "output"
-  dimnames(res$output) <- list(dimnames(res$output)[[1]], dimnames(r$output)[[2]], NULL)
-  r$output <- res$output
+    # first let's create the output
+    names(res)[names(res) == "trajectories"] <- "output"
+    dimnames(res$output) <- list(dimnames(res$output)[[1]], dimnames(r$output)[[2]], NULL)
+    r$output <- res$output
 
-  # and adjust the time as before
-  full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
-  saved_full <- r$output[,"time",full_row]
-  for(i in seq_len(replicates)) {
-    na_pos <- which(is.na(r$output[,"time",i]))
-    full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
-    if(length(na_pos) > 0) {
-      full_to_place[na_pos] <- NA
+    # and adjust the time as before
+    full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
+    saved_full <- r$output[,"time",full_row]
+    for(i in seq_len(replicates)) {
+      na_pos <- which(is.na(r$output[,"time",i]))
+      full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
+      if(length(na_pos) > 0) {
+        full_to_place[na_pos] <- NA
+      }
+      r$output[,"time",i] <- full_to_place
     }
-    r$output[,"time",i] <- full_to_place
+
+  } else if (inherits(squire_model, "deterministic")) {
+    r <- list("output" = res$trajectories)
+    r <- structure(r, class = "squire_simulation")
   }
 
   # second let's recreate the output
@@ -268,15 +286,7 @@ calibrate <- function(data,
   )
 
   # we will add the interventions here so that we now what times are needed for projection
-  r$interventions <- list(R0_change = R0_change,
-                          date_R0_change = date_R0_change,
-                          date_contact_matrix_set_change = date_contact_matrix_set_change,
-                          contact_matrix_set = contact_matrix_set,
-                          date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
-                          ICU_bed_capacity = ICU_bed_capacity,
-                          date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
-                          hosp_bed_capacity = hosp_bed_capacity)
-
+  r$interventions <- interventions
 
   # as well as adding the scan_results so it's easy to draw from the scan again in the future
   r$scan_results <- scan_results
@@ -286,7 +296,7 @@ calibrate <- function(data,
 
   # and fix the replicates
   r$parameters$replicates <- replicates
-  r$parameters$time_period <- diff(range(r$output[,"time",]))
+  r$parameters$time_period <- as.numeric(diff(as.Date(range(rownames(r$output)))))
 
   return(r)
 }

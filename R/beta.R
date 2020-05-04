@@ -36,6 +36,7 @@ beta_est_simple <- function(duration_infectiousness, mixing_matrix, R0) {
 #' @param mixing_matrix Mixing matrix
 #'
 #' @return Eigenvalue
+#' @export
 #'
 adjusted_eigen <- function(dur_IMild, dur_ICase, prob_hosp, mixing_matrix) {
   # assertions
