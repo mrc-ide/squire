@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.4</span>
       </span>
     </div>
 
@@ -150,6 +150,7 @@
   <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>country</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -287,6 +288,10 @@ unprovided. Either <code>country</code> or <code>population</code> and
       <th>population</th>
       <td><p>Population vector (for each age group). Default = NULL,
 which will cause population to be sourced from <code>country</code></p></td>
+    </tr>
+    <tr>
+      <th>dt</th>
+      <td><p>Time Step. Default = 0.1</p></td>
     </tr>
     <tr>
       <th>...</th>
