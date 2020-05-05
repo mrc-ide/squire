@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.5</span>
       </span>
     </div>
 
@@ -131,6 +131,7 @@
   <span class='no'>time_period</span>,
   <span class='no'>hosp_bed_capacity</span>,
   <span class='no'>ICU_bed_capacity</span>,
+  <span class='kw'>mod_gen</span> <span class='kw'>=</span> <span class='no'>explicit_SEIR_deterministic</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -167,6 +168,11 @@ which will cause population to be sourced from <code>country</code></p></td>
       <td><p>ICU bed capacity. Can be single number of vector if capacity time-varies.</p></td>
     </tr>
     <tr>
+      <th>mod_gen</th>
+      <td><p>An odin model generation function. Default:
+`explicit_SEIR_deterministic`</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>Other arguments to pass to <code><a href='parameters_explicit_SEEIR.html'>parameters_explicit_SEEIR</a></code></p></td>
     </tr>
@@ -177,7 +183,12 @@ which will cause population to be sourced from <code>country</code></p></td>
     <p>Simulation output</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"></pre>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>pop</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_population.html'>get_population</a></span>(<span class='st'>"Afghanistan"</span>)
+<span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_mixing_matrix.html'>get_mixing_matrix</a></span>(<span class='st'>"Afghanistan"</span>)
+<span class='fu'>run_deterministic_SEIR_model</span>(<span class='no'>pop</span>$<span class='no'>n</span>, <span class='no'>m</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>50</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>3</span>/<span class='fl'>2</span>), <span class='fl'>365</span>, <span class='fl'>100000</span>,
+<span class='fl'>1000000</span>)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
