@@ -149,3 +149,37 @@ run_trigger_threshold <- function(country, population, income_strata,
               time_in_lockdown = time_in_lockdown,
               index = index))
 }
+
+
+get_time_in_lockdown <- function(trigger_output) {
+  time_in_lockdown <- trigger_output$time_in_lockdown[1:5500, ]
+  length_output <- length(time_in_lockdown[, 1])
+  replicates <- dim(time_in_lockdown)[2]
+  overall_time_in_lockdown <- apply(time_in_lockdown, 2, sum)
+  return(mean(overall_time_in_lockdown/length_output))
+}
+
+get_max_ICU_req <- function(x) {
+  index <- x$index
+  out <- x$model_output
+  replicates <- dim(out)[3]
+  max_ICU_occupancy <- c()
+  for (i in 1:replicates) {
+    daily_ICU_occupancy <- rollapply(out[, index$total_ICU_req, i], 10,
+                                     mean, partial = TRUE, align = "right")
+    daily_ICU_occupancy <- daily_ICU_occupancy[seq(1, length(daily_ICU_occupancy), 10)]
+    max_ICU_occupancy[i] <- max(daily_ICU_occupancy)
+  }
+  return(mean(max_ICU_occupancy))
+}
+
+get_total_deaths <- function(x) {
+  index <- x$index
+  out <- x$model_output
+  replicates <- dim(out)[3]
+  total_daily_deaths <- c()
+  for (i in 1:replicates) {
+    total_daily_deaths[i] <- sum(x$model_output[, index$delta_D, i])
+  }
+  return(mean(total_daily_deaths))
+}
