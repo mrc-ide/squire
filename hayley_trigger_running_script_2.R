@@ -12,15 +12,15 @@ suppression_reduction <- 0.25
 suppression_duration <- 30
 mitigation_reduction <- 1
 max_lockdowns <- 15
-R0 <- c(2.2, 2.2, 2.2*0.25, 2.2)
+R0 <- c(2.2, 1.6, 0.5, 2.2)
 tt_R0 <- c(0, 27, 68, 98)
-replicates <- 50
+replicates <- 10
 r <- run_explicit_SEEIR_model("United Kingdom")
 index <- squire:::odin_index(r$model)            # get the indices for each of the model outputs
 
 # Running for LIC
 income_strata <- "LMIC"
-trigger_threshold <- 10
+trigger_threshold <- 100
 country <- "Senegal"
 pop <- get_population(country)
 pop <- pop$n
