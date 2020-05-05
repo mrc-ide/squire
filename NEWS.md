@@ -1,3 +1,7 @@
+# squire 0.4.5
+
+* Add functionality for running the deterministic model in javascript
+
 # squire 0.4.4
 
 * Patch for `calibrate` to ensure correct dt values provided
