@@ -313,6 +313,8 @@ run_explicit_SEEIR_model <- function(
 #' @param time_period Length of simulation. Default = 365
 #' @param hosp_bed_capacity General bed capacity. Can be single number of vector if capacity time-varies.
 #' @param ICU_bed_capacity ICU bed capacity. Can be single number of vector if capacity time-varies.
+#' @param mod_gen An odin model generation function. Default:
+#' `explicit_SEIR_deterministic`
 #' @param ... Other arguments to pass to \code{\link{parameters_explicit_SEEIR}}
 #'
 #' @return Simulation output
@@ -322,7 +324,7 @@ run_explicit_SEEIR_model <- function(
 #' \dontrun{
 #' pop <- get_population("Afghanistan")
 #' m <- get_mixing_matrix("Afghanistan")
-#' run_deterministic_SEIR_model(pop$n, m, [0, 50], [3, 3/2], 365, 100000,
+#' run_deterministic_SEIR_model(pop$n, m, c(0, 50), c(3, 3/2), 365, 100000,
 #' 1000000)
 #' }
 run_deterministic_SEIR_model <- function(
@@ -333,6 +335,7 @@ run_deterministic_SEIR_model <- function(
   time_period,
   hosp_bed_capacity,
   ICU_bed_capacity,
+  mod_gen = explicit_SEIR_deterministic,
   ...
   ) {
 
@@ -403,13 +406,13 @@ run_deterministic_SEIR_model <- function(
     p_dist = default_params$p_dist,
     hosp_bed_capacity = hosp_bed_capacity,
     ICU_bed_capacity = ICU_bed_capacity,
-    tt_matrix = default_params$tt_matrix,
+    tt_matrix = I(default_params$tt_matrix),
     mix_mat_set = default_params$mix_mat_set,
-    tt_beta = default_params$tt_beta,
-    beta_set = default_params$beta_set
+    tt_beta = I(default_params$tt_beta),
+    beta_set = I(default_params$beta_set)
   )
 
-  mod <- explicit_SEIR_deterministic(user = pars)
+  mod <- mod_gen(user = pars)
   t <- seq(from = 0, to = time_period - 1)
   results <- mod$run(t)
   out <- list(output = results, parameters = pars, model = mod)

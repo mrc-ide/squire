@@ -2,6 +2,11 @@
 
 language: R
 cache: packages
+
+addons:
+  apt:
+    packages:
+      - libv8-dev
 r_github_packages:
   - mrc-ide/dde
 r_packages:
