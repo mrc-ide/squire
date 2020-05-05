@@ -2,12 +2,16 @@
 run_trigger_threshold <- function(country, population, income_strata,
                                   replicates, suppression_reduction,
                                   trigger_threshold,
-                                  suppression_duration, mitigation_reduction, dt = 0.1,
-                                  R0 = c(3, 3), tt_R0 = c(0, 50), max_lockdowns = 15,
+                                  suppression_duration, mitigation_reduction = 0.66,
+                                  dt = 0.1,
+                                  R0,
+                                  tt_R0,
+                                  max_lockdowns = 20,
                                   hospital_bed_capacity = NULL,
                                   ICU_bed_capacity = NULL,
                                   income_strata_healthcare_capacity = NULL,
-                                  poorer_outcomes = FALSE) {
+                                  poorer_outcomes = FALSE,
+                                  time_period = 550) {
 
   # Defining the Country, Population and Mixing Matrix
   contact_matrix <- get_mixing_matrix(country)
@@ -37,7 +41,7 @@ run_trigger_threshold <- function(country, population, income_strata,
     r <- run_explicit_SEEIR_model(population = population,
                                   contact_matrix_set = contact_matrix_set,
                                   tt_R0 = tt_R0, R0 = R0, dt = dt,
-                                  replicates = replicates, time_period = 550,
+                                  replicates = replicates, time_period = time_period,
                                   ICU_bed_capacity = ICU_bed_capacity, hosp_bed_capacity = hospital_bed_capacity,
                                   dur_get_ox_survive = 9.5,
                                   dur_get_ox_die = 7.6,
@@ -52,7 +56,7 @@ run_trigger_threshold <- function(country, population, income_strata,
     r <- run_explicit_SEEIR_model(population = population,
                                   contact_matrix_set = contact_matrix_set,
                                   tt_R0 = tt_R0, R0 = R0, dt = dt,
-                                  replicates = replicates, time_period = 550,
+                                  replicates = replicates, time_period = time_period,
                                   ICU_bed_capacity = ICU_bed_capacity, hosp_bed_capacity = hospital_bed_capacity,
                                   prob_non_severe_death_treatment = c(rep(0.25, 16), 0.5804312),
                                   dur_get_ox_survive = 9.5,
@@ -83,7 +87,7 @@ run_trigger_threshold <- function(country, population, income_strata,
       req <- out[, index$total_number_requiring_IMV, ]
       trigger_times <- lapply(seq_along(trigger_times), function(x){
         daily_ICU_incidence <- rollapply(req[, x], 1/dt, sum, partial = TRUE, align = "right")
-        trigger_times <- min(which(daily_ICU_incidence > trigger_threshold))
+        trigger_times <- max(tt_R0)/dt + min(which(daily_ICU_incidence[(max(tt_R0)/dt):length_output] > trigger_threshold))
       })
       trigger_times <- unlist(trigger_times)
       for (k in 1:replicates) {
@@ -130,12 +134,19 @@ run_trigger_threshold <- function(country, population, income_strata,
                   time_in_lockdown = time_in_lockdown,
                   index = index))
     }
-    #print(trigger_times)
+
+    print(trigger_times)
     for(j in 1:replicates) {
       if (trigger_times[j] == length_output) {
       } else {
-        r$model$set_user(beta_set = c(baseline_beta * suppression_reduction, baseline_beta * mitigation_reduction))
-        r$model$set_user(tt_beta = c(trigger_times[j], trigger_times[j] + suppression_duration/dt))
+        r$model$set_user(beta_set = c(baseline_beta * suppression_reduction,
+                                      baseline_beta * suppression_reduction,
+                                      baseline_beta * suppression_reduction,
+                                      baseline_beta * mitigation_reduction))
+        r$model$set_user(tt_beta = c(trigger_times[j],
+                                     trigger_times[j] + 1,
+                                     trigger_times[j] + 2,
+                                     trigger_times[j] + suppression_duration/dt))
         out[trigger_times[j]:length_output, , j] <- r$model$run(step = trigger_times[j]:length_output,
                                                                 replicate = 1,
                                                                 y = as.numeric(out[trigger_times[j], initials, j]))
