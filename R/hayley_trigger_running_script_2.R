@@ -10,7 +10,7 @@ load("data/income_strata_healthcare_capacity.rda")
 # Run Invariant Parameters
 suppression_reduction <- 0.25
 suppression_duration <- 30
-mitigation_reduction <- 1
+mitigation_reduction <- 0.66
 max_lockdowns <- 15
 R0 <- c(2.2, 2.2*0.66, 2.2*0.25, 2.2*0.66 )
 tt_R0 <- c(0, 27, 68, 152 )
