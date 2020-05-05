@@ -10,24 +10,24 @@ load("data/income_strata_healthcare_capacity.rda")
 # Run Invariant Parameters
 suppression_reduction <- 0.25
 suppression_duration <- 30
-mitigation_reduction <- 0.66
+mitigation_reduction <- 1
 max_lockdowns <- 15
-R0 <- c(2.2, 2.2*0.66, 2.2*0.25, 2.2*0.66)
+R0 <- c(2.2, 2.2, 2.2*0.25, 2.2)
 tt_R0 <- c(0, 27, 68, 98)
-replicates <- 5
+replicates <- 50
 r <- run_explicit_SEEIR_model("United Kingdom")
 index <- squire:::odin_index(r$model)            # get the indices for each of the model outputs
 
 # Running for LIC
 income_strata <- "LMIC"
-trigger_threshold <- 1
+trigger_threshold <- 10
 country <- "Senegal"
 pop <- get_population(country)
 pop <- pop$n
 contact_matrix <- squire::get_mixing_matrix("Senegal")
 income_strata_healthcare_capacity <- squire::income_strata_healthcare_capacity
-time_period <- 550
-dt <- 0.05
+time_period <- 720
+dt <- 0.1
 
 LIC <- run_trigger_threshold(country = country,
                              population = pop,
