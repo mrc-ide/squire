@@ -1,6 +1,11 @@
-# squire 0.4.5
+
+# squire 0.4.6
 
 * Patch for `particle_filter_data` when only 1 row of data is provided
+
+# squire 0.4.5
+
+* Add functionality for running the deterministic model in javascript
 
 # squire 0.4.4
 
