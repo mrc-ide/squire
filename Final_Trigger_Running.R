@@ -12,6 +12,7 @@ trigger_thresholds <- c(1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120,
                         2750, 3000, 3500, 4000, 4500, 5000, 6000, 7000, 8000, 10000,
                         20000, 30000, 40000, 50000, 75000, 100000, 150000)
 
+
 # Loading in ICU Capacity
 load("data/income_strata_healthcare_capacity.rda")
 ICU <- income_strata_healthcare_capacity$ICU_beds
