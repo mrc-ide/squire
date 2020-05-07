@@ -2,7 +2,7 @@
 title: "Explanation for unintuitive results"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{parameters}
+  %\VignetteIndexEntry{unintuitive}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
