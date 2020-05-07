@@ -1,0 +1,21 @@
+---
+title: "Explanation for unintuitive results"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{parameters}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This page details results that initially seem unexpected. This collection is 
+intended to support understanding of the `squire` model and to help further its
+interpretability. 
+
+## 1. Increased bed supply increases demand for beds

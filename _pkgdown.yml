@@ -41,6 +41,8 @@ navbar:
       icon: fa-home
     - text: Parameters
       href: articles/parameters.html
+    - text: Unintuitive Results
+      href: articles/unituitive.html
     - text: Reference
       href: reference/index.html
     - text: News
