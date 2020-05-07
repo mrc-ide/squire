@@ -4,7 +4,9 @@
 \name{contact_matrices}
 \alias{contact_matrices}
 \title{Contact matrices}
-\format{A list of contact matrices}
+\format{
+A list of contact matrices
+}
 \usage{
 contact_matrices
 }

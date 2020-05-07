@@ -16,6 +16,12 @@
 #'
 #' @param day_step Step to increment date in days
 #'
+#' @param Meff_min Minimum value of Meff (Movement effect size) in the search
+#'
+#' @param Meff_max Maximum value of Meff (Movement effect size) in the search
+#'
+#' @param Meff_step Step to increment Meff (Movement effect size) between min and max
+#'
 #' @param data Deaths data to fit to. See \code{example_deaths.csv}
 #'   and \code{particle_filter_data()}
 #'
@@ -56,6 +62,9 @@ scan_R0_date <- function(
   first_start_date,
   last_start_date,
   day_step,
+  Meff_min,
+  Meff_max,
+  Meff_step,
   data,
   model_params,
   R0_change = NULL,
@@ -73,6 +82,9 @@ scan_R0_date <- function(
   assert_custom_class(model_params, "squire_parameters")
   assert_pos(R0_min)
   assert_pos(R0_max)
+  assert_pos(Meff_max)
+  assert_pos(Meff_min)
+  assert_pos(Meff_step)
   assert_date(first_start_date)
   assert_date(last_start_date)
   assert_pos_int(day_step)
@@ -81,7 +93,8 @@ scan_R0_date <- function(
 
   R0_1D <- seq(R0_min, R0_max, R0_step)
   date_list <- seq(as.Date(first_start_date), as.Date(last_start_date), day_step)
-  param_grid <- expand.grid(R0 = R0_1D, start_date = date_list)
+  Meff_1D <- seq(Meff_min, Meff_max, Meff_step)
+  param_grid <- expand.grid(R0 = R0_1D, start_date = date_list, Meff = Meff_1D)
 
   # Set up observation parameters that translate our model outputs to observations
   if (is.null(pars_obs)) {
@@ -142,11 +155,10 @@ scan_R0_date <- function(
   ## Construct a matrix with start_date as columns, and beta as rows
   ## order of return is set by order passed to expand.grid, above
   ## Returned column-major (down columns of varying beta) - set byrow = FALSE
-  mat_log_ll <- matrix(
+  mat_log_ll <- array(
     pf_run_ll,
-    nrow = length(R0_1D),
-    ncol = length(date_list),
-    byrow = FALSE)
+    dim = c(length(R0_1D), length(date_list), length(Meff_1D))
+  )
 
   # Exponentiate elements and normalise to 1 to get probabilities
   prob_matrix <- exp(mat_log_ll)
@@ -163,6 +175,7 @@ scan_R0_date <- function(
 
   results <- list(x = R0_1D,
                   y = date_list,
+                  z = Meff_1D,
                   mat_log_ll = mat_log_ll,
                   renorm_mat_LL = renorm_mat_LL,
                   inputs = list(
@@ -190,6 +203,7 @@ scan_R0_date <- function(
 #' @noRd
 R0_date_particle_filter <- function(R0,
                                     start_date,
+                                    Meff,
                                     squire_model,
                                     model_params,
                                     data,
@@ -240,7 +254,7 @@ R0_date_particle_filter <- function(R0,
 
   # Second create the new R0s for the R0
   if (!is.null(R0_change)) {
-    R0 <- c(R0, R0 * R0_change)
+    R0 <- c(R0, R0 * R0_change * Meff)
   }
 
   # and work out our beta
@@ -328,14 +342,13 @@ sample_grid_scan <- function(scan_results,
 
   # grab the pobability matrix
   prob <- scan_results$renorm_mat_LL
-  nr <- nrow(prob)
-  nc <- ncol(prob)
+  dm <- dim(prob)
 
   # construct what the grid of beta and start values that
   # correspond to the z axis matrix
-  x_grid <- matrix(scan_results$x, nrow = nr, ncol = nc)
-  y_grid <- matrix(as.character(scan_results$y), nrow = nr,
-                   ncol = nc, byrow = TRUE)
+  x_grid <- array(scan_results$x, dm)
+  y_grid <- array(mapply(rep, scan_results$y, length(scan_results$x)), dm)
+  z_grid <- array(mapply(rep, scan_results$z, length(scan_results$x)*length(scan_results$y)), dm)
 
   # draw which grid pairs are chosen
   pairs <- sample(x =  length(prob), size = n_sample_pairs,
@@ -344,9 +357,11 @@ sample_grid_scan <- function(scan_results,
   # what are related beta and dates
   R0 <- x_grid[pairs]
   dates <- y_grid[pairs]
+  Meff <- z_grid[pairs]
 
   # recreate parameters for re running
-  param_grid <- data.frame("R0" = R0, "start_date" = dates, stringsAsFactors = FALSE)
+  param_grid <- data.frame("R0" = R0, "start_date" = dates, "Meff" = Meff, stringsAsFactors = FALSE)
+  param_grid$start_date <- scan_results$y[match(param_grid$start_date, as.numeric(scan_results$y))]
   squire_model <- scan_results$inputs$model
   model_params <- scan_results$inputs$model_params
   pars_obs <- scan_results$inputs$pars_obs

@@ -11,6 +11,9 @@ scan_R0_date(
   first_start_date,
   last_start_date,
   day_step,
+  Meff_min,
+  Meff_max,
+  Meff_step,
   data,
   model_params,
   R0_change = NULL,
@@ -35,6 +38,12 @@ scan_R0_date(
 \item{last_start_date}{Latest start date as 'yyyy-mm-dd'}
 
 \item{day_step}{Step to increment date in days}
+
+\item{Meff_min}{Minimum value of Meff (Movement effect size) in the search}
+
+\item{Meff_max}{Maximum value of Meff (Movement effect size) in the search}
+
+\item{Meff_step}{Step to increment Meff (Movement effect size) between min and max}
 
 \item{data}{Deaths data to fit to. See \code{example_deaths.csv}
 and \code{particle_filter_data()}}
