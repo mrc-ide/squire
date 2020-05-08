@@ -54,6 +54,19 @@ and \code{particle_filter_data()}}
 
 \item{day_step}{Step to increment date in days}
 
+\item{Meff_min}{Minimum value of Meff (Movement effect size) in the search.
+Default = 1, which is the same as \code{Meff_max}. If \code{Meff_max} and
+\code{Meff_min} are the same then only a 2d grid search is performed based
+on R0 and start_date}
+
+\item{Meff_max}{Maximum value of Meff (Movement effect size) in the search.
+Default = 1, which is the same as \code{Meff_min}. If \code{Meff_max} and
+\code{Meff_min} are the same then only a 2d grid search is performed based
+on R0 and start_date}
+
+\item{Meff_step}{Step to increment Meff (Movement effect size) between min
+and max. Default = 0.1}
+
 \item{squire_model}{A squire model. Default = \code{explicit_SEIR()}}
 
 \item{pars_obs}{list of parameters to use for the comparison function.}

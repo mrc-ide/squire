@@ -79,7 +79,7 @@ List of R0 and start date grid values, and
   normalised probabilities at each point
 }
 \description{
-Run a grid search of the particle filter over R0 and start date.
+Run a grid search of the particle filter over R0, start date and Meff.
 This is parallelised, first run \code{plan(multiprocess)} to set
 this up.
 }
