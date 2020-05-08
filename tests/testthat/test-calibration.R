@@ -579,6 +579,7 @@ test_that("calibrate 3d particle works", {
   pars_obs = NULL
   n_particles = 2
 
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG"=FALSE)
   set.seed(93L)
   out <- calibrate(
     data = data,

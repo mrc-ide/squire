@@ -1,4 +1,9 @@
 
+# squire 0.4.7
+
+* `calibrate` can do 3D grid scans investigating Meff
+* `plot.squire_scan` will collapse n-dimensional scans using `show` argument
+
 # squire 0.4.6
 
 * Patch for `particle_filter_data` when only 1 row of data is provided

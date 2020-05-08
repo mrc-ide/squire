@@ -861,14 +861,14 @@ plot.squire_scan <- function(x, ..., what = "likelihood", log = FALSE, show = c(
   # adjust axes
   if(class(x$x) == "numeric") {
     gg <- gg + ggplot2::scale_x_continuous(expand = c(0, 0))
-  } else if (class(x$x) == "date") {
+  } else if (inherits(x$x, "Date")) {
     gg <- gg + ggplot2::scale_x_date(expand = c(0, 0))
   }
 
 
   if(class(x$y) == "numeric") {
     gg <- gg + ggplot2::scale_y_continuous(expand = c(0, 0))
-  } else if (class(x$y) == "date") {
+  } else if (inherits(x$y, "Date")) {
     gg <- gg + ggplot2::scale_y_date(expand = c(0, 0))
   }
 
