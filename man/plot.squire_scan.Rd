@@ -4,7 +4,7 @@
 \alias{plot.squire_scan}
 \title{squire scan plot}
 \usage{
-\method{plot}{squire_scan}(x, ..., what = "likelihood", log = FALSE)
+\method{plot}{squire_scan}(x, ..., what = "likelihood", log = FALSE, show = c(1, 2))
 }
 \arguments{
 \item{x}{An squire_scan object}
@@ -14,6 +14,8 @@
 \item{what}{What scan outputs are we plotting of "likelihood" vs "probability"}
 
 \item{log}{Should the axes by plotted on log scale}
+
+\item{show}{Which dimensions of the scan to show. Default = c(1, 2)}
 }
 \description{
 squire scan plot

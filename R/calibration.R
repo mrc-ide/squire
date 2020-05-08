@@ -25,6 +25,16 @@
 #' @param contact_matrix_set List of contact matrices to be used from the dates
 #'   provided in \code{date_contact_matrix_set_change}.Must be same length as
 #'   \code{date_contact_matrix_set_change}
+#' @param Meff_min Minimum value of Meff (Movement effect size) in the search.
+#'   Default = 1, which is the same as \code{Meff_max}. If \code{Meff_max} and
+#'   \code{Meff_min} are the same then only a 2d grid search is performed based
+#'   on R0 and start_date
+#' @param Meff_max Maximum value of Meff (Movement effect size) in the search.
+#'   Default = 1, which is the same as \code{Meff_min}. If \code{Meff_max} and
+#'   \code{Meff_min} are the same then only a 2d grid search is performed based
+#'   on R0 and start_date
+#' @param Meff_step Step to increment Meff (Movement effect size) between min
+#'   and max. Default = 0.1
 #' @param ... Further aguments for the model parameter function. If using the
 #'   \code{\link{explicit_model}} (default) this will be
 #'   \code{parameters_explicit_SEEIR}.
@@ -42,6 +52,9 @@ calibrate <- function(data,
                       first_start_date,
                       last_start_date,
                       day_step,
+                      Meff_min = 1,
+                      Meff_max = 1,
+                      Meff_step = 0.1,
                       squire_model = explicit_model(),
                       pars_obs = NULL,
                       forecast = 0,
@@ -97,6 +110,12 @@ calibrate <- function(data,
   }
   if (as.Date(first_start_date) >= as.Date(last_start_date)) {
     stop("'last_start_date' must be greater than 'first_start_date'")
+  }
+  if (R0_max < R0_min) {
+    stop("'R0_max' must be greater 'R0_min'")
+  }
+  if (Meff_max < Meff_min) {
+    stop("'Meff_max' must be greater 'Meff_min'")
   }
 
   # checks that dates are not in the future compared to our data
@@ -219,33 +238,62 @@ calibrate <- function(data,
                         hosp_bed_capacity = hosp_bed_capacity)
 
   # construct scan
-  scan_results <- scan_R0_date(R0_min = R0_min,
-                               R0_max = R0_max,
-                               R0_step = R0_step,
-                               first_start_date = first_start_date,
-                               last_start_date = last_start_date,
-                               day_step = day_step,
-                               data = data,
-                               model_params = model_params,
-                               R0_change = R0_change,
-                               date_R0_change = date_R0_change,
-                               date_contact_matrix_set_change = date_contact_matrix_set_change,
-                               date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
-                               date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
-                               squire_model = squire_model,
-                               n_particles = n_particles)
+  if (Meff_min == Meff_max) {
+    scan_results <- scan_R0_date(R0_min = R0_min,
+                                 R0_max = R0_max,
+                                 R0_step = R0_step,
+                                 first_start_date = first_start_date,
+                                 last_start_date = last_start_date,
+                                 day_step = day_step,
+                                 data = data,
+                                 model_params = model_params,
+                                 R0_change = R0_change,
+                                 date_R0_change = date_R0_change,
+                                 date_contact_matrix_set_change = date_contact_matrix_set_change,
+                                 date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+                                 date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
+                                 squire_model = squire_model,
+                                 n_particles = n_particles)
+  } else {
+    scan_results <- scan_R0_date_Meff(R0_min = R0_min,
+                                      R0_max = R0_max,
+                                      R0_step = R0_step,
+                                      first_start_date = first_start_date,
+                                      last_start_date = last_start_date,
+                                      day_step = day_step,
+                                      Meff_min = Meff_min,
+                                      Meff_max = Meff_max,
+                                      Meff_step = Meff_step,
+                                      data = data,
+                                      model_params = model_params,
+                                      R0_change = R0_change,
+                                      date_R0_change = date_R0_change,
+                                      date_contact_matrix_set_change = date_contact_matrix_set_change,
+                                      date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+                                      date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
+                                      squire_model = squire_model,
+                                      n_particles = n_particles)
+  }
 
   # carry out sims drawn from the grid
-  res <- sample_grid_scan(scan_results = scan_results,
-                          n_sample_pairs = replicates,
-                          n_particles = n_particles,
-                          forecast_days = forecast ,
-                          full_output = TRUE)
+  if (Meff_min == Meff_max) {
+    res <- sample_grid_scan(scan_results = scan_results,
+                            n_sample_pairs = replicates,
+                            n_particles = n_particles,
+                            forecast_days = forecast ,
+                            full_output = TRUE)
+  } else {
+    res <- sample_3d_grid_scan(scan_results = scan_results,
+                               n_sample_pairs = replicates,
+                               n_particles = n_particles,
+                               forecast_days = forecast ,
+                               full_output = TRUE)
+  }
 
   # recreate model output for each type of model(ish)
   if (inherits(squire_model, "stochastic")) {
 
-  # create a fake run object and fill in the required elements
+    # create a fake run object and fill in the required elements
     r <- squire_model$run_func(country = country,
                                contact_matrix_set = contact_matrix_set,
                                tt_contact_matrix = tt_contact_matrix,
