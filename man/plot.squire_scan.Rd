@@ -4,7 +4,7 @@
 \alias{plot.squire_scan}
 \title{squire scan plot}
 \usage{
-\method{plot}{squire_scan}(x, ..., what = "likelihood", log = FALSE)
+\method{plot}{squire_scan}(x, ..., what = "likelihood", log = FALSE, show = c(1, 2))
 }
 \arguments{
 \item{x}{An squire_scan object}

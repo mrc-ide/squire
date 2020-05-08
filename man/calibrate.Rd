@@ -12,9 +12,9 @@ calibrate(
   first_start_date,
   last_start_date,
   day_step,
-  Meff_min,
-  Meff_max,
-  Meff_step,
+  Meff_min = 1,
+  Meff_max = 1,
+  Meff_step = 0.1,
   squire_model = explicit_model(),
   pars_obs = NULL,
   forecast = 0,
@@ -53,12 +53,6 @@ and \code{particle_filter_data()}}
 \item{last_start_date}{Latest start date as 'yyyy-mm-dd'}
 
 \item{day_step}{Step to increment date in days}
-
-\item{Meff_min}{Minimum value of Meff (Movement effect size) in the search}
-
-\item{Meff_max}{Maximum value of Meff (Movement effect size) in the search}
-
-\item{Meff_step}{Step to increment Meff (Movement effect size) between min and max}
 
 \item{squire_model}{A squire model. Default = \code{explicit_SEIR()}}
 
