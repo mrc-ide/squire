@@ -14,6 +14,8 @@
 \item{what}{What scan outputs are we plotting of "likelihood" vs "probability"}
 
 \item{log}{Should the axes by plotted on log scale}
+
+\item{show}{Which dimensions of the scan to show. Default = c(1, 2)}
 }
 \description{
 squire scan plot

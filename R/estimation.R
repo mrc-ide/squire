@@ -788,6 +788,7 @@ sample_3d_grid_scan <- function(scan_results,
 #' @param x An squire_scan object
 #' @param what What scan outputs are we plotting of "likelihood" vs "probability"
 #' @param log Should the axes by plotted on log scale
+#' @param show Which dimensions of the scan to show. Default = c(1, 2)
 #' @param ... additional arguments affecting the plot produced.
 #'
 #' @export
