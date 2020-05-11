@@ -213,9 +213,6 @@ calibrate <- function(data,
   # make the date definitely a date
   data$date <- as.Date(as.character(data$date))
 
-  # adjust for reporting fraction
-  data$deaths <- (data$deaths/reporting_fraction)
-
   # build model parameters
   model_params <- squire_model$parameter_func(country = country,
                                               population = population,
@@ -237,6 +234,13 @@ calibrate <- function(data,
                         date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
                         hosp_bed_capacity = hosp_bed_capacity)
 
+  # construct pars_obs for the user
+  pars_obs <-  list(phi_cases = reporting_fraction,
+                    k_cases = 2,
+                    phi_death = reporting_fraction,
+                    k_death = 2,
+                    exp_noise = 1e6)
+
   # construct scan
   if (Meff_min == Meff_max) {
     scan_results <- scan_R0_date(R0_min = R0_min,
@@ -253,6 +257,7 @@ calibrate <- function(data,
                                  date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                                  date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
                                  squire_model = squire_model,
+                                 pars_obs = pars_obs,
                                  n_particles = n_particles)
   } else {
     scan_results <- scan_R0_date_Meff(R0_min = R0_min,
@@ -272,6 +277,7 @@ calibrate <- function(data,
                                       date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                                       date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
                                       squire_model = squire_model,
+                                      pars_obs = pars_obs,
                                       n_particles = n_particles)
   }
 

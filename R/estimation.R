@@ -85,7 +85,7 @@ scan_R0_date <- function(
 
   # Set up observation parameters that translate our model outputs to observations
   if (is.null(pars_obs)) {
-    pars_obs <-  list(phi_cases = 0.1,
+    pars_obs <-  list(phi_cases = 1,
                       k_cases = 2,
                       phi_death = 1,
                       k_death = 2,
@@ -282,7 +282,7 @@ scan_R0_date_Meff <- function(
 
   # Set up observation parameters that translate our model outputs to observations
   if (is.null(pars_obs)) {
-    pars_obs <-  list(phi_cases = 0.1,
+    pars_obs <-  list(phi_cases = 1,
                       k_cases = 2,
                       phi_death = 1,
                       k_death = 2,
@@ -905,8 +905,7 @@ plot_sample_grid_search <- function(x, what = "deaths") {
     base_plot <- base_plot +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=.data$cases/x$scan_results$inputs$pars_obs$phi_cases,
-                                       x=as.Date(.data$date)), x$scan_results$inputs$data)
+      ggplot2::geom_point(ggplot2::aes(y=.data$cases, x=as.Date(.data$date)), x$scan_results$inputs$data)
 
   }
 
@@ -929,8 +928,7 @@ plot_sample_grid_search <- function(x, what = "deaths") {
     base_plot <- base_plot +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=.data$deaths/x$scan_results$inputs$pars_obs$phi_death,
-                                       x=as.Date(.data$date)), x$scan_results$inputs$data)
+      ggplot2::geom_point(ggplot2::aes(y=.data$deaths,x=as.Date(.data$date)), x$scan_results$inputs$data)
 
   } else {
 
