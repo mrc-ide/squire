@@ -93,8 +93,8 @@ probability of dying.
 ## Installation
 
 <i>squire</i> utilises the package
-[ODIN](https://github.com/mrc-ide/odin) to generate the model.
-[ODIN](https://github.com/mrc-ide/odin) implements a high-level language
+[odin](https://github.com/mrc-ide/odin) to generate the model.
+[odin](https://github.com/mrc-ide/odin) implements a high-level language
 for implementing mathematical models and can be installed by running the
 following command:
 
@@ -102,9 +102,9 @@ following command:
 install.packages("odin")
 ```
 
-The model generated using ODIN is written in C and so you will require a
+The model generated using odin is written in C and so you will require a
 compiler to install dependencies for the package and to build any models
-with ODIN. Windows users should install
+with odin. Windows users should install
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/). See the
 relevant section in
 [R-admin](https://cran.r-project.org/doc/manuals/r-release/R-admin.html#The-Windows-toolset)
@@ -115,7 +115,7 @@ The function `odin::can_compile()` will check if it is able to compile
 things, but by the time you install the package that will probably have
 been satisfied.
 
-After installation of ODIN, ensure you have the devtools package
+After installation of odin, ensure you have the devtools package
 installed by running the following:
 
 ``` r

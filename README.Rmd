@@ -72,17 +72,17 @@ Individuals newly requiring hospitalisation (either a hospital or ICU bed) are t
 
 ## Installation
 
-<i>squire</i> utilises the package [ODIN](https://github.com/mrc-ide/odin) to generate the model. [ODIN](https://github.com/mrc-ide/odin) implements a high-level language for implementing mathematical models and can be installed by running the following command:
+<i>squire</i> utilises the package [odin](https://github.com/mrc-ide/odin) to generate the model. [odin](https://github.com/mrc-ide/odin) implements a high-level language for implementing mathematical models and can be installed by running the following command:
 
 ```{r, eval=FALSE}
 install.packages("odin")
 ```
 
-The model generated using ODIN is written in C and so you will require a compiler to install dependencies for the package and to build any models with ODIN. Windows users should install [Rtools](https://cran.r-project.org/bin/windows/Rtools/).  See the relevant section in [R-admin](https://cran.r-project.org/doc/manuals/r-release/R-admin.html#The-Windows-toolset) for advice.  Be sure to select the "edit PATH" checkbox during installation or the tools will not be found.
+The model generated using odin is written in C and so you will require a compiler to install dependencies for the package and to build any models with odin. Windows users should install [Rtools](https://cran.r-project.org/bin/windows/Rtools/).  See the relevant section in [R-admin](https://cran.r-project.org/doc/manuals/r-release/R-admin.html#The-Windows-toolset) for advice.  Be sure to select the "edit PATH" checkbox during installation or the tools will not be found.
 
 The function `odin::can_compile()` will check if it is able to compile things, but by the time you install the package that will probably have been satisfied.
 
-After installation of ODIN, ensure you have the devtools package installed by running the following:
+After installation of odin, ensure you have the devtools package installed by running the following:
 
 ```{r, eval=FALSE}
 install.packages("devtools")
