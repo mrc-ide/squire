@@ -1,4 +1,8 @@
 
+# squire 0.4.8
+
+* `calibrate` argument `reporting_fraction` implemented now in likelihood 
+
 # squire 0.4.7
 
 * `calibrate` can do 3D grid scans investigating Meff
