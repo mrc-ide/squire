@@ -269,7 +269,7 @@ particle_filter <- function(data, model, compare, n_particles,
 
     # calculate the weights for this fit
     log_weights <- compare(t, states)
-    print(log_weights)
+
     if (!is.null(log_weights)) {
       weights <- scale_log_weights(log_weights)
       log_likelihood <- log_likelihood + weights$average

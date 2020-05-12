@@ -815,13 +815,13 @@ test_that("ring roll changes work", {
   data <- data.frame("date" = seq.Date(from = as.Date("2020-02-01"), length.out = 120, by = 1),
                      "deaths" = s$y[-1])
   for(i in seq(8,120,8)) {
-    data$deaths[i] <- data$deaths[i]+data$deaths[(i-7):(i-1)]
+    data$deaths[i] <- data$deaths[i]+sum(data$deaths[(i-7):(i-1)])
     data$deaths[(i-7):(i-1)] <- 0
   }
 
   set.seed(93L)
   out <- calibrate(
-    data = data[-(1:55),],
+    data = data[which(data$deaths>0)[1]:120,],
     R0_min = 2,
     R0_max = 2,
     R0_step = 0.1,
@@ -830,14 +830,14 @@ test_that("ring roll changes work", {
     day_step = 1,
     squire_model = explicit_model(),
     roll = 1,
-    n_particles = 50,
+    n_particles = 5,
     replicates = 2,
     country = "Algeria",
     forecast = 0
   )
 
   out2 <- calibrate(
-    data = data[-(1:55),],
+    data = data[which(data$deaths>0)[1]:120,],
     R0_min = 2,
     R0_max = 2,
     R0_step = 0.1,
@@ -845,14 +845,14 @@ test_that("ring roll changes work", {
     last_start_date = "2020-02-02",
     day_step = 1,
     squire_model = explicit_model(),
-    roll = 7,
-    n_particles = 50,
+    roll = 14,
+    n_particles = 5,
     replicates = 2,
     country = "Algeria",
     forecast = 0
   )
 
-  index <- odin_index(out$model)
-  expect_true(sum(rowSums(out$output[,index$D,1]))  > sum(rowSums(out2$output[,index$D,1])))
+  expect_warning(expect_s3_class(plot(out, particle_fit = TRUE) , "gg"))
+  expect_warning(expect_s3_class(plot(out2, particle_fit = TRUE) , "gg"))
 
 })
