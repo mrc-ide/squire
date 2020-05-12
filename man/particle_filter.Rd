@@ -10,6 +10,7 @@ particle_filter(
   compare,
   n_particles,
   forecast_days = 0,
+  roll = 1,
   save_particles = FALSE,
   full_output = FALSE,
   save_sample_state = FALSE,
@@ -28,6 +29,10 @@ particle_filter(
 
 \item{forecast_days}{Number of days to forecast forward from end
 states.  Requires that \code{save_particles} is \code{TRUE}.}
+
+\item{roll}{Integer for number of days to be compared against data.
+Default = 1, which will compare current date. If greater than 1, the sum
+of the last roll dates of data will be compared.}
 
 \item{save_particles}{Logical, indicating if we save full particle
 histories (this is slower).}

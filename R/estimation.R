@@ -89,7 +89,8 @@ scan_R0_date <- function(
                       k_cases = 2,
                       phi_death = 1,
                       k_death = 2,
-                      exp_noise = 1e6)
+                      exp_noise = 1e6,
+                      roll = 1)
   }
 
   #
@@ -286,7 +287,8 @@ scan_R0_date_Meff <- function(
                       k_cases = 2,
                       phi_death = 1,
                       k_death = 2,
-                      exp_noise = 1e6)
+                      exp_noise = 1e6,
+                      roll = 1)
   }
 
   #

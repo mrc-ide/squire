@@ -20,6 +20,7 @@ calibrate(
   forecast = 0,
   n_particles = 100,
   reporting_fraction = 1,
+  roll = 1,
   replicates = 100,
   date_R0_change = NULL,
   R0_change = NULL,
@@ -78,6 +79,10 @@ and max. Default = 0.1}
 \item{reporting_fraction}{Reporting fraction. Numeric for what proportion of
 the total deaths the reported deaths represent. E.g. 0.5 results in
 the model calibrating to twice the deaths provided by \code{data$deaths}}
+
+\item{roll}{Integer for number of days to be compared against data.
+Default = 1, which will compare current date. If greater than 1, the sum
+of the last roll dates of data will be compared.}
 
 \item{replicates}{Replicates to be run. Default = 100}
 

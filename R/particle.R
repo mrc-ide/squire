@@ -39,7 +39,8 @@ run_particle_filter <- function(data,
                                                   k_cases = 2,
                                                   phi_death = 1,
                                                   k_death = 2,
-                                                  exp_noise = 1e6),
+                                                  exp_noise = 1e6,
+                                                  roll = 1),
                                 n_particles = 1000,
                                 forecast_days = 0,
                                 save_particles = FALSE,
@@ -83,6 +84,7 @@ run_particle_filter <- function(data,
   pf_results <- particle_filter(data = data,
                                 model = model_func,
                                 compare = compare_func,
+                                roll = obs_params$roll,
                                 n_particles = n_particles,
                                 save_particles = save_particles,
                                 forecast_days = forecast_days,
@@ -119,6 +121,10 @@ run_particle_filter <- function(data,
 #' @param forecast_days Number of days to forecast forward from end
 #'   states.  Requires that \code{save_particles} is \code{TRUE}.
 #'
+#' @param roll Integer for number of days to be compared against data.
+#'   Default = 1, which will compare current date. If greater than 1, the sum
+#'   of the last roll dates of data will be compared.
+#'
 #' @param save_particles Logical, indicating if we save full particle
 #'   histories (this is slower).
 #'
@@ -133,7 +139,9 @@ run_particle_filter <- function(data,
 #'  particles at the final time point for which we have data
 #'
 particle_filter <- function(data, model, compare, n_particles,
-                            forecast_days = 0, save_particles = FALSE,
+                            forecast_days = 0,
+                            roll = 1,
+                            save_particles = FALSE,
                             full_output = FALSE,
                             save_sample_state = FALSE, save_end_states = FALSE) {
 
@@ -161,6 +169,9 @@ particle_filter <- function(data, model, compare, n_particles,
 
   # which indexes are the initials
   i_state <- seq_along(model$initial()) + 1L
+
+  # set up our state ring
+  states <- ring::ring_buffer_env(roll + 1)
 
   ## ---------------------------------------------------------------------------
   ## Initial Step
@@ -203,6 +214,10 @@ particle_filter <- function(data, model, compare, n_particles,
                        return_minimal = TRUE)[, 1, , drop = TRUE]
   }
 
+  # place state in our states
+  states$push(state, iterate = FALSE)
+
+
   ## ---------------------------------------------------------------------------
   ## Particle filter stepping
   ## ---------------------------------------------------------------------------
@@ -236,9 +251,14 @@ particle_filter <- function(data, model, compare, n_particles,
       }
 
     }
+    states$push(state, iterate = FALSE)
+    if(!identical(states$tail(), prev_state)) {
+      a <- 1
+      browser()
+    }
 
     # calculate the weights for this fit
-    log_weights <- compare(t, state, prev_state)
+    log_weights <- compare(t, states)
     if (!is.null(log_weights)) {
       weights <- scale_log_weights(log_weights)
       log_likelihood <- log_likelihood + weights$average
@@ -325,6 +345,7 @@ compare_output <- function(model, pars_obs, data, type="explicit_SEEIR_model") {
   phi_cases <- pars_obs$phi_cases
   k_cases <- pars_obs$k_cases
   exp_noise <- pars_obs$exp_noise
+  roll <- pars_obs$roll
 
   # locations of these
   index_cases <- cases_total_index(model) - 1L
@@ -334,7 +355,7 @@ compare_output <- function(model, pars_obs, data, type="explicit_SEEIR_model") {
 
   ## This returns a closure, with the above variables bound, the
   ## sampler will provide the arguments below.
-  function(t, state, prev_state) {
+  function(t, states) {
 
     # for the time being we'll only fit to deaths however uncomment to add cases
     # if (is.na(data$cases[t] && is.na(data$deaths[t]))) {
@@ -342,14 +363,33 @@ compare_output <- function(model, pars_obs, data, type="explicit_SEEIR_model") {
       return(NULL)
     }
 
-    log_weights <- rep(0, ncol(state))
+    log_weights <- rep(0, ncol(states$head()))
 
-    if (!is.na(data$deaths[t])) {
-      ## new deaths summed across ages/infectivities
-      model_deaths <- colSums(state[index_D, ]) -
-        colSums(prev_state[index_D, ])
+    if (!all(is.na(data$deaths[max((t-roll+1), 1):t]))) {
+
+      ## if there are no NAs in the data then we can just do
+      ## sum of today's minus the first in the buffer
+      if (!any(is.na(data$deaths[max((t-roll+1), 1):t]))) {
+      model_deaths <- colSums(states$head()[index_D, ]) -
+        colSums(states$tail()[index_D, ])
+      } else {
+
+        # otherwise go through each state difference
+        model_deaths <- vapply(
+          seq_len(states$used()-1), function(x) {
+            colSums(states$tail_offset(x)[index_D, ]) -
+              colSums(states$tail_offset(x-1)[index_D, ])
+          }, FUN.VALUE = numeric(ncol(states$head())))
+
+        # and then only sum those for which the data is not NA for today
+        model_deaths <- model_deaths[,which(!is.na(data$deaths[max((t-roll+1), 1):t]))]
+        model_deaths <- rowSums(model_deaths)
+
+      }
+
       log_weights <- log_weights +
-        ll_nbinom(data$deaths[t], model_deaths, phi_death, k_death, exp_noise)
+        ll_nbinom(sum(data$deaths[max((t-roll+1), 1):t], na.rm = TRUE),
+                  model_deaths, phi_death, k_death, exp_noise)
     }
 
     # We are not going to be bringing cases in so comment this out

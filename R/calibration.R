@@ -3,6 +3,9 @@
 #' @param reporting_fraction Reporting fraction. Numeric for what proportion of
 #'   the total deaths the reported deaths represent. E.g. 0.5 results in
 #'   the model calibrating to twice the deaths provided by \code{data$deaths}
+#' @param roll Integer for number of days to be compared against data.
+#'   Default = 1, which will compare current date. If greater than 1, the sum
+#'   of the last roll dates of data will be compared.
 #' @param replicates Replicates to be run. Default = 100
 #' @param forecast Number of days to forecast forward. Default = 0
 #' @param baseline_hosp_bed_capacity The starting number of hospital beds before
@@ -60,6 +63,7 @@ calibrate <- function(data,
                       forecast = 0,
                       n_particles = 100,
                       reporting_fraction = 1,
+                      roll = 1,
                       replicates = 100,
                       date_R0_change = NULL,
                       R0_change = NULL,
@@ -86,6 +90,7 @@ calibrate <- function(data,
   assert_date(last_start_date)
   assert_date(data$date)
   assert_pos_int(day_step)
+  assert_pos_int(roll)
   assert_numeric(n_particles)
   assert_numeric(reporting_fraction)
   assert_custom_class(squire_model, "squire_model")
@@ -239,7 +244,8 @@ calibrate <- function(data,
                     k_cases = 2,
                     phi_death = reporting_fraction,
                     k_death = 2,
-                    exp_noise = 1e6)
+                    exp_noise = 1e6,
+                    roll = roll)
 
   # construct scan
   if (Meff_min == Meff_max) {

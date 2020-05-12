@@ -33,6 +33,7 @@ Imports:
     furrr,
     magrittr,
     purrr,
+    ring,
     crayon,
     methods,
     ggplot2

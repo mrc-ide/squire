@@ -171,7 +171,8 @@ test_that("particle_filter error cases", {
                    k_ICU = 2,
                    phi_death = 926 / 1019,
                    k_death = 2,
-                   exp_noise = 1e6)
+                   exp_noise = 1e6,
+                   roll = 1)
 
   expect_warning(mod <- squire_model$odin_model(user = pars_model))
   compare <- squire_model$compare_model(mod, pars_obs, d)
