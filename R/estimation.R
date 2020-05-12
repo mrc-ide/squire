@@ -136,6 +136,7 @@ scan_R0_date <- function(
       forecast_days = 0,
       save_particles = FALSE,
       .progress = TRUE,
+      .options = furrr::future_options(packages = "ring"),
       return = "ll")
 
   }
@@ -334,6 +335,7 @@ scan_R0_date_Meff <- function(
       forecast_days = 0,
       save_particles = FALSE,
       .progress = TRUE,
+      .options = furrr::future_options(packages = "ring"),
       return = "ll")
 
   }
@@ -405,6 +407,8 @@ R0_date_particle_filter <- function(R0,
                                     save_particles = FALSE,
                                     full_output = FALSE,
                                     return = "full") {
+
+  require(ring)
 
   # first set up our new timings for the new start date
   if (is.null(date_R0_change)) {
@@ -581,6 +585,7 @@ sample_grid_scan <- function(scan_results,
       return = "sample"
     )
   } else {
+    ring <- ring::ring_buffer_env(1)
     traces <- furrr::future_pmap(
       .l = param_grid,
       .f = R0_date_particle_filter,
@@ -598,6 +603,7 @@ sample_grid_scan <- function(scan_results,
       full_output = full_output,
       save_particles = TRUE,
       return = "sample",
+      .options = furrr::future_options(packages = "ring"),
       .progress = TRUE
     )
   }

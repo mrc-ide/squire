@@ -803,3 +803,56 @@ test_that("reporting fraction into pars_obs", {
   expect_true(sum(rowSums(out$output[,index$D,1]))  > sum(rowSums(out2$output[,index$D,1])))
 
 })
+
+
+
+#------------------------------------------------
+test_that("ring roll changes work", {
+
+  s <- run_explicit_SEEIR_model("Algeria", R0 = 2, day_return = TRUE, replicates = 1, time_period = 120)
+  s <- format_output(s, "deaths")
+
+  data <- data.frame("date" = seq.Date(from = as.Date("2020-02-01"), length.out = 120, by = 1),
+                     "deaths" = s$y[-1])
+  for(i in seq(8,120,8)) {
+    data$deaths[i] <- data$deaths[i]+data$deaths[(i-7):(i-1)]
+    data$deaths[(i-7):(i-1)] <- 0
+  }
+
+  set.seed(93L)
+  out <- calibrate(
+    data = data[-(1:55),],
+    R0_min = 2,
+    R0_max = 2,
+    R0_step = 0.1,
+    first_start_date = "2020-02-01",
+    last_start_date = "2020-02-02",
+    day_step = 1,
+    squire_model = explicit_model(),
+    roll = 1,
+    n_particles = 50,
+    replicates = 2,
+    country = "Algeria",
+    forecast = 0
+  )
+
+  out2 <- calibrate(
+    data = data[-(1:55),],
+    R0_min = 2,
+    R0_max = 2,
+    R0_step = 0.1,
+    first_start_date = "2020-02-01",
+    last_start_date = "2020-02-02",
+    day_step = 1,
+    squire_model = explicit_model(),
+    roll = 7,
+    n_particles = 50,
+    replicates = 2,
+    country = "Algeria",
+    forecast = 0
+  )
+
+  index <- odin_index(out$model)
+  expect_true(sum(rowSums(out$output[,index$D,1]))  > sum(rowSums(out2$output[,index$D,1])))
+
+})

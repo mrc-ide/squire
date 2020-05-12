@@ -173,6 +173,17 @@ particle_filter <- function(data, model, compare, n_particles,
   # set up our state ring
   states <- ring::ring_buffer_env(roll + 1)
 
+  # state history update
+  update_history <- function(states, kappa)
+  {
+    x <- states$.tail
+    for (i in seq_len(states$used())) {
+      x$data <- x$data[,kappa]
+      x <- x$.next
+    }
+    return(states)
+  }
+
   ## ---------------------------------------------------------------------------
   ## Initial Step
   ## ---------------------------------------------------------------------------
@@ -214,6 +225,9 @@ particle_filter <- function(data, model, compare, n_particles,
                        return_minimal = TRUE)[, 1, , drop = TRUE]
   }
 
+  # first place an empty state of NAs
+  states$push(matrix(NA, nrow = nrow(state), ncol = ncol(state)), iterate = FALSE)
+
   # place state in our states
   states$push(state, iterate = FALSE)
 
@@ -252,13 +266,10 @@ particle_filter <- function(data, model, compare, n_particles,
 
     }
     states$push(state, iterate = FALSE)
-    if(!identical(states$tail(), prev_state)) {
-      a <- 1
-      browser()
-    }
 
     # calculate the weights for this fit
     log_weights <- compare(t, states)
+    print(log_weights)
     if (!is.null(log_weights)) {
       weights <- scale_log_weights(log_weights)
       log_likelihood <- log_likelihood + weights$average
@@ -270,6 +281,7 @@ particle_filter <- function(data, model, compare, n_particles,
       # resample based on the weights
       kappa <- resample(weights$weights, "systematic")
       state <- state[, kappa]
+      states <- update_history(states, kappa)
       if (save_particles) {
         particles <- particles[, , kappa]
       }
@@ -382,7 +394,7 @@ compare_output <- function(model, pars_obs, data, type="explicit_SEEIR_model") {
           }, FUN.VALUE = numeric(ncol(states$head())))
 
         # and then only sum those for which the data is not NA for today
-        model_deaths <- model_deaths[,which(!is.na(data$deaths[max((t-roll+1), 1):t]))]
+        model_deaths <- model_deaths[,which(!is.na(data$deaths[max((t-roll+1), 1):t])), drop = FALSE]
         model_deaths <- rowSums(model_deaths)
 
       }
