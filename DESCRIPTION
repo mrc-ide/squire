@@ -21,11 +21,11 @@ Suggests:
     covr,
     readxl,
     knitr,
+    odin.js,
     rmarkdown
 RoxygenNote: 7.1.0
 Imports: 
     odin,
-    odin.js,
     dde (>= 1.0.2),
     dplyr,
     tidyr,
