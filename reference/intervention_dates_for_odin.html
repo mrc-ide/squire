@@ -74,7 +74,7 @@ relative to the data and to odin's internal clock." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.9</span>
       </span>
     </div>
 
@@ -127,7 +127,7 @@ exists to make explicit how time changes through the model
 relative to the data and to odin's internal clock.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>intervention_dates_for_odin</span>(<span class='no'>dates</span>, <span class='no'>start_date</span>, <span class='no'>steps_per_day</span>)</pre>
+    <pre class="usage"><span class='fu'>intervention_dates_for_odin</span>(<span class='no'>dates</span>, <span class='no'>change</span>, <span class='no'>start_date</span>, <span class='no'>steps_per_day</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -135,7 +135,11 @@ relative to the data and to odin's internal clock.</p>
     <tr>
       <th>dates</th>
       <td><p>Dates (or ISO-formatted strings for
-conversion with <code><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></code> at which R0 changes.</p></td>
+conversion with <code><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></code> at which intervention changes.</p></td>
+    </tr>
+    <tr>
+      <th>change</th>
+      <td><p>Variable that is changing at each of dates.</p></td>
     </tr>
     <tr>
       <th>start_date</th>
@@ -148,6 +152,11 @@ earlier than the first date in <code>data</code>.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>If start date is after elements in dates, these will be trimmed
+  accordinly and the final change value used as the value one day after
+  start date.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
