@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.8</span>
       </span>
     </div>
 
@@ -131,6 +131,9 @@
   <span class='no'>first_start_date</span>,
   <span class='no'>last_start_date</span>,
   <span class='no'>day_step</span>,
+  <span class='kw'>Meff_min</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>Meff_max</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>Meff_step</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
   <span class='kw'>squire_model</span> <span class='kw'>=</span> <span class='fu'><a href='explicit_model.html'>explicit_model</a></span>(),
   <span class='kw'>pars_obs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>forecast</span> <span class='kw'>=</span> <span class='fl'>0</span>,
@@ -185,6 +188,25 @@ and <code><a href='particle_filter_data.html'>particle_filter_data()</a></code><
     <tr>
       <th>day_step</th>
       <td><p>Step to increment date in days</p></td>
+    </tr>
+    <tr>
+      <th>Meff_min</th>
+      <td><p>Minimum value of Meff (Movement effect size) in the search.
+Default = 1, which is the same as <code>Meff_max</code>. If <code>Meff_max</code> and
+<code>Meff_min</code> are the same then only a 2d grid search is performed based
+on R0 and start_date</p></td>
+    </tr>
+    <tr>
+      <th>Meff_max</th>
+      <td><p>Maximum value of Meff (Movement effect size) in the search.
+Default = 1, which is the same as <code>Meff_min</code>. If <code>Meff_max</code> and
+<code>Meff_min</code> are the same then only a 2d grid search is performed based
+on R0 and start_date</p></td>
+    </tr>
+    <tr>
+      <th>Meff_step</th>
+      <td><p>Step to increment Meff (Movement effect size) between min
+and max. Default = 0.1</p></td>
     </tr>
     <tr>
       <th>squire_model</th>
@@ -316,7 +338,7 @@ which will cause population to be sourced from <code>country</code></p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Patrick Walker, OJ Watson, Charlie Whittaker, Peter Winskill.</p>
+  <p>Developed by Patrick Walker, OJ Watson, Charlie Whittaker, Peter Winskill, Giovanni Charles.</p>
 </div>
 
 <div class="pkgdown">

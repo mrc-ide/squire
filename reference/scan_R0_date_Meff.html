@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Prepare intervention timing for odin — intervention_dates_for_odin • squire</title>
+<title>Grid search of R0 and start date — scan_R0_date_Meff • squire</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,10 @@
 
 
 
-<meta property="og:title" content="Prepare intervention timing for odin — intervention_dates_for_odin" />
-<meta property="og:description" content="Prepare dates of intervention for use with odin.  This function
-exists to make explicit how time changes through the model
-relative to the data and to odin's internal clock." />
+<meta property="og:title" content="Grid search of R0 and start date — scan_R0_date_Meff" />
+<meta property="og:description" content="Run a grid search of the particle filter over R0, start date and Meff.
+This is parallelised, first run plan(multiprocess) to set
+this up." />
 
 
 
@@ -116,38 +116,133 @@ relative to the data and to odin's internal clock." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Prepare intervention timing for odin</h1>
+    <h1>Grid search of R0 and start date</h1>
     
-    <div class="hidden name"><code>intervention_dates_for_odin.Rd</code></div>
+    <div class="hidden name"><code>scan_R0_date_Meff.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Prepare dates of intervention for use with odin.  This function
-exists to make explicit how time changes through the model
-relative to the data and to odin's internal clock.</p>
+    <p>Run a grid search of the particle filter over R0, start date and Meff.
+This is parallelised, first run <code>plan(multiprocess)</code> to set
+this up.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>intervention_dates_for_odin</span>(<span class='no'>dates</span>, <span class='no'>start_date</span>, <span class='no'>steps_per_day</span>)</pre>
+    <pre class="usage"><span class='fu'>scan_R0_date_Meff</span>(
+  <span class='no'>R0_min</span>,
+  <span class='no'>R0_max</span>,
+  <span class='no'>R0_step</span>,
+  <span class='no'>first_start_date</span>,
+  <span class='no'>last_start_date</span>,
+  <span class='no'>day_step</span>,
+  <span class='no'>Meff_min</span>,
+  <span class='no'>Meff_max</span>,
+  <span class='no'>Meff_step</span>,
+  <span class='no'>data</span>,
+  <span class='no'>model_params</span>,
+  <span class='kw'>R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>date_R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>date_contact_matrix_set_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>date_ICU_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>date_hosp_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>squire_model</span> <span class='kw'>=</span> <span class='fu'>explicit_SEIR</span>(),
+  <span class='kw'>pars_obs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>n_particles</span> <span class='kw'>=</span> <span class='fl'>100</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>dates</th>
-      <td><p>Dates (or ISO-formatted strings for
-conversion with <code><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></code> at which R0 changes.</p></td>
+      <th>R0_min</th>
+      <td><p>Minimum value of R0 in the search</p></td>
     </tr>
     <tr>
-      <th>start_date</th>
-      <td><p>The date to start the simulation from.  Must be
-earlier than the first date in <code>data</code>.</p></td>
+      <th>R0_max</th>
+      <td><p>Maximum value of R0 in the search</p></td>
     </tr>
     <tr>
-      <th>steps_per_day</th>
-      <td><p>The number of steps per day</p></td>
+      <th>R0_step</th>
+      <td><p>Step to increment R0 between min and max</p></td>
+    </tr>
+    <tr>
+      <th>first_start_date</th>
+      <td><p>Earliest start date as 'yyyy-mm-dd'</p></td>
+    </tr>
+    <tr>
+      <th>last_start_date</th>
+      <td><p>Latest start date as 'yyyy-mm-dd'</p></td>
+    </tr>
+    <tr>
+      <th>day_step</th>
+      <td><p>Step to increment date in days</p></td>
+    </tr>
+    <tr>
+      <th>Meff_min</th>
+      <td><p>Minimum value of Meff (Movement effect size) in the search</p></td>
+    </tr>
+    <tr>
+      <th>Meff_max</th>
+      <td><p>Maximum value of Meff (Movement effect size) in the search</p></td>
+    </tr>
+    <tr>
+      <th>Meff_step</th>
+      <td><p>Step to increment Meff (Movement effect size) between min and max</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>Deaths data to fit to. See <code>example_deaths.csv</code>
+and <code><a href='particle_filter_data.html'>particle_filter_data()</a></code></p></td>
+    </tr>
+    <tr>
+      <th>model_params</th>
+      <td><p>Squire model parameters. Created from a call to one of
+the <code>parameters_&lt;type&gt;_model</code> functions.</p></td>
+    </tr>
+    <tr>
+      <th>R0_change</th>
+      <td><p>Numeric vector for relative changes in R0. Default = NULL,
+i.e. no change in R0</p></td>
+    </tr>
+    <tr>
+      <th>date_R0_change</th>
+      <td><p>Calendar dates at which R0_change occurs.
+Defaut = NULL, i.e. no change in R0</p></td>
+    </tr>
+    <tr>
+      <th>date_contact_matrix_set_change</th>
+      <td><p>Calendar dates at which the contact matrices
+set in <code>model_params</code> change. Defaut = NULL, i.e. no change</p></td>
+    </tr>
+    <tr>
+      <th>date_ICU_bed_capacity_change</th>
+      <td><p>Calendar dates at which ICU bed
+capacity changes set in <code>model_params</code> change.
+Defaut = NULL, i.e. no change</p></td>
+    </tr>
+    <tr>
+      <th>date_hosp_bed_capacity_change</th>
+      <td><p>Calendar dates at which hospital bed
+capacity changes set in <code>model_params</code> change.
+Defaut = NULL, i.e. no change</p></td>
+    </tr>
+    <tr>
+      <th>squire_model</th>
+      <td><p>A squire model. Default = <code>explicit_SEIR()</code></p></td>
+    </tr>
+    <tr>
+      <th>pars_obs</th>
+      <td><p>list of parameters to use for the comparison function.</p></td>
+    </tr>
+    <tr>
+      <th>n_particles</th>
+      <td><p>Number of particles. Positive Integer. Default = 100</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>List of R0 and start date grid values, and
+  normalised probabilities at each point</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
