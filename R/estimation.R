@@ -408,8 +408,6 @@ R0_date_particle_filter <- function(R0,
                                     full_output = FALSE,
                                     return = "full") {
 
-  require(ring)
-
   # first set up our new timings for the new start date
   if (is.null(date_R0_change)) {
     tt_beta <- 0
