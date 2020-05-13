@@ -82,6 +82,9 @@ calibrate <- function(data,
   assert_numeric(R0_min)
   assert_numeric(R0_max)
   assert_numeric(R0_step)
+  assert_numeric(Meff_min)
+  assert_numeric(Meff_max)
+  assert_numeric(Meff_step)
   assert_date(first_start_date)
   assert_date(last_start_date)
   assert_date(data$date)
@@ -116,17 +119,6 @@ calibrate <- function(data,
   }
   if (Meff_max < Meff_min) {
     stop("'Meff_max' must be greater 'Meff_min'")
-  }
-
-  # checks that dates are not in the future compared to our data
-  if(!is.null(date_R0_change)) {
-    assert_date(date_R0_change)
-    if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
-      stop("Last date in date_R0_change is greater than the last date in data")
-    }
-    if(as.Date(last_start_date) >= as.Date(head(date_R0_change, 1))) {
-      stop("First date in date_R0_change is earlier than last_start_date")
-    }
   }
 
   # handle contact matrix changes
@@ -309,7 +301,7 @@ calibrate <- function(data,
                                tt_ICU_beds = tt_ICU_beds,
                                population = population,
                                replicates = 1,
-                               time_period = max(tt_contact_matrix,tt_hosp_beds,tt_ICU_beds,1),
+                               time_period = nrow(res$trajectories),
                                ...)
 
     # first let's create the output

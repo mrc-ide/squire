@@ -4,11 +4,13 @@
 \alias{intervention_dates_for_odin}
 \title{Prepare intervention timing for odin}
 \usage{
-intervention_dates_for_odin(dates, start_date, steps_per_day)
+intervention_dates_for_odin(dates, change, start_date, steps_per_day)
 }
 \arguments{
 \item{dates}{Dates (or ISO-formatted strings for
-conversion with \code{\link{as.Date}} at which R0 changes.}
+conversion with \code{\link{as.Date}} at which intervention changes.}
+
+\item{change}{Variable that is changing at each of dates.}
 
 \item{start_date}{The date to start the simulation from.  Must be
 earlier than the first date in \code{data}.}
@@ -19,4 +21,9 @@ earlier than the first date in \code{data}.}
 Prepare dates of intervention for use with odin.  This function
 exists to make explicit how time changes through the model
 relative to the data and to odin's internal clock.
+}
+\details{
+If start date is after elements in dates, these will be trimmed
+  accordinly and the final change value used as the value one day after
+  start date.
 }

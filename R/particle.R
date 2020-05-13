@@ -429,8 +429,14 @@ particle_filter_data <- function(data, start_date, steps_per_day) {
 #' relative to the data and to odin's internal clock.
 #' @title Prepare intervention timing for odin
 #'
+#' @details If start date is after elements in dates, these will be trimmed
+#'   accordinly and the final change value used as the value one day after
+#'   start date.
+#'
 #' @param dates Dates (or ISO-formatted strings for
-#'   conversion with \code{\link{as.Date}} at which R0 changes.
+#'   conversion with \code{\link{as.Date}} at which intervention changes.
+#'
+#' @param change Variable that is changing at each of dates.
 #'
 #' @param start_date The date to start the simulation from.  Must be
 #'   earlier than the first date in \code{data}.
@@ -438,11 +444,13 @@ particle_filter_data <- function(data, start_date, steps_per_day) {
 #' @param steps_per_day The number of steps per day
 #'
 intervention_dates_for_odin <- function(dates,
+                                        change,
                                         start_date,
                                         steps_per_day) {
 
   ## assertions
   assert_pos_int(steps_per_day)
+  assert_same_length(dates, change)
   assert_date(start_date)
   assert_date(dates)
 
@@ -451,15 +459,30 @@ intervention_dates_for_odin <- function(dates,
   dates <- as.Date(dates)
 
   # checks on timings
-  if (any(start_date >= dates)) {
-    stop("'start_date' must be less than the first date in dates")
-  }
   if (any(diff(dates) <= 0)) {
     stop("dates must be strictly increasing")
   }
 
+  # trim dates if needed
+  if (any(start_date >= dates)) {
+
+    # which are before the start date
+    to_change <- which(dates <= start_date)
+    to_drop <- head(to_change, -1)
+
+    # remove all but the last one
+    if (length(to_drop) > 0) {
+      dates <- dates[-to_drop]
+      change <- change[-to_drop]
+    }
+
+    # change the first remaining date
+    dates[1] <- as.Date(start_date)+1
+
+  }
+
   tt <- round((as.numeric(dates - start_date)) * steps_per_day)
-  return(tt)
+  return(list("tt" = tt, "change" = change))
 
 }
 
