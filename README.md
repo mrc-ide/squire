@@ -14,6 +14,7 @@ status](https://travis-ci.org/mrc-ide/squire.svg?branch=master)](https://travis-
 status](https://ci.appveyor.com/api/projects/status/github/mrc-ide/squire?branch=master&svg=true)](https://ci.appveyor.com/project/pwinskill/squire)
 [![Codecov test
 coverage](https://codecov.io/gh/mrc-ide/squire/branch/master/graph/badge.svg)](https://codecov.io/gh/mrc-ide/squire?branch=master)
+[![DOI](https://zenodo.org/badge/251261968.svg)](https://zenodo.org/badge/latestdoi/251261968)
 <!-- badges: end -->
 
 squire enables users to simulate models of SARS-CoV-2 epidemics. This is
