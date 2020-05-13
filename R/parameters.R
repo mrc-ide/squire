@@ -105,7 +105,7 @@ get_hosp_bed_capacity <- function(country = NULL) {
     population <- get_population(country)$n
     hosp_beds <- beds$hosp_beds
     hosp_bed_capacity <- round(hosp_beds * sum(population)/1000)
-
+    hosp_bed_capacity
 }
 # -----------------------------------------------------------------------------
 #' Parmaters for explicit SEEIR model

@@ -809,7 +809,7 @@ test_that("reporting fraction into pars_obs", {
 #------------------------------------------------
 test_that("ring roll changes work", {
 
-  s <- run_explicit_SEEIR_model("Algeria", R0 = 2, day_return = TRUE, replicates = 1, time_period = 120)
+  s <- run_explicit_SEEIR_model("Algeria", R0 = 2, day_return = TRUE, replicates = 1, time_period = 120, seed = 5)
   s <- format_output(s, "deaths")
 
   data <- data.frame("date" = seq.Date(from = as.Date("2020-02-01"), length.out = 120, by = 1),
@@ -854,5 +854,61 @@ test_that("ring roll changes work", {
 
   expect_warning(expect_s3_class(plot(out, particle_fit = TRUE) , "gg"))
   expect_warning(expect_s3_class(plot(out2, particle_fit = TRUE) , "gg"))
+
+})
+
+
+#------------------------------------------------
+test_that("ring roll changes deterministic work", {
+
+  mat <- get_mixing_matrix("Algeria")
+  s <- run_deterministic_SEIR_model(population = get_population("Algeria")$n,
+                                    contact_matrix = mat,
+                                    R0 = 2, tt_R0 = 0,
+                                    hosp_bed_capacity = get_hosp_bed_capacity("Algeria"),
+                                    ICU_bed_capacity = get_ICU_bed_capacity("Algeria"),
+                                    time_period = 120)
+  s <- format_deterministic_output(s)
+  s <- s[s$compartment=="deaths",]
+
+  data <- data.frame("date" = seq.Date(from = as.Date("2020-02-01"), length.out = 120, by = 1),
+                     "deaths" = round(s$value))
+  for(i in seq(8,120,8)) {
+    data$deaths[i] <- data$deaths[i]+sum(data$deaths[(i-7):(i-1)])
+    data$deaths[(i-7):(i-1)] <- 0
+  }
+
+  set.seed(93L)
+  out <- calibrate(
+    data = data[which(data$deaths>0)[1]:120,],
+    R0_min = 2,
+    R0_max = 2,
+    R0_step = 0.1,
+    first_start_date = "2020-02-01",
+    last_start_date = "2020-02-02",
+    day_step = 1,
+    squire_model = deterministic_model(),
+    roll = 1,
+    n_particles = 2,
+    replicates = 1,
+    country = "Algeria",
+    forecast = 0
+  )
+
+  out2 <- calibrate(
+    data = data[which(data$deaths>0)[1]:120,],
+    R0_min = 2,
+    R0_max = 2,
+    R0_step = 0.1,
+    first_start_date = "2020-02-01",
+    last_start_date = "2020-02-02",
+    day_step = 1,
+    squire_model = deterministic_model(),
+    roll = 14,
+    n_particles = 2,
+    replicates = 1,
+    country = "Algeria",
+    forecast = 0
+  )
 
 })

@@ -3,6 +3,8 @@
 
 # Number of Age groups
 N_age <- user()
+time <- t
+output(time) <- TRUE
 
 # Generating Force of Infection
 m[, ] <- interpolate(tt_matrix, mix_mat_set, "constant")

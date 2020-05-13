@@ -107,7 +107,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
             "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
 
   # are the steps not 1 apart? if so we need to sum the incident variables (infecions/deaths)
-  if(diff(tail(x$output[,"step",1],2)) != 1) {
+  if(diff(tail(x$output[,1,1],2)) != 1) {
 
     # assign the infections
     for(i in seq_along(x$parameters$population)) {

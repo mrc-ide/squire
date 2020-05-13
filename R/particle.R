@@ -656,7 +656,8 @@ run_deterministic_comparison <- function(data,
                                                            k_cases = 2,
                                                            phi_death = 1,
                                                            k_death = 2,
-                                                           exp_noise = 1e6),
+                                                           exp_noise = 1e6,
+                                                           roll = 1),
                                          forecast_days = 0,
                                          save_history = FALSE,
                                          return = "ll") {
@@ -688,16 +689,28 @@ run_deterministic_comparison <- function(data,
   fore_steps <- seq(data$day_end[nrow(data)], length.out = forecast_days + 1L)
   steps <- unique(c(steps,fore_steps))
 
-  # model run
+  # model runi
   out <- model_func$run(t = seq(0, tail(steps,1), 1))
   index <- odin_index(model_func)
+
+  # simple rollsum
+  roll_sum <- function(x, k) {
+    breaks <- lapply(seq_len(length(x)+(k-1)), function(i){
+      max(1,(i-(k-1))):min(i, length(x))
+    })
+    return(unlist(lapply(breaks, function(i) {
+      sum(x[i], na.rm=TRUE)
+    })))
+  }
 
   # get deaths for comparison
   Ds <- diff(rowSums(out[,index$D]))
   Ds <- Ds[data$day_end[-1]]
   deaths <- data$deaths[-1]
 
-  ll <- ll_nbinom(deaths, Ds, obs_params$phi_death, obs_params$k_death, obs_params$exp_noise)
+  ll <- ll_nbinom(roll_sum(deaths, obs_params$roll),
+                  roll_sum(Ds,obs_params$roll),
+                  obs_params$phi_death, obs_params$k_death, obs_params$exp_noise)
   log_likelihood <- sum(ll)
 
   # start the return object creation with likelihoods and other return options
