@@ -421,38 +421,38 @@ R0_date_particle_filter <- function(R0,
     tt_contact_matrix <- 0
   } else {
     tt_list <- intervention_dates_for_odin(dates = date_contact_matrix_set_change,
-                                           change = model_params$contact_matrix_set,
+                                           change = model_params$contact_matrix_set[-1],
                                            start_date = start_date,
                                            steps_per_day = round(1/model_params$dt))
 
-    tt_contact_matrix <- unique(c(0, tt_list$tt))
-    model_params$contact_matrix_set <- tt_list$change
+    model_params$tt_contact_matrix <- unique(c(0, tt_list$tt))
+    model_params$contact_matrix_set <- append(model_params$contact_matrix_set[1], tt_list$change)
 
   }
 
   if (is.null(date_ICU_bed_capacity_change)) {
     tt_ICU_beds <- 0
   } else {
-    tt_list <- intervention_dates_for_odin(dates = date_contact_matrix_set_change,
-                                           change = model_params$ICU_beds,
+    tt_list <- intervention_dates_for_odin(dates = date_ICU_bed_capacity_change,
+                                           change = model_params$ICU_beds[-1],
                                            start_date = start_date,
                                            steps_per_day = round(1/model_params$dt))
 
-    tt_ICU_beds <- unique(c(0, tt_list$tt))
-    model_params$tt_ICU_beds <- tt_list$change
+    model_params$tt_ICU_beds <- unique(c(0, tt_list$tt))
+    model_params$ICU_beds <- c(model_params$ICU_beds[1], tt_list$change)
 
   }
 
   if (is.null(date_hosp_bed_capacity_change)) {
     tt_hosp_beds <- 0
   } else {
-    tt_list <- intervention_dates_for_odin(dates = date_contact_matrix_set_change,
-                                           change = model_params$hosp_beds,
+    tt_list <- intervention_dates_for_odin(dates = date_hosp_bed_capacity_change,
+                                           change = model_params$hosp_beds[-1],
                                            start_date = start_date,
                                            steps_per_day = round(1/model_params$dt))
 
-    tt_hosp_beds <- unique(c(0, tt_list$tt))
-    model_params$tt_hosp_beds <- tt_list$change
+    model_params$tt_hosp_beds <- unique(c(0, tt_list$tt))
+    model_params$hosp_beds <- c(model_params$hosp_beds[1], tt_list$change)
 
   }
 
