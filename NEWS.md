@@ -1,3 +1,6 @@
+# squire 0.4.9
+
+* `calibrate` now allows intervetnion dates to be before epidemic start date
 
 # squire 0.4.8
 
