@@ -490,9 +490,9 @@ test_that("calibrate 3d particle works", {
   R0_step = 0.1
   first_start_date = "2020-02-01"
   last_start_date = "2020-02-02"
-  Meff_min = -5
-  Meff_max = 2.5
-  Meff_step = 2.5
+  Meff_min = 0.1
+  Meff_max = 1.8
+  Meff_step = 0.8
   day_step = 1
   R0_change = int_unique$change
   date_R0_change = as.Date(int_unique$dates_change)

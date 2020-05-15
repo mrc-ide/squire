@@ -425,7 +425,7 @@ R0_date_particle_filter <- function(R0,
                                     date_hosp_bed_capacity_change,
                                     pars_obs,
                                     n_particles,
-                                    Meff = NA,
+                                    Meff = 1,
                                     forecast_days = 0,
                                     save_particles = FALSE,
                                     full_output = FALSE,
@@ -485,11 +485,7 @@ R0_date_particle_filter <- function(R0,
 
   # Second create the new R0s for the R0 and any changes to Meff
   if (!is.null(R0_change)) {
-    if(is.na(Meff)) {
-      R0 <- c(R0, R0 * R0_change)
-    } else {
-      R0 <- c(R0, R0 * 2 * plogis(-(R0_change - 1) * Meff))
-    }
+      R0 <- c(R0, R0 * R0_change * Meff)
   }
 
   # and work out our beta

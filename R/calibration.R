@@ -87,9 +87,9 @@ calibrate <- function(data,
   assert_numeric(R0_min)
   assert_numeric(R0_max)
   assert_numeric(R0_step)
-  assert_numeric(Meff_min)
-  assert_numeric(Meff_max)
-  assert_numeric(Meff_step)
+  assert_pos(Meff_min)
+  assert_pos(Meff_max)
+  assert_pos(Meff_step)
   assert_date(first_start_date)
   assert_date(last_start_date)
   assert_date(data$date)
@@ -239,7 +239,7 @@ calibrate <- function(data,
                     exp_noise = 1e6)
 
   # construct scan
-  if (is.na(Meff_min) || is.na(Meff_max)) {
+  if (Meff_min == Meff_max) {
     scan_results <- scan_R0_date(R0_min = R0_min,
                                  R0_max = R0_max,
                                  R0_step = R0_step,
