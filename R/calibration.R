@@ -138,9 +138,6 @@ calibrate <- function(data,
     if(as.Date(tail(date_contact_matrix_set_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
     }
-    if(as.Date(last_start_date) >= as.Date(head(date_contact_matrix_set_change, 1))) {
-      stop("First date in date_contact_matrix_set_change is earlier than last_start_date")
-    }
 
     # Get in correct format
     if(is.matrix(baseline_contact_matrix)) {
@@ -169,9 +166,6 @@ calibrate <- function(data,
     if(as.Date(tail(date_ICU_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_ICU_bed_capacity_change is greater than the last date in data")
     }
-    if(as.Date(last_start_date) >= as.Date(head(date_ICU_bed_capacity_change, 1))) {
-      stop("First date in date_ICU_bed_capacity_change is earlier than last_start_date")
-    }
 
     tt_ICU_beds <- c(0, seq_len(length(date_ICU_bed_capacity_change)))
     ICU_bed_capacity <- c(baseline_ICU_bed_capacity, ICU_bed_capacity)
@@ -194,9 +188,6 @@ calibrate <- function(data,
     assert_numeric(baseline_hosp_bed_capacity)
     if(as.Date(tail(date_hosp_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_hosp_bed_capacity_change is greater than the last date in data")
-    }
-    if(as.Date(last_start_date) >= as.Date(head(date_hosp_bed_capacity_change, 1))) {
-      stop("First date in date_hosp_bed_capacity_change is earlier than last_start_date")
     }
 
     tt_hosp_beds <- c(0, seq_len(length(date_hosp_bed_capacity_change)))

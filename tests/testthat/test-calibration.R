@@ -141,47 +141,6 @@ test_that("calibrate particle works", {
     squire_model = squire_model,
     pars_obs = pars_obs,
     n_particles = n_particles,
-    baseline_contact_matrix = contact_matrices[[1]],
-    reporting_fraction = reporting_fraction,
-    contact_matrix_set = contact_matrices[1],
-    date_contact_matrix_set_change = "2020-02-01",
-    replicates = replicates,
-    country = country,
-    forecast = 0
-  ))
-
-  # DATE CHECKS date_hosp
-  expect_error(out <- calibrate(
-    data = data,
-    R0_min = R0_min,
-    R0_max = R0_max,
-    R0_step = R0_step,
-    first_start_date = first_start_date,
-    last_start_date = last_start_date,
-    day_step = day_step,
-    squire_model = squire_model,
-    pars_obs = pars_obs,
-    n_particles = n_particles,
-    reporting_fraction = reporting_fraction,
-    baseline_hosp_bed_capacity = 10,
-    hosp_bed_capacity = 100,
-    date_hosp_bed_capacity_change = "2020-02-01",
-    replicates = replicates,
-    country = country,
-    forecast = 0
-  ))
-
-  expect_error(out <- calibrate(
-    data = data,
-    R0_min = R0_min,
-    R0_max = R0_max,
-    R0_step = R0_step,
-    first_start_date = first_start_date,
-    last_start_date = last_start_date,
-    day_step = day_step,
-    squire_model = squire_model,
-    pars_obs = pars_obs,
-    n_particles = n_particles,
     reporting_fraction = reporting_fraction,
     hosp_bed_capacity = 10,
     date_hosp_bed_capacity_change = date_R0_change[1],
@@ -228,26 +187,6 @@ test_that("calibrate particle works", {
     baseline_ICU_bed_capacity = 10,
     ICU_bed_capacity = 100,
     date_ICU_bed_capacity_change = "2020-05-10",
-    replicates = replicates,
-    country = country,
-    forecast = 0
-  ))
-
-  expect_error(out <- calibrate(
-    data = data,
-    R0_min = R0_min,
-    R0_max = R0_max,
-    R0_step = R0_step,
-    first_start_date = first_start_date,
-    last_start_date = last_start_date,
-    day_step = day_step,
-    squire_model = squire_model,
-    pars_obs = pars_obs,
-    n_particles = n_particles,
-    reporting_fraction = reporting_fraction,
-    baseline_ICU_bed_capacity = 10,
-    ICU_bed_capacity = 100,
-    date_ICU_bed_capacity_change = "2020-02-01",
     replicates = replicates,
     country = country,
     forecast = 0

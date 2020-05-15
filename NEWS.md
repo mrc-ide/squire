@@ -1,3 +1,7 @@
+# squire 0.4.10
+
+* `calibrate` new argument for `R0_prior`
+
 # squire 0.4.9
 
 * `calibrate` now allows intervetnion dates to be before epidemic start date
