@@ -8,6 +8,7 @@ scan_R0_date_Meff(
   R0_min,
   R0_max,
   R0_step,
+  R0_prior = NULL,
   first_start_date,
   last_start_date,
   day_step,
@@ -32,6 +33,11 @@ scan_R0_date_Meff(
 \item{R0_max}{Maximum value of R0 in the search}
 
 \item{R0_step}{Step to increment R0 between min and max}
+
+\item{R0_prior}{Prior for R0. Default = NULL, which is a flat prior. Should be
+provided as a list with first argument the distribution function and the second
+the function arguments (excluding quantiles which are worked out based on
+R0_min and R0_max), e.g. `list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))`.}
 
 \item{first_start_date}{Earliest start date as 'yyyy-mm-dd'}
 

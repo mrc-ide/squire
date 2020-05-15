@@ -35,6 +35,10 @@
 #'   on R0 and start_date
 #' @param Meff_step Step to increment Meff (Movement effect size) between min
 #'   and max. Default = 0.1
+#' @param R0_prior Prior for R0. Default = NULL, which is a flat prior. Should be
+#'  provided as a list with first argument the distribution function and the second
+#'  the function arguments (excluding quantiles which are worked out based on
+#'  R0_min and R0_max), e.g. `list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))`.
 #' @param ... Further aguments for the model parameter function. If using the
 #'   \code{\link{explicit_model}} (default) this will be
 #'   \code{parameters_explicit_SEEIR}.
@@ -49,6 +53,7 @@ calibrate <- function(data,
                       R0_min,
                       R0_max,
                       R0_step,
+                      R0_prior = NULL,
                       first_start_date,
                       last_start_date,
                       day_step,
@@ -234,10 +239,11 @@ calibrate <- function(data,
                     exp_noise = 1e6)
 
   # construct scan
-  if (Meff_min == Meff_max) {
+  if (is.na(Meff_min) || is.na(Meff_max)) {
     scan_results <- scan_R0_date(R0_min = R0_min,
                                  R0_max = R0_max,
                                  R0_step = R0_step,
+                                 R0_prior = R0_prior,
                                  first_start_date = first_start_date,
                                  last_start_date = last_start_date,
                                  day_step = day_step,
@@ -255,6 +261,7 @@ calibrate <- function(data,
     scan_results <- scan_R0_date_Meff(R0_min = R0_min,
                                       R0_max = R0_max,
                                       R0_step = R0_step,
+                                      R0_prior = R0_prior,
                                       first_start_date = first_start_date,
                                       last_start_date = last_start_date,
                                       day_step = day_step,

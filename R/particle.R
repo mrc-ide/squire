@@ -476,10 +476,15 @@ intervention_dates_for_odin <- function(dates,
       change <- change[-to_drop]
     }
 
-    # change the first remaining date
+    # change the first remaining date if that date + 1 does not already exist
+    if ((as.Date(start_date)+1) %in% dates) {
+     dates <- dates[-1]
+     change <- change[-1]
+    } else {
     dates[1] <- as.Date(start_date)+1
-
   }
+  }
+
 
   tt <- round((as.numeric(dates - start_date)) * steps_per_day)
   return(list("tt" = tt, "change" = change))
