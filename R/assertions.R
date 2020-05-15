@@ -136,6 +136,24 @@ assert_single_int <- function(x, name = deparse(substitute(x))) {
   return(TRUE)
 }
 
+
+#------------------------------------------------
+# x is positive (with or without zero allowed)
+#' @noRd
+assert_neg <- function(x, zero_allowed = TRUE, message1 = "%s must be less than or equal to zero", message2 = "%s must be greater than zero", name = deparse(substitute(x))) {
+  assert_numeric(x, name = name)
+  if (zero_allowed) {
+    if (!all(x<=0)) {
+      stop(sprintf(message1, name), call. = FALSE)
+    }
+  } else {
+    if (!all(x<0)) {
+      stop(sprintf(message2, name), call. = FALSE)
+    }
+  }
+  return(TRUE)
+}
+
 #------------------------------------------------
 # x is positive (with or without zero allowed)
 #' @noRd

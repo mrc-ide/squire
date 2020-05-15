@@ -1,0 +1,983 @@
+# Converts dates from data into a numeric offset as used in the MCMC
+# Automatically converts type
+start_date_to_offset <- function(first_data_date, start_date)
+{
+  # Format conversion cascades as required
+  # string -> Date -> numeric
+
+  # Convert any strings to Dates
+  if (class(first_data_date) == "character" || class(first_data_date) == "factor") {
+    first_data_date = as.Date(first_data_date)
+  }
+  if (class(start_date) == "character" || class(first_data_date) == "factor") {
+    start_date = as.Date(start_date)
+  }
+
+  # Convert any Dates to numerics
+  if (class(first_data_date) == "Date") {
+    first_data_date = as.numeric(first_data_date)
+  }
+  if (class(start_date) == "Date") {
+    start_date = as.numeric(start_date)
+  }
+
+  first_data_date - start_date
+}
+
+# Converts dates from  numeric offset as used in the MCMC to a Date
+# Automatically converts type
+offset_to_start_date <- function(first_data_date, start_date)
+{
+  if (class(start_date) != "numeric") {
+    stop("Offset start date must be numeric")
+  }
+
+  # Convert any strings to Dates
+  if (class(first_data_date) == "character" || class(first_data_date) == "factor") {
+    first_data_date = as.Date(first_data_date)
+  }
+
+  as.Date(start_date, origin=first_data_date)
+}
+
+#' Run a pmcmc sampler
+#'
+#' @title Run a pmcmc sampler
+#'
+#' @param data Data to fit to.  This must be constructed with
+#'   \code{particle_filter_data}
+#' @param model_params Squire model parameters. Created from a call to one of
+#'   the \code{parameters_<type>_model} functions.
+#' @param squire_model A squire model to use
+#' @param pars_obs list of parameters to use in comparison
+#'   with \code{compare}. Must be a list containing, e.g.
+#'   list(phi_cases = 0.1,
+#'        k_cases = 2,
+#'        phi_death = 1,
+#'        k_death = 2,
+#'        exp_noise = 1e6)
+#' @param n_mcmc number of mcmc mcmc iterations to perform
+#' @param pars_to_sample names of parameters to be sampled
+#' @param pars_init named list of initial inputs for parameters being sampled
+#' @param pars_min named list of lower reflecting boundaries for parameter proposals
+#' @param pars_max named list of upper reflecting boundaries for parameter proposals
+#' @param proposal_kernel named matrix of proposal covariance for parameters
+#' @param pars_discrete named list of logicals, indicating if proposed jump should be discrete
+#' @param log_likelihood function to calculate log likelihood, must take named parameter vector as input,
+#'                 allow passing of implicit arguments corresponding to the main function arguments.
+#'                 Returns a named list, with entries:
+#'                   - $log_likelihood, a single numeric
+#'                   - $sample_state, a numeric vector corresponding to the state of a single particle, chosen at random,
+#'                   at the final time point for which we have data.
+#'                   If NULL, calculated using the function calc_loglikelihood.
+#' @param log_prior function to calculate log prior, must take named parameter vector as input, returns a single numeric.
+#'                  If NULL, uses uninformative priors which do not affect the posterior
+#' @param n_particles Number of particles
+#' @param steps_per_day Number of steps per day
+#' @param output_proposals Logical indicating whether proposed parameter jumps should be output along with results
+#' @param n_chains Number of chains to run
+#'
+#' @return an mcmc object containing
+#' - List of inputs
+#' - Matrix of accepted parameter samples, rows = iterations
+#'   as well as log prior, (particle filter estimate of) log likelihood and log posterior
+#'
+#' @description The user inputs initial parameter values for beta_start and sample_date
+#' The log prior likelihood of these parameters is calculated based on the user-defined
+#' prior distributions.
+#' The log likelihood of the data given the initial parameters is estimated using a particle filter,
+#' which has two functions:
+#'      - Firstly, to generate a set of 'n_particles' samples of the model state space,
+#'        at time points corresponding to the data, one of which is
+#'        selected randomly to serve as the proposed state sequence sample at the final
+#'        data time point.
+#'      - Secondly, to produce an unbiased estimate of the likelihood of the data given the proposed parameters.
+#' The log posterior of the initial parameters given the data is then estimated by adding the log prior and
+#' log likelihood estimate.
+#'
+#' The pMCMC sampler then proceeds as follows, for n_mcmc iterations:
+#' At each loop iteration the pMCMC sampler pefsorms three steps:
+#'   1. Propose new candidate samples for beta_start, beta_end and start_date based on
+#'     the current samples, using the proposal distribution
+#'     (currently multivariate Gaussian with user-input covariance matrix (proposal_kernel), and reflecting boundaries defined by pars_min, pars_max)
+#'   2. Calculate the log prior of the proposed parameters,
+#'      Use the particle filter to estimate log likelihood of the data given the proposed parameters, as described above,
+#'      as well as proposing a model state space.
+#'      Add the log prior and log likelihood estimate to estimate the log posterior of the proposed parameters given the data.
+#'   3. Metropolis-Hastings step: The joint canditate sample (consisting of the proposed parameters
+#'      and state space) is then accepted with probability min(1, a), where the acceptance ratio is
+#'      simply the ratio of the posterior likelihood of the proposed parameters to the posterior likelihood
+#'      of the current parameters. Note that by choosing symmetric proposal distributions by including
+#'      reflecting boundaries, we avoid the the need to include the proposal likelihood in the MH ratio.
+#'
+#'   If the proposed parameters and states are accepted then we update the current parameters and states
+#'   to match the proposal, otherwise the previous parameters/states are retained for the next iteration.
+#'
+#' @export
+#' @import coda
+#' @importFrom stats rnorm
+#' @importFrom mvtnorm rmvnorm
+
+pmcmc <- function(data,
+                  n_mcmc,
+                  squire_model,
+                  model_params,
+                  pars_obs,
+                  pars_init = list('start_date'     = as.Date("2020-02-07"),
+                                   'R0'             = 2.5),
+                  pars_min = list('start_date'      = as.Date("2020-02-01"),
+                                  'R0'              = 0),
+                  pars_max = list('start_date'      = as.Date("2020-02-20"),
+                                  'R0'              = 5),
+                  pars_discrete = list('start_date' = TRUE,
+                                       'R0'         = FALSE),
+                  proposal_kernel,
+                  log_likelihood = NULL,
+                  log_prior = NULL,
+                  n_particles = 1e2,
+                  steps_per_day = 4,
+                  output_proposals = FALSE,
+                  n_chains = 1) {
+
+  #..................
+  # assertions & checks
+  #..................
+  # data
+  assert_dataframe(data)
+  sapply(data$date, assert_date)
+  assert_increasing(as.numeric(as.Date(data$date)),
+                    message = "Dates must be in increasing order")
+
+  # squire and odin
+  assert_custom_class(squire_model, "squire_model")
+  assert_custom_class(model_params, "squire_parameters")
+  assert_pos_int(steps_per_day)
+
+  # check input pars df
+  assert_list(pars_init)
+  assert_list(pars_min)
+  assert_list(pars_max)
+  assert_list(pars_discrete)
+  assert_eq(names(pars_init), names(pars_min))
+  assert_eq(names(pars_min), names(pars_max))
+  assert_eq(names(pars_max), names(pars_discrete))
+  assert_in(names(pars_init), c("R0", "start_date"),
+            message = "Params to infer must include R0 and start_date")
+  assert_date(pars_init$start_date)
+  assert_date(pars_min$start_date)
+  assert_date(pars_max$start_date)
+  if (pars_max$start_date >= as.Date(data$date[1])-1) {
+    stop("Maximum start date must be at least 2 days before the first date in data")
+  }
+  assert_bounded(as.numeric(pars_init$start_date), left = as.numeric(pars_min$start_date), right = as.numeric(pars_max$start_date))
+
+  assert_pos(pars_min$R0)
+  assert_pos(pars_max$R0)
+  assert_pos(pars_init$R0)
+  assert_bounded(pars_init$R0, left = pars_min$R0, right = pars_max$R0)
+  sapply(unlist(pars_discrete), assert_logical)
+  # TODO only allow specific parameters to be sampled --> check that those covariates are right form
+
+  # check proposal kernel
+  assert_matrix(proposal_kernel)
+  assert_eq(colnames(proposal_kernel), names(pars_init))
+  assert_eq(rownames(proposal_kernel), names(pars_init))
+
+  # check likelihood items
+  if ( !(assert_null(log_likelihood) | inherits(log_likelihood, "function")) ) {
+    stop("Log Likelihood (log_likelihood) must be null or a user specified function")
+  }
+  if ( !(assert_null(log_prior) | inherits(log_prior, "function")) ) {
+    stop("Log Likelihood (log_likelihood) must be null or a user specified function")
+  }
+  assert_list(pars_obs)
+  assert_eq(names(pars_obs), c("phi_cases", "k_cases", "phi_death", "k_death", "exp_noise"))
+  sapply(unlist(pars_obs), assert_numeric)
+
+  # mcmc items
+  assert_pos_int(n_mcmc)
+  assert_pos_int(n_chains)
+  assert_pos_int(n_particles)
+  assert_logical(output_proposals)
+
+  #..................
+  # Generate MCMC parameters
+  #..................
+  inputs <- list(
+    data = data,
+    n_mcmc = n_mcmc,
+    model_params = model_params,
+    pars_obs = pars_obs,
+    squire_model = squire_model,
+    pars = list(pars_obs = pars_obs,
+                pars_init = pars_init,
+                pars_min = pars_min,
+                pars_max = pars_max,
+                proposal_kernel = proposal_kernel,
+                pars_discrete = pars_discrete),
+    n_particles = n_particles,
+    steps_per_day = steps_per_day)
+
+  #..................
+  # create prior and likelihood functions given the inputs
+  #..................
+  if(is.null(log_prior)) {
+    # set improper, uninformative prior
+    log_prior <- function(pars) log(1e-10)
+  }
+  calc_lprior <- log_prior
+
+  if(is.null(log_likelihood)) {
+    log_likelihood <- calc_loglikelihood
+  } else if (!('...' %in% names(formals(log_likelihood)))){
+    stop('log_likelihood function must be able to take unnamed arguments')
+  }
+
+  # create shorthand function to calc ll given main inputs
+  calc_ll <- function(pars) {
+    X <- log_likelihood(pars = pars,
+                        data = data,
+                        squire_model = squire_model,
+                        model_params = model_params,
+                        steps_per_day = steps_per_day,
+                        pars_obs = pars_obs,
+                        n_particles = n_particles,
+                        forecast_days = 0,
+                        return = "ll"
+    )
+    X
+  }
+
+  #..................
+  # proposals
+  #..................
+  # NB, squire set up for date input, but proposal either for MCMC as numeric
+  # need to update proposal bounds
+  pars_min[["start_date"]] <- -(start_date_to_offset(data$date[1], pars_min[["start_date"]])) # negative here because we are working backwards in time
+  pars_max[["start_date"]] <- -(start_date_to_offset(data$date[1], pars_max[["start_date"]]))
+
+  # needs to be a vector to pass to reflecting boundary function
+  pars_min <- unlist(pars_min)
+  pars_max <- unlist(pars_max)
+  pars_discrete <- unlist(pars_discrete)
+
+  # create shorthand function to propose new pars given main inputs
+  propose_jump <- function(pars) {
+    propose_parameters(pars = pars,
+                       proposal_kernel = proposal_kernel,
+                       pars_discrete = pars_discrete,
+                       pars_min = pars_min,
+                       pars_max = pars_max)
+  }
+
+  #..................
+  # RUN MCMC
+  #..................
+  # Run the chains in parallel
+  if (Sys.getenv("SQUIRE_PARALLEL_DEBUG") == "TRUE") {
+
+    chains <- purrr::pmap(
+      .l =  list(n_mcmc = rep(n_mcmc, n_chains)),
+      .f = run_mcmc_chain,
+      inputs = inputs,
+      curr_pars = pars_init,
+      calc_lprior = calc_lprior,
+      calc_ll = calc_ll,
+      propose_jump = propose_jump,
+      first_data_date = data$date[1],
+      output_proposals = output_proposals)
+
+  } else {
+
+    chains <- furrr::future_pmap(
+      .l =  list(n_mcmc = rep(n_mcmc, n_chains)),
+      .f = run_mcmc_chain,
+      inputs = inputs,
+      curr_pars = pars_init,
+      calc_lprior = calc_lprior,
+      calc_ll = calc_ll,
+      propose_jump = propose_jump,
+      first_data_date = data$date[1],
+      output_proposals = output_proposals,
+      .progress = TRUE)
+  }
+
+  #..................
+  # MCMC diagnostics and tidy
+  #..................
+  if (n_chains > 1) {
+    names(chains) <- paste0('chain', seq_len(n_chains))
+
+    # calculating rhat
+    # convert parallel chains to a coda-friendly format
+    chains_coda <- lapply(chains, function(x) {
+
+      traces <- x$results
+      if('start_date' %in% pars_to_sample) {
+        traces$start_date <- start_date_to_offset(data$date[1], traces$start_date)
+      }
+
+      coda::as.mcmc(traces[, names(pars_init)])
+    })
+
+    rhat <- tryCatch(expr = {
+      x <- coda::gelman.diag(chains_coda)
+      x
+    }, error = function(e) {
+      print('unable to calculate rhat')
+    })
+
+
+    res <- list(inputs = chains[[1]]$inputs,
+                rhat = rhat,
+                chains = lapply(chains, '[', -1))
+
+    class(res) <- 'pmcmc_list'
+  } else {
+    res <- chains[[1]]
+  }
+
+  res
+
+}
+
+# Run a single pMCMC chain
+run_mcmc_chain <- function(inputs,
+                           curr_pars,
+                           calc_lprior,
+                           calc_ll,
+                           n_mcmc,
+                           propose_jump,
+                           first_data_date,
+                           output_proposals) {
+
+  #..................
+  # Set initial state
+  #..................
+  ## calculate initial prior
+  curr_lprior <- calc_lprior(pars = curr_pars)
+
+  # run particle filter on initial parameters
+  p_filter_est <- calc_ll(pars = curr_pars)
+  # NB, squire originally set up to deal with date format triggering
+  # however, proposal set up to deal with numerics, need to change
+  curr_pars[["start_date"]] <- -(start_date_to_offset(first_data_date, curr_pars[["start_date"]]))
+  curr_pars <- unlist(curr_pars)
+
+  #..................
+  # assertions and checks on log_prior and log_likelihood functions
+  #..................
+  if(length(curr_lprior) > 1) {
+    stop('log_prior must return a single numeric representing the log prior')
+  }
+
+  if(is.infinite(curr_lprior)) {
+    stop('initial parameters are not compatible with supplied prior')
+  }
+
+  if(length(p_filter_est) != 2) {
+    stop('log_likelihood function must return a list containing elements log_likelihood and sample_state')
+  }
+  if(!setequal(names(p_filter_est), c('log_likelihood', 'sample_state'))) {
+    stop('log_likelihood function must return a list containing elements log_likelihood and sample_state')
+  }
+  if(length(p_filter_est$log_likelihood) > 1) {
+    stop('log_likelihood must be a single numeric representing the estimated log likelihood')
+  }
+  assert_neg(x = p_filter_est$log_likelihood,
+             message1 = 'log_likelihood must be negative or zero')
+  sapply(p_filter_est$sample_state, assert_pos,
+         message1 = 'sample_state must be a vector of non-negative numbers')
+
+  #..................
+  # Create objects to store outputs
+  #..................
+  # extract loglikelihood estimate and sample state
+  # calculate posterior
+  curr_ll <- p_filter_est$log_likelihood
+  curr_lpost <- curr_lprior + curr_ll
+  curr_ss <- p_filter_est$sample_state
+
+  # initialise output arrays
+  res_init <- c(curr_pars,
+                'log_prior' = curr_lprior,
+                'log_likelihood' = curr_ll,
+                'log_posterior' = curr_lpost)
+  res <- matrix(data = NA,
+                nrow = n_mcmc + 1L,
+                ncol = length(res_init),
+                dimnames = list(NULL,
+                                names(res_init)))
+
+  states <- matrix(data = NA,
+                   nrow = n_mcmc + 1L,
+                   ncol = length(curr_ss))
+
+
+  if(output_proposals) {
+    proposals <- matrix(data = NA,
+                        nrow = n_mcmc + 1L,
+                        ncol = length(res_init) + 1L,
+                        dimnames = list(NULL,
+                                        c(names(res_init),
+                                          'accept_prob')))
+  }
+
+  ## record initial results
+  res[1, ] <- res_init
+  states[1, ] <- curr_ss
+
+  #..................
+  # main pmcmc loop
+  #..................
+  for(iter in seq_len(n_mcmc) + 1L) {
+
+    # propose new parameters
+    prop_pars <- propose_jump(curr_pars)
+
+    ## calculate proposed prior / lhood / posterior
+    prop_lprior <- calc_lprior(pars = prop_pars)
+    # NB, squire originally set up to deal with date format triggering --> convert the current parameter start date back to date, whereas proposal is done in numeric
+    prop_pars.squire <- as.list(prop_pars)
+    prop_pars.squire[["start_date"]] <- offset_to_start_date(first_data_date, prop_pars[["start_date"]]) # convert to date
+    p_filter_est <- calc_ll(pars = prop_pars.squire)
+    prop_ll <- p_filter_est$log_likelihood
+    prop_ss <- p_filter_est$sample_state
+    prop_lpost <- prop_lprior + prop_ll
+
+
+    # calculate probability of acceptance
+    accept_prob <- exp(prop_lpost - curr_lpost)
+
+
+    if(runif(1) < accept_prob) { # MH step
+      # update parameters and calculated likelihoods
+      curr_pars <- prop_pars
+      curr_lprior <- prop_lprior
+      curr_ll <- prop_ll
+      curr_lpost <- prop_lpost
+      curr_ss <- prop_ss
+    }
+
+    # record results
+    res[iter, ] <- c(curr_pars,
+                     curr_lprior,
+                     curr_ll,
+                     curr_lpost)
+    states[iter, ] <- curr_ss
+
+
+    if(output_proposals) {
+      proposals[iter, ] <- c(prop_pars,
+                             prop_lprior,
+                             prop_ll,
+                             prop_lpost,
+                             min(accept_prob, 1))
+    }
+
+  }
+
+  res <- as.data.frame(res)
+
+  coda_res <- coda::as.mcmc(res)
+  rejection_rate <- coda::rejectionRate(coda_res)
+  ess <- coda::effectiveSize(coda_res)
+
+  res$start_date <- offset_to_start_date(first_data_date, res$start_date)
+
+  out <- list('inputs' = inputs,
+              'results' = as.data.frame(res),
+              'states' = states,
+              'acceptance_rate' = 1-rejection_rate,
+              "ess" = ess)
+
+  if(output_proposals) {
+    proposals <- as.data.frame(proposals)
+    proposals$start_date <- offset_to_start_date(first_data_date, proposals$start_date)
+    out$proposals <- proposals
+  }
+
+  class(out) <- 'pmcmc'
+  out
+
+}
+
+# Run odin model to calculate log-likelihood
+# return: Set to 'll' to return the log-likelihood (for MCMC) or to
+#
+calc_loglikelihood <- function(pars, data, squire_model, model_params,
+                               steps_per_day, pars_obs, n_particles,
+                               forecast_days = 0, return = "ll") {
+  #..................
+  # specify particle setup
+  #..................
+  switch(return,
+         "full" = {
+           save_particles <- TRUE
+           pf_return <- "sample"
+         },
+         "ll" = {
+           save_particles <- FALSE
+           forecast_days <- 0
+           pf_return <- "single"
+         },
+         {
+           stop("Unknown return type to calc_loglikelihood")
+         }
+  )
+
+  #..................
+  # (potentially redundant) assertion
+  #..................
+  assert_in(c("R0", "start_date"), names(pars),
+            message = "Must specify R0 and start date as parameters to infer")
+  #..................
+  # unpack current params
+  #..................
+  R0 <- pars[["R0"]]
+  start_date <- pars[["start_date"]]
+  #TODO extend this to allow for additional parameters that we can estimate
+
+  #..................
+  # more (potentially redundant) assertions
+  #..................
+  assert_pos(R0)
+  assert_date(start_date)
+
+  #..................
+  # setup model based on inputs
+  #..................
+
+  # change betas
+  if (is.null(date_R0_change)) {
+    tt_beta <- 0
+  } else {
+    tt_beta <- unique(c(0, intervention_dates_for_odin(dates = date_R0_change,
+                                                       start_date = start_date,
+                                                       steps_per_day = round(1/model_params$dt))))
+  }
+  # and contact matrixes
+  if (is.null(date_contact_matrix_set_change)) {
+    tt_contact_matrix <- 0
+  } else {
+    tt_contact_matrix <- unique(c(0, intervention_dates_for_odin(dates = date_contact_matrix_set_change,
+                                                                 start_date = start_date,
+                                                                 steps_per_day = round(1/model_params$dt))))
+  }
+  # and icu beds
+  if (is.null(date_ICU_bed_capacity_change)) {
+    tt_ICU_beds <- 0
+  } else {
+    tt_ICU_beds <- unique(c(0, intervention_dates_for_odin(dates = date_ICU_bed_capacity_change,
+                                                           start_date = start_date,
+                                                           steps_per_day = round(1/model_params$dt))))
+  }
+  # and hosp beds
+  if (is.null(date_hosp_bed_capacity_change)) {
+    tt_hosp_beds <- 0
+  } else {
+    tt_hosp_beds <- unique(c(0, intervention_dates_for_odin(dates = date_hosp_bed_capacity_change,
+                                                            start_date = start_date,
+                                                            steps_per_day = round(1/model_params$dt))))
+  }
+
+  # and now get new R0s for the R0
+  if (!is.null(R0_change)) {
+    R0 <- c(R0, R0 * R0_change * Meff)
+  }
+
+  # which allow us to work out our beta
+  beta_set <- beta_est(squire_model = squire_model,
+                       model_params = model_params,
+                       R0 = R0)
+
+  #..................
+  # update the model params accordingly from new inputs
+  #..................
+  model_params$beta_set <- beta_set
+  model_params$tt_beta <- tt_beta
+  model_params$tt_contact_matrix <- tt_contact_matrix
+  model_params$tt_ICU_beds <- tt_ICU_beds
+  model_params$tt_hosp_beds <- tt_hosp_beds
+
+  #..................
+  # run the particle filter
+  #..................
+  if (inherits(squire_model, "stochastic")) {
+
+    pf_result <- run_particle_filter(data = data,
+                                     squire_model = squire_model,
+                                     model_params = model_params,
+                                     model_start_date = start_date,
+                                     obs_params = pars_obs,
+                                     n_particles = n_particles,
+                                     forecast_days = forecast_days,
+                                     save_particles = save_particles,
+                                     return = pf_return)
+
+  } else {
+    if (pf_return == "single") {
+      stop("Deterministic approach does not support single particle filter return")
+    } #TODO work around this?
+
+    pf_result <- run_deterministic_comparison(data = data,
+                                              squire_model = squire_model,
+                                              model_params = model_params,
+                                              model_start_date = start_date,
+                                              obs_params = pars_obs,
+                                              forecast_days = forecast_days,
+                                              save_history = save_particles,
+                                              return = pf_return)
+
+  }
+
+  pf_result
+}
+
+
+# proposal for MCMC
+propose_parameters <- function(pars, proposal_kernel, pars_discrete, pars_min, pars_max) {
+
+  ## proposed jumps are normal with mean pars and sd as input for parameter
+  jumps <- pars + drop(rmvnorm(n = 1,  sigma = proposal_kernel))
+
+  # discretise if necessary
+  jumps[pars_discrete] <- round(jumps[pars_discrete])
+  # reflect proposal if it exceeds upper or lower parameter boundary
+  jumps <- reflect_proposal(x = jumps,
+                            floor = pars_min,
+                            cap = pars_max)
+  jumps
+}
+
+
+## create function to reflect proposal boundaries at pars_min and pars_max
+# this ensures the proposal is symetrical and we can simplify the MH step
+
+reflect_proposal <- function(x, floor, cap) {
+  interval <- cap - floor
+  abs((x + interval - floor) %% (2 * interval) - interval) + floor
+}
+
+
+
+#..............................................................
+# Collect & Summarize MCMC Runs
+#..............................................................
+
+#' @title create a master chain from a pmcmc_list object
+#' @param x a pmcmc_list object
+#' @param burn_in an integer denoting the number of samples to discard from each chain
+#' @export
+#'
+create_master_chain <- function(x, burn_in) {
+
+  if(class(x) != 'pmcmc_list') {
+    stop('x must be a pmcmc_list object')
+  }
+  if(!is.numeric(burn_in)) {
+    stop('burn_in must be an integer')
+  }
+  if(burn_in < 0) {
+    stop('burn_in must not be negative')
+  }
+  if(burn_in >= x$inputs$n_mcmc) {
+    stop('burn_in is greater than chain length')
+  }
+
+  chains <- lapply(
+    X = x$chains,
+    FUN = function(z) z$results[-seq_len(burn_in), ]
+  )
+
+  do.call(what = rbind, args = chains)
+}
+
+
+#' @export
+#' @importFrom stats cor sd
+summary.pmcmc <- function(object, ...) {
+
+  par_names <- names(object$inputs$pars$pars_init)
+
+  ## convert start_date to numeric to calculate stats
+  data_start_date <- as.Date(object$inputs$data$date[1])
+  traces <- object$results[,par_names]
+  traces$start_date <- start_date_to_offset(data_start_date, traces$start_date)
+
+  # calculate correlation matrix
+  corr_mat <- round(cor(traces),2)
+
+  # add in reduction in beta parameter
+  if('beta_end' %in% par_names) {
+    traces <- cbind(traces,
+                    beta_red = traces$beta_end/traces$beta_start)
+  }
+
+  # compile summary
+  summ <- rbind(mean = colMeans(traces),
+                apply(traces, MARGIN = 2, quantile, c(0.025, 0.975)),
+                min = apply(traces, MARGIN = 2, min),
+                max =  apply(traces, MARGIN = 2, max)
+  )
+  summ <- as.data.frame(summ)
+  summ <- round(summ, 3)
+
+  sds <- round(apply(traces, 2, sd), 3)
+  # convert start_date back into dates
+  summ$start_date <- as.Date(-summ$start_date, data_start_date)
+  summ[c('2.5%', '97.5%', 'min', 'max'), 'start_date'] <- summ[c('97.5%', '2.5%', 'max', 'min'), 'start_date']
+
+  out <- list('summary' = summ,
+              'corr_mat' = corr_mat,
+              'sd' = sds)
+  out
+
+}
+
+#' @export
+summary.pmcmc_list <- function(object, ..., burn_in = 101) {
+
+  master_chain <- create_master_chain(x = object,
+                                      burn_in = burn_in)
+
+  z <- list(inputs = object$inputs,
+            results = master_chain)
+  summary.pmcmc(z)
+
+}
+
+
+#' @export
+#' @importFrom viridis cividis
+#' @importFrom graphics hist par plot.new text
+plot.pmcmc <- function(x, ...) {
+
+  summ <- summary(x)
+  par_names <- names(x$inputs$pars$pars_init)
+
+  traces <- x$results[, par_names]
+  cols <- viridis::cividis(nrow(traces))
+  cols <- cols[order(order(x$results$log_likelihood))]
+
+
+
+  par_name <- 'beta_start'
+  print_summ <- function(par_name) {
+    x <- summ$summary
+    paste0(x['mean', par_name],
+           '\n(',
+           x['2.5%', par_name],
+           ', ',
+           x['97.5%', par_name], ')')
+  }
+
+
+
+  n_pars <- length(par_names)
+
+
+  par( bty = 'n',
+       mfcol = c(n_pars, n_pars + 1L),
+       mar = c(3,3,2,1),
+       mgp = c(1.5, 0.5, 0),
+       oma = c(1,1,1,1))
+
+
+  for (i in seq_len(n_pars)) {
+    for(j in seq_len(n_pars)) {
+
+      if (i == j) { # plot hists on diagonal
+        par_name <- par_names[i]
+        breaks = ifelse(par_name == 'start_date',
+                        yes = seq(as.Date('2019-12-01'),
+                                  as.Date(x$inputs$data$date[1]), 7),
+                        no = 10)
+        hist(traces[[i]],
+             main = print_summ(par_name),
+             xlab = par_name,
+             breaks = breaks,
+             cex.main = 1,
+             font.main = 1,
+             freq = FALSE)
+      } else if (i < j) {  # plot correlations on lower triangle
+        plot(x = traces[[i]],
+             y = traces[[j]],
+             xlab = par_names[i],
+             ylab = par_names[j],
+             col = cols,
+             pch = 20)
+      } else if (i > j) { # print rho on upper triangle
+        plot.new()
+        text(x = 0.5,
+             y=0.5,
+             labels = paste('r =',
+                            summ$corr_mat[i, j]))
+      }
+    }
+  }
+
+  # print traces in final column
+  mapply(FUN = plot, traces,
+         type = 'l',
+         ylab = par_names,
+         xlab = "Iteration")
+
+
+}
+
+#' @export
+#' @importFrom viridis cividis
+#' @importFrom graphics hist par plot.new text lines legend
+#'
+plot.pmcmc_list <- function(x, burn_in = 1, ...) {
+
+  summ <- summary(x, burn_in = burn_in)
+  par_names <- names(x$inputs$pars$pars_init)
+  n_pars <- length(par_names)
+
+  chains <- x$chains
+  n_chains <- length(chains)
+  cols_trace <- rev(viridis::viridis(n_chains))
+
+
+  # compile master chain and order by log posterior for plotting
+  master_chain <- create_master_chain(x, burn_in = burn_in)
+
+  master_chain <- master_chain[order(master_chain$log_posterior), ]
+  cols <- viridis::cividis(nrow(master_chain))
+  cols <- cols[order(master_chain$log_posterior)]
+
+
+
+
+  traces <- lapply(par_names, FUN = function(par_name) {
+    lapply(X = chains,
+           FUN = function(z) z$results[-seq_len(burn_in), par_name])
+  })
+  names(traces) <- par_names
+
+  plot_traces <- function(trace, col) {
+    lines(x = seq_along(trace),
+          y = trace,
+          col = col)
+  }
+
+
+
+  breaks <- lapply(par_names, function(par_name){
+    seq(from = min(master_chain[, par_name]),
+        to =  max(master_chain[, par_name]),
+        length.out = 20)
+  })
+  names(breaks) <- par_names
+
+  hists <- lapply(par_names, FUN = function(par_name) {
+    lapply(X = traces[[par_name]],
+           FUN = hist,
+           plot = FALSE,
+           breaks = breaks[[par_name]])
+  })
+  names(hists) <- par_names
+
+  hist_ylim <- lapply(hists, function(h) {
+    chain_max <- sapply(h, function(chain) max(chain$density) )
+    c(0, max(chain_max))
+  })
+
+  plot_hists <- function(h, col, breaks) {
+    with(h, lines(x =  breaks,
+                  y = c(density,
+                        density[length(density)]),
+                  type = 's',
+                  col = col))
+  }
+
+
+  print_summ <- function(par_name) {
+    x <- summ$summary
+    paste0(x['mean', par_name],
+           '\n(',
+           x['2.5%', par_name],
+           ', ',
+           x['97.5%', par_name], ')')
+  }
+
+
+  par( bty = 'n',
+       mfcol = c(n_pars, n_pars + 1L),
+       mar = c(3,3,2,1),
+       mgp = c(1.5, 0.5, 0),
+       oma = c(1,1,1,1))
+
+
+  for (i in seq_len(n_pars)) {
+    for(j in seq_len(n_pars)) {
+
+      if (i == j) { # plot hists on diagonal
+        par_name <- par_names[i]
+        bs <- breaks[[par_name]]
+        plot(x = bs[1] ,  # force date axis where needed
+             y = 1,
+             type = 'n',
+             xlim = c(bs[1], bs[length(bs)]),
+             ylim = hist_ylim[[par_name]],
+             xlab = par_name,
+             ylab = '',
+             main = print_summ(par_name),
+             cex.main = 1,
+             font.main = 1
+        )
+
+        mapply(FUN = plot_hists,
+               h = hists[[par_name]],
+               breaks = bs,
+               col = cols_trace)
+
+
+      } else if (i < j) {  # plot correlations on lower triangle
+        plot(x = master_chain[[i]],
+             y = master_chain[[j]],
+             xlab = par_names[i],
+             ylab = par_names[j],
+             col = cols,
+             pch = 20)
+      } else if (i > j) { # print rho on upper triangle
+        plot.new()
+        text(x = 0.5,
+             y=0.5,
+             labels = paste('r =',
+                            summ$corr_mat[i, j]))
+      }
+    }
+  }
+
+
+  # print traces in final column
+  n_iter <- nrow(master_chain) / n_chains
+
+  mapply(FUN = function(par_name, leg) {
+    plot(x = 1,
+         y = breaks[[par_name]][1],
+         type = 'n',
+         xlab = 'Iteration',
+         ylab = par_name,
+         xlim = c(0, n_iter),
+         ylim <- range(master_chain[, par_name]))
+
+    mapply(FUN = plot_traces,
+           trace = traces[[par_name]],
+           col = cols_trace)
+
+    if(leg) {
+      legend('top',
+             ncol = n_chains,
+             legend = paste('Chain', seq_len(n_chains)),
+             fill = cols_trace,
+             bty = 'n')
+    }
+  },
+  par_name = par_names,
+  leg = c(TRUE, FALSE, FALSE))
+
+}
