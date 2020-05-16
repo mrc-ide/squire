@@ -197,7 +197,7 @@ projections <- function(r,
   if (!is.null(time_period)) {
 
     t_diff <- diff(tail(r$output[,1,1],2))
-    t_start <- r$output[(r$output[,"time",1]==0),1,1]+t_diff
+    t_start <- r$output[which((r$output[,"time",1]==0)),1,1]+t_diff
     t_initial <- unique(stats::na.omit(r$output[1,1,]))
 
     t_steps <- lapply(t_steps, function(x) {
@@ -205,7 +205,7 @@ projections <- function(r,
     })
     steps <- seq(t_initial, max(t_steps[[1]]), t_diff)
 
-    arr_new <- array(NA, dim = c((max(t_steps[[1]])/(t_diff)) + (1-t_initial),
+    arr_new <- array(NA, dim = c(which(r$output[,"time",1]==0) + length(t_steps[[1]]),
                                  ncol(r$output), dim(r$output)[3]))
     arr_new[seq_len(nrow(r$output)),,] <- r$output
     rownms <- rownames(r$output)
@@ -214,8 +214,8 @@ projections <- function(r,
       rownames(arr_new) <- as.character(as.Date(rownms[1]) + seq_len(nrow(arr_new)) - 1L)
     }
     r$output <- arr_new
-    r$output[,1,] <- matrix(rep(steps,r$parameters$replicates), ncol = r$parameters$replicates)
     colnames(r$output) <- colnms
+    r$output[which(r$output[,1,1]==t_start):nrow(r$output),1,] <- matrix(unlist(t_steps), ncol = r$parameters$replicates)
   }
 
   # final values of R0, contacts, and beds
@@ -466,7 +466,11 @@ t0_variables <- function(r) {
     ret <- lapply(seq_len(dims[3]), function(x) {
 
       if(!is.null(r$interventions$R0_change)) {
-        R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change, 1)
+        if (is.null(r$replicate_parameters$Meff)) {
+          R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change, 1)
+        } else {
+        R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change * r$replicate_parameters$Meff[x], 1)
+        }
       } else {
         R0 <- r$replicate_parameters$R0[x]
       }

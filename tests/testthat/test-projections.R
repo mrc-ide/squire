@@ -240,6 +240,8 @@ test_that("projection continuation past array size", {
   p <- projections(r, R0_change = 2, time_period = 20)
   expect_true(all(round((diff(p$output[,"time",])),1) == r$parameters$dt))
 
+  expect_true(unique(diff(p$output[,1,1])) == 1)
+
 
 })
 
