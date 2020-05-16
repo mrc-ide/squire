@@ -10,6 +10,11 @@
 #'
 #' @param R0_step Step to increment R0 between min and max
 #'
+#' @param R0_prior Prior for R0. Default = NULL, which is a flat prior. Should be
+#'  provided as a list with first argument the distribution function and the second
+#'  the function arguments (excluding quantiles which are worked out based on
+#'  R0_min and R0_max), e.g. `list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))`.
+#'
 #' @param first_start_date Earliest start date as 'yyyy-mm-dd'
 #'
 #' @param last_start_date Latest start date as 'yyyy-mm-dd'
@@ -53,6 +58,7 @@ scan_R0_date <- function(
   R0_min,
   R0_max,
   R0_step,
+  R0_prior = NULL,
   first_start_date,
   last_start_date,
   day_step,
@@ -148,6 +154,14 @@ scan_R0_date <- function(
     ncol = length(date_list),
     byrow = FALSE)
 
+
+  # apply prior post hoc
+  if(!is.null(R0_prior)) {
+    R0_prior$args$x <- R0_1D
+    R0_prior$args$log <- TRUE
+    mat_log_ll <- mat_log_ll + do.call(R0_prior[[1]], R0_prior[[2]])
+  }
+
   # Exponentiate elements and normalise to 1 to get probabilities
   prob_matrix <- exp(mat_log_ll)
   renorm_mat_LL <- prob_matrix/sum(prob_matrix)
@@ -193,6 +207,11 @@ scan_R0_date <- function(
 #' @param R0_max Maximum value of R0 in the search
 #'
 #' @param R0_step Step to increment R0 between min and max
+#'
+#' @param R0_prior Prior for R0. Default = NULL, which is a flat prior. Should be
+#'  provided as a list with first argument the distribution function and the second
+#'  the function arguments (excluding quantiles which are worked out based on
+#'  R0_min and R0_max), e.g. `list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))`.
 #'
 #' @param first_start_date Earliest start date as 'yyyy-mm-dd'
 #'
@@ -243,6 +262,7 @@ scan_R0_date_Meff <- function(
   R0_min,
   R0_max,
   R0_step,
+  R0_prior = NULL,
   first_start_date,
   last_start_date,
   day_step,
@@ -266,8 +286,8 @@ scan_R0_date_Meff <- function(
   assert_custom_class(model_params, "squire_parameters")
   assert_pos(R0_min)
   assert_pos(R0_max)
-  assert_pos(Meff_max)
-  assert_pos(Meff_min)
+  assert_numeric(Meff_max)
+  assert_numeric(Meff_min)
   assert_pos(Meff_step)
   assert_date(first_start_date)
   assert_date(last_start_date)
@@ -344,6 +364,13 @@ scan_R0_date_Meff <- function(
     dim = c(length(R0_1D), length(date_list), length(Meff_1D))
   )
 
+  # apply prior post hoc
+  if(!is.null(R0_prior)) {
+    R0_prior$args$x <- R0_1D
+    R0_prior$args$log <- TRUE
+    mat_log_ll <- mat_log_ll + do.call(R0_prior[[1]], R0_prior[[2]])
+  }
+
   # Exponentiate elements and normalise to 1 to get probabilities
   prob_matrix <- exp(mat_log_ll)
   renorm_mat_LL <- prob_matrix/sum(prob_matrix)
@@ -388,7 +415,6 @@ scan_R0_date_Meff <- function(
 #' @noRd
 R0_date_particle_filter <- function(R0,
                                     start_date,
-                                    Meff = 1,
                                     squire_model,
                                     model_params,
                                     data,
@@ -399,6 +425,7 @@ R0_date_particle_filter <- function(R0,
                                     date_hosp_bed_capacity_change,
                                     pars_obs,
                                     n_particles,
+                                    Meff = 1,
                                     forecast_days = 0,
                                     save_particles = FALSE,
                                     full_output = FALSE,
@@ -456,9 +483,9 @@ R0_date_particle_filter <- function(R0,
 
   }
 
-  # Second create the new R0s for the R0
+  # Second create the new R0s for the R0 and any changes to Meff
   if (!is.null(R0_change)) {
-    R0 <- c(R0, R0 * R0_change * Meff)
+      R0 <- c(R0, R0 * R0_change * Meff)
   }
 
   # and work out our beta

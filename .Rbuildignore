@@ -14,3 +14,4 @@ images
 scripts
 det_check
 ^.*\.covrignore$
+^cluster$

@@ -35,6 +35,10 @@
 #'   on R0 and start_date
 #' @param Meff_step Step to increment Meff (Movement effect size) between min
 #'   and max. Default = 0.1
+#' @param R0_prior Prior for R0. Default = NULL, which is a flat prior. Should be
+#'  provided as a list with first argument the distribution function and the second
+#'  the function arguments (excluding quantiles which are worked out based on
+#'  R0_min and R0_max), e.g. `list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))`.
 #' @param ... Further aguments for the model parameter function. If using the
 #'   \code{\link{explicit_model}} (default) this will be
 #'   \code{parameters_explicit_SEEIR}.
@@ -49,6 +53,7 @@ calibrate <- function(data,
                       R0_min,
                       R0_max,
                       R0_step,
+                      R0_prior = NULL,
                       first_start_date,
                       last_start_date,
                       day_step,
@@ -82,9 +87,9 @@ calibrate <- function(data,
   assert_numeric(R0_min)
   assert_numeric(R0_max)
   assert_numeric(R0_step)
-  assert_numeric(Meff_min)
-  assert_numeric(Meff_max)
-  assert_numeric(Meff_step)
+  assert_pos(Meff_min)
+  assert_pos(Meff_max)
+  assert_pos(Meff_step)
   assert_date(first_start_date)
   assert_date(last_start_date)
   assert_date(data$date)
@@ -133,9 +138,6 @@ calibrate <- function(data,
     if(as.Date(tail(date_contact_matrix_set_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
     }
-    if(as.Date(last_start_date) >= as.Date(head(date_contact_matrix_set_change, 1))) {
-      stop("First date in date_contact_matrix_set_change is earlier than last_start_date")
-    }
 
     # Get in correct format
     if(is.matrix(baseline_contact_matrix)) {
@@ -164,9 +166,6 @@ calibrate <- function(data,
     if(as.Date(tail(date_ICU_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_ICU_bed_capacity_change is greater than the last date in data")
     }
-    if(as.Date(last_start_date) >= as.Date(head(date_ICU_bed_capacity_change, 1))) {
-      stop("First date in date_ICU_bed_capacity_change is earlier than last_start_date")
-    }
 
     tt_ICU_beds <- c(0, seq_len(length(date_ICU_bed_capacity_change)))
     ICU_bed_capacity <- c(baseline_ICU_bed_capacity, ICU_bed_capacity)
@@ -189,9 +188,6 @@ calibrate <- function(data,
     assert_numeric(baseline_hosp_bed_capacity)
     if(as.Date(tail(date_hosp_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_hosp_bed_capacity_change is greater than the last date in data")
-    }
-    if(as.Date(last_start_date) >= as.Date(head(date_hosp_bed_capacity_change, 1))) {
-      stop("First date in date_hosp_bed_capacity_change is earlier than last_start_date")
     }
 
     tt_hosp_beds <- c(0, seq_len(length(date_hosp_bed_capacity_change)))
@@ -227,17 +223,27 @@ calibrate <- function(data,
                         hosp_bed_capacity = hosp_bed_capacity)
 
   # construct pars_obs for the user
-  pars_obs <-  list(phi_cases = reporting_fraction,
+  if (is.null(pars_obs)) {
+
+    pars_obs <-  list(phi_cases = reporting_fraction,
                     k_cases = 2,
                     phi_death = reporting_fraction,
                     k_death = 2,
                     exp_noise = 1e6)
+
+    } else {
+
+    pars_obs$phi_cases <- reporting_fraction
+    pars_obs$phi_death <- reporting_fraction
+
+  }
 
   # construct scan
   if (Meff_min == Meff_max) {
     scan_results <- scan_R0_date(R0_min = R0_min,
                                  R0_max = R0_max,
                                  R0_step = R0_step,
+                                 R0_prior = R0_prior,
                                  first_start_date = first_start_date,
                                  last_start_date = last_start_date,
                                  day_step = day_step,
@@ -255,6 +261,7 @@ calibrate <- function(data,
     scan_results <- scan_R0_date_Meff(R0_min = R0_min,
                                       R0_max = R0_max,
                                       R0_step = R0_step,
+                                      R0_prior = R0_prior,
                                       first_start_date = first_start_date,
                                       last_start_date = last_start_date,
                                       day_step = day_step,
