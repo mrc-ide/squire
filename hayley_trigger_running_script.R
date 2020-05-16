@@ -1,6 +1,7 @@
 # Loading Required Libraries
 library(tidyverse); library(zoo)
-
+library(devtools)
+devtools::document()
 # Sourcing Functions for Running Model With Threshold Based Triggers
 source("trigger_running_function.R")
 load("data/income_strata_healthcare_capacity.rda")
@@ -22,7 +23,7 @@ UMIC_icu <- (ICU[3] * 50000000 /1000) / 2
 HIC_icu <- (ICU[4] * 50000000 /1000) / 2
 
 # Defining Parameters Used in All Model Runs
-replicates <- 60
+replicates <- 5
 R0 <- c(3, 3)
 tt_R0 <- c(0, 50)
 suppression_reduction <- 0.25
@@ -32,10 +33,10 @@ max_lockdowns <- 20
 
 ### 1. Running Without Capacity Constraints to Examine Time In Suppression vs Capacity Required
 ###     -> For Runs Where We Have an Initial Suppression Based On Known Timings for Income Strata
-income_strata <- c("LIC", "LMIC", "UMIC", "HIC")
-countries <- c("Madagascar", "Nicaragua", "Grenada", "Malta")
-raw_death_triggers <- c(0, 0.00243, 0.0553, 0.157)
-death_triggers <- round(50 * raw_death_triggers)
+income_strata <- c("LIC")
+countries <- c("Madagascar")
+#raw_death_triggers <- c(0, 0.00243, 0.0553, 0.157)
+#death_triggers <- round(50 * raw_death_triggers)
 a_max_ICU_req <- matrix(nrow = 4, ncol = length(trigger_thresholds))
 a_time_in_lockdown <- matrix(nrow = 4, ncol = length(trigger_thresholds))
 a_deaths <- matrix(nrow = 4, ncol = length(trigger_thresholds))
@@ -44,10 +45,10 @@ for (i in 1:length(countries)) {
   pop <- get_population(countries[i])
   pop <- (50000000/sum(pop$n)) * pop$n
   for (j in 1:length(trigger_thresholds)) {
-    x <- realistic_run_trigger_threshold(country = countries[i], population = pop,
+    x <- run_trigger_threshold(country = countries[i], population = pop,
                                          replicates = replicates,
                                          income_strata = income_strata[i],
-                                         initial_trigger_threshold = death_triggers[i],
+                                        # initial_trigger_threshold = death_triggers[i],
                                          trigger_threshold = trigger_thresholds[j],
                                          suppression_reduction = suppression_reduction,
                                          suppression_duration = suppression_duration,
