@@ -74,7 +74,7 @@ this up." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.11</span>
       </span>
     </div>
 
@@ -131,6 +131,7 @@ this up.</p>
   <span class='no'>R0_min</span>,
   <span class='no'>R0_max</span>,
   <span class='no'>R0_step</span>,
+  <span class='kw'>R0_prior</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>first_start_date</span>,
   <span class='no'>last_start_date</span>,
   <span class='no'>day_step</span>,
@@ -163,6 +164,13 @@ this up.</p>
     <tr>
       <th>R0_step</th>
       <td><p>Step to increment R0 between min and max</p></td>
+    </tr>
+    <tr>
+      <th>R0_prior</th>
+      <td><p>Prior for R0. Default = NULL, which is a flat prior. Should be
+provided as a list with first argument the distribution function and the second
+the function arguments (excluding quantiles which are worked out based on
+R0_min and R0_max), e.g. `list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))`.</p></td>
     </tr>
     <tr>
       <th>first_start_date</th>
@@ -255,7 +263,7 @@ Defaut = NULL, i.e. no change</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Patrick Walker, OJ Watson, Charlie Whittaker, Peter Winskill, Giovanni Charles.</p>
+  <p>Developed by OJ Watson, Patrick Walker, Charlie Whittaker, Peter Winskill, Giovanni Charles.</p>
 </div>
 
 <div class="pkgdown">
