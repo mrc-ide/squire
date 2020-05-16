@@ -223,11 +223,20 @@ calibrate <- function(data,
                         hosp_bed_capacity = hosp_bed_capacity)
 
   # construct pars_obs for the user
-  pars_obs <-  list(phi_cases = reporting_fraction,
+  if (is.null(pars_obs)) {
+
+    pars_obs <-  list(phi_cases = reporting_fraction,
                     k_cases = 2,
                     phi_death = reporting_fraction,
                     k_death = 2,
                     exp_noise = 1e6)
+
+    } else {
+
+    pars_obs$phi_cases <- reporting_fraction
+    pars_obs$phi_death <- reporting_fraction
+
+  }
 
   # construct scan
   if (Meff_min == Meff_max) {

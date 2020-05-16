@@ -619,7 +619,11 @@ test_that("reporting fraction into pars_obs", {
   date_R0_change = as.Date(int_unique$dates_change)
   date_contact_matrix_set_change = NULL
   squire_model = explicit_model()
-  pars_obs = NULL
+  pars_obs <-  list(phi_cases = 1,
+                    k_cases = 2,
+                    phi_death = 1,
+                    k_death = 2,
+                    exp_noise = 1e6)
   n_particles = 5
 
   set.seed(93L)
@@ -794,9 +798,32 @@ test_that("R0_prior", {
     forecast = 0
   )
 
-  get <- lapply(list(out,out2), format_output, "deaths")
+  out3 <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    Meff_min = 0.9,
+    Meff_max = 1,
+    Meff_step = 0.1,
+    R0_prior = list("func" = dnorm, "args"=list("mean"=0.1,"sd"=0.01,"log"=TRUE)),
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    replicates = replicates,
+    country = country,
+    forecast = 0
+  )
+
+  get <- lapply(list(out,out2, out3), format_output, "deaths")
 
   expect_true(max(get[[1]]$y,na.rm=TRUE) > max(get[[2]]$y,na.rm=TRUE))
+  expect_true(max(get[[1]]$y,na.rm=TRUE) > max(get[[3]]$y,na.rm=TRUE))
 
 })
 
