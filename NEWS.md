@@ -1,3 +1,7 @@
+# squire 0.4.12
+
+* Explicit Meff inclusion in `R0_date_particle_filter` and `projections` fix
+
 # squire 0.4.11
 
 * patching `projections` when projecting further than original calibrate run
