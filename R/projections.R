@@ -215,7 +215,7 @@ projections <- function(r,
     }
     r$output <- arr_new
     colnames(r$output) <- colnms
-    r$output[which(r$output[,1,1]==t_start):nrow(r$output),1,] <- matrix(unlist(t_steps), ncol = r$parameters$replicates)
+    r$output[(which(r$output[,1,1]==(t_start-t_diff))+1):nrow(r$output),1,] <- matrix(unlist(t_steps), ncol = r$parameters$replicates)
   }
 
   # final values of R0, contacts, and beds

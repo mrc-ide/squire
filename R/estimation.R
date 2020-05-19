@@ -121,6 +121,7 @@ scan_R0_date <- function(
       n_particles = n_particles,
       forecast_days = 0,
       save_particles = FALSE,
+      Meff_include = FALSE,
       return = "ll")
 
   } else {
@@ -140,6 +141,7 @@ scan_R0_date <- function(
       n_particles = n_particles,
       forecast_days = 0,
       save_particles = FALSE,
+      Meff_include = FALSE,
       .progress = TRUE,
       return = "ll")
 
@@ -332,6 +334,7 @@ scan_R0_date_Meff <- function(
       n_particles = n_particles,
       forecast_days = 0,
       save_particles = FALSE,
+      Meff_include = TRUE,
       return = "ll")
 
   } else {
@@ -352,6 +355,7 @@ scan_R0_date_Meff <- function(
       forecast_days = 0,
       save_particles = FALSE,
       .progress = TRUE,
+      Meff_include = TRUE,
       return = "ll")
 
   }
@@ -426,6 +430,7 @@ R0_date_particle_filter <- function(R0,
                                     pars_obs,
                                     n_particles,
                                     Meff = 1,
+                                    Meff_include = FALSE,
                                     forecast_days = 0,
                                     save_particles = FALSE,
                                     full_output = FALSE,
@@ -485,7 +490,12 @@ R0_date_particle_filter <- function(R0,
 
   # Second create the new R0s for the R0 and any changes to Meff
   if (!is.null(R0_change)) {
+    if (Meff_include) {
+      #R0 <- c(R0, exp(log(R0) - Meff*(1-R0_change)))
       R0 <- c(R0, R0 * R0_change * Meff)
+    } else {
+      R0 <- c(R0, R0 * R0_change)
+    }
   }
 
   # and work out our beta
@@ -616,6 +626,7 @@ sample_grid_scan <- function(scan_results,
       n_particles = n_particles,
       forecast_days = forecast_days,
       full_output = full_output,
+      Meff_include = FALSE,
       save_particles = TRUE,
       return = "sample"
     )
@@ -636,6 +647,7 @@ sample_grid_scan <- function(scan_results,
       forecast_days = forecast_days,
       full_output = full_output,
       save_particles = TRUE,
+      Meff_include = FALSE,
       return = "sample",
       .progress = TRUE
     )
@@ -767,6 +779,7 @@ sample_3d_grid_scan <- function(scan_results,
       forecast_days = forecast_days,
       full_output = full_output,
       save_particles = TRUE,
+      Meff_include = TRUE,
       return = "sample"
     )
   } else {
@@ -786,6 +799,7 @@ sample_3d_grid_scan <- function(scan_results,
       forecast_days = forecast_days,
       full_output = full_output,
       save_particles = TRUE,
+      Meff_include = TRUE,
       return = "sample",
       .progress = TRUE
     )
