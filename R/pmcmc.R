@@ -1,48 +1,6 @@
-# Converts dates from data into a numeric offset as used in the MCMC
-# Automatically converts type
-start_date_to_offset <- function(first_data_date, start_date)
-{
-  # Format conversion cascades as required
-  # string -> Date -> numeric
-
-  # Convert any strings to Dates
-  if (class(first_data_date) == "character" || class(first_data_date) == "factor") {
-    first_data_date = as.Date(first_data_date)
-  }
-  if (class(start_date) == "character" || class(first_data_date) == "factor") {
-    start_date = as.Date(start_date)
-  }
-
-  # Convert any Dates to numerics
-  if (class(first_data_date) == "Date") {
-    first_data_date = as.numeric(first_data_date)
-  }
-  if (class(start_date) == "Date") {
-    start_date = as.numeric(start_date)
-  }
-
-  first_data_date - start_date
-}
-
-# Converts dates from  numeric offset as used in the MCMC to a Date
-# Automatically converts type
-offset_to_start_date <- function(first_data_date, start_date)
-{
-  if (class(start_date) != "numeric") {
-    stop("Offset start date must be numeric")
-  }
-
-  # Convert any strings to Dates
-  if (class(first_data_date) == "character" || class(first_data_date) == "factor") {
-    first_data_date = as.Date(first_data_date)
-  }
-
-  as.Date(start_date, origin=first_data_date)
-}
-
-#' Run a pmcmc sampler
+#' Run a pmcmc sampler with the Squire model setup (i.e. include the various model parameters for the odin model to generate curves)
 #'
-#' @title Run a pmcmc sampler
+#' @title Run a P MCMC Sampler within the Squire Framework
 #'
 #' @param data Data to fit to.  This must be constructed with
 #'   \code{particle_filter_data}
@@ -72,17 +30,30 @@ offset_to_start_date <- function(first_data_date, start_date)
 #'                   If NULL, calculated using the function calc_loglikelihood.
 #' @param log_prior function to calculate log prior, must take named parameter vector as input, returns a single numeric.
 #'                  If NULL, uses uninformative priors which do not affect the posterior
-#' @param n_particles Number of particles
+#' @param n_particles Number of particles (considered for both the PMCMC fit and sampling from posterior)
 #' @param steps_per_day Number of steps per day
 #' @param output_proposals Logical indicating whether proposed parameter jumps should be output along with results
-#' @param n_chains Number of chains to run
+#' @param n_chains number of chains to run
+#' @inheritParams calibrate
+#' @param burnin number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories
+#' @param n_trajectories number of trajectories to be returned that are being sampled from the posterior probability results produced by \code{\link{run_mcmc_chain}}
+#' to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory
 #'
-#' @return an mcmc object containing
-#' - List of inputs
-#' - Matrix of accepted parameter samples, rows = iterations
-#'   as well as log prior, (particle filter estimate of) log likelihood and log posterior
+#' @return \code{\link{list}}. First element (Squire_Simulation_Result) are \code{squire_model} trajectories
+#'   from the sampled pMCMC parameter iterations. The second element (pMCMC) is an mcmc object generated
+#'   from \code{pmcmc} and contains:
+#'   \itemize{
+#'     \item{inputs}{List of inputs}
+#'     \item{results}{Matrix of accepted parameter samples, rows = iterations
+#'       as well as log prior, (particle filter estimate of) log likelihood and log posterior}
+#'     \item{states}{Matrix of compartment states}
+#'     \item{acceptance_rate}{MCMC acceptance rate}
+#'     \item{ess}{MCMC chain effective sample size}
+#'       }
+#'   The third element (pMCMC_SampledTraj) contains the parameter values for the sampled pMCMC parameter iterations
+#'   used to generate the \code{squire_model} trajectories
 #'
-#' @description The user inputs initial parameter values for beta_start and sample_date
+#' @description The user inputs initial parameter values for R0, Meff, and the start date
 #' The log prior likelihood of these parameters is calculated based on the user-defined
 #' prior distributions.
 #' The log likelihood of the data given the initial parameters is estimated using a particle filter,
@@ -113,6 +84,10 @@ offset_to_start_date <- function(first_data_date, start_date)
 #'   If the proposed parameters and states are accepted then we update the current parameters and states
 #'   to match the proposal, otherwise the previous parameters/states are retained for the next iteration.
 #'
+#' After generating the pMCMC simulation, there are \code{n_trajectories} specific iterations sampled based on the
+#' posterior probability. The parameters from those iterations are then used to generate new trajectories within
+#' the \code{squire_model} framework.
+#'
 #' @export
 #' @import coda
 #' @importFrom stats rnorm
@@ -120,38 +95,54 @@ offset_to_start_date <- function(first_data_date, start_date)
 
 pmcmc <- function(data,
                   n_mcmc,
-                  squire_model,
-                  model_params,
-                  pars_obs,
-                  pars_init = list('start_date'     = as.Date("2020-02-07"),
-                                   'R0'             = 2.5),
-                  pars_min = list('start_date'      = as.Date("2020-02-01"),
-                                  'R0'              = 0),
-                  pars_max = list('start_date'      = as.Date("2020-02-20"),
-                                  'R0'              = 5),
-                  pars_discrete = list('start_date' = TRUE,
-                                       'R0'         = FALSE),
-                  proposal_kernel,
                   log_likelihood = NULL,
                   log_prior = NULL,
                   n_particles = 1e2,
                   steps_per_day = 4,
                   output_proposals = FALSE,
-                  n_chains = 1) {
+                  n_chains = 1,
+                  squire_model,
+                  pars_obs,
+                  model_params,
+                  pars_init = list('start_date'     = as.Date("2020-02-07"),
+                                   'R0'             = 2.5,
+                                   'Meff'           = 2),
+                  pars_min = list('start_date'      = as.Date("2020-02-01"),
+                                  'R0'              = 0,
+                                  'Meff'            = 1),
+                  pars_max = list('start_date'      = as.Date("2020-02-20"),
+                                  'R0'              = 5,
+                                  'Meff'            = 3),
+                  pars_discrete = list('start_date' = TRUE,
+                                       'R0'         = FALSE,
+                                       'Meff'       = FALSE),
+                  proposal_kernel,
+                  reporting_fraction = 1,
+                  country = NULL,
+                  population = NULL,
+                  contact_matrix_set = NULL,
+                  baseline_contact_matrix = NULL,
+                  date_contact_matrix_set_change = NULL,
+                  date_R0_change = NULL,
+                  R0_change = NULL,
+                  hosp_bed_capacity = NULL,
+                  baseline_hosp_bed_capacity = NULL,
+                  date_hosp_bed_capacity_change = NULL,
+                  ICU_bed_capacity = NULL,
+                  baseline_ICU_bed_capacity = NULL,
+                  date_ICU_bed_capacity_change = NULL
+) {
 
   #..................
   # assertions & checks
   #..................
   # data
   assert_dataframe(data)
-  sapply(data$date, assert_date)
+  assert_in("date", names(data))
+  assert_in("deaths", names(data))
+  assert_date(data$dat)
   assert_increasing(as.numeric(as.Date(data$date)),
                     message = "Dates must be in increasing order")
-
-  # squire and odin
-  assert_custom_class(squire_model, "squire_model")
-  assert_custom_class(model_params, "squire_parameters")
-  assert_pos_int(steps_per_day)
 
   # check input pars df
   assert_list(pars_init)
@@ -161,8 +152,8 @@ pmcmc <- function(data,
   assert_eq(names(pars_init), names(pars_min))
   assert_eq(names(pars_min), names(pars_max))
   assert_eq(names(pars_max), names(pars_discrete))
-  assert_in(names(pars_init), c("R0", "start_date"),
-            message = "Params to infer must include R0 and start_date")
+  assert_in(names(pars_init), c("R0", "start_date", "Meff"),
+            message = "Params to infer must include R0, start_date, and Effective Mobility")
   assert_date(pars_init$start_date)
   assert_date(pars_min$start_date)
   assert_date(pars_max$start_date)
@@ -175,8 +166,12 @@ pmcmc <- function(data,
   assert_pos(pars_max$R0)
   assert_pos(pars_init$R0)
   assert_bounded(pars_init$R0, left = pars_min$R0, right = pars_max$R0)
-  sapply(unlist(pars_discrete), assert_logical)
-  # TODO only allow specific parameters to be sampled --> check that those covariates are right form
+
+  assert_pos(pars_min$Meff)
+  assert_pos(pars_max$Meff)
+  assert_pos(pars_init$Meff)
+  assert_bounded(pars_init$Meff, left = pars_min$Meff, right = pars_max$Meff)
+  assert_logical(unlist(pars_discrete))
 
   # check proposal kernel
   assert_matrix(proposal_kernel)
@@ -192,7 +187,7 @@ pmcmc <- function(data,
   }
   assert_list(pars_obs)
   assert_eq(names(pars_obs), c("phi_cases", "k_cases", "phi_death", "k_death", "exp_noise"))
-  sapply(unlist(pars_obs), assert_numeric)
+  assert_numeric(unlist(pars_obs))
 
   # mcmc items
   assert_pos_int(n_mcmc)
@@ -200,13 +195,165 @@ pmcmc <- function(data,
   assert_pos_int(n_particles)
   assert_logical(output_proposals)
 
+  # squire and odin
+  assert_custom_class(squire_model, "squire_model")
+  assert_custom_class(model_params, "squire_parameters")
+  assert_pos_int(steps_per_day)
+  assert_numeric(reporting_fraction)
+  assert_bounded(reporting_fraction, 0, 1, inclusive_left = FALSE, inclusive_right = TRUE)
+  #TODO talk to OJ about country vs. explicit model vs. population
+  assert_string(country)
+  #assert_numeric(population)
+  #if (is.null(squire_model)) {
+  #  assert_string(country)
+  #  assert_numeric(population)
+  #}
+
+  # date change items
+  assert_same_length(R0_change, date_R0_change)
+  # checks that dates are not in the future compared to our data
+  if(!is.null(date_R0_change)) {
+    assert_date(date_R0_change)
+    if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_R0_change is greater than the last date in data")
+    }
+    if(as.Date(last_start_date) >= as.Date(head(date_R0_change, 1))) {
+      stop("First date in date_R0_change is earlier than last_start_date")
+    }
+  }
+
+  if(!is.null(date_R0_change)) {
+    assert_date(date_R0_change)
+    if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_R0_change is greater than the last date in data")
+    }
+    if(as.Date(last_start_date) >= as.Date(head(date_R0_change, 1))) {
+      stop("First date in date_R0_change is earlier than last_start_date")
+    }
+  }
+
+  if(!is.null(contact_matrix_set)) {
+    assert_list(contact_matrix_set)
+  }
+  assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
+  assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
+  assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
+
+  # handle contact matrix changes
+  if(!is.null(date_contact_matrix_set_change)) {
+
+    assert_date(date_contact_matrix_set_change)
+    assert_list(contact_matrix_set)
+
+    if(is.null(baseline_contact_matrix)) {
+      stop("baseline_contact_matrix can't be NULL if date_contact_matrix_set_change is provided")
+    }
+    if(as.Date(tail(date_contact_matrix_set_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
+    }
+    if(as.Date(pars_max$start_date) >= as.Date(head(date_contact_matrix_set_change, 1))) {
+      stop("First date in date_contact_matrix_set_change is earlier than maximum start date of epidemic")
+    }
+
+    # Get in correct format
+    if(is.matrix(baseline_contact_matrix)) {
+      baseline_contact_matrix <- list(baseline_contact_matrix)
+    }
+
+    tt_contact_matrix <- c(0, seq_len(length(date_contact_matrix_set_change)))
+    contact_matrix_set <- append(baseline_contact_matrix, contact_matrix_set)
+
+  } else {
+    tt_contact_matrix <- 0
+    contact_matrix_set <- baseline_contact_matrix
+  }
+
+  # handle ICU changes
+  if(!is.null(date_ICU_bed_capacity_change)) {
+
+    assert_date(date_ICU_bed_capacity_change)
+    assert_vector(ICU_bed_capacity)
+    assert_numeric(ICU_bed_capacity)
+
+    if(is.null(baseline_ICU_bed_capacity)) {
+      stop("baseline_ICU_bed_capacity can't be NULL if date_ICU_bed_capacity_change is provided")
+    }
+    assert_numeric(baseline_ICU_bed_capacity)
+    if(as.Date(tail(date_ICU_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_ICU_bed_capacity_change is greater than the last date in data")
+    }
+    if(as.Date(pars_max$start_date) >= as.Date(head(date_ICU_bed_capacity_change, 1))) {
+      stop("First date in date_ICU_bed_capacity_change is earlier than maximum start date of epidemic")
+    }
+
+    tt_ICU_beds <- c(0, seq_len(length(date_ICU_bed_capacity_change)))
+    ICU_bed_capacity <- c(baseline_ICU_bed_capacity, ICU_bed_capacity)
+
+  } else {
+    tt_ICU_beds <- 0
+    ICU_bed_capacity <- baseline_ICU_bed_capacity
+  }
+
+  # handle hosp bed changed
+  if(!is.null(date_hosp_bed_capacity_change)) {
+
+    assert_date(date_hosp_bed_capacity_change)
+    assert_vector(hosp_bed_capacity)
+    assert_numeric(hosp_bed_capacity)
+
+    if(is.null(baseline_hosp_bed_capacity)) {
+      stop("baseline_hosp_bed_capacity can't be NULL if date_hosp_bed_capacity_change is provided")
+    }
+    assert_numeric(baseline_hosp_bed_capacity)
+    if(as.Date(tail(date_hosp_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_hosp_bed_capacity_change is greater than the last date in data")
+    }
+    if(as.Date(pars_max$start_date) >= as.Date(head(date_hosp_bed_capacity_change, 1))) {
+      stop("First date in date_hosp_bed_capacity_change is earlier than maximum start date of epidemic")
+    }
+
+    tt_hosp_beds <- c(0, seq_len(length(date_hosp_bed_capacity_change)))
+    hosp_bed_capacity <- c(baseline_hosp_bed_capacity, hosp_bed_capacity)
+
+  } else {
+    tt_hosp_beds <- 0
+    hosp_bed_capacity <- baseline_hosp_bed_capacity
+  }
+
   #..................
-  # Generate MCMC parameters
+  # Generate Odin items
+  #..................
+  # make the date definitely a date
+  data$date <- as.Date(as.character(data$date))
+  # adjust for reporting fraction
+  data$deaths <- (data$deaths/reporting_fraction)
+
+  # build model parameters
+  model_params <- squire_model$parameter_func(country = country,
+                                              population = population,
+                                              dt = 1/steps_per_day,
+                                              contact_matrix_set = contact_matrix_set,
+                                              tt_contact_matrix = tt_contact_matrix,
+                                              hosp_bed_capacity = hosp_bed_capacity,
+                                              tt_hosp_beds = tt_hosp_beds,
+                                              ICU_bed_capacity = ICU_bed_capacity,
+                                              tt_ICU_beds = tt_ICU_beds)
+  # collect interventions for odin model likelihood
+  interventions <- list(R0_change = R0_change,
+                        date_R0_change = date_R0_change,
+                        date_contact_matrix_set_change = date_contact_matrix_set_change,
+                        date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+                        date_hosp_bed_capacity_change = date_hosp_bed_capacity_change)
+
+
+  #..................
+  # Collect Odin and MCMC Inputs
   #..................
   inputs <- list(
     data = data,
     n_mcmc = n_mcmc,
     model_params = model_params,
+    interventions = interventions,
     pars_obs = pars_obs,
     squire_model = squire_model,
     pars = list(pars_obs = pars_obs,
@@ -215,8 +362,9 @@ pmcmc <- function(data,
                 pars_max = pars_max,
                 proposal_kernel = proposal_kernel,
                 pars_discrete = pars_discrete),
-    n_particles = n_particles,
-    steps_per_day = steps_per_day)
+    n_particles = n_particles)
+
+
 
   #..................
   # create prior and likelihood functions given the inputs
@@ -239,7 +387,7 @@ pmcmc <- function(data,
                         data = data,
                         squire_model = squire_model,
                         model_params = model_params,
-                        steps_per_day = steps_per_day,
+                        interventions = interventions,
                         pars_obs = pars_obs,
                         n_particles = n_particles,
                         forecast_days = 0,
@@ -328,18 +476,100 @@ pmcmc <- function(data,
     })
 
 
-    res <- list(inputs = chains[[1]]$inputs,
-                rhat = rhat,
-                chains = lapply(chains, '[', -1))
+    pmcmc_results <- list(inputs = chains[[1]]$inputs,
+                          rhat = rhat,
+                          chains = lapply(chains, '[', -1))
 
-    class(res) <- 'pmcmc_list'
+    class(pmcmc_results) <- 'pmcmc_list'
   } else {
-    res <- chains[[1]]
+    pmcmc_results <- chains[[1]]
   }
 
-  res
+  #..................
+  # Sample PMCMC Results
+  #..................
+  pmcmc_sample_trajectories <- sample_pmcmc(pmcmc_results = pmcmc_results,
+                                            burnin = burnin,
+                                            n_trajectories = n_trajectories,
+                                            n_particles = n_particles,
+                                            forecast_days = 0)
 
+  #..................
+  # Pull Sampled results and "recreate" squire models
+  #..................
+  if (inherits(squire_model, "stochastic")) {
+
+    # create a fake run object and fill in the required elements
+    r <- squire_model$run_func(country = country,
+                               contact_matrix_set = contact_matrix_set,
+                               tt_contact_matrix = tt_contact_matrix,
+                               hosp_bed_capacity = hosp_bed_capacity,
+                               tt_hosp_beds = tt_hosp_beds,
+                               ICU_bed_capacity = ICU_bed_capacity,
+                               tt_ICU_beds = tt_ICU_beds,
+                               population = population,
+                               replicates = 1,
+                               time_period = max(tt_contact_matrix,tt_hosp_beds,tt_ICU_beds,1),
+                               ...)
+
+    # first let's tidy up the pmcmc trajectories for a nice return (i.e. don't need input multiple times)
+    res <- pmcmc_sample_trajectories
+    pmcmc_sample_trajectories <- pmcmc_sample_trajectories[!grepl("input", names(pmcmc_sample_trajectories))]
+    class(pmcmc_sample_trajectories) <- "sample_PMCMC_abridged"
+    # then let's create the output that we are going to use
+    names(res)[names(res) == "trajectories"] <- "output"
+    dimnames(res$output) <- list(dimnames(res$output)[[1]], dimnames(r$output)[[2]], NULL)
+    r$output <- res$output
+
+    # and adjust the time as before
+    full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
+    saved_full <- r$output[,"time",full_row]
+    for(i in seq_len(n_trajectories)) {
+      na_pos <- which(is.na(r$output[,"time",i]))
+      full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
+      if(length(na_pos) > 0) {
+        full_to_place[na_pos] <- NA
+      }
+      r$output[,"time",i] <- full_to_place
+    }
+
+  } else if (inherits(squire_model, "deterministic")) {
+    r <- list("output" = pmcmc_sample_trajectories$trajectories)
+    r <- structure(r, class = "squire_simulation")
+  }
+
+  # second let's recreate the output
+  r$model <- res$inputs$model$odin_model(
+    user = res$inputs$model_params, unused_user_action = "ignore"
+  )
+  # we will add the interventions here so that we know what times are needed for projection
+  r$interventions <- interventions
+
+  # as well as adding the scan_results so it's easy to draw from the scan again in the future
+  r$pmcmc_results <- pmcmc_results
+
+  # and add the parameters that changed between each simulation, i.e. drawn from gris
+  r$trajectory_parameters <- res$sampled_PMCMC_Results
+
+  # and fix the replicates
+  r$parameters$replicates <- n_trajectories
+  r$parameters$time_period <- as.numeric(diff(as.Date(range(rownames(r$output)))))
+
+  #..............................................................
+  # larger output
+  #..............................................................
+  out <- list(
+    Squire_Simulation_Result = r,
+    pMCMC = pmcmc_results,
+    pMCMC_SampledTraj = pmcmc_sample_trajectories
+  )
+  return(out)
 }
+
+
+
+
+
 
 # Run a single pMCMC chain
 run_mcmc_chain <- function(inputs,
@@ -386,8 +616,8 @@ run_mcmc_chain <- function(inputs,
   }
   assert_neg(x = p_filter_est$log_likelihood,
              message1 = 'log_likelihood must be negative or zero')
-  sapply(p_filter_est$sample_state, assert_pos,
-         message1 = 'sample_state must be a vector of non-negative numbers')
+  assert_pos(p_filter_est$sample_state,
+             message1 = 'sample_state must be a vector of non-negative numbers')
 
   #..................
   # Create objects to store outputs
@@ -506,19 +736,22 @@ run_mcmc_chain <- function(inputs,
 # return: Set to 'll' to return the log-likelihood (for MCMC) or to
 #
 calc_loglikelihood <- function(pars, data, squire_model, model_params,
-                               steps_per_day, pars_obs, n_particles,
-                               forecast_days = 0, return = "ll") {
+                               pars_obs, n_particles,
+                               forecast_days = 0, return = "ll",
+                               interventions) {
   #..................
   # specify particle setup
   #..................
   switch(return,
          "full" = {
            save_particles <- TRUE
+           full_output <- TRUE
            pf_return <- "sample"
          },
          "ll" = {
            save_particles <- FALSE
            forecast_days <- 0
+           full_output <- FALSE
            pf_return <- "single"
          },
          {
@@ -529,24 +762,29 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   #..................
   # (potentially redundant) assertion
   #..................
-  assert_in(c("R0", "start_date"), names(pars),
-            message = "Must specify R0 and start date as parameters to infer")
+  assert_in(c("R0", "start_date", "Meff"), names(pars),
+            message = "Must specify R0, start date, and Movement effect size as parameters to infer")
   #..................
   # unpack current params
   #..................
   R0 <- pars[["R0"]]
   start_date <- pars[["start_date"]]
-  #TODO extend this to allow for additional parameters that we can estimate
+  Meff <- pars[["Meff"]]
 
   #..................
   # more (potentially redundant) assertions
   #..................
   assert_pos(R0)
   assert_date(start_date)
+  assert_pos(Meff)
 
   #..................
-  # setup model based on inputs
+  # setup model based on inputs and interventions
   #..................
+  date_R0_change <- interventions$date_R0_change
+  date_contact_matrix_set_change <- interventions$date_contact_matrix_set_change
+  date_ICU_bed_capacity_change <- interventions$date_ICU_bed_capacity_change
+  date_hosp_bed_capacity_change <- interventions$date_hosp_bed_capacity_change
 
   # change betas
   if (is.null(date_R0_change)) {
@@ -554,7 +792,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   } else {
     tt_beta <- unique(c(0, intervention_dates_for_odin(dates = date_R0_change,
                                                        start_date = start_date,
-                                                       steps_per_day = round(1/model_params$dt))))
+                                                       steps_per_day = round(1/model_params$dt)))) # NB, dt and steps_per_day redundant but kept for posterity
   }
   # and contact matrixes
   if (is.null(date_contact_matrix_set_change)) {
@@ -613,6 +851,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                      n_particles = n_particles,
                                      forecast_days = forecast_days,
                                      save_particles = save_particles,
+                                     full_output = full_output,
                                      return = pf_return)
 
   } else {
@@ -981,3 +1220,5 @@ plot.pmcmc_list <- function(x, burn_in = 1, ...) {
   leg = c(TRUE, FALSE, FALSE))
 
 }
+
+

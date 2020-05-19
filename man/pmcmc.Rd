@@ -2,25 +2,39 @@
 % Please edit documentation in R/pmcmc.R
 \name{pmcmc}
 \alias{pmcmc}
-\title{Run a pmcmc sampler}
+\title{Run a P MCMC Sampler within the Squire Framework}
 \usage{
 pmcmc(
   data,
   n_mcmc,
-  squire_model,
-  model_params,
-  pars_obs,
-  pars_init = list(start_date = as.Date("2020-02-07"), R0 = 2.5),
-  pars_min = list(start_date = as.Date("2020-02-01"), R0 = 0),
-  pars_max = list(start_date = as.Date("2020-02-20"), R0 = 5),
-  pars_discrete = list(start_date = TRUE, R0 = FALSE),
-  proposal_kernel,
   log_likelihood = NULL,
   log_prior = NULL,
   n_particles = 100,
   steps_per_day = 4,
   output_proposals = FALSE,
-  n_chains = 1
+  n_chains = 1,
+  squire_model,
+  pars_obs,
+  model_params,
+  pars_init = list(start_date = as.Date("2020-02-07"), R0 = 2.5, Meff = 2),
+  pars_min = list(start_date = as.Date("2020-02-01"), R0 = 0, Meff = 1),
+  pars_max = list(start_date = as.Date("2020-02-20"), R0 = 5, Meff = 3),
+  pars_discrete = list(start_date = TRUE, R0 = FALSE, Meff = FALSE),
+  proposal_kernel,
+  reporting_fraction = 1,
+  country = NULL,
+  population = NULL,
+  contact_matrix_set = NULL,
+  baseline_contact_matrix = NULL,
+  date_contact_matrix_set_change = NULL,
+  date_R0_change = NULL,
+  R0_change = NULL,
+  hosp_bed_capacity = NULL,
+  baseline_hosp_bed_capacity = NULL,
+  date_hosp_bed_capacity_change = NULL,
+  ICU_bed_capacity = NULL,
+  baseline_ICU_bed_capacity = NULL,
+  date_ICU_bed_capacity_change = NULL
 )
 }
 \arguments{
@@ -28,29 +42,6 @@ pmcmc(
 \code{particle_filter_data}}
 
 \item{n_mcmc}{number of mcmc mcmc iterations to perform}
-
-\item{squire_model}{A squire model to use}
-
-\item{model_params}{Squire model parameters. Created from a call to one of
-the \code{parameters_<type>_model} functions.}
-
-\item{pars_obs}{list of parameters to use in comparison
-with \code{compare}. Must be a list containing, e.g.
-list(phi_cases = 0.1,
-     k_cases = 2,
-     phi_death = 1,
-     k_death = 2,
-     exp_noise = 1e6)}
-
-\item{pars_init}{named list of initial inputs for parameters being sampled}
-
-\item{pars_min}{named list of lower reflecting boundaries for parameter proposals}
-
-\item{pars_max}{named list of upper reflecting boundaries for parameter proposals}
-
-\item{pars_discrete}{named list of logicals, indicating if proposed jump should be discrete}
-
-\item{proposal_kernel}{named matrix of proposal covariance for parameters}
 
 \item{log_likelihood}{function to calculate log likelihood, must take named parameter vector as input,
 allow passing of implicit arguments corresponding to the main function arguments.
@@ -63,24 +54,116 @@ Returns a named list, with entries:
 \item{log_prior}{function to calculate log prior, must take named parameter vector as input, returns a single numeric.
 If NULL, uses uninformative priors which do not affect the posterior}
 
-\item{n_particles}{Number of particles}
+\item{n_particles}{Number of particles (considered for both the PMCMC fit and sampling from posterior)}
 
 \item{steps_per_day}{Number of steps per day}
 
 \item{output_proposals}{Logical indicating whether proposed parameter jumps should be output along with results}
 
-\item{n_chains}{Number of chains to run}
+\item{n_chains}{number of chains to run}
+
+\item{squire_model}{A squire model to use}
+
+\item{pars_obs}{list of parameters to use in comparison
+with \code{compare}. Must be a list containing, e.g.
+list(phi_cases = 0.1,
+     k_cases = 2,
+     phi_death = 1,
+     k_death = 2,
+     exp_noise = 1e6)}
+
+\item{model_params}{Squire model parameters. Created from a call to one of
+the \code{parameters_<type>_model} functions.}
+
+\item{pars_init}{named list of initial inputs for parameters being sampled}
+
+\item{pars_min}{named list of lower reflecting boundaries for parameter proposals}
+
+\item{pars_max}{named list of upper reflecting boundaries for parameter proposals}
+
+\item{pars_discrete}{named list of logicals, indicating if proposed jump should be discrete}
+
+\item{proposal_kernel}{named matrix of proposal covariance for parameters}
+
+\item{reporting_fraction}{Reporting fraction. Numeric for what proportion of
+the total deaths the reported deaths represent. E.g. 0.5 results in
+the model calibrating to twice the deaths provided by \code{data$deaths}}
+
+\item{country}{Character for country beign simulated. WIll be used to
+generate \code{population} and \code{contact_matrix_set} if
+unprovided. Either \code{country} or \code{population} and
+\code{contact_matrix_set} must be provided.}
+
+\item{population}{Population vector (for each age group). Default = NULL,
+which will cause population to be sourced from \code{country}}
+
+\item{contact_matrix_set}{List of contact matrices to be used from the dates
+provided in \code{date_contact_matrix_set_change}.Must be same length as
+\code{date_contact_matrix_set_change}}
+
+\item{baseline_contact_matrix}{The starting contact matrix prior to any changes
+due to interventions or otherwise. Default = NULL, which will use the contact
+matrix associated with the coutnry provided.}
+
+\item{date_contact_matrix_set_change}{Calendar dates at which the contact matrices
+set in \code{model_params} change. Defaut = NULL, i.e. no change}
+
+\item{date_R0_change}{Calendar dates at which R0_change occurs.
+Defaut = NULL, i.e. no change in R0}
+
+\item{R0_change}{Numeric vector for relative changes in R0. Default = NULL,
+i.e. no change in R0}
+
+\item{hosp_bed_capacity}{Number of hospital beds at each date specified in
+\code{date_hosp_bed_capacity_change}. Must be same length as
+\code{date_hosp_bed_capacity_change}.}
+
+\item{baseline_hosp_bed_capacity}{The starting number of hospital beds before
+the epidemic started. Default = NULL, which will use the hospital beds data
+for the country provided. If no country is provided then this is 5/1000 of
+the population}
+
+\item{date_hosp_bed_capacity_change}{Calendar dates at which hospital bed
+capacity changes set in \code{model_params} change.
+Defaut = NULL, i.e. no change}
+
+\item{ICU_bed_capacity}{Number of ICU beds at each date specified in
+\code{date_ICU_bed_capacity_change}. Must be same length as
+\code{date_ICU_bed_capacity_change}.}
+
+\item{baseline_ICU_bed_capacity}{The starting number of ICU beds before
+the epidemic started. Default = NULL, which will use the hospital beds data
+for the country provided. If no country is provided then this is 3/100 of
+hospital beds}
+
+\item{date_ICU_bed_capacity_change}{Calendar dates at which ICU bed
+capacity changes set in \code{model_params} change.
+Defaut = NULL, i.e. no change}
 
 \item{pars_to_sample}{names of parameters to be sampled}
+
+\item{burnin}{number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories}
+
+\item{n_trajectories}{number of trajectories to be returned that are being sampled from the posterior probability results produced by \code{\link{run_mcmc_chain}}
+to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory}
 }
 \value{
-an mcmc object containing
-- List of inputs
-- Matrix of accepted parameter samples, rows = iterations
-  as well as log prior, (particle filter estimate of) log likelihood and log posterior
+\code{\link{list}}. First element (Squire_Simulation_Result) are \code{squire_model} trajectories
+  from the sampled pMCMC parameter iterations. The second element (pMCMC) is an mcmc object generated
+  from \code{pmcmc} and contains:
+  \itemize{
+    \item{inputs}{List of inputs}
+    \item{results}{Matrix of accepted parameter samples, rows = iterations
+      as well as log prior, (particle filter estimate of) log likelihood and log posterior}
+    \item{states}{Matrix of compartment states}
+    \item{acceptance_rate}{MCMC acceptance rate}
+    \item{ess}{MCMC chain effective sample size}
+      }
+  The third element (pMCMC_SampledTraj) contains the parameter values for the sampled pMCMC parameter iterations
+  used to generate the \code{squire_model} trajectories
 }
 \description{
-The user inputs initial parameter values for beta_start and sample_date
+The user inputs initial parameter values for R0, Meff, and the start date
 The log prior likelihood of these parameters is calculated based on the user-defined
 prior distributions.
 The log likelihood of the data given the initial parameters is estimated using a particle filter,
@@ -110,7 +193,11 @@ At each loop iteration the pMCMC sampler pefsorms three steps:
 
   If the proposed parameters and states are accepted then we update the current parameters and states
   to match the proposal, otherwise the previous parameters/states are retained for the next iteration.
+
+After generating the pMCMC simulation, there are \code{n_trajectories} specific iterations sampled based on the
+posterior probability. The parameters from those iterations are then used to generate new trajectories within
+the \code{squire_model} framework.
 }
 \details{
-Run a pmcmc sampler
+Run a pmcmc sampler with the Squire model setup (i.e. include the various model parameters for the odin model to generate curves)
 }
