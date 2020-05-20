@@ -17,6 +17,7 @@ calibrate(
   Meff_max = 1,
   Meff_step = 0.1,
   squire_model = explicit_model(),
+  Rt_func = function(R0_change, R0, Meff) {     exp(log(R0) - Meff * (1 - R0_change)) },
   pars_obs = NULL,
   forecast = 0,
   n_particles = 100,
@@ -74,6 +75,10 @@ on R0 and start_date}
 and max. Default = 0.1}
 
 \item{squire_model}{A squire model. Default = \code{explicit_SEIR()}}
+
+\item{Rt_func}{Function for converting R0, Meff and R0_change. Function must
+have names arguments of R0, Meff and R0_change. Default is linear relationship
+on the log scale given by \code{exp(log(R0) - Meff*(1-R0_change))}.}
 
 \item{pars_obs}{list of parameters to use for the comparison function.}
 

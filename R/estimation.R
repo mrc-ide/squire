@@ -15,6 +15,10 @@
 #'  the function arguments (excluding quantiles which are worked out based on
 #'  R0_min and R0_max), e.g. `list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))`.
 #'
+#' @param Rt_func Function for converting R0, Meff and R0_change. Function must
+#'   have names arguments of R0, Meff and R0_change. Default is linear relationship
+#'   on the log scale given by \code{exp(log(R0) - Meff*(1-R0_change))}.
+#'
 #' @param first_start_date Earliest start date as 'yyyy-mm-dd'
 #'
 #' @param last_start_date Latest start date as 'yyyy-mm-dd'
@@ -58,12 +62,13 @@ scan_R0_date <- function(
   R0_min,
   R0_max,
   R0_step,
-  R0_prior = NULL,
   first_start_date,
   last_start_date,
   day_step,
   data,
   model_params,
+  Rt_func = function(R0_change, R0, Meff){ exp(log(R0) - Meff*(1-R0_change)) },
+  R0_prior = NULL,
   R0_change = NULL,
   date_R0_change = NULL,
   date_contact_matrix_set_change = NULL,
@@ -122,6 +127,7 @@ scan_R0_date <- function(
       forecast_days = 0,
       save_particles = FALSE,
       Meff_include = FALSE,
+      Rt_func = Rt_func,
       return = "ll")
 
   } else {
@@ -142,6 +148,7 @@ scan_R0_date <- function(
       forecast_days = 0,
       save_particles = FALSE,
       Meff_include = FALSE,
+      Rt_func = Rt_func,
       .progress = TRUE,
       return = "ll")
 
@@ -191,6 +198,7 @@ scan_R0_date <- function(
                       date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                       date_hosp_bed_capacity_change = date_hosp_bed_capacity_change
                     ),
+                    Rt_func = Rt_func,
                     pars_obs = pars_obs,
                     data = data))
 
@@ -213,7 +221,11 @@ scan_R0_date <- function(
 #' @param R0_prior Prior for R0. Default = NULL, which is a flat prior. Should be
 #'  provided as a list with first argument the distribution function and the second
 #'  the function arguments (excluding quantiles which are worked out based on
-#'  R0_min and R0_max), e.g. `list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))`.
+#'  R0_min and R0_max), e.g. \code{list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))}.
+#'
+#' @param Rt_func Function for converting R0, Meff and R0_change. Function must
+#'   have names arguments of R0, Meff and R0_change. Default is linear relationship
+#'   on the log scale given by \code{exp(log(R0) - Meff*(1-R0_change))}.
 #'
 #' @param first_start_date Earliest start date as 'yyyy-mm-dd'
 #'
@@ -264,7 +276,6 @@ scan_R0_date_Meff <- function(
   R0_min,
   R0_max,
   R0_step,
-  R0_prior = NULL,
   first_start_date,
   last_start_date,
   day_step,
@@ -273,6 +284,8 @@ scan_R0_date_Meff <- function(
   Meff_step,
   data,
   model_params,
+  Rt_func = function(R0_change, R0, Meff){ exp(log(R0) - Meff*(1-R0_change)) },
+  R0_prior = NULL,
   R0_change = NULL,
   date_R0_change = NULL,
   date_contact_matrix_set_change = NULL,
@@ -286,6 +299,7 @@ scan_R0_date_Meff <- function(
 
   assert_custom_class(squire_model, "squire_model")
   assert_custom_class(model_params, "squire_parameters")
+  assert_in(names(formals(Rt_func)), c("R0_change", "R0", "Meff"))
   assert_pos(R0_min)
   assert_pos(R0_max)
   assert_numeric(Meff_max)
@@ -335,6 +349,7 @@ scan_R0_date_Meff <- function(
       forecast_days = 0,
       save_particles = FALSE,
       Meff_include = TRUE,
+      Rt_func = Rt_func,
       return = "ll")
 
   } else {
@@ -356,6 +371,7 @@ scan_R0_date_Meff <- function(
       save_particles = FALSE,
       .progress = TRUE,
       Meff_include = TRUE,
+      Rt_func = Rt_func,
       return = "ll")
 
   }
@@ -404,6 +420,7 @@ scan_R0_date_Meff <- function(
                       date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                       date_hosp_bed_capacity_change = date_hosp_bed_capacity_change
                     ),
+                    Rt_func = Rt_func,
                     pars_obs = pars_obs,
                     data = data))
 
@@ -431,6 +448,7 @@ R0_date_particle_filter <- function(R0,
                                     n_particles,
                                     Meff = 1,
                                     Meff_include = FALSE,
+                                    Rt_func = function(R0_change, R0, Meff){ exp(log(R0) - Meff*(1-R0_change)) },
                                     forecast_days = 0,
                                     save_particles = FALSE,
                                     full_output = FALSE,
@@ -492,7 +510,9 @@ R0_date_particle_filter <- function(R0,
   if (!is.null(R0_change)) {
     if (Meff_include) {
       #R0 <- c(R0, exp(log(R0) - Meff*(1-R0_change)))
-      R0 <- c(R0, R0 * R0_change * Meff)
+      R0 <- c(R0, vapply(R0_change, function(x){
+        Rt_func(R0_change = x, R0 = R0, Meff = Meff)
+        }, FUN.VALUE = numeric(1)))
     } else {
       R0 <- c(R0, R0 * R0_change)
     }
@@ -622,6 +642,7 @@ sample_grid_scan <- function(scan_results,
       date_contact_matrix_set_change = scan_results$inputs$interventions$date_contact_matrix_set_change,
       date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
       date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
+      Rt_func = scan_results$inputs$Rt_func,
       pars_obs = pars_obs,
       n_particles = n_particles,
       forecast_days = forecast_days,
@@ -642,6 +663,7 @@ sample_grid_scan <- function(scan_results,
       date_contact_matrix_set_change = scan_results$inputs$interventions$date_contact_matrix_set_change,
       date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
       date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
+      Rt_func = scan_results$inputs$Rt_func,
       pars_obs = pars_obs,
       n_particles = n_particles,
       forecast_days = forecast_days,
@@ -774,6 +796,7 @@ sample_3d_grid_scan <- function(scan_results,
       date_contact_matrix_set_change = scan_results$inputs$interventions$date_contact_matrix_set_change,
       date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
       date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
+      Rt_func = scan_results$inputs$Rt_func,
       pars_obs = pars_obs,
       n_particles = n_particles,
       forecast_days = forecast_days,
@@ -794,6 +817,7 @@ sample_3d_grid_scan <- function(scan_results,
       date_contact_matrix_set_change = scan_results$inputs$interventions$date_contact_matrix_set_change,
       date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
       date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
+      Rt_func = scan_results$inputs$Rt_func,
       pars_obs = pars_obs,
       n_particles = n_particles,
       forecast_days = forecast_days,

@@ -55,7 +55,7 @@ test_that("scan_R0_date works", {
   expect_is(scan_results, "squire_scan")
   expect_true("inputs" %in% names(scan_results))
   expect_setequal(names(scan_results$inputs),
-                  c("model", "model_params", "interventions", "pars_obs", "data"))
+                  c("model", "model_params", "interventions", "pars_obs", "data", "Rt_func"))
 
   R0_grid <- seq(R0_min, R0_max, R0_step)
   date_grid <- seq(as.Date(first_start_date), as.Date(last_start_date), day_step)
