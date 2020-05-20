@@ -1,3 +1,7 @@
+# squire 0.4.13
+
+* `calibrate` now takes an `Rt_func` argument for specifying Rt calculation
+
 # squire 0.4.12
 
 * Explicit Meff inclusion in `R0_date_particle_filter` and `projections` fix

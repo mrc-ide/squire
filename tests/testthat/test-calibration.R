@@ -455,6 +455,7 @@ test_that("calibrate 3d particle works", {
     day_step = day_step,
     squire_model = squire_model,
     pars_obs = pars_obs,
+    Rt_func = function(R0_change, R0, Meff) {R0_change*Meff*R0},
     n_particles = n_particles,
     reporting_fraction = reporting_fraction,
     R0_change = R0_change,
@@ -824,6 +825,105 @@ test_that("R0_prior", {
 
   expect_true(max(get[[1]]$y,na.rm=TRUE) > max(get[[2]]$y,na.rm=TRUE))
   expect_true(max(get[[1]]$y,na.rm=TRUE) > max(get[[3]]$y,na.rm=TRUE))
+
+})
+
+#------------------------------------------------
+test_that("Rt_func", {
+
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  replicates = 2
+  R0_min = 2.6
+  R0_max = 2.7
+  R0_step = 0.1
+  first_start_date = "2020-02-01"
+  last_start_date = "2020-02-02"
+  Meff_min = 0.6
+  Meff_max = 0.7
+  Meff_step = 0.05
+  day_step = 1
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  pars_obs = NULL
+  n_particles = 2
+
+  set.seed(93L)
+  out <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    Meff_min = 1.5,
+    Meff_max = 2.5,
+    Meff_step = 0.5,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    replicates = replicates,
+    country = country,
+    forecast = 0
+  )
+
+  out2 <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    Meff_min = 1.5,
+    Meff_max = 2.5,
+    Meff_step = 0.5,
+    Rt_func = function(R0_change, R0, Meff){R0_change*Meff*R0},
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    replicates = replicates,
+    country = country,
+    forecast = 0
+  )
+
+  out3 <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    Meff_min = Meff_min,
+    Meff_max = Meff_max,
+    Meff_step = Meff_step,
+    Rt_func = function(R0_change, R0, Meff){R0_change*Meff*R0},
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = squire_model,
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    replicates = replicates,
+    country = country,
+    forecast = 0
+  )
+
+  expect_gt(mean(out$scan_results$mat_log_ll),mean(out2$scan_results$mat_log_ll))
+  expect_gt(mean(out3$scan_results$mat_log_ll),mean(out2$scan_results$mat_log_ll))
 
 })
 
