@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.13</span>
       </span>
     </div>
 
@@ -136,6 +136,7 @@
   <span class='kw'>Meff_max</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>Meff_step</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
   <span class='kw'>squire_model</span> <span class='kw'>=</span> <span class='fu'><a href='explicit_model.html'>explicit_model</a></span>(),
+  <span class='kw'>Rt_func</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>R0_change</span>, <span class='no'>R0</span>, <span class='no'>Meff</span>) {     <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>R0</span>) - <span class='no'>Meff</span> * (<span class='fl'>1</span> - <span class='no'>R0_change</span>)) },
   <span class='kw'>pars_obs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>forecast</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>n_particles</span> <span class='kw'>=</span> <span class='fl'>100</span>,
@@ -219,6 +220,12 @@ and max. Default = 0.1</p></td>
     <tr>
       <th>squire_model</th>
       <td><p>A squire model. Default = <code>explicit_SEIR()</code></p></td>
+    </tr>
+    <tr>
+      <th>Rt_func</th>
+      <td><p>Function for converting R0, Meff and R0_change. Function must
+have names arguments of R0, Meff and R0_change. Default is linear relationship
+on the log scale given by <code><a href='https://rdrr.io/r/base/Log.html'>exp(log(R0) - Meff*(1-R0_change))</a></code>.</p></td>
     </tr>
     <tr>
       <th>pars_obs</th>

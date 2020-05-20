@@ -74,7 +74,7 @@ this up." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.13</span>
       </span>
     </div>
 
@@ -131,7 +131,6 @@ this up.</p>
   <span class='no'>R0_min</span>,
   <span class='no'>R0_max</span>,
   <span class='no'>R0_step</span>,
-  <span class='kw'>R0_prior</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>first_start_date</span>,
   <span class='no'>last_start_date</span>,
   <span class='no'>day_step</span>,
@@ -140,6 +139,8 @@ this up.</p>
   <span class='no'>Meff_step</span>,
   <span class='no'>data</span>,
   <span class='no'>model_params</span>,
+  <span class='kw'>Rt_func</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>R0_change</span>, <span class='no'>R0</span>, <span class='no'>Meff</span>) {     <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>R0</span>) - <span class='no'>Meff</span> * (<span class='fl'>1</span> - <span class='no'>R0_change</span>)) },
+  <span class='kw'>R0_prior</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>date_R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>date_contact_matrix_set_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -164,13 +165,6 @@ this up.</p>
     <tr>
       <th>R0_step</th>
       <td><p>Step to increment R0 between min and max</p></td>
-    </tr>
-    <tr>
-      <th>R0_prior</th>
-      <td><p>Prior for R0. Default = NULL, which is a flat prior. Should be
-provided as a list with first argument the distribution function and the second
-the function arguments (excluding quantiles which are worked out based on
-R0_min and R0_max), e.g. `list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))`.</p></td>
     </tr>
     <tr>
       <th>first_start_date</th>
@@ -205,6 +199,19 @@ and <code><a href='particle_filter_data.html'>particle_filter_data()</a></code><
       <th>model_params</th>
       <td><p>Squire model parameters. Created from a call to one of
 the <code>parameters_&lt;type&gt;_model</code> functions.</p></td>
+    </tr>
+    <tr>
+      <th>Rt_func</th>
+      <td><p>Function for converting R0, Meff and R0_change. Function must
+have names arguments of R0, Meff and R0_change. Default is linear relationship
+on the log scale given by <code><a href='https://rdrr.io/r/base/Log.html'>exp(log(R0) - Meff*(1-R0_change))</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>R0_prior</th>
+      <td><p>Prior for R0. Default = NULL, which is a flat prior. Should be
+provided as a list with first argument the distribution function and the second
+the function arguments (excluding quantiles which are worked out based on
+R0_min and R0_max), e.g. <code><a href='https://rdrr.io/r/base/list.html'>list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))</a></code>.</p></td>
     </tr>
     <tr>
       <th>R0_change</th>
