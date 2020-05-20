@@ -67,9 +67,7 @@ scan_R0_date <- function(
   day_step,
   data,
   model_params,
-  Rt_func = function(R0_change, R0, Meff){
-    exp(log(R0) - Meff*(1-R0_change))
-  },
+  Rt_func = function(R0_change, R0, Meff){ exp(log(R0) - Meff*(1-R0_change)) },
   R0_prior = NULL,
   R0_change = NULL,
   date_R0_change = NULL,
@@ -286,9 +284,7 @@ scan_R0_date_Meff <- function(
   Meff_step,
   data,
   model_params,
-  Rt_func = function(R0_change, R0, Meff){
-    exp(log(R0) - Meff*(1-R0_change))
-  },
+  Rt_func = function(R0_change, R0, Meff){ exp(log(R0) - Meff*(1-R0_change)) },
   R0_prior = NULL,
   R0_change = NULL,
   date_R0_change = NULL,
@@ -452,9 +448,7 @@ R0_date_particle_filter <- function(R0,
                                     n_particles,
                                     Meff = 1,
                                     Meff_include = FALSE,
-                                    Rt_func = function(R0_change, R0, Meff){
-                                      exp(log(R0) - Meff*(1-R0_change))
-                                    },
+                                    Rt_func = function(R0_change, R0, Meff){ exp(log(R0) - Meff*(1-R0_change)) },
                                     forecast_days = 0,
                                     save_particles = FALSE,
                                     full_output = FALSE,
