@@ -10,15 +10,16 @@ load("data/income_strata_healthcare_capacity.rda")
 # Run Invariant Parameters
 suppression_reduction <- 0.25
 suppression_duration <- 30
-mitigation_reduction <- 1
-max_lockdowns <- 15
-R0 <- c(2.2, 1.6, 0.5, 2.2)
-tt_R0 <- c(0, 27, 68, 98)
-replicates <- 10
-r <- run_explicit_SEEIR_model("United Kingdom")
-index <- squire:::odin_index(r$model)            # get the indices for each of the model outputs
+mitigation_reduction <- 1 * 0.66
+max_lockdowns <- 16
+R0 <- c(2.12, 1.42461, 0.8498, 1.42461)
+tt_R0 <- c(0, 29, 83, 162)
+replicates <- 50
+a <- run_explicit_SEEIR_model("United Kingdom")
+index <- squire:::odin_index(a$model)            # get the indices for each of the model outputs
 
 # Running for LIC
+set.seed(10001)
 income_strata <- "LMIC"
 trigger_threshold <- 100
 country <- "Senegal"
@@ -26,7 +27,7 @@ pop <- get_population(country)
 pop <- pop$n
 contact_matrix <- squire::get_mixing_matrix("Senegal")
 income_strata_healthcare_capacity <- squire::income_strata_healthcare_capacity
-time_period <- 720
+time_period <- 365
 dt <- 0.1
 
 LIC <- run_trigger_threshold(country = country,
@@ -58,8 +59,8 @@ LIC_lockdown <- round(apply(LIC$time_in_lockdown[1:(time_period/dt), ], 1, media
 
 LIC_z_test <- data.frame(time = LIC_time, y = LIC_y) %>%
   gather(replicate, incidence, -time)
-ggplot(LIC_z_test, aes(x = time, y = incidence, col = replicate)) +
-  geom_line()
+# ggplot(LIC_z_test, aes(x = time, y = incidence, col = replicate)) +
+#   geom_line()
 
 LIC_z <- data.frame(time = LIC_time, y = LIC_y) %>%
   gather(replicate, incidence, -time) %>%
@@ -74,6 +75,7 @@ b <- ggplot(LIC_z, aes(x = time, y = median)) +
   geom_line(col = "#7067CF", size = 1) +
   theme_bw() +
   xlab("") +
+  ylim(c(0, 200)) +
   geom_line(aes(y = LIC_icu), linetype = "dashed", size = 0.5) +
   geom_line(aes(x = tt_R0[1]), linetype = "dashed", size = 0.5) +
   geom_line(aes(x = tt_R0[2]), linetype = "dashed", size = 0.5) +
