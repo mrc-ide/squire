@@ -45,13 +45,15 @@ run_trigger_threshold <- function(country, population, income_strata,
                                   ICU_bed_capacity = ICU_bed_capacity, hosp_bed_capacity = hospital_bed_capacity,
                                   dur_get_ox_survive = 9.5,
                                   dur_get_ox_die = 7.6,
-                                  dur_not_get_ox_survive =  9.5,
-                                  dur_not_get_ox_die = 7.6,
+                                  dur_not_get_ox_survive =  4.75,
+                                  dur_not_get_ox_die = 3.8,
                                   dur_get_mv_survive = 11.3,
                                   dur_get_mv_die =  10.1,
-                                  dur_not_get_mv_survive = 11.3,
-                                  dur_not_get_mv_die = 10.1,
-                                  dur_rec = 3.4)
+                                  dur_not_get_mv_survive = 5.65,
+                                  dur_not_get_mv_die = 1,
+                                  dur_rec = 3.4,
+                                  prob_non_severe_death_treatment = c(rep(0.25, 16), 0.5804312)
+                                  )
   } else if (poorer_outcomes == TRUE) {
     r <- run_explicit_SEEIR_model(population = population,
                                   contact_matrix_set = contact_matrix_set,
@@ -159,6 +161,9 @@ run_trigger_threshold <- function(country, population, income_strata,
   return(list(model_output = out,
               time_in_lockdown = time_in_lockdown,
               index = index))
+
+
+
 }
 
 
