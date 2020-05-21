@@ -35,7 +35,9 @@ Imports:
     purrr,
     crayon,
     methods,
-    ggplot2
+    ggplot2,
+    viridis,
+    mvtnorm
 Depends: R (>= 3.1.0)
 VignetteBuilder: knitr
 Remotes:

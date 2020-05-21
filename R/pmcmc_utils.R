@@ -25,13 +25,19 @@
 
 sample_pmcmc <- function(pmcmc_results,
                          burnin = 0,
+                         n_chains,
                          n_trajectories = 10,
                          n_particles = 100,
                          forecast_days = 0) {
   #..................
   # assertions and checks
   #..................
-  assert_custom_class(pmcmc_results, "pmcmc")
+  assert_pos_int(n_chains)
+  if (n_chains == 1) {
+    assert_custom_class(pmcmc_results, "pmcmc")
+  } else {
+    assert_custom_class(pmcmc_results, "pmcmc_list")
+  }
   assert_pos_int(burnin)
   assert_pos_int(n_trajectories)
   assert_pos_int(n_particles)
@@ -40,8 +46,10 @@ sample_pmcmc <- function(pmcmc_results,
   #..................
   # sample params based on the log posterior
   #..................
-  if (burnin > 0) {
-    res <- pmcmc_results$results[(burnin + 1):nrow(pmcmc_results$results), ]
+  if (n_chains > 1) {
+    res <- create_master_chain(x = pmcmc_results, burn_in = burnin)
+  } else if (n_chains == 1 & burnin > 0) {
+    res <- pmcmc_results$results[-seq_along(burnin), ]
   } else {
     res <- pmcmc_results$results
   }
@@ -50,7 +58,12 @@ sample_pmcmc <- function(pmcmc_results,
   logpos.prob <- 1/abs(res$log_posterior) # convert to probability, larger values -- i.e. less likely values --  have less "weight"
   logpos.prob <- logpos.prob/sum(logpos.prob) # standardize
   # sample rows and then
-  params.smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob)
+  if (n_trajectories > nrow(res)) {
+    warning("Sampling more trajectories than MCMC iterations. Consider running your MCMC for longer or reducing your burnin")
+    params.smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob, replace = TRUE)
+  } else {
+    params.smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob, replace = TRUE)
+  }
   params.smpl <- res[params.smpl, !grepl("log", colnames(res))]
 
   # TODO relax this limitation?
@@ -64,7 +77,7 @@ sample_pmcmc <- function(pmcmc_results,
   #..................
   # run particle filter for trajectories
   #..................
-  message("Sampling from PMCMC Posterior...")
+  message("Sampling from pMCMC Posterior...")
 
   if (Sys.getenv("SQUIRE_PARALLEL_DEBUG") == "TRUE") {
     traces <- purrr::map(
@@ -119,11 +132,10 @@ sample_pmcmc <- function(pmcmc_results,
   out <- list("trajectories" = trajectories,
               "sampled_PMCMC_Results" = params.smpl,
               inputs = list(
-                model_params = pmcmc_results$inputs$model_params,
-                pars_obs = pmcmc_results$inputs$pars_obs,
-                data = pmcmc_results$inputs$data,
-                model = pmcmc_results$inputs$squire_model)
-  )
+                model_params = model_params,
+                pars_obs = pars_obs,
+                data = data,
+                model = squire_model))
 
   class(out) <- "sample_PMCMC"
 

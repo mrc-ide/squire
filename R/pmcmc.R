@@ -4,8 +4,6 @@
 #'
 #' @param data Data to fit to.  This must be constructed with
 #'   \code{particle_filter_data}
-#' @param model_params Squire model parameters. Created from a call to one of
-#'   the \code{parameters_<type>_model} functions.
 #' @param squire_model A squire model to use
 #' @param pars_obs list of parameters to use in comparison
 #'   with \code{compare}. Must be a list containing, e.g.
@@ -202,7 +200,6 @@ pmcmc <- function(data,
 
   # squire and odin
   assert_custom_class(squire_model, "squire_model")
-  assert_custom_class(model_params, "squire_parameters")
   assert_pos_int(steps_per_day)
   assert_numeric(reporting_fraction)
   assert_bounded(reporting_fraction, 0, 1, inclusive_left = FALSE, inclusive_right = TRUE)
@@ -348,8 +345,11 @@ pmcmc <- function(data,
   interventions <- list(R0_change = R0_change,
                         date_R0_change = date_R0_change,
                         date_contact_matrix_set_change = date_contact_matrix_set_change,
+                        contact_matrix_set = contact_matrix_set,
                         date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
-                        date_hosp_bed_capacity_change = date_hosp_bed_capacity_change)
+                        ICU_bed_capacity = ICU_bed_capacity,
+                        date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
+                        hosp_bed_capacity = hosp_bed_capacity)
 
 
   #..................
@@ -467,7 +467,7 @@ pmcmc <- function(data,
     chains_coda <- lapply(chains, function(x) {
 
       traces <- x$results
-      if('start_date' %in% pars_to_sample) {
+      if('start_date' %in% names(pars_init)) {
         traces$start_date <- start_date_to_offset(data$date[1], traces$start_date)
       }
 
@@ -482,23 +482,24 @@ pmcmc <- function(data,
     })
 
 
-    pmcmc_results <- list(inputs = chains[[1]]$inputs,
+    pmcmc <- list(inputs = chains[[1]]$inputs,
                           rhat = rhat,
                           chains = lapply(chains, '[', -1))
 
-    class(pmcmc_results) <- 'pmcmc_list'
+    class(pmcmc) <- 'pmcmc_list'
   } else {
-    pmcmc_results <- chains[[1]]
+    pmcmc <- chains[[1]]
   }
 
   #..................
   # Sample PMCMC Results
   #..................
-  pmcmc_sample_trajectories <- sample_pmcmc(pmcmc_results = pmcmc_results,
-                                            burnin = burnin,
-                                            n_trajectories = n_trajectories,
-                                            n_particles = n_particles,
-                                            forecast_days = 0)
+  pmcmc_samples <- sample_pmcmc(pmcmc_results = pmcmc,
+                                burnin = burnin,
+                                n_chains = n_chains,
+                                n_trajectories = n_trajectories,
+                                n_particles = n_particles,
+                                forecast_days = 0)
 
   #..................
   # Pull Sampled results and "recreate" squire models
@@ -515,17 +516,21 @@ pmcmc <- function(data,
                                tt_ICU_beds = tt_ICU_beds,
                                population = population,
                                replicates = 1,
-                               time_period = max(tt_contact_matrix,tt_hosp_beds,tt_ICU_beds,1),
-                               ...)
+                               time_period = max(tt_contact_matrix,tt_hosp_beds,tt_ICU_beds,1))
 
-    # first let's tidy up the pmcmc trajectories for a nice return (i.e. don't need input multiple times)
-    res <- pmcmc_sample_trajectories
-    pmcmc_sample_trajectories <- pmcmc_sample_trajectories[!grepl("input", names(pmcmc_sample_trajectories))]
-    class(pmcmc_sample_trajectories) <- "sample_PMCMC_abridged"
+    # first let's add our pmcmc results for a nice return
+    # we'll save our inputs so it is easy to recreate later
+    r$pmcmc_sample_inputs <- pmcmc_samples$inputs
+    # and add the parameters that changed between each simulation, i.e. posterior draws
+    r$trajectory_parameters <- res$sampled_PMCMC_Results
+    # as well as adding the pmcmc chains so it's easy to draw from the chains again in the future
+    r$pmcmc_results <- pmcmc
+
+
     # then let's create the output that we are going to use
-    names(res)[names(res) == "trajectories"] <- "output"
-    dimnames(res$output) <- list(dimnames(res$output)[[1]], dimnames(r$output)[[2]], NULL)
-    r$output <- res$output
+    names(pmcmc_samples)[names(pmcmc_samples) == "trajectories"] <- "output"
+    dimnames(pmcmc_samples$output) <- list(dimnames(pmcmc_samples$output)[[1]], dimnames(r$output)[[2]], NULL)
+    r$output <- pmcmc_samples$output
 
     # and adjust the time as before
     full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
@@ -545,17 +550,11 @@ pmcmc <- function(data,
   }
 
   # second let's recreate the output
-  r$model <- res$inputs$model$odin_model(
-    user = res$inputs$model_params, unused_user_action = "ignore"
+  r$model <- pmcmc_samples$inputs$model$odin_model(
+    user = pmcmc_samples$inputs$model_params, unused_user_action = "ignore"
   )
   # we will add the interventions here so that we know what times are needed for projection
   r$interventions <- interventions
-
-  # as well as adding the scan_results so it's easy to draw from the scan again in the future
-  r$pmcmc_results <- pmcmc_results
-
-  # and add the parameters that changed between each simulation, i.e. drawn from gris
-  r$trajectory_parameters <- res$sampled_PMCMC_Results
 
   # and fix the replicates
   r$parameters$replicates <- n_trajectories
@@ -564,16 +563,9 @@ pmcmc <- function(data,
   #..............................................................
   # larger output
   #..............................................................
-  out <- list(
-    Squire_Simulation_Result = r,
-    pMCMC = pmcmc_results,
-    pMCMC_SampledTraj = pmcmc_sample_trajectories
-  )
-  return(out)
+  class(r)
+  return(r)
 }
-
-
-
 
 
 
@@ -587,6 +579,7 @@ run_mcmc_chain <- function(inputs,
                            first_data_date,
                            output_proposals) {
 
+  message("Running pMCMC...")
   #..................
   # Set initial state
   #..................
@@ -787,6 +780,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   #..................
   # setup model based on inputs and interventions
   #..................
+  R0_change <- interventions$R0_change
   date_R0_change <- interventions$date_R0_change
   date_contact_matrix_set_change <- interventions$date_contact_matrix_set_change
   date_ICU_bed_capacity_change <- interventions$date_ICU_bed_capacity_change
@@ -905,326 +899,5 @@ reflect_proposal <- function(x, floor, cap) {
 }
 
 
-
-#..............................................................
-# Collect & Summarize MCMC Runs
-#..............................................................
-
-#' @title create a master chain from a pmcmc_list object
-#' @param x a pmcmc_list object
-#' @param burn_in an integer denoting the number of samples to discard from each chain
-#' @export
-#'
-create_master_chain <- function(x, burn_in) {
-
-  if(class(x) != 'pmcmc_list') {
-    stop('x must be a pmcmc_list object')
-  }
-  if(!is.numeric(burn_in)) {
-    stop('burn_in must be an integer')
-  }
-  if(burn_in < 0) {
-    stop('burn_in must not be negative')
-  }
-  if(burn_in >= x$inputs$n_mcmc) {
-    stop('burn_in is greater than chain length')
-  }
-
-  chains <- lapply(
-    X = x$chains,
-    FUN = function(z) z$results[-seq_len(burn_in), ]
-  )
-
-  do.call(what = rbind, args = chains)
-}
-
-
-#' @export
-#' @importFrom stats cor sd
-summary.pmcmc <- function(object, ...) {
-
-  par_names <- names(object$inputs$pars$pars_init)
-
-  ## convert start_date to numeric to calculate stats
-  data_start_date <- as.Date(object$inputs$data$date[1])
-  traces <- object$results[,par_names]
-  traces$start_date <- start_date_to_offset(data_start_date, traces$start_date)
-
-  # calculate correlation matrix
-  corr_mat <- round(cor(traces),2)
-
-  # add in reduction in beta parameter
-  if('beta_end' %in% par_names) {
-    traces <- cbind(traces,
-                    beta_red = traces$beta_end/traces$beta_start)
-  }
-
-  # compile summary
-  summ <- rbind(mean = colMeans(traces),
-                apply(traces, MARGIN = 2, quantile, c(0.025, 0.975)),
-                min = apply(traces, MARGIN = 2, min),
-                max =  apply(traces, MARGIN = 2, max)
-  )
-  summ <- as.data.frame(summ)
-  summ <- round(summ, 3)
-
-  sds <- round(apply(traces, 2, sd), 3)
-  # convert start_date back into dates
-  summ$start_date <- as.Date(-summ$start_date, data_start_date)
-  summ[c('2.5%', '97.5%', 'min', 'max'), 'start_date'] <- summ[c('97.5%', '2.5%', 'max', 'min'), 'start_date']
-
-  out <- list('summary' = summ,
-              'corr_mat' = corr_mat,
-              'sd' = sds)
-  out
-
-}
-
-#' @export
-summary.pmcmc_list <- function(object, ..., burn_in = 101) {
-
-  master_chain <- create_master_chain(x = object,
-                                      burn_in = burn_in)
-
-  z <- list(inputs = object$inputs,
-            results = master_chain)
-  summary.pmcmc(z)
-
-}
-
-
-#' @export
-#' @importFrom viridis cividis
-#' @importFrom graphics hist par plot.new text
-plot.pmcmc <- function(x, ...) {
-
-  summ <- summary(x)
-  par_names <- names(x$inputs$pars$pars_init)
-
-  traces <- x$results[, par_names]
-  cols <- viridis::cividis(nrow(traces))
-  cols <- cols[order(order(x$results$log_likelihood))]
-
-
-
-  par_name <- 'beta_start'
-  print_summ <- function(par_name) {
-    x <- summ$summary
-    paste0(x['mean', par_name],
-           '\n(',
-           x['2.5%', par_name],
-           ', ',
-           x['97.5%', par_name], ')')
-  }
-
-
-
-  n_pars <- length(par_names)
-
-
-  par( bty = 'n',
-       mfcol = c(n_pars, n_pars + 1L),
-       mar = c(3,3,2,1),
-       mgp = c(1.5, 0.5, 0),
-       oma = c(1,1,1,1))
-
-
-  for (i in seq_len(n_pars)) {
-    for(j in seq_len(n_pars)) {
-
-      if (i == j) { # plot hists on diagonal
-        par_name <- par_names[i]
-        breaks = ifelse(par_name == 'start_date',
-                        yes = seq(as.Date('2019-12-01'),
-                                  as.Date(x$inputs$data$date[1]), 7),
-                        no = 10)
-        hist(traces[[i]],
-             main = print_summ(par_name),
-             xlab = par_name,
-             breaks = breaks,
-             cex.main = 1,
-             font.main = 1,
-             freq = FALSE)
-      } else if (i < j) {  # plot correlations on lower triangle
-        plot(x = traces[[i]],
-             y = traces[[j]],
-             xlab = par_names[i],
-             ylab = par_names[j],
-             col = cols,
-             pch = 20)
-      } else if (i > j) { # print rho on upper triangle
-        plot.new()
-        text(x = 0.5,
-             y=0.5,
-             labels = paste('r =',
-                            summ$corr_mat[i, j]))
-      }
-    }
-  }
-
-  # print traces in final column
-  mapply(FUN = plot, traces,
-         type = 'l',
-         ylab = par_names,
-         xlab = "Iteration")
-
-
-}
-
-#' @export
-#' @importFrom viridis cividis
-#' @importFrom graphics hist par plot.new text lines legend
-#'
-plot.pmcmc_list <- function(x, burn_in = 1, ...) {
-
-  summ <- summary(x, burn_in = burn_in)
-  par_names <- names(x$inputs$pars$pars_init)
-  n_pars <- length(par_names)
-
-  chains <- x$chains
-  n_chains <- length(chains)
-  cols_trace <- rev(viridis::viridis(n_chains))
-
-
-  # compile master chain and order by log posterior for plotting
-  master_chain <- create_master_chain(x, burn_in = burn_in)
-
-  master_chain <- master_chain[order(master_chain$log_posterior), ]
-  cols <- viridis::cividis(nrow(master_chain))
-  cols <- cols[order(master_chain$log_posterior)]
-
-
-
-
-  traces <- lapply(par_names, FUN = function(par_name) {
-    lapply(X = chains,
-           FUN = function(z) z$results[-seq_len(burn_in), par_name])
-  })
-  names(traces) <- par_names
-
-  plot_traces <- function(trace, col) {
-    lines(x = seq_along(trace),
-          y = trace,
-          col = col)
-  }
-
-
-
-  breaks <- lapply(par_names, function(par_name){
-    seq(from = min(master_chain[, par_name]),
-        to =  max(master_chain[, par_name]),
-        length.out = 20)
-  })
-  names(breaks) <- par_names
-
-  hists <- lapply(par_names, FUN = function(par_name) {
-    lapply(X = traces[[par_name]],
-           FUN = hist,
-           plot = FALSE,
-           breaks = breaks[[par_name]])
-  })
-  names(hists) <- par_names
-
-  hist_ylim <- lapply(hists, function(h) {
-    chain_max <- sapply(h, function(chain) max(chain$density) )
-    c(0, max(chain_max))
-  })
-
-  plot_hists <- function(h, col, breaks) {
-    with(h, lines(x =  breaks,
-                  y = c(density,
-                        density[length(density)]),
-                  type = 's',
-                  col = col))
-  }
-
-
-  print_summ <- function(par_name) {
-    x <- summ$summary
-    paste0(x['mean', par_name],
-           '\n(',
-           x['2.5%', par_name],
-           ', ',
-           x['97.5%', par_name], ')')
-  }
-
-
-  par( bty = 'n',
-       mfcol = c(n_pars, n_pars + 1L),
-       mar = c(3,3,2,1),
-       mgp = c(1.5, 0.5, 0),
-       oma = c(1,1,1,1))
-
-
-  for (i in seq_len(n_pars)) {
-    for(j in seq_len(n_pars)) {
-
-      if (i == j) { # plot hists on diagonal
-        par_name <- par_names[i]
-        bs <- breaks[[par_name]]
-        plot(x = bs[1] ,  # force date axis where needed
-             y = 1,
-             type = 'n',
-             xlim = c(bs[1], bs[length(bs)]),
-             ylim = hist_ylim[[par_name]],
-             xlab = par_name,
-             ylab = '',
-             main = print_summ(par_name),
-             cex.main = 1,
-             font.main = 1
-        )
-
-        mapply(FUN = plot_hists,
-               h = hists[[par_name]],
-               breaks = bs,
-               col = cols_trace)
-
-
-      } else if (i < j) {  # plot correlations on lower triangle
-        plot(x = master_chain[[i]],
-             y = master_chain[[j]],
-             xlab = par_names[i],
-             ylab = par_names[j],
-             col = cols,
-             pch = 20)
-      } else if (i > j) { # print rho on upper triangle
-        plot.new()
-        text(x = 0.5,
-             y=0.5,
-             labels = paste('r =',
-                            summ$corr_mat[i, j]))
-      }
-    }
-  }
-
-
-  # print traces in final column
-  n_iter <- nrow(master_chain) / n_chains
-
-  mapply(FUN = function(par_name, leg) {
-    plot(x = 1,
-         y = breaks[[par_name]][1],
-         type = 'n',
-         xlab = 'Iteration',
-         ylab = par_name,
-         xlim = c(0, n_iter),
-         ylim <- range(master_chain[, par_name]))
-
-    mapply(FUN = plot_traces,
-           trace = traces[[par_name]],
-           col = cols_trace)
-
-    if(leg) {
-      legend('top',
-             ncol = n_chains,
-             legend = paste('Chain', seq_len(n_chains)),
-             fill = cols_trace,
-             bty = 'n')
-    }
-  },
-  par_name = par_names,
-  leg = c(TRUE, FALSE, FALSE))
-
-}
 
 
