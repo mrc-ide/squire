@@ -101,9 +101,12 @@ pmcmc <- function(data,
                   steps_per_day = 4,
                   output_proposals = FALSE,
                   n_chains = 1,
-                  squire_model,
-                  pars_obs,
-                  model_params,
+                  squire_model = explicit_model(),
+                  pars_obs = list(phi_cases = 0.1,
+                                  k_cases = 2,
+                                  phi_death = 1,
+                                  k_death = 2,
+                                  exp_noise = 1e6),
                   pars_init = list('start_date'     = as.Date("2020-02-07"),
                                    'R0'             = 2.5,
                                    'Meff'           = 2),
@@ -116,7 +119,7 @@ pmcmc <- function(data,
                   pars_discrete = list('start_date' = TRUE,
                                        'R0'         = FALSE,
                                        'Meff'       = FALSE),
-                  proposal_kernel,
+                  proposal_kernel = NULL,
                   reporting_fraction = 1,
                   country = NULL,
                   population = NULL,
@@ -130,7 +133,9 @@ pmcmc <- function(data,
                   date_hosp_bed_capacity_change = NULL,
                   ICU_bed_capacity = NULL,
                   baseline_ICU_bed_capacity = NULL,
-                  date_ICU_bed_capacity_change = NULL
+                  date_ICU_bed_capacity_change = NULL,
+                  burnin = 0,
+                  n_trajectories = 100
 ) {
 
   #..................
@@ -201,6 +206,7 @@ pmcmc <- function(data,
   assert_pos_int(steps_per_day)
   assert_numeric(reporting_fraction)
   assert_bounded(reporting_fraction, 0, 1, inclusive_left = FALSE, inclusive_right = TRUE)
+
   #TODO talk to OJ about country vs. explicit model vs. population
   assert_string(country)
   #assert_numeric(population)
