@@ -37,18 +37,26 @@
 #' @param n_trajectories number of trajectories to be returned that are being sampled from the posterior probability results produced by \code{\link{run_mcmc_chain}}
 #' to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory
 #'
-#' @return \code{\link{list}}. First element (Squire_Simulation_Result) are \code{squire_model} trajectories
-#'   from the sampled pMCMC parameter iterations. The second element (pMCMC) is an mcmc object generated
-#'   from \code{pmcmc} and contains:
+#' @return \code{squire_simulation}. First element \code{output}, are trajectories
+#'   from the sampled pMCMC parameter iterations. The second element \code{parameters} are the model parameters
+#'   used fro squire. The third element \code{model} is the squire model used. The fourth element,
+#'    \code{pmcmc_sample_inputs) are inputs into the squire model for the pMCMC. The fifth element
+#'     (pMCMC_results) is an mcmc object generated from \code{pmcmc} and contains:
 #'   \itemize{
 #'     \item{inputs}{List of inputs}
-#'     \item{results}{Matrix of accepted parameter samples, rows = iterations
-#'       as well as log prior, (particle filter estimate of) log likelihood and log posterior}
-#'     \item{states}{Matrix of compartment states}
-#'     \item{acceptance_rate}{MCMC acceptance rate}
-#'     \item{ess}{MCMC chain effective sample size}
-#'       }
-#'   The third element (pMCMC_SampledTraj) contains the parameter values for the sampled pMCMC parameter iterations
+#'     \item{chains}{List that include:
+#'         \itemize{
+#'             \item{results}{Matrix of accepted parameter samples, rows = iterations
+#'             as well as log prior, (particle filter estimate of) log likelihood and log posterior}
+#'            \item{states}{Matrix of compartment states}
+#'            \item{acceptance_rate}{MCMC acceptance rate}
+#'            \item{ess}{MCMC chain effective sample size}
+#'         }
+#'      }
+#'      \item{rhat}{MCMC Diagnostics}
+#'     }
+#'  The sixth element \code{interventions} contains the interventions that can be called with projections. The
+#'  seventh  element (trajectory_parameters) contains the parameter values for the sampled pMCMC parameter iterations
 #'   used to generate the \code{squire_model} trajectories
 #'
 #' @description The user inputs initial parameter values for R0, Meff, and the start date
@@ -220,8 +228,8 @@ pmcmc <- function(data,
     if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_R0_change is greater than the last date in data")
     }
-    if(as.Date(last_start_date) >= as.Date(head(date_R0_change, 1))) {
-      stop("First date in date_R0_change is earlier than last_start_date")
+    if(as.Date(pars_max$start_date) >= as.Date(head(date_R0_change, 1))) {
+      stop("First date in date_R0_change is earlier than maximum start date allowed in pars search")
     }
   }
 
@@ -230,8 +238,20 @@ pmcmc <- function(data,
     if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_R0_change is greater than the last date in data")
     }
-    if(as.Date(last_start_date) >= as.Date(head(date_R0_change, 1))) {
-      stop("First date in date_R0_change is earlier than last_start_date")
+    if(as.Date(pars_max$start_date) >= as.Date(head(date_R0_change, 1))) {
+      stop("First date in date_R0_change is earlier than maximum start date allowed in pars search")
+    }
+  }
+
+  # catch that if date_R0_change isn't set, Meff isn't doing anything -- not to confuse user
+  if(is.null(date_R0_change)) {
+    if (pars_min[["Meff"]] != 1 & pars_max[["Meff"]] != 1 & pars_init[["Meff"]] != 1) {
+      stop("Without an R0 date change, Meff is not being used. Set Meff to 1 in all pars lists")
+    } else {
+      # this slight tweak, so it still works with reflect proposal but won't move since it's not being estimated
+      pars_min[["Meff"]] <- pars_min[["Meff"]] - 1e-10
+      pars_max[["Meff"]] <- pars_max[["Meff"]] + 1e-10
+      pars_discrete[["Meff"]] <- TRUE
     }
   }
 
@@ -255,7 +275,7 @@ pmcmc <- function(data,
       stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
     }
     if(as.Date(pars_max$start_date) >= as.Date(head(date_contact_matrix_set_change, 1))) {
-      stop("First date in date_contact_matrix_set_change is earlier than maximum start date of epidemic")
+      stop("First date in date_contact_matrix_set_change is earlier than maximum start date allowed in pars search")
     }
 
     # Get in correct format
@@ -483,8 +503,8 @@ pmcmc <- function(data,
 
 
     pmcmc <- list(inputs = chains[[1]]$inputs,
-                          rhat = rhat,
-                          chains = lapply(chains, '[', -1))
+                  rhat = rhat,
+                  chains = lapply(chains, '[', -1))
 
     class(pmcmc) <- 'pmcmc_list'
   } else {
@@ -522,7 +542,7 @@ pmcmc <- function(data,
     # we'll save our inputs so it is easy to recreate later
     r$pmcmc_sample_inputs <- pmcmc_samples$inputs
     # and add the parameters that changed between each simulation, i.e. posterior draws
-    r$trajectory_parameters <- res$sampled_PMCMC_Results
+    r$trajectory_parameters <- pmcmc_samples$sampled_PMCMC_Results
     # as well as adding the pmcmc chains so it's easy to draw from the chains again in the future
     r$pmcmc_results <- pmcmc
 
@@ -545,7 +565,29 @@ pmcmc <- function(data,
     }
 
   } else if (inherits(squire_model, "deterministic")) {
-    r <- list("output" = pmcmc_sample_trajectories$trajectories)
+
+    # as above fix trajectories
+    r <- list()
+    names(pmcmc_samples)[names(pmcmc_samples) == "trajectories"] <- "output"
+    dimnames(pmcmc_samples$output) <- list(dimnames(pmcmc_samples$output)[[1]], dimnames(r$output)[[2]], NULL)
+    r$output <- pmcmc_samples$output
+
+    # and adjust the time as before
+    full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
+    saved_full <- r$output[,"time",full_row]
+    for(i in seq_len(n_trajectories)) {
+      na_pos <- which(is.na(r$output[,"time",i]))
+      full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
+      if(length(na_pos) > 0) {
+        full_to_place[na_pos] <- NA
+      }
+      r$output[,"time",i] <- full_to_place
+    }
+
+    # same as above, add in pmcmc items
+    r$pmcmc_sample_inputs <- pmcmc_samples$inputs
+    r$trajectory_parameters <- pmcmc_samples$sampled_PMCMC_Results
+    r$pmcmc_results <- pmcmc
     r <- structure(r, class = "squire_simulation")
   }
 
@@ -560,10 +602,9 @@ pmcmc <- function(data,
   r$parameters$replicates <- n_trajectories
   r$parameters$time_period <- as.numeric(diff(as.Date(range(rownames(r$output)))))
 
-  #..............................................................
-  # larger output
-  #..............................................................
-  class(r)
+  #......................
+  # out
+  #......................
   return(r)
 }
 
@@ -615,8 +656,6 @@ run_mcmc_chain <- function(inputs,
   }
   assert_neg(x = p_filter_est$log_likelihood,
              message1 = 'log_likelihood must be negative or zero')
-  assert_pos(p_filter_est$sample_state,
-             message1 = 'sample_state must be a vector of non-negative numbers')
 
   #..................
   # Create objects to store outputs
@@ -854,22 +893,66 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                      full_output = full_output,
                                      return = pf_return)
 
-  } else {
-    if (pf_return == "single") {
-      stop("Deterministic approach does not support single particle filter return")
-    } #TODO work around this?
+  } else if (inherits(squire_model, "deterministic")) {
 
-    pf_result <- run_deterministic_comparison(data = data,
-                                              squire_model = squire_model,
-                                              model_params = model_params,
-                                              model_start_date = start_date,
-                                              obs_params = pars_obs,
-                                              forecast_days = forecast_days,
-                                              save_history = save_particles,
-                                              return = pf_return)
-
+    # a bit of an ugly work-around to keep pMCMC sample state and log-likelihood framework consistent
+    # with scan results as well
+    # need states for pMCMC
+    switch(pf_return,
+           "single"={
+             pf_result <- list()
+             pf_result$log_likelihood <- run_deterministic_comparison(data = data,
+                                                                      squire_model = squire_model,
+                                                                      model_params = model_params,
+                                                                      model_start_date = start_date,
+                                                                      obs_params = pars_obs,
+                                                                      forecast_days = forecast_days,
+                                                                      save_history = FALSE,
+                                                                      return = "ll")
+             # need states for pMCMC
+             pf_result$sample_state <- run_deterministic_comparison(data = data,
+                                                                    squire_model = squire_model,
+                                                                    model_params = model_params,
+                                                                    model_start_date = start_date,
+                                                                    obs_params = pars_obs,
+                                                                    forecast_days = forecast_days,
+                                                                    save_history = TRUE,
+                                                                    return = "single")
+           },
+           "full" = {
+             pf_result <- run_deterministic_comparison(data = data,
+                                                       squire_model = squire_model,
+                                                       model_params = model_params,
+                                                       model_start_date = start_date,
+                                                       obs_params = pars_obs,
+                                                       forecast_days = forecast_days,
+                                                       save_history = TRUE,
+                                                       return = "full")
+           },
+           "ll" = {
+             pf_result$log_likelihood <- run_deterministic_comparison(data = data,
+                                                                      squire_model = squire_model,
+                                                                      model_params = model_params,
+                                                                      model_start_date = start_date,
+                                                                      obs_params = pars_obs,
+                                                                      forecast_days = forecast_days,
+                                                                      save_history = FALSE,
+                                                                      return = "ll")
+           },
+           "sample" = {
+             pf_result <- run_deterministic_comparison(data = data,
+                                                       squire_model = squire_model,
+                                                       model_params = model_params,
+                                                       model_start_date = start_date,
+                                                       obs_params = pars_obs,
+                                                       forecast_days = forecast_days,
+                                                       save_history = TRUE,
+                                                       return = "sample")
+           }
+    )
   }
 
+  # out
   pf_result
 }
 

@@ -62,7 +62,7 @@ sample_pmcmc <- function(pmcmc_results,
     warning("Sampling more trajectories than MCMC iterations. Consider running your MCMC for longer or reducing your burnin")
     params.smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob, replace = TRUE)
   } else {
-    params.smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob, replace = TRUE)
+    params.smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob, replace = FALSE)
   }
   params.smpl <- res[params.smpl, !grepl("log", colnames(res))]
 
@@ -132,10 +132,11 @@ sample_pmcmc <- function(pmcmc_results,
   out <- list("trajectories" = trajectories,
               "sampled_PMCMC_Results" = params.smpl,
               inputs = list(
-                model_params = model_params,
-                pars_obs = pars_obs,
-                data = data,
-                model = squire_model))
+                model = pmcmc_results$inputs$squire_model,
+                model_params = pmcmc_results$inputs$model_params,
+                interventions = pmcmc_results$inputs$interventions,
+                data = pmcmc_results$inputs$data,
+                pars_obs = pmcmc_results$inputs$pars_obs))
 
   class(out) <- "sample_PMCMC"
 
