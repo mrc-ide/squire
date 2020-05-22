@@ -36,6 +36,7 @@
 #' @param burnin number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories
 #' @param n_trajectories number of trajectories to be returned that are being sampled from the posterior probability results produced by \code{\link{run_mcmc_chain}}
 #' to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory
+#' @param forecast Number of days to forecast forward. Default = 0
 #'
 #' @return \code{squire_simulation}. First element \code{output}, are trajectories
 #'   from the sampled pMCMC parameter iterations. The second element \code{parameters} are the model parameters
@@ -44,7 +45,7 @@
 #'     (pMCMC_results) is an mcmc object generated from \code{pmcmc} and contains:
 #'   \itemize{
 #'     \item{inputs}{List of inputs}
-#'     \item{chains}{List that include:
+#'     \item{chains}{List that include}:
 #'         \itemize{
 #'             \item{results}{Matrix of accepted parameter samples, rows = iterations
 #'             as well as log prior, (particle filter estimate of) log likelihood and log posterior}
@@ -141,7 +142,8 @@ pmcmc <- function(data,
                   baseline_ICU_bed_capacity = NULL,
                   date_ICU_bed_capacity_change = NULL,
                   burnin = 0,
-                  n_trajectories = 100
+                  n_trajectories = 100,
+                  forecast = 0
 ) {
 
   #..................
@@ -506,9 +508,10 @@ pmcmc <- function(data,
                   rhat = rhat,
                   chains = lapply(chains, '[', -1))
 
-    class(pmcmc) <- 'pmcmc_list'
+    class(pmcmc) <- 'squire_pmcmc_list'
   } else {
     pmcmc <- chains[[1]]
+    class(pmcmc) <- "squire_pmcmc"
   }
 
   #..................
@@ -519,7 +522,7 @@ pmcmc <- function(data,
                                 n_chains = n_chains,
                                 n_trajectories = n_trajectories,
                                 n_particles = n_particles,
-                                forecast_days = 0)
+                                forecast_days = forecast)
 
   #..................
   # Pull Sampled results and "recreate" squire models
@@ -765,7 +768,6 @@ run_mcmc_chain <- function(inputs,
     out$proposals <- proposals
   }
 
-  class(out) <- 'pmcmc'
   out
 
 }
@@ -906,7 +908,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                                                       model_params = model_params,
                                                                       model_start_date = start_date,
                                                                       obs_params = pars_obs,
-                                                                      forecast_days = forecast_days,
+                                                                      forecast_days = 0,
                                                                       save_history = FALSE,
                                                                       return = "ll")
              # need states for pMCMC
@@ -915,7 +917,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                                                     model_params = model_params,
                                                                     model_start_date = start_date,
                                                                     obs_params = pars_obs,
-                                                                    forecast_days = forecast_days,
+                                                                    forecast_days = forecast,
                                                                     save_history = TRUE,
                                                                     return = "single")
            },
@@ -925,7 +927,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                                        model_params = model_params,
                                                        model_start_date = start_date,
                                                        obs_params = pars_obs,
-                                                       forecast_days = forecast_days,
+                                                       forecast_days = forecast,
                                                        save_history = TRUE,
                                                        return = "full")
            },
@@ -935,7 +937,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                                                       model_params = model_params,
                                                                       model_start_date = start_date,
                                                                       obs_params = pars_obs,
-                                                                      forecast_days = forecast_days,
+                                                                      forecast_days = 0,
                                                                       save_history = FALSE,
                                                                       return = "ll")
            },
@@ -945,7 +947,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                                        model_params = model_params,
                                                        model_start_date = start_date,
                                                        obs_params = pars_obs,
-                                                       forecast_days = forecast_days,
+                                                       forecast_days = forecast,
                                                        save_history = TRUE,
                                                        return = "sample")
            }

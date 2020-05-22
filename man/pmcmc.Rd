@@ -13,14 +13,14 @@ pmcmc(
   steps_per_day = 4,
   output_proposals = FALSE,
   n_chains = 1,
-  squire_model,
-  pars_obs,
-  model_params,
+  squire_model = explicit_model(),
+  pars_obs = list(phi_cases = 0.1, k_cases = 2, phi_death = 1, k_death = 2, exp_noise =
+    1e+06),
   pars_init = list(start_date = as.Date("2020-02-07"), R0 = 2.5, Meff = 2),
   pars_min = list(start_date = as.Date("2020-02-01"), R0 = 0, Meff = 1),
   pars_max = list(start_date = as.Date("2020-02-20"), R0 = 5, Meff = 3),
   pars_discrete = list(start_date = TRUE, R0 = FALSE, Meff = FALSE),
-  proposal_kernel,
+  proposal_kernel = NULL,
   reporting_fraction = 1,
   country = NULL,
   population = NULL,
@@ -34,7 +34,9 @@ pmcmc(
   date_hosp_bed_capacity_change = NULL,
   ICU_bed_capacity = NULL,
   baseline_ICU_bed_capacity = NULL,
-  date_ICU_bed_capacity_change = NULL
+  date_ICU_bed_capacity_change = NULL,
+  burnin = 0,
+  n_trajectories = 100
 )
 }
 \arguments{
@@ -71,9 +73,6 @@ list(phi_cases = 0.1,
      phi_death = 1,
      k_death = 2,
      exp_noise = 1e6)}
-
-\item{model_params}{Squire model parameters. Created from a call to one of
-the \code{parameters_<type>_model} functions.}
 
 \item{pars_init}{named list of initial inputs for parameters being sampled}
 
@@ -140,26 +139,34 @@ hospital beds}
 capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
 
-\item{pars_to_sample}{names of parameters to be sampled}
-
 \item{burnin}{number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories}
 
 \item{n_trajectories}{number of trajectories to be returned that are being sampled from the posterior probability results produced by \code{\link{run_mcmc_chain}}
 to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory}
+
+\item{pars_to_sample}{names of parameters to be sampled}
 }
 \value{
-\code{\link{list}}. First element (Squire_Simulation_Result) are \code{squire_model} trajectories
-  from the sampled pMCMC parameter iterations. The second element (pMCMC) is an mcmc object generated
-  from \code{pmcmc} and contains:
+\code{squire_simulation}. First element \code{output}, are trajectories
+  from the sampled pMCMC parameter iterations. The second element \code{parameters} are the model parameters
+  used fro squire. The third element \code{model} is the squire model used. The fourth element,
+   \code{pmcmc_sample_inputs) are inputs into the squire model for the pMCMC. The fifth element
+    (pMCMC_results) is an mcmc object generated from \code{pmcmc} and contains:
   \itemize{
     \item{inputs}{List of inputs}
-    \item{results}{Matrix of accepted parameter samples, rows = iterations
-      as well as log prior, (particle filter estimate of) log likelihood and log posterior}
-    \item{states}{Matrix of compartment states}
-    \item{acceptance_rate}{MCMC acceptance rate}
-    \item{ess}{MCMC chain effective sample size}
-      }
-  The third element (pMCMC_SampledTraj) contains the parameter values for the sampled pMCMC parameter iterations
+    \item{chains}{List that include}:
+        \itemize{
+            \item{results}{Matrix of accepted parameter samples, rows = iterations
+            as well as log prior, (particle filter estimate of) log likelihood and log posterior}
+           \item{states}{Matrix of compartment states}
+           \item{acceptance_rate}{MCMC acceptance rate}
+           \item{ess}{MCMC chain effective sample size}
+        }
+     }
+     \item{rhat}{MCMC Diagnostics}
+    }
+ The sixth element \code{interventions} contains the interventions that can be called with projections. The
+ seventh  element (trajectory_parameters) contains the parameter values for the sampled pMCMC parameter iterations
   used to generate the \code{squire_model} trajectories
 }
 \description{

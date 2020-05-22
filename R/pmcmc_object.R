@@ -80,8 +80,8 @@ plot_pmcmc_sample  <- function(x, what = "deaths") {
 #'
 create_master_chain <- function(x, burn_in) {
 
-  if(class(x) != 'pmcmc_list') {
-    stop('x must be a pmcmc_list object')
+  if(class(x) != 'squire_pmcmc_list') {
+    stop('x must be a squire_pmcmc_list object')
   }
   if(!is.numeric(burn_in)) {
     stop('burn_in must be an integer')
@@ -107,7 +107,7 @@ create_master_chain <- function(x, burn_in) {
 
 #' @export
 #' @importFrom stats cor sd
-summary.pmcmc <- function(object, ...) {
+summary.squire_pmcmc <- function(object, ...) {
 
   par_names <- names(object$inputs$pars$pars_init)
 
@@ -141,7 +141,7 @@ summary.pmcmc <- function(object, ...) {
 }
 
 #' @export
-summary.pmcmc_list <- function(object, ..., burn_in = 101) {
+summary.squire_pmcmc_list <- function(object, ..., burn_in = 101) {
 
   master_chain <- create_master_chain(x = object,
                                       burn_in = burn_in)
@@ -156,7 +156,7 @@ summary.pmcmc_list <- function(object, ..., burn_in = 101) {
 #' @export
 #' @importFrom viridis cividis
 #' @importFrom graphics hist par plot.new text
-plot.pmcmc <- function(x, ...) {
+plot.squire_pmcmc <- function(x, ...) {
 
   summ <- summary(x)
   par_names <- names(x$inputs$pars$pars_init)
@@ -232,7 +232,7 @@ plot.pmcmc <- function(x, ...) {
 #' @importFrom viridis cividis
 #' @importFrom graphics hist par plot.new text lines legend
 #'
-plot.pmcmc_list <- function(x, burn_in = 1, ...) {
+plot.squire_pmcmc_list <- function(x, burn_in = 1, ...) {
 
   summ <- summary(x, burn_in = burn_in)
   par_names <- names(x$inputs$pars$pars_init)

@@ -34,9 +34,9 @@ sample_pmcmc <- function(pmcmc_results,
   #..................
   assert_pos_int(n_chains)
   if (n_chains == 1) {
-    assert_custom_class(pmcmc_results, "pmcmc")
+    assert_custom_class(pmcmc_results, "squire_pmcmc")
   } else {
-    assert_custom_class(pmcmc_results, "pmcmc_list")
+    assert_custom_class(pmcmc_results, "squire_pmcmc_list")
   }
   assert_pos_int(burnin)
   assert_pos_int(n_trajectories)
@@ -138,7 +138,7 @@ sample_pmcmc <- function(pmcmc_results,
                 data = pmcmc_results$inputs$data,
                 pars_obs = pmcmc_results$inputs$pars_obs))
 
-  class(out) <- "sample_PMCMC"
+  class(out) <- "squire_sample_PMCMC"
 
   return(out)
 

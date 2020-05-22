@@ -7,6 +7,7 @@
 sample_pmcmc(
   pmcmc_results,
   burnin = 0,
+  n_chains,
   n_trajectories = 10,
   n_particles = 100,
   forecast_days = 0
