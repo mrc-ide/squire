@@ -148,7 +148,7 @@ summary.squire_pmcmc_list <- function(object, ..., burn_in = 101) {
 
   z <- list(inputs = object$inputs,
             results = master_chain)
-  summary.pmcmc(z)
+  summary.squire_pmcmc(z)
 
 }
 

@@ -14,28 +14,27 @@ sample_pmcmc(
 )
 }
 \arguments{
-\item{pmcmc_results}{output of \code{\link{run_mcmc_chain}}; The results from the PMCMC run -- can have mutliple chains.}
+\item{pmcmc_results}{output of \code{run_mcmc_chain}; The results from the PMCMC run -- can have mutliple chains.}
 
 \item{burnin}{integer; Number of iterations to discard from the start of MCMC run. Default = 0}
+
+\item{n_chains}{number of chains that considered. Should inherent from pmcmc.}
 
 \item{n_trajectories}{interger; Number of trajectories to be returned. Integer. Default = 10.}
 
 \item{n_particles}{integer; Number of particles to be considered in the particle filter. Default = 100}
 
 \item{forecast_days}{integer; number of days being forecast. Default = 0}
-
-\item{full_output}{logical; Indicator for whether the full model output,
-including the state and the declared outputs are returned. Deafult = FALSE}
 }
 \value{
-\code{\link{list}}. First element (trajectories) is a 3
-  dimensional array of trajectories (time, state, tranjectories). Second
-  element (sampled_PMCMC_Results) is the parameters chosen when sampling from the
-  \code{pmcmc} and the third dimension (inputs) is a list of
-  model inputs.
+\describe{
+  \item{trajectories}{A 3-dimensional array of trajectories (time, state, tranjectories).}
+  \item{sampled_PMCMC_Results}{The parameters chosen when sampling from the \code{pmcmc} posteriors}
+  \item{inputs}{A list of model inputs.}
+  }
 }
 \description{
-Sample from the posterior probability results produced by \code{\link{run_mcmc_chain}}
+Sample from the posterior probability results produced by \code{run_mcmc_chain}
 to select parameter set. For each parmater set sampled, run particle
 filter with \code{num_particles} and sample 1 trajectory
 }

@@ -36,7 +36,8 @@ pmcmc(
   baseline_ICU_bed_capacity = NULL,
   date_ICU_bed_capacity_change = NULL,
   burnin = 0,
-  n_trajectories = 100
+  replicates = 100,
+  forecast = 0
 )
 }
 \arguments{
@@ -141,33 +142,34 @@ Defaut = NULL, i.e. no change}
 
 \item{burnin}{number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories}
 
-\item{n_trajectories}{number of trajectories to be returned that are being sampled from the posterior probability results produced by \code{\link{run_mcmc_chain}}
+\item{replicates}{number of trajectories (replicates) to be returned that are being sampled from the posterior probability results produced by \code{run_mcmc_chain}
 to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory}
 
-\item{pars_to_sample}{names of parameters to be sampled}
+\item{forecast}{Number of days to forecast forward. Default = 0}
 }
 \value{
-\code{squire_simulation}. First element \code{output}, are trajectories
-  from the sampled pMCMC parameter iterations. The second element \code{parameters} are the model parameters
-  used fro squire. The third element \code{model} is the squire model used. The fourth element,
-   \code{pmcmc_sample_inputs) are inputs into the squire model for the pMCMC. The fifth element
-    (pMCMC_results) is an mcmc object generated from \code{pmcmc} and contains:
-  \itemize{
-    \item{inputs}{List of inputs}
-    \item{chains}{List that include}:
-        \itemize{
-            \item{results}{Matrix of accepted parameter samples, rows = iterations
-            as well as log prior, (particle filter estimate of) log likelihood and log posterior}
-           \item{states}{Matrix of compartment states}
-           \item{acceptance_rate}{MCMC acceptance rate}
-           \item{ess}{MCMC chain effective sample size}
+squire_simulation \describe{
+  \item{output}{Trajectories from the sampled pMCMC parameter iterations.}
+  \item{parameters}{Model parameters use for squire}
+  \item{model}{Squire model used}
+  \item{pmcmc_sample_inputs}{Inputs into the squire model for the pMCMC.}
+  \item{pMCMC_results}{An mcmc object generated from \code{pmcmc} and contains:}
+     \describe{
+        \item{inputs}{List of inputs}
+        \item{chains}{List that include}:
+           \describe{
+             \item{results}{Matrix of accepted parameter samples, rows = iterations
+                   as well as log prior, (particle filter estimate of) log likelihood and log posterior}
+             \item{states}{Matrix of compartment states}
+             \item{acceptance_rate}{MCMC acceptance rate}
+             \item{ess}{MCMC chain effective sample size}
         }
+       \item{rhat}{MCMC Diagnostics}
      }
-     \item{rhat}{MCMC Diagnostics}
-    }
- The sixth element \code{interventions} contains the interventions that can be called with projections. The
- seventh  element (trajectory_parameters) contains the parameter values for the sampled pMCMC parameter iterations
-  used to generate the \code{squire_model} trajectories
+ \item{interventions}{Contains the interventions that can be called with projections}.
+ \item{trajectory_parameters}{contains the parameter values for the sampled pMCMC parameter iterations
+  used to generate the \code{squire_model} trajectories}
+}
 }
 \description{
 The user inputs initial parameter values for R0, Meff, and the start date
@@ -201,7 +203,7 @@ At each loop iteration the pMCMC sampler pefsorms three steps:
   If the proposed parameters and states are accepted then we update the current parameters and states
   to match the proposal, otherwise the previous parameters/states are retained for the next iteration.
 
-After generating the pMCMC simulation, there are \code{n_trajectories} specific iterations sampled based on the
+After generating the pMCMC simulation, there are \code{replicates} specific iterations sampled based on the
 posterior probability. The parameters from those iterations are then used to generate new trajectories within
 the \code{squire_model} framework.
 }

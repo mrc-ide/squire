@@ -79,12 +79,12 @@ projections <- function(r,
   # ----------------------------------------------------------------------------
   assert_custom_class(r, "squire_simulation")
   # TODO future asserts if these are our "end" classes
-  if (is.null(r$pmcmc_results) & is.null(r$scan_results)) {
-    stop("Model must have been produced either with Scan Grid or pMCMC Approach")
+  if (is.null(r$output) & is.null(r$scan_results) & is.null(r$pmcmc_results)) {
+    stop("Model must have been produced either with Squire Default, Scan Grid (calibrate), or pMCMC (pmcmcm) Approach")
   }
 
   if (!is.null(r$pmcmc_results)) {
-    if (inherits(r$pmcmc_results$inputs$model, "deterministic")) {
+    if (inherits(r$pmcmc_results$inputs$squire_model, "deterministic")) {
       stop("projections unlikely to work with deterministic squire model currently")
     }
   } else if (!is.null(r$scan_results)) {

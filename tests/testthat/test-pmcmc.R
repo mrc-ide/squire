@@ -46,7 +46,7 @@ test_that("pmcmc fitting works", {
                steps_per_day = steps_per_day,
                output_proposals = FALSE,
                n_chains = 1,
-               n_trajectories = 2,
+               replicates = 2,
                burnin = 0,
                squire_model = squire_model,
                pars_init = pars_init,
@@ -60,7 +60,6 @@ test_that("pmcmc fitting works", {
                country = country)
 
   expect_named(out, c("output", "parameters", "model", "pmcmc_sample_inputs", "trajectory_parameters", "pmcmc_results", "interventions"))
-  expect_s3_class(plot(out$pmcmc_results), "list")
   expect_warning(expect_s3_class(plot(out, what = "cases", particle_fit = TRUE), "gg"))
   expect_warning(expect_s3_class(plot(out, what = "deaths", particle_fit = TRUE), "gg"))
   expect_error(plot(out, what = "rubbish", particle_fit = TRUE),"must be one of")
@@ -76,7 +75,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -101,7 +100,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -128,7 +127,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -152,7 +151,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -176,7 +175,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -202,7 +201,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -225,7 +224,7 @@ test_that("pmcmc fitting works", {
                steps_per_day = steps_per_day,
                output_proposals = FALSE,
                n_chains = 1,
-               n_trajectories = 2,
+               replicates = 2,
                burnin = 0,
                squire_model = squire_model,
                pars_init = pars_init,
@@ -251,7 +250,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -278,7 +277,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -304,7 +303,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -330,7 +329,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -354,7 +353,7 @@ test_that("pmcmc fitting works", {
                steps_per_day = steps_per_day,
                output_proposals = FALSE,
                n_chains = 1,
-               n_trajectories = 2,
+               replicates = 2,
                burnin = 0,
                squire_model = squire_model,
                pars_init = pars_init,
@@ -381,7 +380,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -407,7 +406,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -434,7 +433,7 @@ test_that("pmcmc fitting works", {
                  steps_per_day = steps_per_day,
                  output_proposals = FALSE,
                  n_chains = 1,
-                 n_trajectories = 2,
+                 replicates = 2,
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
@@ -458,7 +457,7 @@ test_that("pmcmc fitting works", {
                steps_per_day = steps_per_day,
                output_proposals = FALSE,
                n_chains = 1,
-               n_trajectories = 2,
+               replicates = 2,
                burnin = 0,
                squire_model = squire_model,
                pars_init = pars_init,
@@ -486,7 +485,6 @@ test_that("pmcmc non future works", {
   int_unique <- interventions_unique(interventions)
   reporting_fraction = 1
   country = "Algeria"
-  n_trajectories = 2
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
                    'Meff'           = 2)
@@ -526,7 +524,7 @@ test_that("pmcmc non future works", {
                steps_per_day = steps_per_day,
                output_proposals = FALSE,
                n_chains = 1,
-               n_trajectories = 2,
+               replicates = 2,
                burnin = 0,
                squire_model = squire_model,
                pars_init = pars_init,
@@ -551,7 +549,6 @@ test_that("pmcmc deterministic", {
   int_unique <- interventions_unique(interventions)
   reporting_fraction = 1
   country = "Algeria"
-  n_trajectories = 2
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
                    'Meff'           = 2)
@@ -590,7 +587,7 @@ test_that("pmcmc deterministic", {
                steps_per_day = steps_per_day,
                output_proposals = FALSE,
                n_chains = 1,
-               n_trajectories = 2,
+               replicates = 2,
                burnin = 0,
                squire_model = deterministic_model(),
                pars_init = pars_init,
@@ -620,6 +617,7 @@ test_that("pmcmc user pop and contact", {
   interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
   int_unique <- interventions_unique(interventions)
   reporting_fraction = 1
+  country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
                    'Meff'           = 1)
@@ -628,7 +626,7 @@ test_that("pmcmc user pop and contact", {
                   'Meff'            = 1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff'            = 1)
+                  'Meff'            = 5)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
                        'Meff'       = FALSE)
@@ -657,7 +655,7 @@ test_that("pmcmc user pop and contact", {
                steps_per_day = steps_per_day,
                output_proposals = FALSE,
                n_chains = 1,
-               n_trajectories = 2,
+               replicates = 2,
                burnin = 0,
                squire_model = squire_model,
                pars_init = pars_init,
@@ -673,50 +671,8 @@ test_that("pmcmc user pop and contact", {
                baseline_contact_matrix = mat)
 
   expect_true(
-    identical(out$scan_results$inputs$model_params$contact_matrix_set[[1]], mat)
+    identical(out$pmcmc_results$inputs$model_params$contact_matrix_set[[1]], mat)
   )
-
-})
-
-#------------------------------------------------
-test_that("calibrate dt not playing with day stepping well", {
-
-  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
-  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
-  int_unique <- interventions_unique(interventions)
-  reporting_fraction = 1
-  country = "Algeria"
-  replicates = 2
-  R0_min = 2.6
-  R0_max = 2.6
-  R0_step = 0.1
-  first_start_date = "2020-02-01"
-  last_start_date = "2020-02-02"
-  day_step = 1
-  R0_change = int_unique$change
-  date_R0_change = as.Date(int_unique$dates_change)
-  date_contact_matrix_set_change = NULL
-  squire_model = explicit_model()
-  pars_obs = NULL
-  n_particles = 2
-
-  expect_error(out <- calibrate(
-    data = data,
-    R0_min = R0_min,
-    R0_max = R0_max,
-    R0_step = R0_step,
-    first_start_date = first_start_date,
-    last_start_date = last_start_date,
-    day_step = day_step,
-    squire_model = squire_model,
-    pars_obs = pars_obs,
-    n_particles = n_particles,
-    reporting_fraction = reporting_fraction,
-    replicates = replicates,
-    country = "Algeria",
-    forecast = 0,
-    dt = 0.61
-  ), "must result in an integer")
 
 })
 

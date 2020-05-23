@@ -13,7 +13,6 @@
 #'        k_death = 2,
 #'        exp_noise = 1e6)
 #' @param n_mcmc number of mcmc mcmc iterations to perform
-#' @param pars_to_sample names of parameters to be sampled
 #' @param pars_init named list of initial inputs for parameters being sampled
 #' @param pars_min named list of lower reflecting boundaries for parameter proposals
 #' @param pars_max named list of upper reflecting boundaries for parameter proposals
@@ -34,31 +33,32 @@
 #' @param n_chains number of chains to run
 #' @inheritParams calibrate
 #' @param burnin number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories
-#' @param n_trajectories number of trajectories to be returned that are being sampled from the posterior probability results produced by \code{\link{run_mcmc_chain}}
+#' @param replicates number of trajectories (replicates) to be returned that are being sampled from the posterior probability results produced by \code{run_mcmc_chain}
 #' to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory
 #' @param forecast Number of days to forecast forward. Default = 0
 #'
-#' @return \code{squire_simulation}. First element \code{output}, are trajectories
-#'   from the sampled pMCMC parameter iterations. The second element \code{parameters} are the model parameters
-#'   used fro squire. The third element \code{model} is the squire model used. The fourth element,
-#'    \code{pmcmc_sample_inputs) are inputs into the squire model for the pMCMC. The fifth element
-#'     (pMCMC_results) is an mcmc object generated from \code{pmcmc} and contains:
-#'   \itemize{
-#'     \item{inputs}{List of inputs}
-#'     \item{chains}{List that include}:
-#'         \itemize{
-#'             \item{results}{Matrix of accepted parameter samples, rows = iterations
-#'             as well as log prior, (particle filter estimate of) log likelihood and log posterior}
-#'            \item{states}{Matrix of compartment states}
-#'            \item{acceptance_rate}{MCMC acceptance rate}
-#'            \item{ess}{MCMC chain effective sample size}
+#' @return squire_simulation \describe{
+#'   \item{output}{Trajectories from the sampled pMCMC parameter iterations.}
+#'   \item{parameters}{Model parameters use for squire}
+#'   \item{model}{Squire model used}
+#'   \item{pmcmc_sample_inputs}{Inputs into the squire model for the pMCMC.}
+#'   \item{pMCMC_results}{An mcmc object generated from \code{pmcmc} and contains:}
+#'      \describe{
+#'         \item{inputs}{List of inputs}
+#'         \item{chains}{List that include}:
+#'            \describe{
+#'              \item{results}{Matrix of accepted parameter samples, rows = iterations
+#'                    as well as log prior, (particle filter estimate of) log likelihood and log posterior}
+#'              \item{states}{Matrix of compartment states}
+#'              \item{acceptance_rate}{MCMC acceptance rate}
+#'              \item{ess}{MCMC chain effective sample size}
 #'         }
+#'        \item{rhat}{MCMC Diagnostics}
 #'      }
-#'      \item{rhat}{MCMC Diagnostics}
-#'     }
-#'  The sixth element \code{interventions} contains the interventions that can be called with projections. The
-#'  seventh  element (trajectory_parameters) contains the parameter values for the sampled pMCMC parameter iterations
-#'   used to generate the \code{squire_model} trajectories
+#'  \item{interventions}{Contains the interventions that can be called with projections}.
+#'  \item{trajectory_parameters}{contains the parameter values for the sampled pMCMC parameter iterations
+#'   used to generate the \code{squire_model} trajectories}
+#'}
 #'
 #' @description The user inputs initial parameter values for R0, Meff, and the start date
 #' The log prior likelihood of these parameters is calculated based on the user-defined
@@ -91,7 +91,7 @@
 #'   If the proposed parameters and states are accepted then we update the current parameters and states
 #'   to match the proposal, otherwise the previous parameters/states are retained for the next iteration.
 #'
-#' After generating the pMCMC simulation, there are \code{n_trajectories} specific iterations sampled based on the
+#' After generating the pMCMC simulation, there are \code{replicates} specific iterations sampled based on the
 #' posterior probability. The parameters from those iterations are then used to generate new trajectories within
 #' the \code{squire_model} framework.
 #'
@@ -142,10 +142,13 @@ pmcmc <- function(data,
                   baseline_ICU_bed_capacity = NULL,
                   date_ICU_bed_capacity_change = NULL,
                   burnin = 0,
-                  n_trajectories = 100,
+                  replicates = 100,
                   forecast = 0
 ) {
 
+  #............................................................
+  # Section 1 of pMCMC Wrapper: Checks & Setup
+  #...........................................................
   #..................
   # assertions & checks
   #..................
@@ -213,7 +216,7 @@ pmcmc <- function(data,
   assert_pos_int(steps_per_day)
   assert_numeric(reporting_fraction)
   assert_bounded(reporting_fraction, 0, 1, inclusive_left = FALSE, inclusive_right = TRUE)
-
+  assert_pos_int(replicates)
   #TODO talk to OJ about country vs. explicit model vs. population
   assert_string(country)
   #assert_numeric(population)
@@ -446,9 +449,9 @@ pmcmc <- function(data,
                        pars_max = pars_max)
   }
 
-  #..................
-  # RUN MCMC
-  #..................
+  #............................................................
+  # Section 2 of pMCMC Wrapper: Run pMCMC
+  #...........................................................
   # Run the chains in parallel
   if (Sys.getenv("SQUIRE_PARALLEL_DEBUG") == "TRUE") {
 
@@ -513,17 +516,19 @@ pmcmc <- function(data,
     pmcmc <- chains[[1]]
     class(pmcmc) <- "squire_pmcmc"
   }
-
-  #..................
-  # Sample PMCMC Results
-  #..................
+  #............................................................
+  # Section 3 of pMCMC Wrapper: Sample PMCMC Results
+  #...........................................................
   pmcmc_samples <- sample_pmcmc(pmcmc_results = pmcmc,
                                 burnin = burnin,
                                 n_chains = n_chains,
-                                n_trajectories = n_trajectories,
+                                n_trajectories = replicates,
                                 n_particles = n_particles,
                                 forecast_days = forecast)
 
+  #............................................................
+  # Section 4 of pMCMC Wrapper: Tidy Output
+  #...........................................................
   #..................
   # Pull Sampled results and "recreate" squire models
   #..................
@@ -558,7 +563,7 @@ pmcmc <- function(data,
     # and adjust the time as before
     full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
     saved_full <- r$output[,"time",full_row]
-    for(i in seq_len(n_trajectories)) {
+    for(i in seq_len(replicates)) {
       na_pos <- which(is.na(r$output[,"time",i]))
       full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
       if(length(na_pos) > 0) {
@@ -569,24 +574,8 @@ pmcmc <- function(data,
 
   } else if (inherits(squire_model, "deterministic")) {
 
-    # as above fix trajectories
-    r <- list()
-    names(pmcmc_samples)[names(pmcmc_samples) == "trajectories"] <- "output"
-    dimnames(pmcmc_samples$output) <- list(dimnames(pmcmc_samples$output)[[1]], dimnames(r$output)[[2]], NULL)
-    r$output <- pmcmc_samples$output
 
-    # and adjust the time as before
-    full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
-    saved_full <- r$output[,"time",full_row]
-    for(i in seq_len(n_trajectories)) {
-      na_pos <- which(is.na(r$output[,"time",i]))
-      full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
-      if(length(na_pos) > 0) {
-        full_to_place[na_pos] <- NA
-      }
-      r$output[,"time",i] <- full_to_place
-    }
-
+    r <- list("output" = pmcmc_samples$trajectories)
     # same as above, add in pmcmc items
     r$pmcmc_sample_inputs <- pmcmc_samples$inputs
     r$trajectory_parameters <- pmcmc_samples$sampled_PMCMC_Results
@@ -602,7 +591,7 @@ pmcmc <- function(data,
   r$interventions <- interventions
 
   # and fix the replicates
-  r$parameters$replicates <- n_trajectories
+  r$parameters$replicates <- replicates
   r$parameters$time_period <- as.numeric(diff(as.Date(range(rownames(r$output)))))
 
   #......................
@@ -917,7 +906,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                                                     model_params = model_params,
                                                                     model_start_date = start_date,
                                                                     obs_params = pars_obs,
-                                                                    forecast_days = forecast,
+                                                                    forecast_days = forecast_days,
                                                                     save_history = TRUE,
                                                                     return = "single")
            },
@@ -927,7 +916,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                                        model_params = model_params,
                                                        model_start_date = start_date,
                                                        obs_params = pars_obs,
-                                                       forecast_days = forecast,
+                                                       forecast_days = forecast_days,
                                                        save_history = TRUE,
                                                        return = "full")
            },
@@ -947,7 +936,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                                        model_params = model_params,
                                                        model_start_date = start_date,
                                                        obs_params = pars_obs,
-                                                       forecast_days = forecast,
+                                                       forecast_days = forecast_days,
                                                        save_history = TRUE,
                                                        return = "sample")
            }
