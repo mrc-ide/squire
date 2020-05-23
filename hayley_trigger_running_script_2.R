@@ -9,26 +9,26 @@ source("hayley_trigger_running_functions.R")
 load("data/income_strata_healthcare_capacity.rda")
 
 # Run Invariant Parameters
+set.seed(5)
 suppression_reduction <- 0.25
 suppression_duration <- 30
-mitigation_reduction <- 1 * 0.66
+mitigation_reduction <-  1*0.66
 max_lockdowns <- 16
 R0 <- c(2.12, 1.42461, 0.8498, 1.42461)
-tt_R0 <- c(0, 29, 83, 162)
-replicates <- 50
-a <- run_explicit_SEEIR_model("United Kingdom")
-index <- squire:::odin_index(a$model)            # get the indices for each of the model outputs
+tt_R0 <- c(0,   29,      83,     162)
+replicates <- 10
+r <- run_explicit_SEEIR_model("United Kingdom")
+index <- squire:::odin_index(r$model)            # get the indices for each of the model outputs
 
 # Running for LIC
-set.seed(10001)
 income_strata <- "LMIC"
-trigger_threshold <- 3
+trigger_threshold <- 6
 country <- "Senegal"
 pop <- get_population(country)
-pop <- pop$n
+pop <- (50000000/sum(pop$n)) * pop$n
 contact_matrix <- squire::get_mixing_matrix("Senegal")
 income_strata_healthcare_capacity <- squire::income_strata_healthcare_capacity
-time_period <- 365
+time_period <- 730
 dt <- 0.1
 
 LIC <- run_trigger_threshold(country = country,
@@ -82,11 +82,6 @@ d <- ggplot(LIC_z, aes(x = time, y = median)) +
           panel.grid.major.x = element_blank(),
           panel.grid.major.y = element_blank()) +
   scale_x_continuous(labels=c("Jan\n20", "Jul\n20", "Jan\n21", "Jul\n21", "Jan\n22"))
-#+
- # geom_line(aes(x = tt_R0[1]), linetype = "dashed", size = 0.5) +
-#  geom_line(aes(x = tt_R0[2]), linetype = "dashed", size = 0.5) +
- # geom_line(aes(x = tt_R0[3]), linetype = "dashed", size = 0.5) +
-#  geom_line(aes(x = tt_R0[4]), linetype = "dashed", size = 0.5)
 d
 
 sum(LIC_lockdown)

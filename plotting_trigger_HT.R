@@ -1,3 +1,13 @@
+# Sourcing Required Functions
+source("hayley_trigger_running_functions.R")
+
+#----------------------------------- FOR A TRIGGER THRESHOLD OF 3 ---------------------------------------------------
+trigger_threshold <- 6
+trig_lim <- 45
+poorer_outcomes <- TRUE
+# Source the code for each run and then plot
+source("hayley_trigger_running_script_2.R")
+
 
 library(scales)
 
@@ -12,6 +22,15 @@ bloop <- lapply(seq_along(1:dim(LIC$model_output)[3]), function(p) {
 LIC_deaths <- do.call(cbind, bloop) # turns list into matrix
 
 
+testing <- lapply(seq_along(1:dim(LIC$model_output)[3]), function(p) {
+  temp <- apply(LIC$model_output[, index$n_E2_ICase1, p], 1, sum) #to all the row - sum the age groups for that replicate
+  daily_deaths <- rollapply(temp, 1/dt, sum, partial = TRUE, align = "right") #take time points to days
+  daily_deaths_new <- daily_deaths[seq(1, length(daily_deaths), 10)] # 1/dt so that is the 10th elements = daily
+  # list of 10 elements over each p value
+})
+LIC_hosps <- do.call(cbind, testing) # turns list into matrix
+
+plot(LIC_hosps[, 1])
 
 # ne2 I for infections
 # temp call
@@ -38,12 +57,13 @@ LIC_infs <- do.call(cbind, shoop) # turns list into matrix
 # to all the replicates - 10 replicates # Infections
 ploop <- lapply(seq_along(1:dim(LIC$model_output)[3]), function(p) {
   temp_1 <- apply(LIC$model_output[, index$IOxGetLive1, p], 1, sum) #to all the row - sum the age groups for that replicate
-  daily_1 <- rollapply(temp_1, 1/dt, sum, partial = TRUE, align = "right") #take time points to days
-  daily_1_new <- daily_1[seq(1, length(daily_1), 10)] # 1/dt so that is the 10th elements = daily
+  #daily_1 <- rollapply(temp_1, 1/dt, sum, partial = TRUE, align = "right") #take time points to days
+  daily_1_new <- temp_1[seq(1, length(temp_1), 10)] # 1/dt so that is the 10th elements = daily
   # list of 10 elements over each p value
 })
 
 LIC_hosps_1 <- do.call(cbind, ploop) # turns list into matrix
+plot(LIC_hosps_1[, 1])
 
 # ----------------------------------------------------
 ploop_2 <- lapply(seq_along(1:dim(LIC$model_output)[3]), function(p) {
@@ -134,6 +154,19 @@ LIC_hosp_dem <- LIC_hosps_1 + LIC_hosps_2 + LIC_hosps_3 + LIC_hosps_4 + LIC_hosp
 #LIC_hosp_dem <- rbind(LIC_hosps_1 , LIC_hosps_2 , LIC_hosps_3 , LIC_hosps_4 ,
 #                            LIC_hosps_5 , LIC_hosps_6 , LIC_hosps_7 , LIC_hosps_8 ,
 #                            LIC_hosps_9 , LIC_hosps_10)
+
+plot(LIC_infs[, 1])
+plot(LIC_hosps_1[, 1]) # IOxGetLive1
+plot(LIC_hosps_2[, 1]) # IOxGetLive2
+plot(LIC_hosps_3[, 1]) # IOxGetDie1
+plot(LIC_hosps_4[, 1]) # IOxGetDie2
+plot(LIC_hosps_5[, 1]) # IRec1
+plot(LIC_hosps_6[, 1]) # IRec2
+plot(LIC_hosps_7[, 1]) # IOxNotGetLive1
+plot(LIC_hosps_8[, 1]) # IOxNotGetLive2
+plot(LIC_hosps_9[, 1]) # IOxNotGetDie1
+plot(LIC_hosps_10[, 1]) # IOxNotGetDie2
+
 
 #---------------------------------------------------------
 LIC_hosp_new <- LIC_hosps_3 + LIC_hosps_4 + LIC_hosps_5 + LIC_hosps_6
