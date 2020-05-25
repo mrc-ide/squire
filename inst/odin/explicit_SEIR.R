@@ -162,12 +162,6 @@ hosp_occ <- sum(IOxGetLive1) + sum(IOxGetLive2) + sum(IOxGetDie1) + sum(IOxGetDi
 number_requiring_Ox[] <- n_ICase2_Hosp[i] - number_requiring_IMV[i] # Number of hospitalisations that are going to require oxygen
 total_number_requiring_Ox <- sum(number_requiring_Ox)
 current_free_hosp <- hosp_bed_capacity + sum(n_IOxGetDie2_D) + sum(n_IOxGetLive2_R) + sum(n_IRec2_R) - sum(n_IMVGetLive2_Rec) - hosp_occ # Number of hospital beds that are currently free
-temp1 <- sum(n_IOxGetDie2_D)
-temp2 <- sum(n_IOxGetLive2_R)
-temp3 <- sum(n_IRec2_R)
-temp4 <- sum(n_IMVGetLive2_Rec)
-temp5 <- temp1 + temp2 + temp3 - temp4
-output(temp5) <- TRUE
 total_number_get_hosp <- if (current_free_hosp <= 0) 0 else (if(current_free_hosp - total_number_requiring_Ox >= 0) total_number_requiring_Ox else(current_free_hosp)) # Working out the number of new hospital bed requiring infections that get a bed
 number_get_Ox[] <- rmhyper(total_number_get_hosp, number_requiring_Ox)
 

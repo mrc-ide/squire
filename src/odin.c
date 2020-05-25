@@ -2567,10 +2567,10 @@ SEXP explicit_SEIR_set_user(SEXP internal_p, SEXP user) {
   internal->IOxNotGetLive2_0 = (double*) user_get_array(user, false, internal->IOxNotGetLive2_0, "IOxNotGetLive2_0", NA_REAL, NA_REAL, 1, internal->dim_IOxNotGetLive2_0);
   internal->IRec1_0 = (double*) user_get_array(user, false, internal->IRec1_0, "IRec1_0", NA_REAL, NA_REAL, 1, internal->dim_IRec1_0);
   internal->IRec2_0 = (double*) user_get_array(user, false, internal->IRec2_0, "IRec2_0", NA_REAL, NA_REAL, 1, internal->dim_IRec2_0);
-  internal->offset_output_delta_D = 2 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild + internal->dim_number_requiring_IMV;
-  internal->offset_output_n_E2_ICase1 = 2 + internal->dim_n_E2_I;
-  internal->offset_output_n_E2_IMild = 2 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1;
-  internal->offset_output_number_requiring_IMV = 2 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild;
+  internal->offset_output_delta_D = 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild + internal->dim_number_requiring_IMV;
+  internal->offset_output_n_E2_ICase1 = 1 + internal->dim_n_E2_I;
+  internal->offset_output_n_E2_IMild = 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1;
+  internal->offset_output_number_requiring_IMV = 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild;
   internal->offset_variable_D = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1 + internal->dim_IMVNotGetLive2 + internal->dim_IMVNotGetDie1 + internal->dim_IMVNotGetDie2 + internal->dim_IRec1 + internal->dim_IRec2 + internal->dim_R;
   internal->offset_variable_E2 = internal->dim_S + internal->dim_E1;
   internal->offset_variable_ICase1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild;
@@ -2773,26 +2773,24 @@ SEXP explicit_SEIR_metadata(SEXP internal_p) {
   SET_STRING_ELT(variable_names, 25, mkChar("D"));
   SET_VECTOR_ELT(ret, 0, variable_length);
   UNPROTECT(2);
-  SEXP output_length = PROTECT(allocVector(VECSXP, 7));
-  SEXP output_names = PROTECT(allocVector(STRSXP, 7));
+  SEXP output_length = PROTECT(allocVector(VECSXP, 6));
+  SEXP output_names = PROTECT(allocVector(STRSXP, 6));
   setAttrib(output_length, R_NamesSymbol, output_names);
   SET_VECTOR_ELT(output_length, 0, R_NilValue);
-  SET_VECTOR_ELT(output_length, 1, R_NilValue);
-  SET_VECTOR_ELT(output_length, 2, ScalarInteger(internal->dim_n_E2_I));
-  SET_VECTOR_ELT(output_length, 3, ScalarInteger(internal->dim_n_E2_ICase1));
-  SET_VECTOR_ELT(output_length, 4, ScalarInteger(internal->dim_n_E2_IMild));
-  SET_VECTOR_ELT(output_length, 5, ScalarInteger(internal->dim_number_requiring_IMV));
-  SET_VECTOR_ELT(output_length, 6, ScalarInteger(internal->dim_delta_D));
-  SET_STRING_ELT(output_names, 0, mkChar("temp5"));
-  SET_STRING_ELT(output_names, 1, mkChar("time"));
-  SET_STRING_ELT(output_names, 2, mkChar("n_E2_I"));
-  SET_STRING_ELT(output_names, 3, mkChar("n_E2_ICase1"));
-  SET_STRING_ELT(output_names, 4, mkChar("n_E2_IMild"));
-  SET_STRING_ELT(output_names, 5, mkChar("number_requiring_IMV"));
-  SET_STRING_ELT(output_names, 6, mkChar("delta_D"));
+  SET_VECTOR_ELT(output_length, 1, ScalarInteger(internal->dim_n_E2_I));
+  SET_VECTOR_ELT(output_length, 2, ScalarInteger(internal->dim_n_E2_ICase1));
+  SET_VECTOR_ELT(output_length, 3, ScalarInteger(internal->dim_n_E2_IMild));
+  SET_VECTOR_ELT(output_length, 4, ScalarInteger(internal->dim_number_requiring_IMV));
+  SET_VECTOR_ELT(output_length, 5, ScalarInteger(internal->dim_delta_D));
+  SET_STRING_ELT(output_names, 0, mkChar("time"));
+  SET_STRING_ELT(output_names, 1, mkChar("n_E2_I"));
+  SET_STRING_ELT(output_names, 2, mkChar("n_E2_ICase1"));
+  SET_STRING_ELT(output_names, 3, mkChar("n_E2_IMild"));
+  SET_STRING_ELT(output_names, 4, mkChar("number_requiring_IMV"));
+  SET_STRING_ELT(output_names, 5, mkChar("delta_D"));
   SET_VECTOR_ELT(ret, 1, output_length);
   UNPROTECT(2);
-  SET_VECTOR_ELT(ret, 2, ScalarInteger(2 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild + internal->dim_number_requiring_IMV + internal->dim_delta_D));
+  SET_VECTOR_ELT(ret, 2, ScalarInteger(1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild + internal->dim_number_requiring_IMV + internal->dim_delta_D));
   SEXP interpolate_t = PROTECT(allocVector(VECSXP, 3));
   SEXP interpolate_t_nms = PROTECT(allocVector(STRSXP, 3));
   setAttrib(interpolate_t, R_NamesSymbol, interpolate_t_nms);
@@ -3164,18 +3162,12 @@ void explicit_SEIR_rhs(explicit_SEIR_internal* internal, size_t step, double * s
     state_next[internal->offset_variable_IOxNotGetLive1 + i - 1] = IOxNotGetLive1[i - 1] + internal->delta_IOxNotGetLive1[i - 1];
   }
   double time = step * internal->dt;
-  output[1] = time;
-  memcpy(output + 2, internal->n_E2_I, internal->dim_n_E2_I * sizeof(double));
-  double temp1 = odin_sum1(internal->n_IOxGetDie2_D, 0, internal->dim_n_IOxGetDie2_D);
-  double temp2 = odin_sum1(internal->n_IOxGetLive2_R, 0, internal->dim_n_IOxGetLive2_R);
-  double temp3 = odin_sum1(internal->n_IRec2_R, 0, internal->dim_n_IRec2_R);
-  double temp4 = odin_sum1(internal->n_IMVGetLive2_Rec, 0, internal->dim_n_IMVGetLive2_Rec);
+  output[0] = time;
+  memcpy(output + 1, internal->n_E2_I, internal->dim_n_E2_I * sizeof(double));
   memcpy(output + internal->offset_output_delta_D, internal->delta_D, internal->dim_delta_D * sizeof(double));
   memcpy(output + internal->offset_output_n_E2_ICase1, internal->n_E2_ICase1, internal->dim_n_E2_ICase1 * sizeof(double));
   memcpy(output + internal->offset_output_number_requiring_IMV, internal->number_requiring_IMV, internal->dim_number_requiring_IMV * sizeof(double));
-  double temp5 = temp1 + temp2 + temp3 - temp4;
   memcpy(output + internal->offset_output_n_E2_IMild, internal->n_E2_IMild, internal->dim_n_E2_IMild * sizeof(double));
-  output[0] = temp5;
 }
 void explicit_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal) {
   explicit_SEIR_rhs((explicit_SEIR_internal*)internal, step, state, state_next, output);
@@ -3183,7 +3175,7 @@ void explicit_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * st
 SEXP explicit_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
   SEXP state_next = PROTECT(allocVector(REALSXP, LENGTH(state)));
   explicit_SEIR_internal *internal = explicit_SEIR_get_internal(internal_p, 1);
-  SEXP output_ptr = PROTECT(allocVector(REALSXP, 2 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild + internal->dim_number_requiring_IMV + internal->dim_delta_D));
+  SEXP output_ptr = PROTECT(allocVector(REALSXP, 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild + internal->dim_number_requiring_IMV + internal->dim_delta_D));
   setAttrib(state_next, install("output"), output_ptr);
   UNPROTECT(1);
   double *output = REAL(output_ptr);
