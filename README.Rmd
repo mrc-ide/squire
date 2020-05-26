@@ -282,7 +282,7 @@ library(ggplot2)
 library(patchwork)
 library(dplyr)
 
-x <- run_explicit_SEEIR_model(country = "Afghanistan", hosp_bed_capacity = 500, ICU_bed_capacity = 1000)
+x <- run_explicit_SEEIR_model(country = "Afghanistan", hosp_bed_capacity = 500, ICU_bed_capacity = 200)
 
 deaths <- format_output(x = x, var_select = "deaths") %>%
   mutate(replicate = factor(replicate))
@@ -309,6 +309,12 @@ z <- a + b + c + d +
 z
 
 ```
+
+Hospital bed occupancy fluctuates very slightly above the user-specified number of hospital beds available (+1 in the above example). This is due to individuals being discharged from ICU beds into general hospital beds when general hospital bed occupancy is already at maximum capacity. 
+
+We assume that these individuals newly discharged from the ICU would in reality be prioritised to receive general hospital beds and so give them a general hospital bed. Whilst this is now shown in the above panel of hospital bed occupancy, this means that less-sick individuals in general hospital beds would be discharged slightly early to make space. We assume that for these small number of the healthiest individuals in hospital, there is no excess mortality associated with this early discharge. 
+
+Future work will explore a range of bed-prioritisation structures to consider how results might be shaped by who gets a bed and when. 
 
 ### 4.  Calibrating the Model to Observed Deaths Data
 

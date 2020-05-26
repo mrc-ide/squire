@@ -1,3 +1,8 @@
+# squire 0.4.14
+
+* replace chained binomials with mutivariate hypergeometric sampling in stochastic model
+* stochastic model to output number newly requiring ICU beds at each timepoint
+
 # squire 0.4.13
 
 * `calibrate` now takes an `Rt_func` argument for specifying Rt calculation
