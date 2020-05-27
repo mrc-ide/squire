@@ -302,8 +302,8 @@ out3 <- projections(out, time_period = 90, R0_change = 1)
 fd2 <- format_output(out2, "deaths")
 fd3 <- format_output(out3, "deaths")
 
-d2 <- tail((group_by(fd2, t) %>% summarise(m = mean(y)))$m,1)
-d3 <- tail((group_by(fd3, t) %>% summarise(m = mean(y)))$m,1)
+d2 <- mean(fd2$y[fd2$t==max(fd2$t)])
+d3 <- mean(fd3$y[fd3$t==max(fd3$t)])
 
 expect_true(d2>d3)
 expect_true(d3<10)
