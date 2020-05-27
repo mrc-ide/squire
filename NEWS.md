@@ -1,3 +1,8 @@
+# squire 0.4.15
+
+* `projections` now matches by column names when including projection outputs
+* Patch to `t0_variables` for new Rt_func approach
+
 # squire 0.4.14
 
 * replace chained binomials with mutivariate hypergeometric sampling in stochastic model

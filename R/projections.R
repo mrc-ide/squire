@@ -331,6 +331,10 @@ projections <- function(r,
 
   })
 
+  ## get output columns that match
+  cn <- colnames(r$output[which(r$output[,1,1] %in% t_steps[[1]]), , 1])
+  out <- lapply(out, function(x) { x[, which(colnames(x) %in% cn), , drop=FALSE] })
+
   ## collect results
   for(i in seq_len(ds[3])) {
     if(diff(tail(r$output[,"step",1],2)) != 1) {
@@ -469,7 +473,9 @@ t0_variables <- function(r) {
         if (is.null(r$replicate_parameters$Meff)) {
           R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change, 1)
         } else {
-        R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change * r$replicate_parameters$Meff[x], 1)
+          R0 <- r$scan_results$inputs$Rt_func(R0 = r$replicate_parameters$R0[x],
+                                              R0_change = tail(r$interventions$R0_change, 1),
+                                              Meff = r$replicate_parameters$Meff[x])
         }
       } else {
         R0 <- r$replicate_parameters$R0[x]
