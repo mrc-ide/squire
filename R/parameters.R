@@ -121,7 +121,7 @@ get_hosp_bed_capacity <- function(country = NULL) {
 #' @param contact_matrix_set Contact matrices used in simulation. Default =
 #'   NULL, which will generate this based on the \code{country}.
 #' @param tt_contact_matrix Time change points for matrix change. Default = 0
-#' #' @param baseline_contact_matrix Baseline contact matrix in the absence of any control. Default
+#' @param baseline_contact_matrix Baseline contact matrix in the absence of any control. Default
 #'   NULL, which will generate this based on the \code{country}
 #' @param R0 Basic Reproduction Number. Default = 3
 #' @param tt_R0 Change time points for R0. Default = 0
