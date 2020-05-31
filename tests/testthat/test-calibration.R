@@ -108,7 +108,7 @@ test_that("calibrate particle works", {
     replicates = replicates,
     country = country,
     forecast = 0
-  ), "baseline_contact_matrix can")
+  ), "if contact_matrix_set has been specified")
 
   out <- calibrate(
     data = data,

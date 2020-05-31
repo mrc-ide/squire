@@ -21,6 +21,9 @@ run_deterministic_SEIR_model(
 \item{population}{Population vector (for each age group). Default = NULL,
 which will cause population to be sourced from \code{country}}
 
+\item{baseline_contact_matrix}{Baseline contact matrix in the absence of any control. Default
+NULL, which will generate this based on the \code{country}}
+
 \item{contact_matrix}{Contact matrix to use in the simulation.}
 
 \item{tt_R0}{Time change points for R0}

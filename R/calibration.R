@@ -127,6 +127,18 @@ calibrate <- function(data,
     stop("'Meff_max' must be greater 'Meff_min'")
   }
 
+  # Checking whether baseline_contact_matrix needs to be specified
+  if (is.null(baseline_contact_matrix) & !is.null(contact_matrix_set)) {
+    stop("if contact_matrix_set has been specified, user must also specify the argument
+         baseline_contact_matrix, which is the contact matrix in the absence of any control
+         interventions")
+  }
+
+  # Get in correct format
+  if(is.matrix(baseline_contact_matrix)) {
+    baseline_contact_matrix <- list(baseline_contact_matrix)
+  }
+
   # handle contact matrix changes
   if(!is.null(date_contact_matrix_set_change)) {
 
@@ -138,11 +150,6 @@ calibrate <- function(data,
     }
     if(as.Date(tail(date_contact_matrix_set_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
-    }
-
-    # Get in correct format
-    if(is.matrix(baseline_contact_matrix)) {
-      baseline_contact_matrix <- list(baseline_contact_matrix)
     }
 
     tt_contact_matrix <- c(0, seq_len(length(date_contact_matrix_set_change)))
@@ -205,6 +212,7 @@ calibrate <- function(data,
   # build model parameters
   model_params <- squire_model$parameter_func(country = country,
                                               population = population,
+                                              baseline_contact_matrix = baseline_contact_matrix[[1]],
                                               contact_matrix_set = contact_matrix_set,
                                               tt_contact_matrix = tt_contact_matrix,
                                               hosp_bed_capacity = hosp_bed_capacity,
@@ -303,6 +311,7 @@ calibrate <- function(data,
 
     # create a fake run object and fill in the required elements
     r <- squire_model$run_func(country = country,
+                               baseline_contact_matrix = baseline_contact_matrix[[1]],
                                contact_matrix_set = contact_matrix_set,
                                tt_contact_matrix = tt_contact_matrix,
                                hosp_bed_capacity = hosp_bed_capacity,
