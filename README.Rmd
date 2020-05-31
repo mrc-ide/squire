@@ -191,6 +191,7 @@ contact_matrix <- get_mixing_matrix("United Kingdom")
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
+                              baseline_contact_matrix = contact_matrix, 
                               contact_matrix_set = contact_matrix,
                               R0 = 2.5, 
                               time_period = 200,
@@ -198,6 +199,8 @@ r <- run_explicit_SEEIR_model(population = population,
                               replicates = 5)
 plot(r)
 ```
+
+Note that we have to manually specify `baseline_contact_matrix` (which refers to the contact matrix for the population in the absence of any control interventions and is used to calculate the required `beta` to generate a given R0) and `contact_matrix_set` (which can be any contact matrix and is what it is implemented during model running).   
 
 We can also change the R0 and contact matrix at set time points, to reflect 
 changing behaviour resulting from interventions. For example to set a 80%
@@ -208,6 +211,7 @@ reduction in the contact matrix after 100 days :
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               tt_contact_matrix = c(0, 100),
+                              baseline_contact_matrix = contact_matrix, 
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2),
                               R0 = 2.5, 
@@ -225,6 +229,7 @@ To show an 80% reduction after 50 days but only maintained for 30 days :
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               tt_contact_matrix = c(0, 80, 120),
+                              baseline_contact_matrix = contact_matrix, 
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2,
                                                         contact_matrix),
@@ -241,6 +246,7 @@ Alternatively, we could set a changing R0, which falls below 1 after 50 days:
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
+                              baseline_contact_matrix = contact_matrix, 
                               contact_matrix_set = contact_matrix,
                               tt_R0 = c(0, 80),
                               R0 = c(2.5, 0.9),
@@ -257,6 +263,7 @@ The model in squire also allows you to alter healthcare capacity. Default values
 library(patchwork)
 
 r <- run_explicit_SEEIR_model(population = population, 
+                              baseline_contact_matrix = contact_matrix, 
                               contact_matrix_set = contact_matrix,
                               R0 = 2.5, 
                               time_period = 200,
