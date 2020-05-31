@@ -9,6 +9,7 @@ parameters_explicit_SEEIR(
   population = NULL,
   tt_contact_matrix = 0,
   contact_matrix_set = NULL,
+  baseline_contact_matrix = NULL,
   R0 = 3,
   tt_R0 = 0,
   beta_set = NULL,
