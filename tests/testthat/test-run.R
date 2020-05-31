@@ -292,3 +292,43 @@ test_that("default probs", {
                  "prob_severe_death_no_treatment","p_dist"))
 
 })
+
+test_that("baseline contact matrix behaviour as expected", {
+
+  # Checking that baseline_contact_matrix is being used for beta_est_explicit
+  x <- run_explicit_SEEIR_model(country = "United Kingdom",
+                                baseline_contact_matrix = contact_matrices[[1]],
+                                contact_matrix_set = contact_matrices[[1]],
+                                day_return = TRUE)
+  x_deaths <- format_output(x, var_select = "deaths")
+  x_max <- max(x_deaths$y)
+
+  y <- run_explicit_SEEIR_model(country = "United Kingdom",
+                                baseline_contact_matrix = contact_matrices[[1]],
+                                contact_matrix_set = 0.5 * contact_matrices[[1]],
+                                day_return = TRUE)
+  y_deaths <- format_output(y, var_select = "deaths")
+  y_max <- max(y_deaths$y)
+
+  expect_gt(x_max, y_max)
+  expect_equal(y$parameters$beta_set, x$parameters$beta_set)
+
+  # Checking that baseline_contact_matrix is being used for beta_est_explicit
+  z <- run_explicit_SEEIR_model(country = "United Kingdom",
+                                baseline_contact_matrix = 0.5 * contact_matrices[[1]],
+                                contact_matrix_set = contact_matrices[[1]],
+                                day_return = TRUE)
+  z_deaths <- format_output(z, var_select = "deaths")
+  z_max <- max(z_deaths$y)
+
+  a <- run_explicit_SEEIR_model(country = "United Kingdom",
+                                baseline_contact_matrix = contact_matrices[[1]],
+                                contact_matrix_set = contact_matrices[[1]],
+                                day_return = TRUE)
+  a_deaths <- format_output(a, var_select = "deaths")
+  a_max <- max(a_deaths$y)
+
+  expect_gt(z_max, a_max)
+  expect_gt(z$parameters$beta_set, a$parameters$beta_set)
+
+})
