@@ -51,7 +51,9 @@ unprovided. Either \code{country} or \code{population} and
 \item{population}{Population vector (for each age group). Default = NULL,
 which will cause population to be sourced from \code{country}}
 
-\item{tt_contact_matrix}{Time change points for matrix change. Default = 0}
+\item{tt_contact_matrix}{Time change points for matrix change. Default = 0
+#' @param baseline_contact_matrix Baseline contact matrix in the absence of any control. Default
+  NULL, which will generate this based on the \code{country}}
 
 \item{contact_matrix_set}{Contact matrices used in simulation. Default =
 NULL, which will generate this based on the \code{country}.}

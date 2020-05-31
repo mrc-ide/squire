@@ -9,6 +9,7 @@ align(
   reporting_fraction = 1,
   country = NULL,
   population = NULL,
+  baseline_contact_matrix = NULL,
   contact_matrix_set = NULL,
   seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
   min_seeding_cases = 5,
@@ -33,6 +34,9 @@ unprovided. Either \code{country} or \code{population} and
 
 \item{population}{Population vector (for each age group). Default = NULL,
 which will cause population to be sourced from \code{country}}
+
+\item{baseline_contact_matrix}{Baseline contact matrix in the absence of any control. Default
+NULL, which will generate this based on the \code{country}}
 
 \item{contact_matrix_set}{Contact matrices used in simulation. Default =
 NULL, which will generate this based on the \code{country}.}

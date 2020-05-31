@@ -59,6 +59,9 @@ which will cause population to be sourced from \code{country}}
 \item{contact_matrix_set}{Contact matrices used in simulation. Default =
 NULL, which will generate this based on the \code{country}.}
 
+\item{baseline_contact_matrix}{Baseline contact matrix in the absence of any control. Default
+NULL, which will generate this based on the \code{country}}
+
 \item{R0}{Basic Reproduction Number. Default = 3}
 
 \item{tt_R0}{Change time points for R0. Default = 0}

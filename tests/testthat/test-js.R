@@ -6,6 +6,7 @@ test_that("js and R versions agree for basic model", {
   r_result <- run_deterministic_SEIR_model(
     pop$n,
     m,
+    m,
     c(0, 50),
     c(3, 3/2),
     365,
@@ -22,6 +23,7 @@ test_that("js and R versions agree for basic model", {
 
   js_result <- run_deterministic_SEIR_model(
     pop$n,
+    m,
     m,
     c(0, 50),
     c(3, 3/2),

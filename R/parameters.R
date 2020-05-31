@@ -250,6 +250,7 @@ parameters_explicit_SEEIR <- function(
                                                 baseline_contact_matrix = baseline_contact_matrix)
   country <- cpm$country
   population <- cpm$population
+  baseline_contact_matrix <- cpm$baseline_contact_matrix
 
   # Assigning baseline_contact_matrix to contact_matrix_set unless it has been specified
   if (is.null(contact_matrix_set)) {

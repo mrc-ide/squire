@@ -17,11 +17,13 @@ test_that("object methods ", {
                                  population = pop$n,
                                  dt = 1,
                                  time_period = 100,
+                                 baseline_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
   m3 <- run_explicit_SEEIR_model(R0 = 2,
                                  population = pop$n, dt = 1,
                                  replicates = 5,
                                  time_period = 100,
+                                 baseline_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
 
   expect_type(m1, "list")

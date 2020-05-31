@@ -85,6 +85,7 @@ test_that("run explicit works", {
                                  R0 = 2,
                                  time_period = 100,
                                  replicates = 10,
+                                 baseline_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
   expect_type(r1$output, "double")
 
@@ -103,6 +104,7 @@ test_that("run explicit works", {
                                  tt_R0 = c(0, 10),
                                  time_period = 100,
                                  replicates = 10,
+                                 baseline_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
   expect_identical(r1$output, r2$output)
   set.seed(123)
@@ -112,6 +114,7 @@ test_that("run explicit works", {
                                  tt_R0 = c(0, 10),
                                  time_period = 100,
                                  replicates = 10,
+                                 baseline_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
   o2 <- format_output(r2)
   o3 <- format_output(r3)
@@ -125,6 +128,7 @@ test_that("run explicit works", {
                                  R0 = 2,
                                  time_period = 100,
                                  replicates = 10,
+                                 baseline_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set = list(contact_matrices[[1]],
                                                            contact_matrices[[1]]),
                                  tt_contact_matrix = c(0, 50))
@@ -136,6 +140,7 @@ test_that("run explicit works", {
                                  R0 = 2,
                                  time_period = 100,
                                  replicates = 10,
+                                 baseline_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set = list(contact_matrices[[1]],
                                                            contact_matrices[[1]]*0.5,
                                                            contact_matrices[[1]]*0.2),
@@ -148,11 +153,11 @@ test_that("run explicit works", {
                                  R0 = 2,
                                  time_period = 100,
                                  replicates = 10,
+                                 baseline_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set = list(contact_matrices[[1]]),
                                  tt_contact_matrix = c(0, 50))
   expect_true(!identical(r5$output, r6$output))
-  expect_error(run_explicit_SEEIR_model(R0 = 2), "User must provide either the country being simulated or
-         both the population size and contact_matrix_set")
+  expect_error(run_explicit_SEEIR_model(R0 = 2))
 
   r7 <- run_explicit_SEEIR_model(R0 = 2, country = "Afghanistan")
   expect_type(r7$output, "double")
@@ -186,6 +191,7 @@ test_that("run explicit works when healthsystem capacity is swamped", {
 
 
   r <- run_explicit_SEEIR_model(population = population,
+                                baseline_contact_matrix = contact_matrices[[1]],
                                 contact_matrix_set = contact_matrix,
                                 R0 = 2.5,
                                 time_period = 730,
@@ -197,6 +203,7 @@ test_that("run explicit works when healthsystem capacity is swamped", {
   expect_equal(sum(o1$y < 0), 0)
 
   expect_error(r <- run_explicit_SEEIR_model(population = population,
+                                             baseline_contact_matrix = contact_matrices[[1]],
                                              contact_matrix_set = contact_matrix,
                                              R0 = 2.5,
                                              time_period = 730,
@@ -254,6 +261,7 @@ test_that("run deterministic parameterises model correctly", {
   m <- get_mixing_matrix("Afghanistan")
   output <- run_deterministic_SEIR_model(
     pop$n,
+    m,
     m,
     c(0, 50),
     c(3, 3/2),

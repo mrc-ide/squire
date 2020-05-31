@@ -22,17 +22,18 @@
 #' @export
 #' @return List of time adjusted squire_simulations
 align <- function(deaths,
-                      reporting_fraction = 1,
-                      country = NULL,
-                      population = NULL,
-                      contact_matrix_set = NULL,
-                      seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
-                      min_seeding_cases = 5,
-                      max_seeding_cases = 50,
-                      R0 = 3,
-                      R0_scan = NULL,
-                      replicates = 100,
-                      ...) {
+                  reporting_fraction = 1,
+                  country = NULL,
+                  population = NULL,
+                  baseline_contact_matrix = NULL,
+                  contact_matrix_set = NULL,
+                  seeding_age_groups = c("35-40", "40-45", "45-50", "50-55"),
+                  min_seeding_cases = 5,
+                  max_seeding_cases = 50,
+                  R0 = 3,
+                  R0_scan = NULL,
+                  replicates = 100,
+                  ...) {
 
 
   # argument checks
@@ -45,10 +46,15 @@ align <- function(deaths,
   # Handle country population args
   cpm <- parse_country_population_mixing_matrix(country = country,
                                                 population = population,
-                                                contact_matrix_set = contact_matrix_set)
+                                                baseline_contact_matrix = baseline_contact_matrix)
   country <- cpm$country
   population <- cpm$population
-  contact_matrix_set <- cpm$contact_matrix_set
+  baseline_contact_matrix <- cpm$baseline_contact_matrix
+
+  # Assigning baseline_contact_matrix to contact_matrix_set unless it has been specified
+  if (is.null(contact_matrix_set)) {
+    contact_matrix_set <- cpm$baseline_contact_matrix
+  }
 
   # getting indices for relevant age groups where seeding cases occurred
   age_groups <- c("0-5", "5-10", "10-15", "15-20", "20-25", "25-30", "30-35",
@@ -95,6 +101,7 @@ align <- function(deaths,
 
   # run model with fixed day step (to match up with daily deaths)
   r <- run_explicit_SEEIR_model(population = population,
+                                baseline_contact_matrix = baseline_contact_matrix,
                                 contact_matrix_set = contact_matrix_set,
                                 replicates = 1,
                                 R0 = R0,
@@ -110,6 +117,7 @@ align <- function(deaths,
   # check that this reached the deaths
   while (sum(r$output[nt, index$D, 1]) < deaths) {
     r <- run_explicit_SEEIR_model(population = population,
+                                  baseline_contact_matrix = baseline_contact_matrix,
                                   contact_matrix_set = contact_matrix_set,
                                   replicates = 1,
                                   R0 = R0,
@@ -129,7 +137,7 @@ align <- function(deaths,
     beta[1] <- beta_est_explicit(dur_IMild = r$parameters$dur_IMild,
                                  dur_ICase = r$parameters$dur_ICase,
                                  prob_hosp = r$parameters$prob_hosp,
-                                 mixing_matrix =  process_contact_matrix_scaled_age(r$parameters$contact_matrix_set[[1]], r$parameters$population),
+                                 mixing_matrix =  process_contact_matrix_scaled_age(baseline_contact_matrix, r$parameters$population), # OJ can you check whether changing this to baseline contact matrix is correct?
                                  R0 = R0_scan[i])
     r$model$set_user(beta_set = beta)
     r$output <- r$model$run(t, replicate = 1)

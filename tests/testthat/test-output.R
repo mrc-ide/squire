@@ -2,7 +2,7 @@ test_that("deterministic output format works", {
   pop <- get_population("Afghanistan")
   m <- get_mixing_matrix("Afghanistan")
   model_output <- run_deterministic_SEIR_model(
-    pop$n, m, c(0, 50), c(3, 3/2), 2, 100000, 1000000)
+    pop$n, m, m, c(0, 50), c(3, 3/2), 2, 100000, 1000000)
 
   # reset output
   model_output$output[,2:dim(model_output$output)[[2]]] <- 0
@@ -63,6 +63,7 @@ test_that("output format works", {
                                  dt = 1,
                                  time_period = 10,
                                  replicates = 10,
+                                 baseline_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
 
   o1 <- format_output(m1)
@@ -107,6 +108,7 @@ test_that("new helper functions to extract relevant outputs", {
                                  dt = 1,
                                  time_period = 10,
                                  replicates = 10,
+                                 baseline_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
   deaths <- extract_deaths(m1)
   expect_named(deaths, c("replicate", "compartment", "t", "y"))
@@ -255,3 +257,4 @@ test_that("calibrate_output_parsing vs format_output",{
 
 
 })
+

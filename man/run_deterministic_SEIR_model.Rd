@@ -6,6 +6,7 @@
 \usage{
 run_deterministic_SEIR_model(
   population,
+  baseline_contact_matrix,
   contact_matrix,
   tt_R0,
   R0_set,
