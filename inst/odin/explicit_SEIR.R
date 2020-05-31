@@ -189,6 +189,7 @@ output(n_E2_ICase1[]) <- TRUE
 output(n_E2_IMild[]) <- TRUE
 output(number_requiring_IMV[]) <- TRUE
 output(delta_D[]) <- TRUE
+output(delta_D_get[]) <- TRUE
 output(time) <- TRUE
 # output(hosp_bed_capacity) <- TRUE
 # output(hosp_occ) <- TRUE
@@ -240,6 +241,7 @@ delta_IRec1[] <- n_IMVGetLive2_Rec[i] - n_IRec1_IRec2[i]
 delta_IRec2[] <- n_IRec1_IRec2[i] - n_IRec2_R[i]
 delta_R[] <- n_IOxGetLive2_R[i] + n_IOxNotGetLive2_R[i] + n_IRec2_R[i] + n_IMVNotGetLive2_R[i] + n_IMild_R[i]
 delta_D[] <- n_IOxGetDie2_D[i] + n_IOxNotGetDie2_D[i] + n_IMVGetDie2_D[i] + n_IMVNotGetDie2_D[i]
+delta_D_get[] <- n_IOxGetDie2_D[i] + n_IMVGetDie2_D[i]
 
 ##Compute the Force of infection
 
@@ -416,6 +418,7 @@ dim(delta_IRec1) <- N_age
 dim(delta_IRec2) <- N_age
 dim(delta_R) <- N_age
 dim(delta_D) <- N_age
+dim(delta_D_get) <- N_age
 
 # For the Number of People Moving In and Out of Compartments
 dim(n_E1_E2) <- N_age

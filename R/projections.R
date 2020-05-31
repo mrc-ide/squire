@@ -79,7 +79,7 @@ projections <- function(r,
   # ----------------------------------------------------------------------------
   assert_custom_class(r, "squire_simulation")
   if (inherits(r$scan_results$inputs$model, "deterministic")) {
-    stop("projections unlikely to work with deterministic squire model currently")
+    stop("projections does not work with deterministic squire model currently")
   }
   assert_pos_int(tt_R0)
   if(!0 %in% tt_R0) {
@@ -120,7 +120,7 @@ projections <- function(r,
   }
 
   # ----------------------------------------------------------------------------
-  # check are variables are correctly formatted
+  # check our variables are correctly formatted
   # ----------------------------------------------------------------------------
   if(!is.null(R0)){
     assert_numeric(R0)
@@ -258,8 +258,8 @@ projections <- function(r,
       baseline_contact_matrix_set <- contact_matrix_set[1]
       contact_matrix_set <- lapply(
         seq_len(length(contact_matrix_set_change)),
-        function(x){
-          contact_matrix_set[[x]]*contact_matrix_set_change[x]
+        function(y){
+          contact_matrix_set[[y]]*contact_matrix_set_change[y]
         })
     }
 
