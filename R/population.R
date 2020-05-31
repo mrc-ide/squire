@@ -114,28 +114,28 @@ get_healthcare_capacity <-  function(country, simple_SEIR = FALSE){
 #' @noRd
 parse_country_population_mixing_matrix <- function(country = NULL,
                                                    population = NULL,
-                                                   baseline_contact_matrix = NULL) {
+                                                   contact_matrix_set = NULL) {
 
   # Handle country population args
   if (is.null(country) &&
-      (is.null(population) || is.null(baseline_contact_matrix))) {
+      (is.null(population) || is.null(contact_matrix_set))) {
     stop("User must provide either the country being simulated or
-         both the population size and contact matrix")
+         both the population size and contact_matrix_set")
   }
 
   # If a country was provided then grab the population and matrices if needed
   if (is.null(population)) {
     population <- get_population(country)
 
-    if (is.null(baseline_contact_matrix)) {
-      baseline_contact_matrix <- get_mixing_matrix(country)
+    if (is.null(contact_matrix_set)) {
+      contact_matrix_set <- get_mixing_matrix(country)
     }
     population <- population$n
   }
 
   ret <- list(population = population,
               country = country,
-              baseline_contact_matrix = baseline_contact_matrix)
+              contact_matrix_set = contact_matrix_set)
 
   return(ret)
 

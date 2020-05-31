@@ -184,11 +184,8 @@ run_explicit_SEEIR_model <- function(
   # demography
   country = NULL,
   population = NULL,
-
-  # contact matrix related parameters
   tt_contact_matrix = 0,
   contact_matrix_set = NULL,
-  baseline_contact_matrix = NULL,
 
   # transmission
   R0 = 3,
@@ -249,7 +246,6 @@ run_explicit_SEEIR_model <- function(
                                     population=population,
                                     tt_contact_matrix=tt_contact_matrix,
                                     contact_matrix_set=contact_matrix_set,
-                                    baseline_contact_matrix=baseline_contact_matrix,
                                     R0=R0,
                                     tt_R0=tt_R0,
                                     beta_set=beta_set,
