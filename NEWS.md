@@ -1,3 +1,7 @@
+# squire 0.4.16
+
+* `baseline_contact_matrix` now mandatory in `run_explicit_SEEIR`
+
 # squire 0.4.15
 
 * `projections` now matches by column names when including projection outputs
