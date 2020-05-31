@@ -219,8 +219,8 @@ head(output)
 #> 2         1 E             0.2    20
 #> 3         1 E             0.3    20
 #> 4         1 E             0.4    20
-#> 5         1 E             0.5    19
-#> 6         1 E             0.6    19
+#> 5         1 E             0.5    20
+#> 6         1 E             0.6    20
 ```
 
 If we wanted age-disaggregated data, we could set `reduce_age` to
@@ -268,6 +268,7 @@ contact_matrix <- get_mixing_matrix("United Kingdom")
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
+                              baseline_contact_matrix = contact_matrix, 
                               contact_matrix_set = contact_matrix,
                               R0 = 2.5, 
                               time_period = 200,
@@ -282,6 +283,12 @@ plot(r)
 
 <img src="man/figures/README-set params-1.png" width="100%" />
 
+Note that we have to manually specify `baseline_contact_matrix` (which
+refers to the contact matrix for the population in the absence of any
+control interventions and is used to calculate the required `beta` to
+generate a given R0) and `contact_matrix_set` (which can be any contact
+matrix and is what it is implemented during model running).
+
 We can also change the R0 and contact matrix at set time points, to
 reflect changing behaviour resulting from interventions. For example to
 set a 80% reduction in the contact matrix after 100 days :
@@ -291,6 +298,7 @@ set a 80% reduction in the contact matrix after 100 days :
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               tt_contact_matrix = c(0, 100),
+                              baseline_contact_matrix = contact_matrix, 
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2),
                               R0 = 2.5, 
@@ -314,6 +322,7 @@ To show an 80% reduction after 50 days but only maintained for 30 days :
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               tt_contact_matrix = c(0, 80, 120),
+                              baseline_contact_matrix = contact_matrix, 
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2,
                                                         contact_matrix),
@@ -337,6 +346,7 @@ days:
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
+                              baseline_contact_matrix = contact_matrix, 
                               contact_matrix_set = contact_matrix,
                               tt_R0 = c(0, 80),
                               R0 = c(2.5, 0.9),
@@ -363,6 +373,7 @@ library(patchwork)
 #> Warning: package 'patchwork' was built under R version 3.5.3
 
 r <- run_explicit_SEEIR_model(population = population, 
+                              baseline_contact_matrix = contact_matrix, 
                               contact_matrix_set = contact_matrix,
                               R0 = 2.5, 
                               time_period = 200,
@@ -489,10 +500,11 @@ out <- calibrate(
       country = "Algeria"
     )
 #> 
- Progress: ------------------------------------------------------------------------------------ 100%
+ Progress: -----------------------------------------------------------------------------------------------       100%
+ Progress: ----------------------------------------------------------------------------------------------------- 100%
 #> 
 #> 
- Progress: ------------------------------------------------------------------------------------ 100%
+ Progress: ----------------------------------------------------------------------------------------------------- 100%
 ```
 
 `calibrate` returns the same output as `run_explicit_SEEIR_model`, with
@@ -574,11 +586,10 @@ out <- calibrate(
       country = "Algeria"
     )
 #> 
- Progress: ------------------------------------------------------------------------------------ 100%
+ Progress: ----------------------------------------------------------------------------------------------------- 100%
 #> 
 #> 
- Progress: ---------------------------------------------------------------------------          100%
- Progress: ------------------------------------------------------------------------------------ 100%
+ Progress: ----------------------------------------------------------------------------------------------------- 100%
 ```
 
 Let’s see if that is any better.
@@ -628,10 +639,11 @@ out <- calibrate(
       country = "Algeria"
     )
 #> 
- Progress: ------------------------------------------------------------------------------------ 100%
+ Progress: ----------------------------------------------------------------------------------------------------- 100%
 #> 
 #> 
- Progress: ------------------------------------------------------------------------------------ 100%
+ Progress: ------------------------------------------------------------------------------------------            100%
+ Progress: ----------------------------------------------------------------------------------------------------- 100%
 ```
 
 (N.B. Given the potentially long running time for the grid search, the
@@ -676,9 +688,13 @@ out <- calibrate(
       country = "Guinea"
     )
 #> 
- Progress: -------------------------------------------------------------------                  100%
- Progress: -------------------------------------------------------------------                  100%
- Progress: ------------------------------------------------------------------------------------ 100%
+ Progress: ----------------------------------------------------------------------------------------------------- 100%
+#> 
+#> 
+ Progress: --------------------------------------------------------------------------------                      100%
+ Progress: ------------------------------------------------------------------------------------------            100%
+ Progress: ------------------------------------------------------------------------------------------            100%
+ Progress: ----------------------------------------------------------------------------------------------------- 100%
 ```
 
 Firstly, let’s plot the fit up to the current day
@@ -819,6 +835,11 @@ out <- calibrate(
       forecast = 0,
       country = "Guinea"
     )
+#> 
+ Progress: ----------------------------------------------------------------------------------------------------- 100%
+#> 
+#> 
+ Progress: ----------------------------------------------------------------------------------------------------- 100%
 
 plot(out, particle_fit = TRUE)
 ```
