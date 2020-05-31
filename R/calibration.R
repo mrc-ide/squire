@@ -48,7 +48,7 @@
 #'
 #' @export
 #' @return List of dated squire simulations
-#'
+
 calibrate <- function(data,
                       R0_min,
                       R0_max,
@@ -130,8 +130,8 @@ calibrate <- function(data,
   # Checking whether baseline_contact_matrix needs to be specified
   if (is.null(baseline_contact_matrix) & !is.null(contact_matrix_set)) {
     stop("if contact_matrix_set has been specified, user must also specify the argument
-         baseline_contact_matrix, which is the contact matrix in the absence of any control
-         interventions")
+          baseline_contact_matrix, which is the contact matrix in the absence of any control
+          interventions")
   }
 
   # Get in correct format
@@ -141,6 +141,11 @@ calibrate <- function(data,
 
   # handle contact matrix changes
   if(!is.null(date_contact_matrix_set_change)) {
+
+    # Check length of contact_matrix_set is the same as length of date_contact_matrix_set_change
+    if (length(contact_matrix_set) != length(date_contact_matrix_set_change)) {
+      stop("number of contact matrices specified does not equal the number of dates for changes inputted")
+    }
 
     assert_date(date_contact_matrix_set_change)
     assert_list(contact_matrix_set)
@@ -152,12 +157,13 @@ calibrate <- function(data,
       stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
     }
 
-    tt_contact_matrix <- c(0, seq_len(length(date_contact_matrix_set_change)))
-    contact_matrix_set <- append(baseline_contact_matrix, contact_matrix_set)
+    tt_contact_matrix <- c(0, seq_len(length(date_contact_matrix_set_change) - 1))
 
   } else {
+    if (length(contact_matrix_set) > 1){
+      stop("no dates for contact matrix change specified, but multiple contact matrices present in contact_matrix_set")
+    }
     tt_contact_matrix <- 0
-    contact_matrix_set <- baseline_contact_matrix
   }
 
   # handle ICU changes
