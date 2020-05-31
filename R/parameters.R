@@ -184,8 +184,11 @@ parameters_explicit_SEEIR <- function(
   # demography
   country = NULL,
   population = NULL,
+
+  # contact matrix related parameters
   tt_contact_matrix = 0,
   contact_matrix_set = NULL,
+  baseline_contact_matrix = NULL,
 
   # transmission
   R0 = 3,
@@ -198,9 +201,7 @@ parameters_explicit_SEEIR <- function(
   init = NULL,
   seeding_cases = NULL,
 
-  # parameters
-  # probabilities
-  # probabilities
+  # parameters - probabilities
   prob_hosp = probs$prob_hosp,
   prob_severe = probs$prob_severe,
   prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
@@ -234,13 +235,24 @@ parameters_explicit_SEEIR <- function(
 
 ) {
 
+  # Checking whether baseline_contact_matrix needs to be specified
+  if (is.null(baseline_contact_matrix) & !is.null(contact_matrix_set)) {
+    stop("if contact_matrix_set has been specified, user must also specify the argument
+         baseline_contact_matrix, which is the contact matrix in the absence of any control
+         interventions")
+  }
+
   # Handle country population args
   cpm <- parse_country_population_mixing_matrix(country = country,
                                                 population = population,
-                                                contact_matrix_set = contact_matrix_set)
+                                                baseline_contact_matrix = baseline_contact_matrix)
   country <- cpm$country
   population <- cpm$population
-  contact_matrix_set <- cpm$contact_matrix_set
+
+  # Assigning baseline_contact_matrix to contact_matrix_set unless it has been specified
+  if (is.null(contact_matrix_set)) {
+    contact_matrix_set <- cpm$baseline_contact_matrix
+  }
 
   # Standardise contact matrix set
   if(is.matrix(contact_matrix_set)){
@@ -249,10 +261,10 @@ parameters_explicit_SEEIR <- function(
 
   # populate contact matrix set if not provided
   if (length(contact_matrix_set) == 1) {
-    baseline <- contact_matrix_set[[1]]
+    initial_matrix <- contact_matrix_set[[1]]
     contact_matrix_set <- vector("list", length(tt_contact_matrix))
     for(i in seq_along(tt_contact_matrix)) {
-      contact_matrix_set[[i]] <- baseline
+      contact_matrix_set[[i]] <- initial_matrix
     }
   }
 
@@ -368,7 +380,7 @@ parameters_explicit_SEEIR <- function(
   gamma_rec = 2 * 1/dur_rec
 
   if (is.null(beta_set)) {
-    baseline_matrix <- process_contact_matrix_scaled_age(contact_matrix_set[[1]], population)
+    baseline_matrix <- process_contact_matrix_scaled_age(baseline_contact_matrix, population)
     beta_set <- beta_est_explicit(dur_IMild = dur_IMild,
                                   dur_ICase = dur_ICase,
                                   prob_hosp = prob_hosp,
