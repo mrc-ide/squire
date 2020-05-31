@@ -105,7 +105,7 @@ calibrate <- function(data,
   if(!is.null(contact_matrix_set)) {
     assert_list(contact_matrix_set)
   }
-  assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
+  assert_same_length(contact_matrix_set[-1], date_contact_matrix_set_change)
   assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
   assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
   assert_numeric(dt)
@@ -142,9 +142,9 @@ calibrate <- function(data,
   # handle contact matrix changes
   if(!is.null(date_contact_matrix_set_change)) {
 
-    # Check length of contact_matrix_set is the same as length of date_contact_matrix_set_change
-    if (length(contact_matrix_set) != length(date_contact_matrix_set_change)) {
-      stop("number of contact matrices specified does not equal the number of dates for changes inputted")
+    # Check length of contact_matrix_set is 1 greater than the length of date_contact_matrix_set_change
+    if (length(contact_matrix_set[-1]) != length(date_contact_matrix_set_change)) {
+      stop("number of contact matrices specified needs to be 1 greater than the number of dates for changes")
     }
 
     assert_date(date_contact_matrix_set_change)
@@ -157,7 +157,7 @@ calibrate <- function(data,
       stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
     }
 
-    tt_contact_matrix <- c(0, seq_len(length(date_contact_matrix_set_change) - 1))
+    tt_contact_matrix <- c(0, seq_len(length(date_contact_matrix_set_change)))
 
   } else {
     if (length(contact_matrix_set) > 1){

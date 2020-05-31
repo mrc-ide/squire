@@ -467,6 +467,7 @@ R0_date_particle_filter <- function(R0,
 
   }
 
+  #### think this is where I need to change to reflect the new changes upstream - CHARLIE
   if (is.null(date_contact_matrix_set_change)) {
     tt_contact_matrix <- 0
   } else {
