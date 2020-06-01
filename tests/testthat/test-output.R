@@ -63,7 +63,7 @@ test_that("output format works", {
                                  dt = 1,
                                  time_period = 10,
                                  replicates = 10,
-                                 baseline_contact_matrix = contact_matrices[[1]],
+                                 population_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
 
   o1 <- format_output(m1)
@@ -108,7 +108,7 @@ test_that("new helper functions to extract relevant outputs", {
                                  dt = 1,
                                  time_period = 10,
                                  replicates = 10,
-                                 baseline_contact_matrix = contact_matrices[[1]],
+                                 population_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
   deaths <- extract_deaths(m1)
   expect_named(deaths, c("replicate", "compartment", "t", "y"))

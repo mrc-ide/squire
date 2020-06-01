@@ -121,7 +121,7 @@ get_hosp_bed_capacity <- function(country = NULL) {
 #' @param contact_matrix_set Contact matrices used in simulation. Default =
 #'   NULL, which will generate this based on the \code{country}.
 #' @param tt_contact_matrix Time change points for matrix change. Default = 0
-#' @param baseline_contact_matrix Baseline contact matrix in the absence of any control. Default
+#' @param population_contact_matrix Baseline contact matrix in the absence of any control. Default
 #'   NULL, which will generate this based on the \code{country}
 #' @param R0 Basic Reproduction Number. Default = 3
 #' @param tt_R0 Change time points for R0. Default = 0
@@ -190,7 +190,7 @@ parameters_explicit_SEEIR <- function(
   # contact matrix related parameters
   tt_contact_matrix = 0,
   contact_matrix_set = NULL,
-  baseline_contact_matrix = NULL,
+  population_contact_matrix = NULL,
 
   # transmission
   R0 = 3,
@@ -237,24 +237,24 @@ parameters_explicit_SEEIR <- function(
 
 ) {
 
-  # Checking whether baseline_contact_matrix needs to be specified
-  if (is.null(baseline_contact_matrix) & !is.null(contact_matrix_set)) {
+  # Checking whether population_contact_matrix needs to be specified
+  if (is.null(population_contact_matrix) & !is.null(contact_matrix_set)) {
     stop("if contact_matrix_set has been specified, user must also specify the argument
-         baseline_contact_matrix, which is the contact matrix in the absence of any control
+         population_contact_matrix, which is the contact matrix in the absence of any control
          interventions")
   }
 
   # Handle country population args
   cpm <- parse_country_population_mixing_matrix(country = country,
                                                 population = population,
-                                                baseline_contact_matrix = baseline_contact_matrix)
+                                                population_contact_matrix = population_contact_matrix)
   country <- cpm$country
   population <- cpm$population
-  baseline_contact_matrix <- cpm$baseline_contact_matrix
+  population_contact_matrix <- cpm$population_contact_matrix
 
-  # Assigning baseline_contact_matrix to contact_matrix_set unless it has been specified
+  # Assigning population_contact_matrix to contact_matrix_set unless it has been specified
   if (is.null(contact_matrix_set)) {
-    contact_matrix_set <- cpm$baseline_contact_matrix
+    contact_matrix_set <- cpm$population_contact_matrix
   }
 
   # Standardise contact matrix set
@@ -383,7 +383,7 @@ parameters_explicit_SEEIR <- function(
   gamma_rec = 2 * 1/dur_rec
 
   if (is.null(beta_set)) {
-    baseline_matrix <- process_contact_matrix_scaled_age(baseline_contact_matrix, population)
+    baseline_matrix <- process_contact_matrix_scaled_age(population_contact_matrix, population)
     beta_set <- beta_est_explicit(dur_IMild = dur_IMild,
                                   dur_ICase = dur_ICase,
                                   prob_hosp = prob_hosp,

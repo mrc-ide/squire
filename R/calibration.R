@@ -76,6 +76,7 @@ calibrate <- function(data,
                       baseline_hosp_bed_capacity = NULL,
                       hosp_bed_capacity = NULL,
                       date_contact_matrix_set_change = NULL,
+                      population_contact_matrix = NULL,
                       baseline_contact_matrix = NULL,
                       contact_matrix_set = NULL,
                       country = NULL,
@@ -105,7 +106,7 @@ calibrate <- function(data,
   if(!is.null(contact_matrix_set)) {
     assert_list(contact_matrix_set)
   }
-  assert_same_length(contact_matrix_set[-1], date_contact_matrix_set_change)
+  assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
   assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
   assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
   assert_numeric(dt)
@@ -127,8 +128,8 @@ calibrate <- function(data,
     stop("'Meff_max' must be greater 'Meff_min'")
   }
 
-  # Checking whether baseline_contact_matrix needs to be specified
-  if (is.null(baseline_contact_matrix) & !is.null(contact_matrix_set)) {
+  # Checking whether population_contact_matrix needs to be specified
+  if (is.null(population_contact_matrix) & !is.null(contact_matrix_set)) {
     stop("if contact_matrix_set has been specified, user must also specify the argument
           baseline_contact_matrix, which is the contact matrix in the absence of any control
           interventions")
@@ -139,13 +140,12 @@ calibrate <- function(data,
     baseline_contact_matrix <- list(baseline_contact_matrix)
   }
 
+  if (is.matrix(population_contact_matrix)) {
+    population_contact_matrix <- list(population_contact_matrix)
+  }
+
   # handle contact matrix changes
   if(!is.null(date_contact_matrix_set_change)) {
-
-    # Check length of contact_matrix_set is 1 greater than the length of date_contact_matrix_set_change
-    if (length(contact_matrix_set[-1]) != length(date_contact_matrix_set_change)) {
-      stop("number of contact matrices specified needs to be 1 greater than the number of dates for changes")
-    }
 
     assert_date(date_contact_matrix_set_change)
     assert_list(contact_matrix_set)
@@ -158,12 +158,14 @@ calibrate <- function(data,
     }
 
     tt_contact_matrix <- c(0, seq_len(length(date_contact_matrix_set_change)))
+    contact_matrix_set <- append(baseline_contact_matrix, contact_matrix_set)
 
   } else {
-    if (length(contact_matrix_set) > 1){
-      stop("no dates for contact matrix change specified, but multiple contact matrices present in contact_matrix_set")
+    if (length(contact_matrix_set) != 0){
+      stop("no dates for contact matrix change specified, but a contact matrix is present in contact_matrix_set")
     }
     tt_contact_matrix <- 0
+    contact_matrix_set <- baseline_contact_matrix
   }
 
   # handle ICU changes
@@ -218,7 +220,7 @@ calibrate <- function(data,
   # build model parameters
   model_params <- squire_model$parameter_func(country = country,
                                               population = population,
-                                              baseline_contact_matrix = baseline_contact_matrix[[1]],
+                                              population_contact_matrix = population_contact_matrix[[1]],
                                               contact_matrix_set = contact_matrix_set,
                                               tt_contact_matrix = tt_contact_matrix,
                                               hosp_bed_capacity = hosp_bed_capacity,
@@ -317,7 +319,7 @@ calibrate <- function(data,
 
     # create a fake run object and fill in the required elements
     r <- squire_model$run_func(country = country,
-                               baseline_contact_matrix = baseline_contact_matrix[[1]],
+                               population_contact_matrix = population_contact_matrix[[1]],
                                contact_matrix_set = contact_matrix_set,
                                tt_contact_matrix = tt_contact_matrix,
                                hosp_bed_capacity = hosp_bed_capacity,

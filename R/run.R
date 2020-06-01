@@ -109,7 +109,7 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' @param contact_matrix_set Contact matrices used in simulation. Default =
 #'   NULL, which will generate this based on the \code{country}.
 #' @param tt_contact_matrix Time change points for matrix change. Default = 0
-#' @param baseline_contact_matrix Baseline contact matrix in the absence of any control. Default
+#' @param population_contact_matrix Baseline contact matrix in the absence of any control. Default
 #'   NULL, which will generate this based on the \code{country}
 #' @param R0 Basic Reproduction Number. Default = 3
 #' @param tt_R0 Change time points for R0. Default = 0
@@ -190,7 +190,7 @@ run_explicit_SEEIR_model <- function(
   # contact matrix related parameters
   tt_contact_matrix = 0,
   contact_matrix_set = NULL,
-  baseline_contact_matrix = NULL,
+  population_contact_matrix = NULL,
 
   # transmission
   R0 = 3,
@@ -251,7 +251,7 @@ run_explicit_SEEIR_model <- function(
                                     population=population,
                                     tt_contact_matrix=tt_contact_matrix,
                                     contact_matrix_set=contact_matrix_set,
-                                    baseline_contact_matrix=baseline_contact_matrix,
+                                    population_contact_matrix=population_contact_matrix,
                                     R0=R0,
                                     tt_R0=tt_R0,
                                     beta_set=beta_set,
@@ -313,7 +313,7 @@ run_explicit_SEEIR_model <- function(
 #'
 #' @param population Population vector (for each age group). Default = NULL,
 #'   which will cause population to be sourced from \code{country}
-#' @param baseline_contact_matrix Baseline contact matrix in the absence of any control. Default
+#' @param population_contact_matrix Baseline contact matrix in the absence of any control. Default
 #'   NULL, which will generate this based on the \code{country}
 #' @param contact_matrix Contact matrix to use in the simulation.
 #' @param tt_R0 Time change points for R0
@@ -337,7 +337,7 @@ run_explicit_SEEIR_model <- function(
 #' }
 run_deterministic_SEIR_model <- function(
   population,
-  baseline_contact_matrix,
+  population_contact_matrix,
   contact_matrix,
   tt_R0,
   R0_set,
@@ -351,7 +351,7 @@ run_deterministic_SEIR_model <- function(
   default_params <- parameters_explicit_SEEIR(
     population = population,
     tt_contact_matrix = 0,
-    baseline_contact_matrix = baseline_contact_matrix,
+    population_contact_matrix = population_contact_matrix,
     contact_matrix_set = contact_matrix,
     R0 = R0_set,
     tt_R0 = tt_R0,

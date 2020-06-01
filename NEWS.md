@@ -1,6 +1,6 @@
 # squire 0.4.16
 
-* `baseline_contact_matrix` now mandatory in `run_explicit_SEEIR`
+* `population_contact_matrix` (contact matrix in absence of control) now mandatory argument
 
 # squire 0.4.15
 

@@ -85,7 +85,7 @@ test_that("run explicit works", {
                                  R0 = 2,
                                  time_period = 100,
                                  replicates = 10,
-                                 baseline_contact_matrix = contact_matrices[[1]],
+                                 population_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
   expect_type(r1$output, "double")
 
@@ -104,7 +104,7 @@ test_that("run explicit works", {
                                  tt_R0 = c(0, 10),
                                  time_period = 100,
                                  replicates = 10,
-                                 baseline_contact_matrix = contact_matrices[[1]],
+                                 population_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
   expect_identical(r1$output, r2$output)
   set.seed(123)
@@ -114,7 +114,7 @@ test_that("run explicit works", {
                                  tt_R0 = c(0, 10),
                                  time_period = 100,
                                  replicates = 10,
-                                 baseline_contact_matrix = contact_matrices[[1]],
+                                 population_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set=contact_matrices[[1]])
   o2 <- format_output(r2)
   o3 <- format_output(r3)
@@ -128,7 +128,7 @@ test_that("run explicit works", {
                                  R0 = 2,
                                  time_period = 100,
                                  replicates = 10,
-                                 baseline_contact_matrix = contact_matrices[[1]],
+                                 population_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set = list(contact_matrices[[1]],
                                                            contact_matrices[[1]]),
                                  tt_contact_matrix = c(0, 50))
@@ -140,7 +140,7 @@ test_that("run explicit works", {
                                  R0 = 2,
                                  time_period = 100,
                                  replicates = 10,
-                                 baseline_contact_matrix = contact_matrices[[1]],
+                                 population_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set = list(contact_matrices[[1]],
                                                            contact_matrices[[1]]*0.5,
                                                            contact_matrices[[1]]*0.2),
@@ -153,7 +153,7 @@ test_that("run explicit works", {
                                  R0 = 2,
                                  time_period = 100,
                                  replicates = 10,
-                                 baseline_contact_matrix = contact_matrices[[1]],
+                                 population_contact_matrix = contact_matrices[[1]],
                                  contact_matrix_set = list(contact_matrices[[1]]),
                                  tt_contact_matrix = c(0, 50))
   expect_true(!identical(r5$output, r6$output))
@@ -191,7 +191,7 @@ test_that("run explicit works when healthsystem capacity is swamped", {
 
 
   r <- run_explicit_SEEIR_model(population = population,
-                                baseline_contact_matrix = contact_matrices[[1]],
+                                population_contact_matrix = contact_matrices[[1]],
                                 contact_matrix_set = contact_matrix,
                                 R0 = 2.5,
                                 time_period = 730,
@@ -203,7 +203,7 @@ test_that("run explicit works when healthsystem capacity is swamped", {
   expect_equal(sum(o1$y < 0), 0)
 
   expect_error(r <- run_explicit_SEEIR_model(population = population,
-                                             baseline_contact_matrix = contact_matrices[[1]],
+                                             population_contact_matrix = contact_matrices[[1]],
                                              contact_matrix_set = contact_matrix,
                                              R0 = 2.5,
                                              time_period = 730,
@@ -295,16 +295,16 @@ test_that("default probs", {
 
 test_that("baseline contact matrix behaviour as expected", {
 
-  # Checking that baseline_contact_matrix is being used for beta_est_explicit
+  # Checking that population_contact_matrix is being used for beta_est_explicit
   x <- run_explicit_SEEIR_model(country = "United Kingdom",
-                                baseline_contact_matrix = contact_matrices[[1]],
+                                population_contact_matrix = contact_matrices[[1]],
                                 contact_matrix_set = contact_matrices[[1]],
                                 day_return = TRUE)
   x_deaths <- format_output(x, var_select = "deaths")
   x_max <- max(x_deaths$y)
 
   y <- run_explicit_SEEIR_model(country = "United Kingdom",
-                                baseline_contact_matrix = contact_matrices[[1]],
+                                population_contact_matrix = contact_matrices[[1]],
                                 contact_matrix_set = 0.5 * contact_matrices[[1]],
                                 day_return = TRUE)
   y_deaths <- format_output(y, var_select = "deaths")
@@ -313,16 +313,16 @@ test_that("baseline contact matrix behaviour as expected", {
   expect_gt(x_max, y_max)
   expect_equal(y$parameters$beta_set, x$parameters$beta_set)
 
-  # Checking that baseline_contact_matrix is being used for beta_est_explicit
+  # Checking that population_contact_matrix is being used for beta_est_explicit
   z <- run_explicit_SEEIR_model(country = "United Kingdom",
-                                baseline_contact_matrix = 0.5 * contact_matrices[[1]],
+                                population_contact_matrix = 0.5 * contact_matrices[[1]],
                                 contact_matrix_set = contact_matrices[[1]],
                                 day_return = TRUE)
   z_deaths <- format_output(z, var_select = "deaths")
   z_max <- max(z_deaths$y)
 
   a <- run_explicit_SEEIR_model(country = "United Kingdom",
-                                baseline_contact_matrix = contact_matrices[[1]],
+                                population_contact_matrix = contact_matrices[[1]],
                                 contact_matrix_set = contact_matrices[[1]],
                                 day_return = TRUE)
   a_deaths <- format_output(a, var_select = "deaths")

@@ -32,6 +32,7 @@ calibrate(
   baseline_hosp_bed_capacity = NULL,
   hosp_bed_capacity = NULL,
   date_contact_matrix_set_change = NULL,
+  population_contact_matrix = NULL,
   baseline_contact_matrix = NULL,
   contact_matrix_set = NULL,
   country = NULL,
@@ -126,6 +127,9 @@ the population}
 
 \item{date_contact_matrix_set_change}{Calendar dates at which the contact matrices
 set in \code{model_params} change. Defaut = NULL, i.e. no change}
+
+\item{population_contact_matrix}{Baseline contact matrix in the absence of any control. Default
+NULL, which will generate this based on the \code{country}}
 
 \item{baseline_contact_matrix}{The starting contact matrix prior to any changes
 due to interventions or otherwise. Default = NULL, which will use the contact

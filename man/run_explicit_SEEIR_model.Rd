@@ -9,7 +9,7 @@ run_explicit_SEEIR_model(
   population = NULL,
   tt_contact_matrix = 0,
   contact_matrix_set = NULL,
-  baseline_contact_matrix = NULL,
+  population_contact_matrix = NULL,
   R0 = 3,
   tt_R0 = 0,
   beta_set = NULL,
@@ -59,7 +59,7 @@ which will cause population to be sourced from \code{country}}
 \item{contact_matrix_set}{Contact matrices used in simulation. Default =
 NULL, which will generate this based on the \code{country}.}
 
-\item{baseline_contact_matrix}{Baseline contact matrix in the absence of any control. Default
+\item{population_contact_matrix}{Baseline contact matrix in the absence of any control. Default
 NULL, which will generate this based on the \code{country}}
 
 \item{R0}{Basic Reproduction Number. Default = 3}
