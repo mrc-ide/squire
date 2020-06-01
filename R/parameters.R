@@ -237,6 +237,12 @@ parameters_explicit_SEEIR <- function(
 
 ) {
 
+  # Initial input checks
+  stopifnot(length(R0) == length(tt_R0))
+  stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
+  stopifnot(length(hosp_bed_capacity) == length(tt_hosp_beds))
+  stopifnot(length(ICU_bed_capacity) == length(tt_ICU_beds))
+
   # Handle country population args
   cpm <- parse_country_population_mixing_matrix(country = country,
                                                 population = population,
@@ -256,12 +262,9 @@ parameters_explicit_SEEIR <- function(
   }
 
   # populate contact matrix set if not provided
-  if (length(contact_matrix_set) == 1) {
-    initial_matrix <- contact_matrix_set[[1]]
-    contact_matrix_set <- vector("list", length(tt_contact_matrix))
-    for(i in seq_along(tt_contact_matrix)) {
-      contact_matrix_set[[i]] <- initial_matrix
-    }
+  if (is.null(contact_matrix_set)) {
+    contact_matrix_set <- vector("list", 1)
+    contact_matrix_set[[1]] <- population_contact_matrix
   }
 
 
@@ -302,10 +305,6 @@ parameters_explicit_SEEIR <- function(
   # Input checks
   # ----------------------------------------------------------------------------
   mc <- matrix_check(population[-1], contact_matrix_set)
-  stopifnot(length(R0) == length(tt_R0))
-  stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
-  stopifnot(length(hosp_bed_capacity) == length(tt_hosp_beds))
-  stopifnot(length(ICU_bed_capacity) == length(tt_ICU_beds))
   tc <- lapply(list(tt_R0/dt, tt_contact_matrix/dt), check_time_change, time_period/dt)
   tc2 <- lapply(list(tt_hosp_beds/dt, tt_ICU_beds/dt), check_time_change, time_period/dt)
 
