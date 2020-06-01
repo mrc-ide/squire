@@ -98,7 +98,7 @@ If you have any problems installing then please raise an issue on the <i>squire<
 
 If everything has installed correctly, we then need to load the package: 
 
-```{r, eval = FALSE}
+```{r}
 library(squire)
 ```
 
@@ -440,6 +440,7 @@ out <- calibrate(
       forecast = 14,
       R0_change = int_unique$change,
       date_R0_change = int_unique$dates_change,
+      population_contact_matrix = get_mixing_matrix("Algeria"),
       baseline_contact_matrix = get_mixing_matrix("Algeria"),
       contact_matrix_set = list(get_mixing_matrix("Algeria")*0.9),
       date_contact_matrix_set_change = "2020-03-16",

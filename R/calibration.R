@@ -131,7 +131,7 @@ calibrate <- function(data,
   # Checking whether population_contact_matrix needs to be specified
   if (is.null(population_contact_matrix) & !is.null(contact_matrix_set)) {
     stop("if contact_matrix_set has been specified, user must also specify the argument
-          baseline_contact_matrix, which is the contact matrix in the absence of any control
+          population_contact_matrix, which is the contact matrix in the absence of any control
           interventions")
   }
 

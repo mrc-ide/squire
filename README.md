@@ -268,7 +268,7 @@ contact_matrix <- get_mixing_matrix("United Kingdom")
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
-                              baseline_contact_matrix = contact_matrix, 
+                              population_contact_matrix = contact_matrix, 
                               contact_matrix_set = contact_matrix,
                               R0 = 2.5, 
                               time_period = 200,
@@ -283,7 +283,7 @@ plot(r)
 
 <img src="man/figures/README-set params-1.png" width="100%" />
 
-Note that we have to manually specify `baseline_contact_matrix` (which
+Note that we have to manually specify `population_contact_matrix` (which
 refers to the contact matrix for the population in the absence of any
 control interventions and is used to calculate the required `beta` to
 generate a given R0) and `contact_matrix_set` (which can be any contact
@@ -298,7 +298,7 @@ set a 80% reduction in the contact matrix after 100 days :
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               tt_contact_matrix = c(0, 100),
-                              baseline_contact_matrix = contact_matrix, 
+                              population_contact_matrix = contact_matrix, 
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2),
                               R0 = 2.5, 
@@ -322,7 +322,7 @@ To show an 80% reduction after 50 days but only maintained for 30 days :
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               tt_contact_matrix = c(0, 80, 120),
-                              baseline_contact_matrix = contact_matrix, 
+                              population_contact_matrix = contact_matrix, 
                               contact_matrix_set = list(contact_matrix,
                                                         contact_matrix*0.2,
                                                         contact_matrix),
@@ -346,7 +346,7 @@ days:
 
 # run the model
 r <- run_explicit_SEEIR_model(population = population, 
-                              baseline_contact_matrix = contact_matrix, 
+                              population_contact_matrix = contact_matrix, 
                               contact_matrix_set = contact_matrix,
                               tt_R0 = c(0, 80),
                               R0 = c(2.5, 0.9),
@@ -373,7 +373,7 @@ library(patchwork)
 #> Warning: package 'patchwork' was built under R version 3.5.3
 
 r <- run_explicit_SEEIR_model(population = population, 
-                              baseline_contact_matrix = contact_matrix, 
+                              population_contact_matrix = contact_matrix, 
                               contact_matrix_set = contact_matrix,
                               R0 = 2.5, 
                               time_period = 200,
@@ -500,7 +500,6 @@ out <- calibrate(
       country = "Algeria"
     )
 #> 
- Progress: -----------------------------------------------------------------------------------------------       100%
  Progress: ----------------------------------------------------------------------------------------------------- 100%
 #> 
 #> 
@@ -627,6 +626,7 @@ out <- calibrate(
       forecast = 14,
       R0_change = int_unique$change,
       date_R0_change = int_unique$dates_change,
+      population_contact_matrix = get_mixing_matrix("Algeria"),
       baseline_contact_matrix = get_mixing_matrix("Algeria"),
       contact_matrix_set = list(get_mixing_matrix("Algeria")*0.9),
       date_contact_matrix_set_change = "2020-03-16",
@@ -642,7 +642,6 @@ out <- calibrate(
  Progress: ----------------------------------------------------------------------------------------------------- 100%
 #> 
 #> 
- Progress: ------------------------------------------------------------------------------------------            100%
  Progress: ----------------------------------------------------------------------------------------------------- 100%
 ```
 
@@ -692,7 +691,6 @@ out <- calibrate(
 #> 
 #> 
  Progress: --------------------------------------------------------------------------------                      100%
- Progress: ------------------------------------------------------------------------------------------            100%
  Progress: ------------------------------------------------------------------------------------------            100%
  Progress: ----------------------------------------------------------------------------------------------------- 100%
 ```
