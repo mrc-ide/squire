@@ -2,7 +2,7 @@
 % Please edit documentation in R/pmcmc.R
 \name{pmcmc}
 \alias{pmcmc}
-\title{Run a P MCMC Sampler within the Squire Framework}
+\title{Run a Particle MCMC Sampler within the Squire Framework}
 \usage{
 pmcmc(
   data,
@@ -16,10 +16,11 @@ pmcmc(
   squire_model = explicit_model(),
   pars_obs = list(phi_cases = 0.1, k_cases = 2, phi_death = 1, k_death = 2, exp_noise =
     1e+06),
-  pars_init = list(start_date = as.Date("2020-02-07"), R0 = 2.5, Meff = 2),
-  pars_min = list(start_date = as.Date("2020-02-01"), R0 = 0, Meff = 1),
-  pars_max = list(start_date = as.Date("2020-02-20"), R0 = 5, Meff = 3),
-  pars_discrete = list(start_date = TRUE, R0 = FALSE, Meff = FALSE),
+  pars_init = list(start_date = as.Date("2020-02-07"), R0 = 2.5, Meff_dl = 2, Meff_pl =
+    3),
+  pars_min = list(start_date = as.Date("2020-02-01"), R0 = 0, Meff_dl = 1, Meff_pl = 2),
+  pars_max = list(start_date = as.Date("2020-02-20"), R0 = 5, Meff_dl = 3, Meff_pl = 4),
+  pars_discrete = list(start_date = TRUE, R0 = FALSE, Meff_dl = FALSE, Meff_pl = FALSE),
   proposal_kernel = NULL,
   reporting_fraction = 1,
   country = NULL,
@@ -29,6 +30,7 @@ pmcmc(
   date_contact_matrix_set_change = NULL,
   date_R0_change = NULL,
   R0_change = NULL,
+  date_Meff_change = NULL,
   hosp_bed_capacity = NULL,
   baseline_hosp_bed_capacity = NULL,
   date_hosp_bed_capacity_change = NULL,
@@ -63,7 +65,7 @@ If NULL, uses uninformative priors which do not affect the posterior}
 
 \item{output_proposals}{Logical indicating whether proposed parameter jumps should be output along with results}
 
-\item{n_chains}{number of chains to run}
+\item{n_chains}{number of MCMC chains to run}
 
 \item{squire_model}{A squire model to use}
 
@@ -113,6 +115,8 @@ Defaut = NULL, i.e. no change in R0}
 
 \item{R0_change}{Numeric vector for relative changes in R0. Default = NULL,
 i.e. no change in R0}
+
+\item{date_Meff_change}{Date when mobility changed corresponding to expected changes in R0 during and after lockdown}
 
 \item{hosp_bed_capacity}{Number of hospital beds at each date specified in
 \code{date_hosp_bed_capacity_change}. Must be same length as

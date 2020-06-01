@@ -67,8 +67,9 @@ sample_pmcmc <- function(pmcmc_results,
 
   # TODO relax this limitation?
   # catch
-  assert_in(colnames(params.smpl), c("start_date", "R0", "Meff"),
-            message = "Currently only allow for the start date, R0, and Meff to be inferred. All the three must be included")
+  assert_in(colnames(params.smpl), c("start_date", "R0", "Meff_dl", "Meff_pl"),
+            message = "Currently only allow for the start date, R0, and Meff during and after the lockdown to be inferred. All four must be included,
+            although the Meff parameters can be fixed at 1 (and therefore not inferred).")
   # put this in format for calc_loglikelihood
   pars.list <- split(params.smpl, 1:nrow(params.smpl))
   names(pars.list) <- rep("pars", length(pars.list))
