@@ -1,4 +1,5 @@
 context("pmcmc")
+Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
 
 #------------------------------------------------
 test_that("pmcmc fitting works", {
