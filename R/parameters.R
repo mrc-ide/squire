@@ -261,13 +261,6 @@ parameters_explicit_SEEIR <- function(
     contact_matrix_set <- list(contact_matrix_set)
   }
 
-  # populate contact matrix set if not provided
-  if (is.null(contact_matrix_set)) {
-    contact_matrix_set <- vector("list", 1)
-    contact_matrix_set[[1]] <- population_contact_matrix
-  }
-
-
   # populate hospital and ICU bed capacity if not provided
   if (is.null(hosp_bed_capacity)) {
     if (!is.null(country)) {
