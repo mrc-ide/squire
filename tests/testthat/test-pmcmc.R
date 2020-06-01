@@ -1,9 +1,8 @@
 context("pmcmc")
-Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
 
 #------------------------------------------------
 test_that("pmcmc fitting works", {
-
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
   data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
   interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
   int_unique <- interventions_unique(interventions)
@@ -490,7 +489,7 @@ test_that("pmcmc fitting works", {
 
 #------------------------------------------------
 test_that("pmcmc non future works", {
-
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
   data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
   interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
   int_unique <- interventions_unique(interventions)
@@ -558,7 +557,7 @@ test_that("pmcmc non future works", {
 
 #------------------------------------------------
 test_that("pmcmc deterministic", {
-
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
   data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
   interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
   int_unique <- interventions_unique(interventions)
@@ -629,7 +628,7 @@ test_that("pmcmc deterministic", {
 
 #-------------------------------------
 test_that("pmcmc user pop and contact", {
-
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
   pop <- get_population("Nigeria")
   mat <- get_mixing_matrix("Nigeria")*0.9
 
