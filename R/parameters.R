@@ -237,13 +237,6 @@ parameters_explicit_SEEIR <- function(
 
 ) {
 
-  # Checking whether population_contact_matrix needs to be specified
-  if (is.null(population_contact_matrix) & !is.null(contact_matrix_set)) {
-    stop("if contact_matrix_set has been specified, user must also specify the argument
-         population_contact_matrix, which is the contact matrix in the absence of any control
-         interventions")
-  }
-
   # Handle country population args
   cpm <- parse_country_population_mixing_matrix(country = country,
                                                 population = population,
