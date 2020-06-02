@@ -10,6 +10,15 @@
 #'
 #' @param R0_step Step to increment R0 between min and max
 #'
+#' @param R0_prior Prior for R0. Default = NULL, which is a flat prior. Should be
+#'  provided as a list with first argument the distribution function and the second
+#'  the function arguments (excluding quantiles which are worked out based on
+#'  R0_min and R0_max), e.g. `list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))`.
+#'
+#' @param Rt_func Function for converting R0, Meff and R0_change. Function must
+#'   have names arguments of R0, Meff and R0_change. Default is linear relationship
+#'   on the log scale given by \code{exp(log(R0) - Meff*(1-R0_change))}.
+#'
 #' @param first_start_date Earliest start date as 'yyyy-mm-dd'
 #'
 #' @param last_start_date Latest start date as 'yyyy-mm-dd'
@@ -58,6 +67,8 @@ scan_R0_date <- function(
   day_step,
   data,
   model_params,
+  Rt_func = function(R0_change, R0, Meff){ exp(log(R0) - Meff*(1-R0_change)) },
+  R0_prior = NULL,
   R0_change = NULL,
   date_R0_change = NULL,
   date_contact_matrix_set_change = NULL,
@@ -85,7 +96,7 @@ scan_R0_date <- function(
 
   # Set up observation parameters that translate our model outputs to observations
   if (is.null(pars_obs)) {
-    pars_obs <-  list(phi_cases = 0.1,
+    pars_obs <-  list(phi_cases = 1,
                       k_cases = 2,
                       phi_death = 1,
                       k_death = 2,
@@ -115,6 +126,8 @@ scan_R0_date <- function(
       n_particles = n_particles,
       forecast_days = 0,
       save_particles = FALSE,
+      Meff_include = FALSE,
+      Rt_func = Rt_func,
       return = "ll")
 
   } else {
@@ -134,6 +147,8 @@ scan_R0_date <- function(
       n_particles = n_particles,
       forecast_days = 0,
       save_particles = FALSE,
+      Meff_include = FALSE,
+      Rt_func = Rt_func,
       .progress = TRUE,
       return = "ll")
 
@@ -147,6 +162,14 @@ scan_R0_date <- function(
     nrow = length(R0_1D),
     ncol = length(date_list),
     byrow = FALSE)
+
+
+  # apply prior post hoc
+  if(!is.null(R0_prior)) {
+    R0_prior$args$x <- R0_1D
+    R0_prior$args$log <- TRUE
+    mat_log_ll <- mat_log_ll + do.call(R0_prior[[1]], R0_prior[[2]])
+  }
 
   # Exponentiate elements and normalise to 1 to get probabilities
   prob_matrix <- exp(mat_log_ll)
@@ -175,6 +198,7 @@ scan_R0_date <- function(
                       date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                       date_hosp_bed_capacity_change = date_hosp_bed_capacity_change
                     ),
+                    Rt_func = Rt_func,
                     pars_obs = pars_obs,
                     data = data))
 
@@ -193,6 +217,15 @@ scan_R0_date <- function(
 #' @param R0_max Maximum value of R0 in the search
 #'
 #' @param R0_step Step to increment R0 between min and max
+#'
+#' @param R0_prior Prior for R0. Default = NULL, which is a flat prior. Should be
+#'  provided as a list with first argument the distribution function and the second
+#'  the function arguments (excluding quantiles which are worked out based on
+#'  R0_min and R0_max), e.g. \code{list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))}.
+#'
+#' @param Rt_func Function for converting R0, Meff and R0_change. Function must
+#'   have names arguments of R0, Meff and R0_change. Default is linear relationship
+#'   on the log scale given by \code{exp(log(R0) - Meff*(1-R0_change))}.
 #'
 #' @param first_start_date Earliest start date as 'yyyy-mm-dd'
 #'
@@ -251,6 +284,8 @@ scan_R0_date_Meff <- function(
   Meff_step,
   data,
   model_params,
+  Rt_func = function(R0_change, R0, Meff){ exp(log(R0) - Meff*(1-R0_change)) },
+  R0_prior = NULL,
   R0_change = NULL,
   date_R0_change = NULL,
   date_contact_matrix_set_change = NULL,
@@ -264,10 +299,11 @@ scan_R0_date_Meff <- function(
 
   assert_custom_class(squire_model, "squire_model")
   assert_custom_class(model_params, "squire_parameters")
+  assert_in(names(formals(Rt_func)), c("R0_change", "R0", "Meff"))
   assert_pos(R0_min)
   assert_pos(R0_max)
-  assert_pos(Meff_max)
-  assert_pos(Meff_min)
+  assert_numeric(Meff_max)
+  assert_numeric(Meff_min)
   assert_pos(Meff_step)
   assert_date(first_start_date)
   assert_date(last_start_date)
@@ -282,7 +318,7 @@ scan_R0_date_Meff <- function(
 
   # Set up observation parameters that translate our model outputs to observations
   if (is.null(pars_obs)) {
-    pars_obs <-  list(phi_cases = 0.1,
+    pars_obs <-  list(phi_cases = 1,
                       k_cases = 2,
                       phi_death = 1,
                       k_death = 2,
@@ -297,22 +333,24 @@ scan_R0_date_Meff <- function(
 
   if (Sys.getenv("SQUIRE_PARALLEL_DEBUG") == "TRUE") {
 
-  pf_run_ll <- purrr::pmap_dbl(
-    .l = param_grid,
-    .f = R0_date_particle_filter,
-    squire_model = squire_model,
-    model_params = model_params,
-    data = data,
-    R0_change = R0_change,
-    date_R0_change = date_R0_change,
-    date_contact_matrix_set_change = date_contact_matrix_set_change,
-    date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
-    date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
-    pars_obs = pars_obs,
-    n_particles = n_particles,
-    forecast_days = 0,
-    save_particles = FALSE,
-    return = "ll")
+    pf_run_ll <- purrr::pmap_dbl(
+      .l = param_grid,
+      .f = R0_date_particle_filter,
+      squire_model = squire_model,
+      model_params = model_params,
+      data = data,
+      R0_change = R0_change,
+      date_R0_change = date_R0_change,
+      date_contact_matrix_set_change = date_contact_matrix_set_change,
+      date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+      date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
+      pars_obs = pars_obs,
+      n_particles = n_particles,
+      forecast_days = 0,
+      save_particles = FALSE,
+      Meff_include = TRUE,
+      Rt_func = Rt_func,
+      return = "ll")
 
   } else {
 
@@ -332,6 +370,8 @@ scan_R0_date_Meff <- function(
       forecast_days = 0,
       save_particles = FALSE,
       .progress = TRUE,
+      Meff_include = TRUE,
+      Rt_func = Rt_func,
       return = "ll")
 
   }
@@ -343,6 +383,13 @@ scan_R0_date_Meff <- function(
     pf_run_ll,
     dim = c(length(R0_1D), length(date_list), length(Meff_1D))
   )
+
+  # apply prior post hoc
+  if(!is.null(R0_prior)) {
+    R0_prior$args$x <- R0_1D
+    R0_prior$args$log <- TRUE
+    mat_log_ll <- mat_log_ll + do.call(R0_prior[[1]], R0_prior[[2]])
+  }
 
   # Exponentiate elements and normalise to 1 to get probabilities
   prob_matrix <- exp(mat_log_ll)
@@ -373,6 +420,7 @@ scan_R0_date_Meff <- function(
                       date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                       date_hosp_bed_capacity_change = date_hosp_bed_capacity_change
                     ),
+                    Rt_func = Rt_func,
                     pars_obs = pars_obs,
                     data = data))
 
@@ -388,7 +436,6 @@ scan_R0_date_Meff <- function(
 #' @noRd
 R0_date_particle_filter <- function(R0,
                                     start_date,
-                                    Meff = 1,
                                     squire_model,
                                     model_params,
                                     data,
@@ -399,6 +446,9 @@ R0_date_particle_filter <- function(R0,
                                     date_hosp_bed_capacity_change,
                                     pars_obs,
                                     n_particles,
+                                    Meff = 1,
+                                    Meff_include = FALSE,
+                                    Rt_func = function(R0_change, R0, Meff){ exp(log(R0) - Meff*(1-R0_change)) },
                                     forecast_days = 0,
                                     save_particles = FALSE,
                                     full_output = FALSE,
@@ -408,38 +458,64 @@ R0_date_particle_filter <- function(R0,
   if (is.null(date_R0_change)) {
     tt_beta <- 0
   } else {
-    tt_beta <- unique(c(0, intervention_dates_for_odin(dates = date_R0_change,
-                                                start_date = start_date,
-                                                steps_per_day = round(1/model_params$dt))))
+    tt_list <- intervention_dates_for_odin(dates = date_R0_change,
+                                           change = R0_change,
+                                           start_date = start_date,
+                                           steps_per_day = round(1/model_params$dt))
+    model_params$tt_beta <- unique(c(0, tt_list$tt))
+    R0_change <- tt_list$change
+
   }
 
   if (is.null(date_contact_matrix_set_change)) {
     tt_contact_matrix <- 0
   } else {
-    tt_contact_matrix <- unique(c(0, intervention_dates_for_odin(dates = date_contact_matrix_set_change,
-                                                          start_date = start_date,
-                                                          steps_per_day = round(1/model_params$dt))))
+    tt_list <- intervention_dates_for_odin(dates = date_contact_matrix_set_change,
+                                           change = model_params$contact_matrix_set[-1],
+                                           start_date = start_date,
+                                           steps_per_day = round(1/model_params$dt))
+
+    model_params$tt_contact_matrix <- unique(c(0, tt_list$tt))
+    model_params$contact_matrix_set <- append(model_params$contact_matrix_set[1], tt_list$change)
+
   }
 
   if (is.null(date_ICU_bed_capacity_change)) {
     tt_ICU_beds <- 0
   } else {
-    tt_ICU_beds <- unique(c(0, intervention_dates_for_odin(dates = date_ICU_bed_capacity_change,
-                                                    start_date = start_date,
-                                                    steps_per_day = round(1/model_params$dt))))
+    tt_list <- intervention_dates_for_odin(dates = date_ICU_bed_capacity_change,
+                                           change = model_params$ICU_beds[-1],
+                                           start_date = start_date,
+                                           steps_per_day = round(1/model_params$dt))
+
+    model_params$tt_ICU_beds <- unique(c(0, tt_list$tt))
+    model_params$ICU_beds <- c(model_params$ICU_beds[1], tt_list$change)
+
   }
 
   if (is.null(date_hosp_bed_capacity_change)) {
     tt_hosp_beds <- 0
   } else {
-    tt_hosp_beds <- unique(c(0, intervention_dates_for_odin(dates = date_hosp_bed_capacity_change,
-                                                     start_date = start_date,
-                                                     steps_per_day = round(1/model_params$dt))))
+    tt_list <- intervention_dates_for_odin(dates = date_hosp_bed_capacity_change,
+                                           change = model_params$hosp_beds[-1],
+                                           start_date = start_date,
+                                           steps_per_day = round(1/model_params$dt))
+
+    model_params$tt_hosp_beds <- unique(c(0, tt_list$tt))
+    model_params$hosp_beds <- c(model_params$hosp_beds[1], tt_list$change)
+
   }
 
-  # Second create the new R0s for the R0
+  # Second create the new R0s for the R0 and any changes to Meff
   if (!is.null(R0_change)) {
-    R0 <- c(R0, R0 * R0_change * Meff)
+    if (Meff_include) {
+      #R0 <- c(R0, exp(log(R0) - Meff*(1-R0_change)))
+      R0 <- c(R0, vapply(R0_change, function(x){
+        Rt_func(R0_change = x, R0 = R0, Meff = Meff)
+        }, FUN.VALUE = numeric(1)))
+    } else {
+      R0 <- c(R0, R0 * R0_change)
+    }
   }
 
   # and work out our beta
@@ -449,36 +525,31 @@ R0_date_particle_filter <- function(R0,
 
   # update the model params accordingly
   model_params$beta_set <- beta_set
-  model_params$tt_beta <- tt_beta
-  model_params$tt_contact_matrix <- tt_contact_matrix
-  model_params$tt_ICU_beds <- tt_ICU_beds
-  model_params$tt_hosp_beds <- tt_hosp_beds
 
   # run the particle filter
-
   if (inherits(squire_model, "stochastic")) {
 
-  X <- run_particle_filter(data = data,
-                           squire_model = squire_model,
-                           model_params = model_params,
-                           model_start_date = start_date,
-                           obs_params = pars_obs,
-                           n_particles = n_particles,
-                           forecast_days = forecast_days,
-                           full_output = full_output,
-                           save_particles = save_particles,
-                           return = return)
-
-  } else {
-
-    X <- run_deterministic_comparison(data = data,
+    X <- run_particle_filter(data = data,
                              squire_model = squire_model,
                              model_params = model_params,
                              model_start_date = start_date,
                              obs_params = pars_obs,
+                             n_particles = n_particles,
                              forecast_days = forecast_days,
-                             save_history = save_particles,
+                             full_output = full_output,
+                             save_particles = save_particles,
                              return = return)
+
+  } else {
+
+    X <- run_deterministic_comparison(data = data,
+                                      squire_model = squire_model,
+                                      model_params = model_params,
+                                      model_start_date = start_date,
+                                      obs_params = pars_obs,
+                                      forecast_days = forecast_days,
+                                      save_history = save_particles,
+                                      return = return)
 
   }
 
@@ -571,10 +642,12 @@ sample_grid_scan <- function(scan_results,
       date_contact_matrix_set_change = scan_results$inputs$interventions$date_contact_matrix_set_change,
       date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
       date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
+      Rt_func = scan_results$inputs$Rt_func,
       pars_obs = pars_obs,
       n_particles = n_particles,
       forecast_days = forecast_days,
       full_output = full_output,
+      Meff_include = FALSE,
       save_particles = TRUE,
       return = "sample"
     )
@@ -590,11 +663,13 @@ sample_grid_scan <- function(scan_results,
       date_contact_matrix_set_change = scan_results$inputs$interventions$date_contact_matrix_set_change,
       date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
       date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
+      Rt_func = scan_results$inputs$Rt_func,
       pars_obs = pars_obs,
       n_particles = n_particles,
       forecast_days = forecast_days,
       full_output = full_output,
       save_particles = TRUE,
+      Meff_include = FALSE,
       return = "sample",
       .progress = TRUE
     )
@@ -663,10 +738,10 @@ sample_grid_scan <- function(scan_results,
 #' @import furrr
 #' @importFrom utils tail
 sample_3d_grid_scan <- function(scan_results,
-                             n_sample_pairs = 10,
-                             n_particles = 100,
-                             forecast_days = 0,
-                             full_output = FALSE) {
+                                n_sample_pairs = 10,
+                                n_particles = 100,
+                                forecast_days = 0,
+                                full_output = FALSE) {
 
   # checks on args
   assert_custom_class(scan_results, "squire_scan")
@@ -721,33 +796,37 @@ sample_3d_grid_scan <- function(scan_results,
       date_contact_matrix_set_change = scan_results$inputs$interventions$date_contact_matrix_set_change,
       date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
       date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
+      Rt_func = scan_results$inputs$Rt_func,
       pars_obs = pars_obs,
       n_particles = n_particles,
       forecast_days = forecast_days,
       full_output = full_output,
       save_particles = TRUE,
+      Meff_include = TRUE,
       return = "sample"
     )
   } else {
-  traces <- furrr::future_pmap(
-    .l = param_grid,
-    .f = R0_date_particle_filter,
-    squire_model = squire_model,
-    model_params = model_params,
-    data = data,
-    R0_change = scan_results$inputs$interventions$R0_change,
-    date_R0_change = scan_results$inputs$interventions$date_R0_change,
-    date_contact_matrix_set_change = scan_results$inputs$interventions$date_contact_matrix_set_change,
-    date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
-    date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
-    pars_obs = pars_obs,
-    n_particles = n_particles,
-    forecast_days = forecast_days,
-    full_output = full_output,
-    save_particles = TRUE,
-    return = "sample",
-    .progress = TRUE
-  )
+    traces <- furrr::future_pmap(
+      .l = param_grid,
+      .f = R0_date_particle_filter,
+      squire_model = squire_model,
+      model_params = model_params,
+      data = data,
+      R0_change = scan_results$inputs$interventions$R0_change,
+      date_R0_change = scan_results$inputs$interventions$date_R0_change,
+      date_contact_matrix_set_change = scan_results$inputs$interventions$date_contact_matrix_set_change,
+      date_ICU_bed_capacity_change = scan_results$inputs$interventions$date_ICU_bed_capacity_change,
+      date_hosp_bed_capacity_change = scan_results$inputs$interventions$date_hosp_bed_capacity_change,
+      Rt_func = scan_results$inputs$Rt_func,
+      pars_obs = pars_obs,
+      n_particles = n_particles,
+      forecast_days = forecast_days,
+      full_output = full_output,
+      save_particles = TRUE,
+      Meff_include = TRUE,
+      return = "sample",
+      .progress = TRUE
+    )
   }
   # collapse into an array of trajectories
   # the trajectories are different lengths in terms of dates
@@ -848,13 +927,13 @@ plot.squire_scan <- function(x, ..., what = "likelihood", log = FALSE, show = c(
       ggplot2::theme_bw() +
       ggplot2::theme(
         panel.grid = ggplot2::element_blank(),
-                     panel.border = ggplot2::element_blank(),
-                     plot.title = ggplot2::element_text(hjust = 0.5)) +
+        panel.border = ggplot2::element_blank(),
+        plot.title = ggplot2::element_text(hjust = 0.5)) +
       ggplot2::ggtitle("Probability")
 
     if(log) {
       gg <- gg + ggplot2::scale_fill_gradient(name = "Probability", trans = 'log',
-                                               low = "#56B1F7", high = "#132B43")
+                                              low = "#56B1F7", high = "#132B43")
     }
   }
 
@@ -905,8 +984,7 @@ plot_sample_grid_search <- function(x, what = "deaths") {
     base_plot <- base_plot +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=.data$cases/x$scan_results$inputs$pars_obs$phi_cases,
-                                       x=as.Date(.data$date)), x$scan_results$inputs$data)
+      ggplot2::geom_point(ggplot2::aes(y=.data$cases, x=as.Date(.data$date)), x$scan_results$inputs$data)
 
   }
 
@@ -929,8 +1007,7 @@ plot_sample_grid_search <- function(x, what = "deaths") {
     base_plot <- base_plot +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=.data$deaths/x$scan_results$inputs$pars_obs$phi_death,
-                                       x=as.Date(.data$date)), x$scan_results$inputs$data)
+      ggplot2::geom_point(ggplot2::aes(y=.data$deaths,x=as.Date(.data$date)), x$scan_results$inputs$data)
 
   } else {
 

@@ -1,10 +1,10 @@
 Package: squire
 Type: Package
 Title: SEIR transmission model of COVID-19
-Version: 0.4.7
+Version: 0.4.15
 Authors@R: c(
-  person("Patrick", "Walker", email = "patrick.walker06@imperial.ac.uk", role = c("aut")),
   person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut", "cre")),
+  person("Patrick", "Walker", email = "patrick.walker06@imperial.ac.uk", role = c("aut")),
   person("Charlie", "Whittaker", email = "charles.whittaker16@imperial.ac.uk", role = c("aut")),
   person("Peter", "Winskill", email = "p.winskill@imperial.ac.uk", role = c("aut")),
   person("Giovanni", "Charles", email = "giovanni.charles10@imperial.ac.uk", role = c("aut"))
@@ -21,11 +21,11 @@ Suggests:
     covr,
     readxl,
     knitr,
+    odin.js,
     rmarkdown
 RoxygenNote: 7.1.0
 Imports: 
-    odin,
-    odin.js,
+    odin (>= 1.0.3), 
     dde (>= 1.0.2),
     dplyr,
     tidyr,
@@ -43,4 +43,5 @@ Depends: R (>= 3.1.0)
 VignetteBuilder: knitr
 Remotes:
     mrc-ide/dde,
+    mrc-ide/odin,
     mrc-ide/odin.js

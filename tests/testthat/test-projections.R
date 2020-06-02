@@ -240,6 +240,72 @@ test_that("projection continuation past array size", {
   p <- projections(r, R0_change = 2, time_period = 20)
   expect_true(all(round((diff(p$output[,"time",])),1) == r$parameters$dt))
 
+  expect_true(unique(diff(p$output[,1,1])) == 1)
+
 
 })
 
+
+#------------------------------------------------
+test_that("projection for Meff", {
+
+data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+int_unique <- interventions_unique(interventions)
+reporting_fraction = 1
+country = "Algeria"
+replicates = 2
+R0_min = 2.6
+R0_max = 2.7
+R0_step = 0.1
+first_start_date = "2020-02-01"
+last_start_date = "2020-02-02"
+Meff_min = 0.1
+Meff_max = 1.8
+Meff_step = 0.8
+day_step = 1
+R0_change = int_unique$change
+date_R0_change = as.Date(int_unique$dates_change)
+date_contact_matrix_set_change = NULL
+squire_model = explicit_model()
+pars_obs = NULL
+n_particles = 2
+
+Sys.setenv("SQUIRE_PARALLEL_DEBUG"=FALSE)
+set.seed(93L)
+out <- calibrate(
+  data = data,
+  R0_min = R0_min,
+  R0_max = R0_max,
+  R0_step = R0_step,
+  Meff_min = Meff_min,
+  Meff_max = Meff_max,
+  Meff_step = Meff_step,
+  first_start_date = first_start_date,
+  last_start_date = last_start_date,
+  day_step = day_step,
+  squire_model = squire_model,
+  pars_obs = pars_obs,
+  Rt_func = function(R0_change, R0, Meff) {R0_change*Meff*R0},
+  n_particles = n_particles,
+  reporting_fraction = reporting_fraction,
+  R0_change = R0_change,
+  date_R0_change = date_R0_change,
+  replicates = replicates,
+  country = country,
+  forecast = 0
+)
+
+out2 <- projections(out, time_period = 90, R0_change = 2.5)
+out3 <- projections(out, time_period = 90, R0_change = 1)
+
+fd2 <- format_output(out2, "deaths")
+fd3 <- format_output(out3, "deaths")
+
+d2 <- mean(fd2$y[fd2$t==max(fd2$t)])
+d3 <- mean(fd3$y[fd3$t==max(fd3$t)])
+
+expect_true(d2>d3)
+expect_true(d3<10)
+
+})

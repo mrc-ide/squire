@@ -35,6 +35,10 @@
 #'   on R0 and start_date
 #' @param Meff_step Step to increment Meff (Movement effect size) between min
 #'   and max. Default = 0.1
+#' @param R0_prior Prior for R0. Default = NULL, which is a flat prior. Should be
+#'  provided as a list with first argument the distribution function and the second
+#'  the function arguments (excluding quantiles which are worked out based on
+#'  R0_min and R0_max), e.g. `list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))`.
 #' @param ... Further aguments for the model parameter function. If using the
 #'   \code{\link{explicit_model}} (default) this will be
 #'   \code{parameters_explicit_SEEIR}.
@@ -49,6 +53,7 @@ calibrate <- function(data,
                       R0_min,
                       R0_max,
                       R0_step,
+                      R0_prior = NULL,
                       first_start_date,
                       last_start_date,
                       day_step,
@@ -56,6 +61,7 @@ calibrate <- function(data,
                       Meff_max = 1,
                       Meff_step = 0.1,
                       squire_model = explicit_model(),
+                      Rt_func = function(R0_change, R0, Meff){ exp(log(R0) - Meff*(1-R0_change)) },
                       pars_obs = NULL,
                       forecast = 0,
                       n_particles = 100,
@@ -82,6 +88,9 @@ calibrate <- function(data,
   assert_numeric(R0_min)
   assert_numeric(R0_max)
   assert_numeric(R0_step)
+  assert_pos(Meff_min)
+  assert_pos(Meff_max)
+  assert_pos(Meff_step)
   assert_date(first_start_date)
   assert_date(last_start_date)
   assert_date(data$date)
@@ -118,17 +127,6 @@ calibrate <- function(data,
     stop("'Meff_max' must be greater 'Meff_min'")
   }
 
-  # checks that dates are not in the future compared to our data
-  if(!is.null(date_R0_change)) {
-    assert_date(date_R0_change)
-    if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
-      stop("Last date in date_R0_change is greater than the last date in data")
-    }
-    if(as.Date(last_start_date) >= as.Date(head(date_R0_change, 1))) {
-      stop("First date in date_R0_change is earlier than last_start_date")
-    }
-  }
-
   # handle contact matrix changes
   if(!is.null(date_contact_matrix_set_change)) {
 
@@ -140,9 +138,6 @@ calibrate <- function(data,
     }
     if(as.Date(tail(date_contact_matrix_set_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
-    }
-    if(as.Date(last_start_date) >= as.Date(head(date_contact_matrix_set_change, 1))) {
-      stop("First date in date_contact_matrix_set_change is earlier than last_start_date")
     }
 
     # Get in correct format
@@ -172,9 +167,6 @@ calibrate <- function(data,
     if(as.Date(tail(date_ICU_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_ICU_bed_capacity_change is greater than the last date in data")
     }
-    if(as.Date(last_start_date) >= as.Date(head(date_ICU_bed_capacity_change, 1))) {
-      stop("First date in date_ICU_bed_capacity_change is earlier than last_start_date")
-    }
 
     tt_ICU_beds <- c(0, seq_len(length(date_ICU_bed_capacity_change)))
     ICU_bed_capacity <- c(baseline_ICU_bed_capacity, ICU_bed_capacity)
@@ -198,9 +190,6 @@ calibrate <- function(data,
     if(as.Date(tail(date_hosp_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_hosp_bed_capacity_change is greater than the last date in data")
     }
-    if(as.Date(last_start_date) >= as.Date(head(date_hosp_bed_capacity_change, 1))) {
-      stop("First date in date_hosp_bed_capacity_change is earlier than last_start_date")
-    }
 
     tt_hosp_beds <- c(0, seq_len(length(date_hosp_bed_capacity_change)))
     hosp_bed_capacity <- c(baseline_hosp_bed_capacity, hosp_bed_capacity)
@@ -212,9 +201,6 @@ calibrate <- function(data,
 
   # make the date definitely a date
   data$date <- as.Date(as.character(data$date))
-
-  # adjust for reporting fraction
-  data$deaths <- (data$deaths/reporting_fraction)
 
   # build model parameters
   model_params <- squire_model$parameter_func(country = country,
@@ -237,15 +223,33 @@ calibrate <- function(data,
                         date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
                         hosp_bed_capacity = hosp_bed_capacity)
 
+  # construct pars_obs for the user
+  if (is.null(pars_obs)) {
+
+    pars_obs <-  list(phi_cases = reporting_fraction,
+                    k_cases = 2,
+                    phi_death = reporting_fraction,
+                    k_death = 2,
+                    exp_noise = 1e6)
+
+    } else {
+
+    pars_obs$phi_cases <- reporting_fraction
+    pars_obs$phi_death <- reporting_fraction
+
+  }
+
   # construct scan
   if (Meff_min == Meff_max) {
     scan_results <- scan_R0_date(R0_min = R0_min,
                                  R0_max = R0_max,
                                  R0_step = R0_step,
+                                 R0_prior = R0_prior,
                                  first_start_date = first_start_date,
                                  last_start_date = last_start_date,
                                  day_step = day_step,
                                  data = data,
+                                 Rt_func = Rt_func,
                                  model_params = model_params,
                                  R0_change = R0_change,
                                  date_R0_change = date_R0_change,
@@ -253,11 +257,13 @@ calibrate <- function(data,
                                  date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                                  date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
                                  squire_model = squire_model,
+                                 pars_obs = pars_obs,
                                  n_particles = n_particles)
   } else {
     scan_results <- scan_R0_date_Meff(R0_min = R0_min,
                                       R0_max = R0_max,
                                       R0_step = R0_step,
+                                      R0_prior = R0_prior,
                                       first_start_date = first_start_date,
                                       last_start_date = last_start_date,
                                       day_step = day_step,
@@ -265,6 +271,7 @@ calibrate <- function(data,
                                       Meff_max = Meff_max,
                                       Meff_step = Meff_step,
                                       data = data,
+                                      Rt_func = Rt_func,
                                       model_params = model_params,
                                       R0_change = R0_change,
                                       date_R0_change = date_R0_change,
@@ -272,6 +279,7 @@ calibrate <- function(data,
                                       date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                                       date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
                                       squire_model = squire_model,
+                                      pars_obs = pars_obs,
                                       n_particles = n_particles)
   }
 
@@ -303,7 +311,7 @@ calibrate <- function(data,
                                tt_ICU_beds = tt_ICU_beds,
                                population = population,
                                replicates = 1,
-                               time_period = max(tt_contact_matrix,tt_hosp_beds,tt_ICU_beds,1),
+                               time_period = nrow(res$trajectories),
                                ...)
 
     # first let's create the output

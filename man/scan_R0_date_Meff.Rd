@@ -16,6 +16,8 @@ scan_R0_date_Meff(
   Meff_step,
   data,
   model_params,
+  Rt_func = function(R0_change, R0, Meff) {     exp(log(R0) - Meff * (1 - R0_change)) },
+  R0_prior = NULL,
   R0_change = NULL,
   date_R0_change = NULL,
   date_contact_matrix_set_change = NULL,
@@ -50,6 +52,15 @@ and \code{particle_filter_data()}}
 
 \item{model_params}{Squire model parameters. Created from a call to one of
 the \code{parameters_<type>_model} functions.}
+
+\item{Rt_func}{Function for converting R0, Meff and R0_change. Function must
+have names arguments of R0, Meff and R0_change. Default is linear relationship
+on the log scale given by \code{exp(log(R0) - Meff*(1-R0_change))}.}
+
+\item{R0_prior}{Prior for R0. Default = NULL, which is a flat prior. Should be
+provided as a list with first argument the distribution function and the second
+the function arguments (excluding quantiles which are worked out based on
+R0_min and R0_max), e.g. \code{list("func" = dnorm, args = list("mean"= 3.5, "sd"= 3))}.}
 
 \item{R0_change}{Numeric vector for relative changes in R0. Default = NULL,
 i.e. no change in R0}

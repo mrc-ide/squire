@@ -1,3 +1,36 @@
+# squire 0.4.15
+
+* `projections` now matches by column names when including projection outputs
+* Patch to `t0_variables` for new Rt_func approach
+
+# squire 0.4.14
+
+* replace chained binomials with mutivariate hypergeometric sampling in stochastic model
+* stochastic model to output number newly requiring ICU beds at each timepoint
+
+# squire 0.4.13
+
+* `calibrate` now takes an `Rt_func` argument for specifying Rt calculation
+
+# squire 0.4.12
+
+* Explicit Meff inclusion in `R0_date_particle_filter` and `projections` fix
+
+# squire 0.4.11
+
+* patching `projections` when projecting further than original calibrate run
+
+# squire 0.4.10
+
+* `calibrate` new argument for `R0_prior`
+
+# squire 0.4.9
+
+* `calibrate` now allows intervetnion dates to be before epidemic start date
+
+# squire 0.4.8
+
+* `calibrate` argument `reporting_fraction` implemented now in likelihood 
 
 # squire 0.4.7
 
