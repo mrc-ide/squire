@@ -928,10 +928,6 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   # update the model params accordingly from new inputs
   #..................
   model_params$beta_set <- beta_set
-  model_params$tt_beta <- tt_beta
-  model_params$tt_contact_matrix <- tt_contact_matrix
-  model_params$tt_ICU_beds <- tt_ICU_beds
-  model_params$tt_hosp_beds <- tt_hosp_beds
 
   #..................
   # run the particle filter
