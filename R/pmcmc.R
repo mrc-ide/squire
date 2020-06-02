@@ -705,6 +705,11 @@ run_mcmc_chain <- function(inputs,
   assert_neg(x = p_filter_est$log_likelihood,
              message1 = 'log_likelihood must be negative or zero')
 
+  if ((start_scaling_factor_adaptation + 100) > start_covariance_adaptation) {
+    warning('recommend starting to adapt scaling factor at least 100 iterations before beginning covariance
+            matrix adaptation')
+  }
+
   #..................
   # Create objects to store outputs
   #..................
