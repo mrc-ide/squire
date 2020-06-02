@@ -10,19 +10,19 @@ test_that("pmcmc fitting works", {
   country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
-                   'Meff_dl'        = 2,
+                   'Meff'           = 2,
                    'Meff_pl'        = 1)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
                   'R0'              = 1e-10,
-                  'Meff_dl'         = 0.1,
+                  'Meff'            = 0.1,
                   'Meff_pl'         = 1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff_dl'         = 5,
+                  'Meff'            = 5,
                   'Meff_pl'         = 1)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
-                       'Meff_dl'    = FALSE,
+                       'Meff'       = FALSE,
                        'Meff_pl'    = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,
@@ -64,7 +64,7 @@ test_that("pmcmc fitting works", {
                date_Meff_change = NULL,
                country = country)
 
-  expect_named(out, c("output", "parameters", "model", "pmcmc_sample_inputs", "trajectory_parameters", "pmcmc_results", "interventions"))
+  expect_named(out, c("output", "parameters", "model", "inputs", "replicate_parameters", "pmcmc_results", "interventions"))
   expect_warning(expect_s3_class(plot(out, what = "cases", particle_fit = TRUE), "gg"))
   expect_warning(expect_s3_class(plot(out, what = "deaths", particle_fit = TRUE), "gg"))
   expect_error(plot(out, what = "rubbish", particle_fit = TRUE),"must be one of")
@@ -87,7 +87,7 @@ test_that("pmcmc fitting works", {
                  pars_min = pars_min,
                  pars_max = list('start_date'      = as.Date("2020-05-20"),
                                  'R0'              = 5,
-                                 'Meff_dl'         = 1,
+                                 'Meff'            = 1,
                                  'Meff_pl'         = 5),
                  pars_discrete = pars_discrete,
                  pars_obs = pars_obs,
@@ -112,11 +112,11 @@ test_that("pmcmc fitting works", {
                  pars_init = pars_init,
                  pars_min = list('start_date'      = as.Date("2020-05-20"),
                                  'R0'              = 1,
-                                 'Meff_dl'         = 1,
+                                 'Meff'            = 1,
                                  'Meff_pl'         = 1),
                  pars_max = list('start_date'      = as.Date("2020-05-20"),
                                  'R0'              = 5,
-                                 'Meff_dl'         = 5,
+                                 'Meff'            = 5,
                                  'Meff_pl'         = 1),
                  pars_discrete = pars_discrete,
                  pars_obs = pars_obs,
@@ -497,19 +497,19 @@ test_that("pmcmc non future works", {
   country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
-                   'Meff_dl'         = 2,
+                   'Meff'           = 2,
                    'Meff_pl'         = 1)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
                   'R0'              = 1e-10,
-                  'Meff_dl'         = 1,
+                  'Meff'            = 1,
                   'Meff_pl'         = 1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff_dl'         = 3,
+                  'Meff'            = 3,
                   'Meff_pl'         = 1)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
-                       'Meff_dl'    = FALSE,
+                       'Meff'       = FALSE,
                        'Meff_pl'    = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,
@@ -565,19 +565,19 @@ test_that("pmcmc deterministic", {
   country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
-                   'Meff_dl'         = 2,
+                   'Meff'           = 2,
                    'Meff_pl'         = 1)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
                   'R0'              = 0,
-                  'Meff_dl'         = 1,
+                  'Meff'            = 1,
                   'Meff_pl'         = 1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff_dl'         = 5,
+                  'Meff'            = 5,
                   'Meff_pl'         = 1)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
-                       'Meff_dl'    = FALSE,
+                       'Meff'       = FALSE,
                        'Meff_pl'    = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,
@@ -639,19 +639,19 @@ test_that("pmcmc user pop and contact", {
   country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
-                   'Meff_dl'        = 1,
+                   'Meff'           = 1,
                    'Meff_pl'        = 1)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
                   'R0'              = 1e-10,
-                  'Meff_dl'         = 1,
+                  'Meff'            = 1,
                   'Meff_pl'         = 1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff_dl'         = 5,
+                  'Meff'            = 5,
                   'Meff_pl'         = 1)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
-                       'Meff_dl'    = FALSE,
+                       'Meff'       = FALSE,
                        'Meff_pl'    = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,

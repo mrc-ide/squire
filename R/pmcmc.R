@@ -42,7 +42,7 @@
 #'   \item{output}{Trajectories from the sampled pMCMC parameter iterations.}
 #'   \item{parameters}{Model parameters use for squire}
 #'   \item{model}{Squire model used}
-#'   \item{pmcmc_sample_inputs}{Inputs into the squire model for the pMCMC.}
+#'   \item{inputs}{Inputs into the squire model for the pMCMC.}
 #'   \item{pMCMC_results}{An mcmc object generated from \code{pmcmc} and contains:}
 #'      \describe{
 #'         \item{inputs}{List of inputs}
@@ -57,7 +57,7 @@
 #'        \item{rhat}{MCMC Diagnostics}
 #'      }
 #'  \item{interventions}{Contains the interventions that can be called with projections}.
-#'  \item{trajectory_parameters}{contains the parameter values for the sampled pMCMC parameter iterations
+#'  \item{replicate_parameters}{contains the parameter values for the sampled pMCMC parameter iterations
 #'   used to generate the \code{squire_model} trajectories}
 #'}
 #'
@@ -117,20 +117,20 @@ pmcmc <- function(data,
                                   exp_noise = 1e6),
                   pars_init = list('start_date'     = as.Date("2020-02-07"),
                                    'R0'             = 2.5,
-                                   'Meff_dl'        = 2,
+                                   'Meff'           = 2,
                                    'Meff_pl'        = 3),
                   pars_min = list('start_date'      = as.Date("2020-02-01"),
                                   'R0'              = 0,
-                                  'Meff_dl'         = 1,
+                                  'Meff'            = 1,
                                   'Meff_pl'         = 2),
                   pars_max = list('start_date'      = as.Date("2020-02-20"),
                                   'R0'              = 5,
-                                  'Meff_dl'         = 3,
+                                  'Meff'            = 3,
                                   'Meff_pl'         = 4),
                   pars_discrete = list('start_date' = TRUE,
                                        'R0'         = FALSE,
-                                       'Meff_dl'       = FALSE,
-                                       'Meff_pl'       = FALSE),
+                                       'Meff'       = FALSE,
+                                       'Meff_pl'    = FALSE),
                   proposal_kernel = NULL,
                   reporting_fraction = 1,
                   country = NULL,
@@ -174,7 +174,7 @@ pmcmc <- function(data,
   assert_eq(names(pars_init), names(pars_min))
   assert_eq(names(pars_min), names(pars_max))
   assert_eq(names(pars_max), names(pars_discrete))
-  assert_in(names(pars_init), c("R0", "start_date", "Meff_dl", "Meff_pl"),
+  assert_in(names(pars_init), c("R0", "start_date", "Meff", "Meff_pl"),
             message = "Params to infer must include R0, start_date, and Effective Mobility during and after lockdown")
   assert_date(pars_init$start_date)
   assert_date(pars_min$start_date)
@@ -189,10 +189,10 @@ pmcmc <- function(data,
   assert_pos(pars_init$R0)
   assert_bounded(pars_init$R0, left = pars_min$R0, right = pars_max$R0)
 
-  assert_pos(pars_min$Meff_dl)
-  assert_pos(pars_max$Meff_dl)
-  assert_pos(pars_init$Meff_dl)
-  assert_bounded(pars_init$Meff_dl, left = pars_min$Meff_dl, right = pars_max$Meff_dl)
+  assert_pos(pars_min$Meff)
+  assert_pos(pars_max$Meff)
+  assert_pos(pars_init$Meff)
+  assert_bounded(pars_init$Meff, left = pars_min$Meff, right = pars_max$Meff)
 
   assert_pos(pars_min$Meff_pl)
   assert_pos(pars_max$Meff_pl)
@@ -262,14 +262,14 @@ pmcmc <- function(data,
 
   # catch that if date_R0_change isn't set, Meff isn't doing anything -- not to confuse user
   if (is.null(date_R0_change)) {
-    if (pars_min[["Meff_dl"]] != 1 & pars_max[["Meff_dl"]] != 1 & pars_init[["Meff_dl"]] != 1 &
+    if (pars_min[["Meff"]] != 1 & pars_max[["Meff"]] != 1 & pars_init[["Meff"]] != 1 &
         pars_min[["Meff_pl"]] != 1 & pars_max[["Meff_pl"]] != 1 & pars_init[["Meff_pl"]] != 1) {
       stop("Without an R0 date change, Meff during and post lockdown is not being used. Set Meff during and after lockdow to 1 in all pars lists")
     } else {
       # this slight tweak, so it still works with reflect proposal but won't move since it's not being estimated
-      pars_min[["Meff_dl"]] <- pars_min[["Meff_dl"]] - 1e-10
-      pars_max[["Meff_dl"]] <- pars_max[["Meff_dl"]] + 1e-10
-      pars_discrete[["Meff_dl"]] <- TRUE
+      pars_min[["Meff"]] <- pars_min[["Meff"]] - 1e-10
+      pars_max[["Meff"]] <- pars_max[["Meff"]] + 1e-10
+      pars_discrete[["Meff"]] <- TRUE
 
       pars_min[["Meff_pl"]] <- pars_min[["Meff_pl"]] - 1e-10
       pars_max[["Meff_pl"]] <- pars_max[["Meff_pl"]] + 1e-10
@@ -588,9 +588,9 @@ pmcmc <- function(data,
 
     # first let's add our pmcmc results for a nice return
     # we'll save our inputs so it is easy to recreate later
-    r$pmcmc_sample_inputs <- pmcmc_samples$inputs
+    r$inputs <- pmcmc_samples$inputs
     # and add the parameters that changed between each simulation, i.e. posterior draws
-    r$trajectory_parameters <- pmcmc_samples$sampled_PMCMC_Results
+    r$replicate_parameters <- pmcmc_samples$sampled_PMCMC_Results
     # as well as adding the pmcmc chains so it's easy to draw from the chains again in the future
     r$pmcmc_results <- pmcmc
 
@@ -617,8 +617,8 @@ pmcmc <- function(data,
 
     r <- list("output" = pmcmc_samples$trajectories)
     # same as above, add in pmcmc items
-    r$pmcmc_sample_inputs <- pmcmc_samples$inputs
-    r$trajectory_parameters <- pmcmc_samples$sampled_PMCMC_Results
+    r$inputs <- pmcmc_samples$inputs
+    r$replicate_parameters <- pmcmc_samples$sampled_PMCMC_Results
     r$pmcmc_results <- pmcmc
     r <- structure(r, class = "squire_simulation")
   }
@@ -831,14 +831,14 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   #..................
   # (potentially redundant) assertion
   #..................
-  assert_in(c("R0", "start_date", "Meff_dl", "Meff_pl"), names(pars),
+  assert_in(c("R0", "start_date", "Meff", "Meff_pl"), names(pars),
             message = "Must specify R0, start date, and Movement effect size during and after lockdown as parameters to infer")
   #..................
   # unpack current params
   #..................
   R0 <- pars[["R0"]]
   start_date <- pars[["start_date"]]
-  Meff_dl <- pars[["Meff_dl"]]
+  Meff <- pars[["Meff"]]
   Meff_pl <- pars[["Meff_pl"]]
 
   #..................
@@ -846,7 +846,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   #..................
   assert_pos(R0)
   assert_date(start_date)
-  assert_pos(Meff_dl)
+  assert_pos(Meff)
   assert_pos(Meff_pl)
 
   #..................
@@ -898,11 +898,11 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   # and now get new R0s for the R0
   if (!is.null(R0_change)) {
     if (is.null(date_Meff_change)) {
-      R0 <- c(R0, R0 * R0_change * Meff_dl)
+      R0 <- c(R0, R0 * R0_change * Meff)
     } else if (!is.null(date_Meff_change)) {
       # when does mobility change take place
       swtchdates <- which(date_R0_change >= date_Meff_change)
-      R0 <- c(R0, R0 * R0_change[1:(min(swtchdates)-1)] * Meff_dl, R0 * R0_change[min(swtchdates):(length(R0_change))] * Meff_pl)
+      R0 <- c(R0, R0 * R0_change[1:(min(swtchdates)-1)] * Meff, R0 * R0_change[min(swtchdates):(length(R0_change))] * Meff_pl)
     }
   }
 

@@ -59,19 +59,19 @@ sample_pmcmc <- function(pmcmc_results,
   # sample rows and then
   if (n_trajectories > nrow(res)) {
     warning("Sampling more trajectories than MCMC iterations. Consider running your MCMC for longer or reducing your burnin")
-    params.smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob, replace = TRUE)
+    params_smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob, replace = TRUE)
   } else {
-    params.smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob, replace = FALSE)
+    params_smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob, replace = FALSE)
   }
-  params.smpl <- res[params.smpl, !grepl("log", colnames(res))]
+  params_smpl <- res[params_smpl, !grepl("log", colnames(res))]
 
   # TODO relax this limitation?
   # catch
-  assert_in(colnames(params.smpl), c("start_date", "R0", "Meff_dl", "Meff_pl"),
+  assert_in(colnames(params_smpl), c("start_date", "R0", "Meff", "Meff_pl"),
             message = "Currently only allow for the start date, R0, and Meff during and after the lockdown to be inferred. All four must be included,
             although the Meff parameters can be fixed at 1 (and therefore not inferred).")
   # put this in format for calc_loglikelihood
-  pars.list <- split(params.smpl, 1:nrow(params.smpl))
+  pars.list <- split(params_smpl, 1:nrow(params_smpl))
   names(pars.list) <- rep("pars", length(pars.list))
 
   #..................
@@ -130,7 +130,7 @@ sample_pmcmc <- function(pmcmc_results,
 
   # combine and return
   out <- list("trajectories" = trajectories,
-              "sampled_PMCMC_Results" = params.smpl,
+              "sampled_PMCMC_Results" = params_smpl,
               inputs = list(
                 model = pmcmc_results$inputs$squire_model,
                 model_params = pmcmc_results$inputs$model_params,

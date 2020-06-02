@@ -16,11 +16,10 @@ pmcmc(
   squire_model = explicit_model(),
   pars_obs = list(phi_cases = 0.1, k_cases = 2, phi_death = 1, k_death = 2, exp_noise =
     1e+06),
-  pars_init = list(start_date = as.Date("2020-02-07"), R0 = 2.5, Meff_dl = 2, Meff_pl =
-    3),
-  pars_min = list(start_date = as.Date("2020-02-01"), R0 = 0, Meff_dl = 1, Meff_pl = 2),
-  pars_max = list(start_date = as.Date("2020-02-20"), R0 = 5, Meff_dl = 3, Meff_pl = 4),
-  pars_discrete = list(start_date = TRUE, R0 = FALSE, Meff_dl = FALSE, Meff_pl = FALSE),
+  pars_init = list(start_date = as.Date("2020-02-07"), R0 = 2.5, Meff = 2, Meff_pl = 3),
+  pars_min = list(start_date = as.Date("2020-02-01"), R0 = 0, Meff = 1, Meff_pl = 2),
+  pars_max = list(start_date = as.Date("2020-02-20"), R0 = 5, Meff = 3, Meff_pl = 4),
+  pars_discrete = list(start_date = TRUE, R0 = FALSE, Meff = FALSE, Meff_pl = FALSE),
   proposal_kernel = NULL,
   reporting_fraction = 1,
   country = NULL,
@@ -156,7 +155,7 @@ squire_simulation \describe{
   \item{output}{Trajectories from the sampled pMCMC parameter iterations.}
   \item{parameters}{Model parameters use for squire}
   \item{model}{Squire model used}
-  \item{pmcmc_sample_inputs}{Inputs into the squire model for the pMCMC.}
+  \item{inputs}{Inputs into the squire model for the pMCMC.}
   \item{pMCMC_results}{An mcmc object generated from \code{pmcmc} and contains:}
      \describe{
         \item{inputs}{List of inputs}
@@ -171,7 +170,7 @@ squire_simulation \describe{
        \item{rhat}{MCMC Diagnostics}
      }
  \item{interventions}{Contains the interventions that can be called with projections}.
- \item{trajectory_parameters}{contains the parameter values for the sampled pMCMC parameter iterations
+ \item{replicate_parameters}{contains the parameter values for the sampled pMCMC parameter iterations
   used to generate the \code{squire_model} trajectories}
 }
 }

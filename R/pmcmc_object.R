@@ -23,12 +23,12 @@ plot_pmcmc_sample  <- function(x, what = "deaths") {
     names(quants)[1:2] <- c("ymin","ymax")
 
     base_plot <- plot(x, "infections", ci = FALSE, replicates = TRUE, x_var = "date",
-                      date_0 = max(x$pmcmc_sample_inputs$data$date))
+                      date_0 = max(x$inputs$data$date))
     base_plot <- base_plot +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=.data$cases/x$pmcmc_sample_inputs$pars_obs$phi_cases,
-                                       x=as.Date(.data$date)), x$pmcmc_sample_inputs$data)
+      ggplot2::geom_point(ggplot2::aes(y=.data$cases/x$inputs$pars_obs$phi_cases,
+                                       x=as.Date(.data$date)), x$inputs$data)
 
   }
 
@@ -47,12 +47,12 @@ plot_pmcmc_sample  <- function(x, what = "deaths") {
     names(quants)[1:2] <- c("ymin","ymax")
 
     base_plot <- plot(x, "deaths", ci = FALSE, replicates = TRUE, x_var = "date",
-                      date_0 = max(x$pmcmc_sample_inputs$data$date))
+                      date_0 = max(x$inputs$data$date))
     base_plot <- base_plot +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=.data$deaths/x$pmcmc_sample_inputs$pars_obs$phi_death,
-                                       x=as.Date(.data$date)), x$pmcmc_sample_inputs$data)
+      ggplot2::geom_point(ggplot2::aes(y=.data$deaths/x$inputs$pars_obs$phi_death,
+                                       x=as.Date(.data$date)), x$inputs$data)
 
   } else {
 
