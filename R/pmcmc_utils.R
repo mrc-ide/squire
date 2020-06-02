@@ -191,3 +191,50 @@ offset_to_start_date <- function(first_data_date, start_date)
 }
 
 
+#..............................................................
+# Function for updating the scaling factor
+#..............................................................
+#' Involved in the Robbins-Munro optimisation within the Metropolis-Hastings MCMC.
+#' Function to iteratively update the scaling factor of the covariance matrix.
+#'
+#' @title update_sigma
+#' @param scaling_factor the scaling factor involved in the Robbins-Munro optimisation
+#' @param acceptance whether or not the most recent parameter proposal was accepted
+#' @param probability the required acceptance probability
+#' @param i the iteration number
+#' @param number_of_parameters the number of parameters currently being estimated
+
+update_scaling_factor <- function(scaling_factor, acceptance, probability, i, number_of_parameters) {
+  alpha <- -qnorm(probability / 2)
+  c <- ((1 - 1 / number_of_parameters) * sqrt(2 * pi) * exp(alpha ^ 2 / 2) / (2 * alpha) + 1 / (number_of_parameters * probability * (1 - probability)))
+  theta <- log(sqrt(scaling_factor))
+  # theta <- theta + c * (acceptance - probability) / max(200, i / number_of_parameters)
+  theta <- theta + c * (acceptance - probability) / (i / number_of_parameters)
+  return(exp(theta)^2)
+}
+
+
+#..............................................................
+# Function for updating the covariance matrix
+#..............................................................
+#' Involved in the Robbins-Munro optimisation within the Metropolis-Hastings MCMC.
+#' Function to iteratively update the covariance matrix used to propose new parameter
+#' values.
+#'
+#' @title update_cov
+#' @param covariance_matrix the current covariance matrix being used to propose new parameter values
+#' @param i the number of iterations since covariance matrix adaptation began
+#' @param mean_vector initially this the mean of the columns of the MCMC chain. sequentially updated
+#' by this function.
+#' @param current_parameters the current parameter values in the MCMC chain
+#' @param number_of_parameters the number of parameters currently being estimated
+
+update_covariance_matrix <- function(covariance_matrix, i, mean_vector, current_parameters, number_of_parameters) {
+  epsilon = 1 / i
+  new_mean = ((mean_vector * i) + current_parameters) / (i + 1)
+  new_covariance_matrix = (i - 1) / i * covariance_matrix + mean_vector %*% t(mean_vector) - (i + 1) / i * new_mean %*% t(new_mean) + 1 / i * current_parameters %*% t(current_parameters) + epsilon * diag(number_of_parameters)
+  return(list(new_covariance_matrix = new_covariance_matrix, new_mean_vector = new_mean))
+}
+
+
+
