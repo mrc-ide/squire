@@ -36,10 +36,26 @@ test_that("scan_R0_date works", {
                                squire_model = explicit_model(),
                                n_particles = 2)
 
+  scan_results3d <- scan_R0_date_Meff(R0_min = R0_min,
+                               R0_max = R0_max,
+                               R0_step = R0_step,
+                               Meff_min = 0.9,
+                               Meff_max = 0.9,
+                               Meff_step = 0.1,
+                               first_start_date = first_start_date,
+                               last_start_date = last_start_date,
+                               day_step = day_step,
+                               data = data[1:10,],
+                               model_params = parameters_explicit_SEEIR(country = "Algeria"),
+                               R0_change = R0_change,
+                               date_R0_change = date_R0_change,
+                               squire_model = explicit_model(),
+                               n_particles = 2)
+
   expect_is(scan_results, "squire_scan")
   expect_true("inputs" %in% names(scan_results))
   expect_setequal(names(scan_results$inputs),
-                  c("model", "model_params", "interventions", "pars_obs", "data"))
+                  c("model", "model_params", "interventions", "pars_obs", "data", "Rt_func"))
 
   R0_grid <- seq(R0_min, R0_max, R0_step)
   date_grid <- seq(as.Date(first_start_date), as.Date(last_start_date), day_step)
