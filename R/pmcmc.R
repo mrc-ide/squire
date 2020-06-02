@@ -740,7 +740,7 @@ run_mcmc_chain <- function(inputs,
   scaling_factor_storage <- vector(mode = "numeric", length = n_mcmc)
 
   # New parameters related to Robbins Munro optimisation stuff
-  scaling_factor <- 0.2
+  scaling_factor <- 0.2 # NEED A BETTER WAY OF INITIALISING THE INITIAL SCALING FACTOR - PERHAPS AS AN ARGUMENT?
 
   if(output_proposals) {
     proposals <- matrix(data = NA,
@@ -788,11 +788,18 @@ run_mcmc_chain <- function(inputs,
       acceptances[iter] <- 1
     }
 
+    # record results
+    res[iter, ] <- c(curr_pars,
+                     curr_lprior,
+                     curr_ll,
+                     curr_lpost)
+    states[iter, ] <- curr_ss
+
     # adapt and update covariance matrix
     if (iter >= start_covariance_adaptation) {
       if (iter == start_covariance_adaptation) {
-        covariance_matrix <- cov(chain[1:start_covariance_adaptation, ])
-        mean_vector <- apply(chain, 2, mean, na.rm = TRUE)
+        covariance_matrix <- cov(res[1:start_covariance_adaptation, 1:number_of_parameters])
+        mean_vector <- apply(res[, 1:number_of_parameters], 2, mean, na.rm = TRUE)
         covariance_matrix_storage[[iter - start_covariance_adaptation + 1]] <- covariance_matrix
       } else {
         tmp <- update_covariance_matrix(covariance_matrix, iter, mean_vector, output, number_of_parameters)
@@ -807,14 +814,6 @@ run_mcmc_chain <- function(inputs,
       scaling_factor <- update_scaling_factor(scaling_factor, acceptances[iter], required_acceptance_ratio, iter, number_of_parameters)
       scaling_factor_storage[iter - start_scaling_factor_adapting + 1] <- scaling_factor
     }
-
-    # record results
-    res[iter, ] <- c(curr_pars,
-                     curr_lprior,
-                     curr_ll,
-                     curr_lpost)
-    states[iter, ] <- curr_ss
-
 
     if(output_proposals) {
       proposals[iter, ] <- c(prop_pars,
