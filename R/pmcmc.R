@@ -805,7 +805,7 @@ run_mcmc_chain <- function(inputs,
     # adapt and updat scaling factor
     if (iter > start_scaling_factor_adaptation) {
       scaling_factor <- update_scaling_factor(scaling_factor, acceptances[iter], required_acceptance_ratio, iter, number_of_parameters)
-      sf_store[iter - start_scaling_factor_adapting + 1] <- scaling_factor
+      scaling_factor_storage[iter - start_scaling_factor_adapting + 1] <- scaling_factor
     }
 
     # record results
@@ -838,7 +838,10 @@ run_mcmc_chain <- function(inputs,
               'results' = as.data.frame(res),
               'states' = states,
               'acceptance_rate' = 1-rejection_rate,
-              "ess" = ess)
+              "ess" = ess,
+              "scaling_factor" = scaling_factor_storage,
+              "covariance_matrix" = covariance_matrix_storage,
+              "acceptance_ratio" = mean(acceptances))
 
   if(output_proposals) {
     proposals <- as.data.frame(proposals)
