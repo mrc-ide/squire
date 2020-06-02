@@ -149,7 +149,10 @@ pmcmc <- function(data,
                   date_ICU_bed_capacity_change = NULL,
                   burnin = 0,
                   replicates = 100,
-                  forecast = 0
+                  forecast = 0,
+                  required_acceptance_ratio = 0.23,
+                  start_covariance_adaptation = round(n_mcmc/2),
+                  start_scaling_factor_adaptation = 1
 ) {
 
   #............................................................
@@ -505,7 +508,10 @@ pmcmc <- function(data,
       calc_ll = calc_ll,
       propose_jump = propose_jump,
       first_data_date = data$date[1],
-      output_proposals = output_proposals)
+      output_proposals = output_proposals,
+      required_acceptance_ratio = required_acceptance_ratio,
+      start_covariance_adaptation = start_covariance_adaptation,
+      start_scaling_factor_adaptation)
 
   } else {
     chains <- furrr::future_pmap(
@@ -518,6 +524,9 @@ pmcmc <- function(data,
       propose_jump = propose_jump,
       first_data_date = data$date[1],
       output_proposals = output_proposals,
+      required_acceptance_ratio = required_acceptance_ratio,
+      start_covariance_adaptation = start_covariance_adaptation,
+      start_scaling_factor_adaptation,
       .progress = TRUE)
   }
 
@@ -650,7 +659,11 @@ run_mcmc_chain <- function(inputs,
                            n_mcmc,
                            propose_jump,
                            first_data_date,
-                           output_proposals) {
+                           output_proposals,
+                           required_acceptance_ratio,
+                           start_covariance_adaptation,
+                           start_scaling_factor_adaptation
+                           ) {
 
   #..................
   # Set initial state
@@ -662,6 +675,9 @@ run_mcmc_chain <- function(inputs,
   # however, proposal and log prior set up to deal with numerics, need to change
   curr_pars[["start_date"]] <- -(start_date_to_offset(first_data_date, curr_pars[["start_date"]]))
   curr_pars <- unlist(curr_pars)
+
+  number_of_parameters <- length(curr_pars) ## CHECK THIS - UNCLEAR WHAT CURR_PARS IS ATM
+
   ## calculate initial prior
   curr_lprior <- calc_lprior(pars = curr_pars)
 
@@ -713,6 +729,13 @@ run_mcmc_chain <- function(inputs,
                    nrow = n_mcmc + 1L,
                    ncol = length(curr_ss))
 
+  # New storage arrays for Robbins-Munro related optimisation stuff
+  acceptances <- vector(mode = "numeric", length = n_mcmc)
+  covariance_matrix_storage <- vector(mode = "list", length = (n_mcmc - start_covariance_adaptation + 1))
+  scaling_factor_storage <- vector(mode = "numeric", length = n_mcmc)
+
+  # New parameters related to Robbins Munro optimisation stuff
+  scaling_factor <- 0.2
 
   if(output_proposals) {
     proposals <- matrix(data = NA,
@@ -757,6 +780,27 @@ run_mcmc_chain <- function(inputs,
       curr_ll <- prop_ll
       curr_lpost <- prop_lpost
       curr_ss <- prop_ss
+      acceptances[iter] <- 1
+    }
+
+    # adapt and update covariance matrix
+    if (iter >= start_covariance_adaptation) {
+      if (iter == start_covariance_adaptation) {
+        covariance_matrix <- cov(chain[1:start_covariance_adaptation, ])
+        mean_vector <- apply(chain, 2, mean, na.rm = TRUE)
+        covariance_matrix_storage[[iter - start_covariance_adaptation + 1]] <- covariance_matrix
+      } else {
+        tmp <- update_covariance_matrix(covariance_matrix, iter, mean_vector, output, number_of_parameters)
+        covariance_matrix <- tmp$new_covariance_matrix
+        mean_vector <- tmp$new_mean_vector
+        covariance_matrix_storage[[iter - start_covariance_adaptation + 1]] <- covariance_matrix
+      }
+    }
+
+    # adapt and updat scaling factor
+    if (iter > start_scaling_factor_adaptation) {
+      scaling_factor <- update_scaling_factor(scaling_factor, acceptances[iter], required_acceptance_ratio, iter, number_of_parameters)
+      sf_store[iter - start_scaling_factor_adapting + 1] <- scaling_factor
     }
 
     # record results
