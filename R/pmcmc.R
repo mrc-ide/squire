@@ -435,7 +435,7 @@ pmcmc <- function(data,
                 pars_init = pars_init,
                 pars_min = pars_min,
                 pars_max = pars_max,
-                proposal_kernel = proposal_kernel,
+                proposal_kernel = proposal_kernel,  # does this need to be changed??? Don't think so, but would be good for someone else to check
                 pars_discrete = pars_discrete),
     n_particles = n_particles)
 
@@ -485,13 +485,13 @@ pmcmc <- function(data,
   pars_discrete <- unlist(pars_discrete)
 
   # create shorthand function to propose new pars given main inputs
-  propose_jump <- function(pars) {
-    propose_parameters(pars = pars,
-                       proposal_kernel = proposal_kernel,
-                       pars_discrete = pars_discrete,
-                       pars_min = pars_min,
-                       pars_max = pars_max)
-  }
+  # propose_jump <- function(pars) {
+  #   propose_parameters(pars = pars,
+  #                      proposal_kernel = proposal_kernel,
+  #                      pars_discrete = pars_discrete,
+  #                      pars_min = pars_min,
+  #                      pars_max = pars_max)
+  # }
 
   #............................................................
   # Section 2 of pMCMC Wrapper: Run pMCMC
@@ -506,12 +506,15 @@ pmcmc <- function(data,
       curr_pars = pars_init,
       calc_lprior = calc_lprior,
       calc_ll = calc_ll,
-      propose_jump = propose_jump,
       first_data_date = data$date[1],
       output_proposals = output_proposals,
       required_acceptance_ratio = required_acceptance_ratio,
       start_covariance_adaptation = start_covariance_adaptation,
-      start_scaling_factor_adaptation)
+      start_scaling_factor_adaptation,
+      proposal_kernel,
+      pars_discrete,
+      pars_min,
+      pars_max)
 
   } else {
     chains <- furrr::future_pmap(
@@ -521,12 +524,15 @@ pmcmc <- function(data,
       curr_pars = pars_init,
       calc_lprior = calc_lprior,
       calc_ll = calc_ll,
-      propose_jump = propose_jump,
       first_data_date = data$date[1],
       output_proposals = output_proposals,
       required_acceptance_ratio = required_acceptance_ratio,
       start_covariance_adaptation = start_covariance_adaptation,
       start_scaling_factor_adaptation,
+      proposal_kernel,
+      pars_discrete,
+      pars_min,
+      pars_max,
       .progress = TRUE)
   }
 
@@ -657,13 +663,17 @@ run_mcmc_chain <- function(inputs,
                            calc_lprior,
                            calc_ll,
                            n_mcmc,
-                           propose_jump,
                            first_data_date,
                            output_proposals,
                            required_acceptance_ratio,
                            start_covariance_adaptation,
-                           start_scaling_factor_adaptation
+                           start_scaling_factor_adaptation,
+                           proposal_kernel,
+                           pars_discrete,
+                           pars_min,
+                           pars_max
                            ) {
+
 
   #..................
   # Set initial state
@@ -761,7 +771,11 @@ run_mcmc_chain <- function(inputs,
   for(iter in seq_len(n_mcmc) + 1L) {
 
     # propose new parameters
-    prop_pars <- propose_jump(curr_pars)
+    prop_pars <- propose_parameters(curr_pars,
+                                    proposal_kernel * scaling_factor,
+                                    pars_discrete,
+                                    pars_min,
+                                    pars_max)
 
     ## calculate proposed prior / lhood / posterior
     prop_lprior <- calc_lprior(pars = prop_pars)
@@ -798,14 +812,14 @@ run_mcmc_chain <- function(inputs,
     # adapt and update covariance matrix
     if (iter >= start_covariance_adaptation) {
       if (iter == start_covariance_adaptation) {
-        covariance_matrix <- cov(res[1:start_covariance_adaptation, 1:number_of_parameters])
+        proposal_kernel <- cov(res[1:start_covariance_adaptation, 1:number_of_parameters])
         mean_vector <- apply(res[, 1:number_of_parameters], 2, mean, na.rm = TRUE)
-        covariance_matrix_storage[[iter - start_covariance_adaptation + 1]] <- covariance_matrix
+        covariance_matrix_storage[[iter - start_covariance_adaptation + 1]] <- proposal_kernel
       } else {
-        tmp <- update_covariance_matrix(covariance_matrix, iter, mean_vector, output, number_of_parameters)
-        covariance_matrix <- tmp$new_covariance_matrix
+        tmp <- update_covariance_matrix(proposal_kernel, iter, mean_vector, output, number_of_parameters)
+        proposal_kernel <- tmp$new_covariance_matrix
         mean_vector <- tmp$new_mean_vector
-        covariance_matrix_storage[[iter - start_covariance_adaptation + 1]] <- covariance_matrix
+        covariance_matrix_storage[[iter - start_covariance_adaptation + 1]] <- proposal_kernel
       }
     }
 
