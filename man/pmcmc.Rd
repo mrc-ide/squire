@@ -38,7 +38,10 @@ pmcmc(
   date_ICU_bed_capacity_change = NULL,
   burnin = 0,
   replicates = 100,
-  forecast = 0
+  forecast = 0,
+  required_acceptance_ratio = 0.23,
+  start_covariance_adaptation = round(n_mcmc/2),
+  start_scaling_factor_adaptation = 1
 )
 }
 \arguments{
@@ -190,7 +193,7 @@ log likelihood estimate.
 
 The pMCMC sampler then proceeds as follows, for n_mcmc iterations:
 At each loop iteration the pMCMC sampler pefsorms three steps:
-  1. Propose new candidate samples for beta_start, beta_end and start_date based on
+  1. Propose new candidate samples for R0, Meff, Meff_pl, and start_date based on
     the current samples, using the proposal distribution
     (currently multivariate Gaussian with user-input covariance matrix (proposal_kernel), and reflecting boundaries defined by pars_min, pars_max)
   2. Calculate the log prior of the proposed parameters,
