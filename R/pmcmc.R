@@ -76,7 +76,7 @@
 #'
 #' The pMCMC sampler then proceeds as follows, for n_mcmc iterations:
 #' At each loop iteration the pMCMC sampler pefsorms three steps:
-#'   1. Propose new candidate samples for beta_start, beta_end and start_date based on
+#'   1. Propose new candidate samples for R0, Meff, Meff_pl, and start_date based on
 #'     the current samples, using the proposal distribution
 #'     (currently multivariate Gaussian with user-input covariance matrix (proposal_kernel), and reflecting boundaries defined by pars_min, pars_max)
 #'   2. Calculate the log prior of the proposed parameters,
@@ -966,7 +966,11 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
     } else if (!is.null(date_Meff_change)) {
       # when does mobility change take place
       swtchdates <- which(date_R0_change >= date_Meff_change)
-      R0 <- c(R0, R0 * R0_change[1:(min(swtchdates)-1)] * Meff, R0 * R0_change[min(swtchdates):(length(R0_change))] * Meff_pl)
+      #R0 <- c(R0, R0 * R0_change[1:(min(swtchdates)-1)] * Meff, R0 * R0_change[min(swtchdates):(length(R0_change))] * Meff_pl)
+      R0 <- c(R0,
+              exp(log(R0) - Meff*(1-R0_change[1:(min(swtchdates)-1)])),
+              exp(log(R0) * Meff_pl*(1-R0_change[min(swtchdates):(length(R0_change))]))
+              )
     }
   }
 
