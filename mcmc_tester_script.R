@@ -9,9 +9,9 @@ country <- "Algeria"
 true_start_date <- as.Date("2020-02-01")
 true_R0 <- 3
 true_Meff <- 2
-true_Meff_pl <- 2
+true_Meff_pl <- 5
 date_Meff_change <- as.Date("2020-04-20")
-R0_change <- c(seq(true_R0, 0.5, -0.5), 1.5)/true_R0
+R0_change <- c(seq(true_R0, 1, -0.5), 1.5, 2.5)/true_R0
 tt_R0 <- c(0, 40, 50, 65, 70, 80, 100)
 date_R0_change <- true_start_date + tail(tt_R0, -1)
 date_switch <- which(date_R0_change >= date_Meff_change)
@@ -21,19 +21,18 @@ get <- squire::run_explicit_SEEIR_model(country,
                                         tt_R0 = tt_R0,
                                         replicates = 1,
                                         day_return = TRUE,
-                                        time_period = 120,
+                                        time_period = 180,
                                         dt = 0.25,
                                         hosp_bed_capacity = 10000000,
                                         ICU_bed_capacity = 10000000)
-
 index <- squire:::odin_index(get$model)
 deaths <- c(0, diff(rowSums(get$output[,index$D,1])))
 plot(deaths)
 dates <- seq.Date(true_start_date, by = 1, length.out = length(deaths))
 df <- data.frame("date" = dates, "deaths" = deaths)
-df <- tail(df, 100)
-date_R0_change <- true_start_date + tail(c(0, 40, 50, 65, 70, 80, 100), -1)
-R0_change <- head(R0_change, -1)
+df <- tail(df, 150)
+date_R0_change <- true_start_date + tail(tt_R0, -1)
+R0_change <- tail(R0_change, -1)
 
 # PMCMC Parameters
 pars_init = list('start_date' = as.Date("2020-02-03"), 'R0' = 3, 'Meff' = 2, 'Meff_pl' = 5)
@@ -79,15 +78,15 @@ inputs <- list(data = df,
                            pars_max = pars_max,
                            proposal_kernel = proposal_kernel,
                            pars_discrete = pars_discrete),
-               n_particles = 40)
+               n_particles = 20)
 
 # MCMC Functions - Prior and Likelihood Calculation
 logprior <- function(pars){
   assert_in(names(pars), c("start_date", "R0", "Meff", "Meff_pl")) # good sanity check
   ret <- dunif(x = pars[["start_date"]], min = -22, max = -2, log = TRUE) +
-    dnorm(x = pars[["R0"]], mean = 2.5, sd = 1, log = TRUE) +
-    dnorm(x = pars[["Meff"]], mean = 1.8, sd = 2, log = TRUE) +
-    dnorm(x = pars[["Meff_pl"]], mean = 5.6, sd = 2, log = TRUE)
+    dnorm(x = pars[["R0"]], mean = 3, sd = 1, log = TRUE) +
+    dnorm(x = pars[["Meff"]], mean = 2, sd = 2, log = TRUE) +
+    dnorm(x = pars[["Meff_pl"]], mean = 5, sd = 3, log = TRUE)
   return(ret)
 }
 
@@ -98,20 +97,38 @@ calc_ll <- function(pars) {
                           model_params = model_params,
                           interventions = interventions,
                           pars_obs = pars_obs,
-                          n_particles = 40,
+                          n_particles = 50,
                           forecast_days = 0,
                           return = "ll")
   return(X)
 }
 
 # Checking that True Parameters Give a Decent Likelihood and Other Parameters = Worse
-true_pars <- list('start_date' = as.Date("2020-02-01"), 'R0' = 3, 'Meff' = 2, 'Meff_pl' = 2)
-true <- calc_ll(true_pars)$log_likelihood
+true_pars <- list('start_date' = as.Date("2020-02-01"), 'R0' = 3, 'Meff' = 2, 'Meff_pl' = 5)
+true_ll <- calc_loglikelihood(pars = true_pars,
+                              data = df,
+                              squire_model = explicit_model(),
+                              model_params = model_params,
+                              interventions = interventions,
+                              pars_obs = pars_obs,
+                              n_particles = 40,
+                              forecast_days = 0,
+                              return = "ll")
+true_ll$log_likelihood
 true_pars$start_date <- -10
 logprior(true_pars)
 
-worse_pars <- list('start_date' = as.Date("2020-02-01"), 'R0' = 3, 'Meff' = 2, 'Meff_pl' = 0)
-worse <- calc_ll(worse_pars)$log_likelihood
+worse_pars <- list('start_date' = as.Date("2020-02-01"), 'R0' = 3, 'Meff' = 2, 'Meff_pl' = 6)
+worse_ll <- calc_loglikelihood(pars = worse_pars,
+                               data = df,
+                               squire_model = explicit_model(),
+                               model_params = model_params,
+                               interventions = interventions,
+                               pars_obs = pars_obs,
+                               n_particles = 40,
+                               forecast_days = 0,
+                               return = "ll")
+worse_ll$log_likelihood
 worse_pars$start_date <- -10
 logprior(worse_pars)
 
@@ -134,6 +151,8 @@ x <- run_mcmc_chain(inputs = inputs,
                     pars_min = pars_min,
                     pars_max = pars_max)
 toc()
+
+x$acceptance_ratio
 
 plot(x$results[1:niter, 1])
 plot(x$results[1:niter, 2])
