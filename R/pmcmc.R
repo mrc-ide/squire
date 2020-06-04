@@ -465,7 +465,7 @@ pmcmc <- function(data,
     stop('log_likelihood function must be able to take unnamed arguments')
   }
 
-  # create shorthand function to calc ll given main inputs
+  # create shorthand function to calc_ll given main inputs
   calc_ll <- function(pars) {
     X <- log_likelihood(pars = pars,
                         data = data,
@@ -526,7 +526,6 @@ pmcmc <- function(data,
       pars_min = pars_min,
       pars_max = pars_max,
       initial_scaling_factor = initial_scaling_factor)
-
   } else {
     chains <- furrr::future_pmap(
       .l =  list(n_mcmc = rep(n_mcmc, n_chains)),
@@ -872,10 +871,10 @@ run_mcmc_chain <- function(inputs,
                              min(accept_prob, 1))
     }
 
-    if (iter %% 1 == 0) {
-      print(c(round(scaling_factor, 3), mean(acceptances, na.rm = TRUE), iter))
-      print(proposal_kernel)
-    }
+    # if (iter %% 1 == 0) {
+    #   print(c(round(scaling_factor, 3), mean(acceptances, na.rm = TRUE), iter))
+    #   print(proposal_kernel)
+    # }
 
   }
 
