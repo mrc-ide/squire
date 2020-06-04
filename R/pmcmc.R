@@ -1006,7 +1006,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
       #R0 <- c(R0, R0 * R0_change[1:(min(swtchdates)-1)] * Meff, R0 * R0_change[min(swtchdates):(length(R0_change))] * Meff_pl)
       R0 <- c(R0,
               exp(log(R0) - Meff*(1-R0_change[1:(min(swtchdates)-1)])),
-              exp(log(R0) * Meff_pl*(1-R0_change[min(swtchdates):(length(R0_change))]))
+              exp(log(R0) - Meff_pl*(1-R0_change[min(swtchdates):(length(R0_change))]))
               )
     }
   }
