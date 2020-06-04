@@ -110,6 +110,9 @@ pmcmc <- function(data,
                   output_proposals = FALSE,
                   n_chains = 1,
                   squire_model = explicit_model(),
+                  Rt_func = function (R0_change, R0, Meff) {
+                       R0 * (2 * plogis(-(R0_change - 1) * -Meff))
+                    },
                   pars_obs = list(phi_cases = 0.1,
                                   k_cases = 2,
                                   phi_death = 1,
@@ -430,6 +433,7 @@ pmcmc <- function(data,
     model_params = model_params,
     interventions = interventions,
     pars_obs = pars_obs,
+    Rt_func = Rt_func,
     squire_model = squire_model,
     pars = list(pars_obs = pars_obs,
                 pars_init = pars_init,
@@ -465,6 +469,7 @@ pmcmc <- function(data,
                         interventions = interventions,
                         pars_obs = pars_obs,
                         n_particles = n_particles,
+                        Rt_func = Rt_func,
                         forecast_days = 0,
                         return = "ll"
     )
@@ -510,11 +515,11 @@ pmcmc <- function(data,
       output_proposals = output_proposals,
       required_acceptance_ratio = required_acceptance_ratio,
       start_covariance_adaptation = start_covariance_adaptation,
-      start_scaling_factor_adaptation,
-      proposal_kernel,
-      pars_discrete,
-      pars_min,
-      pars_max)
+      start_scaling_factor_adaptation = start_scaling_factor_adaptation,
+      proposal_kernel = proposal_kernel,
+      pars_discrete = pars_discrete,
+      pars_min = pars_min,
+      pars_max = pars_max)
 
   } else {
     chains <- furrr::future_pmap(
@@ -528,11 +533,11 @@ pmcmc <- function(data,
       output_proposals = output_proposals,
       required_acceptance_ratio = required_acceptance_ratio,
       start_covariance_adaptation = start_covariance_adaptation,
-      start_scaling_factor_adaptation,
-      proposal_kernel,
-      pars_discrete,
-      pars_min,
-      pars_max,
+      start_scaling_factor_adaptation = start_scaling_factor_adaptation,
+      proposal_kernel = proposal_kernel,
+      pars_discrete = pars_discrete,
+      pars_min = pars_min,
+      pars_max = pars_max,
       .progress = TRUE)
   }
 
@@ -893,7 +898,7 @@ run_mcmc_chain <- function(inputs,
 # return: Set to 'll' to return the log-likelihood (for MCMC) or to
 #
 calc_loglikelihood <- function(pars, data, squire_model, model_params,
-                               pars_obs, n_particles,
+                               pars_obs, n_particles, Rt_func,
                                forecast_days = 0, return = "ll",
                                interventions) {
   #..................
@@ -999,14 +1004,19 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   # and now get new R0s for the R0
   if (!is.null(R0_change)) {
     if (is.null(date_Meff_change)) {
-      R0 <- c(R0, R0 * R0_change * Meff)
+      R0 <- c(R0, vapply(R0_change, function(x){
+        Rt_func(R0_change = x, R0 = R0, Meff = Meff)
+      }, FUN.VALUE = numeric(1)))
     } else if (!is.null(date_Meff_change)) {
       # when does mobility change take place
       swtchdates <- which(date_R0_change >= date_Meff_change)
-      #R0 <- c(R0, R0 * R0_change[1:(min(swtchdates)-1)] * Meff, R0 * R0_change[min(swtchdates):(length(R0_change))] * Meff_pl)
       R0 <- c(R0,
-              exp(log(R0) - Meff*(1-R0_change[1:(min(swtchdates)-1)])),
-              exp(log(R0) - Meff_pl*(1-R0_change[min(swtchdates):(length(R0_change))]))
+              vapply(R0_change[1:(min(swtchdates)-1)], function(x){
+                Rt_func(R0_change = x, R0 = R0, Meff = Meff)
+              }, FUN.VALUE = numeric(1)),
+              vapply(R0_change[min(swtchdates):(length(R0_change))], function(x){
+                Rt_func(R0_change = x, R0 = R0, Meff = Meff_pl)
+              }, FUN.VALUE = numeric(1))
               )
     }
   }

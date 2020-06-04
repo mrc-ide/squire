@@ -14,6 +14,8 @@ pmcmc(
   output_proposals = FALSE,
   n_chains = 1,
   squire_model = explicit_model(),
+  Rt_func = function(R0_change, R0, Meff) {     R0 * (2 * plogis(-(R0_change - 1) *
+    -Meff)) },
   pars_obs = list(phi_cases = 0.1, k_cases = 2, phi_death = 1, k_death = 2, exp_noise =
     1e+06),
   pars_init = list(start_date = as.Date("2020-02-07"), R0 = 2.5, Meff = 2, Meff_pl = 3),
@@ -70,6 +72,10 @@ If NULL, uses uninformative priors which do not affect the posterior}
 \item{n_chains}{number of MCMC chains to run}
 
 \item{squire_model}{A squire model to use}
+
+\item{Rt_func}{Function for converting R0, Meff and R0_change. Function must
+have names arguments of R0, Meff and R0_change. Default is linear relationship
+on the log scale given by \code{exp(log(R0) - Meff*(1-R0_change))}.}
 
 \item{pars_obs}{list of parameters to use in comparison
 with \code{compare}. Must be a list containing, e.g.
