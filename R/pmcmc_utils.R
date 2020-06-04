@@ -237,6 +237,3 @@ update_covariance_matrix <- function(covariance_matrix, i, mean_vector, current_
   new_covariance_matrix = (i - 1) / i * covariance_matrix + mean_vector %*% t(mean_vector) - (i + 1) / i * new_mean %*% t(new_mean) + 1 / i * current_parameters %*% t(current_parameters) + epsilon * diag(number_of_parameters)
   return(list(new_covariance_matrix = new_covariance_matrix, new_mean_vector = new_mean))
 }
-
-
-

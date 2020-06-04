@@ -37,6 +37,10 @@
 #' @param replicates number of trajectories (replicates) to be returned that are being sampled from the posterior probability results produced by \code{run_mcmc_chain}
 #' to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory
 #' @param forecast Number of days to forecast forward. Default = 0
+#' @param required_acceptance_ratio Desired MCMC acceptance ratio
+#' @param start_covariance_adaptation Iteration number to begin covariance matrix adaptation at
+#' @param start_scaling_factor_adaptation Iteration number to begin RM optimisation of scaling factor at
+#' @param initial_scaling_factor Initial scaling factor for RM opitmisation if implemented
 #'
 #' @return squire_simulation \describe{
 #'   \item{output}{Trajectories from the sampled pMCMC parameter iterations.}
@@ -155,7 +159,8 @@ pmcmc <- function(data,
                   forecast = 0,
                   required_acceptance_ratio = 0.23,
                   start_covariance_adaptation = round(n_mcmc/2),
-                  start_scaling_factor_adaptation = 1
+                  start_scaling_factor_adaptation = 1,
+                  initial_scaling_factor = 1
 ) {
 
   #............................................................
@@ -519,7 +524,8 @@ pmcmc <- function(data,
       proposal_kernel = proposal_kernel,
       pars_discrete = pars_discrete,
       pars_min = pars_min,
-      pars_max = pars_max)
+      pars_max = pars_max,
+      initial_scaling_factor = initial_scaling_factor)
 
   } else {
     chains <- furrr::future_pmap(
@@ -538,6 +544,7 @@ pmcmc <- function(data,
       pars_discrete = pars_discrete,
       pars_min = pars_min,
       pars_max = pars_max,
+      initial_scaling_factor = initial_scaling_factor,
       .progress = TRUE)
   }
 
@@ -793,8 +800,13 @@ run_mcmc_chain <- function(inputs,
   for(iter in seq_len(n_mcmc) + 1L) {
 
     # propose new parameters
+    # temp_proposal_kernel <- proposal_kernel
+    # temp_proposal_kernel[2:4, 2:4] <- temp_proposal_kernel[2:4, 2:4] * scaling_factor
+    # if(temp_proposal_kernel[1, 1] * scaling_factor <= 1) {
+    #   temp_proposal_kernel[1, 1] <- 1/scaling_factor
+    # }
     prop_pars <- propose_parameters(curr_pars,
-                                    proposal_kernel * scaling_factor,
+                                    proposal_kernel, #* scaling_factor,
                                     unlist(pars_discrete),
                                     unlist(pars_min),
                                     unlist(pars_max))
@@ -834,14 +846,12 @@ run_mcmc_chain <- function(inputs,
       timing_cov <- iter - start_covariance_adaptation + 1
       if (iter == start_covariance_adaptation) {
         proposal_kernel <- cov(res[1:start_covariance_adaptation, 1:number_of_parameters])
+        print(proposal_kernel)
         mean_vector <- apply(res[, 1:number_of_parameters], 2, mean, na.rm = TRUE)
         covariance_matrix_storage[[timing_cov]] <- proposal_kernel
       } else {
         tmp <- update_covariance_matrix(proposal_kernel, timing_cov, mean_vector, curr_pars, number_of_parameters)
         proposal_kernel <- tmp$new_covariance_matrix
-        if(proposal_kernel[1, 1] <= 1) {
-          proposal_kernel[1, 1] <- 1
-        }
         mean_vector <- tmp$new_mean_vector
         covariance_matrix_storage[[timing_cov]] <- proposal_kernel
       }
@@ -862,7 +872,10 @@ run_mcmc_chain <- function(inputs,
                              min(accept_prob, 1))
     }
 
-    print(acceptances[iter])
+    if (iter %% 1 == 0) {
+      print(c(round(scaling_factor, 3), mean(acceptances, na.rm = TRUE), iter))
+      print(proposal_kernel)
+    }
 
   }
 

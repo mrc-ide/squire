@@ -43,7 +43,8 @@ pmcmc(
   forecast = 0,
   required_acceptance_ratio = 0.23,
   start_covariance_adaptation = round(n_mcmc/2),
-  start_scaling_factor_adaptation = 1
+  start_scaling_factor_adaptation = 1,
+  initial_scaling_factor = 1
 )
 }
 \arguments{
@@ -158,6 +159,14 @@ Defaut = NULL, i.e. no change}
 to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory}
 
 \item{forecast}{Number of days to forecast forward. Default = 0}
+
+\item{required_acceptance_ratio}{Desired MCMC acceptance ratio}
+
+\item{start_covariance_adaptation}{Iteration number to begin covariance matrix adaptation at}
+
+\item{start_scaling_factor_adaptation}{Iteration number to begin RM optimisation of scaling factor at}
+
+\item{initial_scaling_factor}{Initial scaling factor for RM opitmisation if implemented}
 }
 \value{
 squire_simulation \describe{
