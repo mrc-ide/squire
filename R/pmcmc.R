@@ -697,8 +697,6 @@ run_mcmc_chain <- function(inputs,
   curr_pars[["start_date"]] <- -(start_date_to_offset(first_data_date, curr_pars[["start_date"]]))
   curr_pars <- unlist(curr_pars)
 
-  number_of_parameters <- length(curr_pars)
-
   ## calculate initial prior
   curr_lprior <- calc_lprior(pars = curr_pars)
 
@@ -755,6 +753,8 @@ run_mcmc_chain <- function(inputs,
                    ncol = length(curr_ss))
 
   # New storage arrays for Robbins-Munro optimisation
+
+  # storage for acceptances over time
   acceptances <- vector(mode = "numeric", length = n_mcmc) # tracks acceptances over time
 
   # storage for covariance matrices over time - only properly initalised if we're actually adapting
@@ -775,6 +775,7 @@ run_mcmc_chain <- function(inputs,
 
   # New parameters related to Robbins Munro optimisation stuff
   scaling_factor <- initial_scaling_factor
+  number_of_parameters <- length(curr_pars)
 
   if(output_proposals) {
     proposals <- matrix(data = NA,
@@ -798,12 +799,6 @@ run_mcmc_chain <- function(inputs,
   #..................
   for(iter in seq_len(n_mcmc) + 1L) {
 
-    # propose new parameters
-    # temp_proposal_kernel <- proposal_kernel
-    # temp_proposal_kernel[2:4, 2:4] <- temp_proposal_kernel[2:4, 2:4] * scaling_factor
-    # if(temp_proposal_kernel[1, 1] * scaling_factor <= 1) {
-    #   temp_proposal_kernel[1, 1] <- 1/scaling_factor
-    # }
     prop_pars <- propose_parameters(curr_pars,
                                     proposal_kernel, #* scaling_factor,
                                     unlist(pars_discrete),
@@ -842,10 +837,9 @@ run_mcmc_chain <- function(inputs,
 
     # adapt and update covariance matrix
     if (iter >= start_covariance_adaptation) {
-      timing_cov <- iter - start_covariance_adaptation + 1
+      timing_cov <- iter - start_covariance_adaptation + 1 # iteration relative to when covariance adaptation started
       if (iter == start_covariance_adaptation) {
         proposal_kernel <- cov(res[1:start_covariance_adaptation, 1:number_of_parameters])
-        print(proposal_kernel)
         mean_vector <- apply(res[, 1:number_of_parameters], 2, mean, na.rm = TRUE)
         covariance_matrix_storage[[timing_cov]] <- proposal_kernel
       } else {
@@ -858,7 +852,7 @@ run_mcmc_chain <- function(inputs,
 
     # adapt and updat scaling factor
     if (iter > start_scaling_factor_adaptation) {
-      timing_sf <- iter - start_scaling_factor_adaptation + 1
+      timing_sf <- iter - start_scaling_factor_adaptation + 1 # iteration relative to when scaling factor adaptation started
       scaling_factor <- update_scaling_factor(scaling_factor, acceptances[iter], required_acceptance_ratio, timing_sf, number_of_parameters)
       scaling_factor_storage[timing_sf] <- scaling_factor
     }
