@@ -512,7 +512,7 @@ R0_date_particle_filter <- function(R0,
       #R0 <- c(R0, exp(log(R0) - Meff*(1-R0_change)))
       R0 <- c(R0, vapply(R0_change, function(x){
         Rt_func(R0_change = x, R0 = R0, Meff = Meff)
-        }, FUN.VALUE = numeric(1)))
+      }, FUN.VALUE = numeric(1)))
     } else {
       R0 <- c(R0, R0 * R0_change)
     }
