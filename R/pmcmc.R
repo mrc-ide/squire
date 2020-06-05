@@ -800,16 +800,19 @@ run_mcmc_chain <- function(inputs,
   for(iter in seq_len(n_mcmc) + 1L) {
 
     prop_pars <- propose_parameters(curr_pars,
-                                    proposal_kernel, #* scaling_factor,
+                                    proposal_kernel * scaling_factor,
                                     unlist(pars_discrete),
                                     unlist(pars_min),
                                     unlist(pars_max))
 
+    prop_for_eval <- prop_pars$for_eval
+    prop_for_chain <- prop_pars$for_chain
+
     ## calculate proposed prior / lhood / posterior
-    prop_lprior <- calc_lprior(pars = prop_pars)
+    prop_lprior <- calc_lprior(pars = prop_for_eval)
     # NB, squire originally set up to deal with date format triggering --> convert the current parameter start date back to date, whereas proposal and potential log prior function are done in numeric
-    prop_pars.squire <- as.list(prop_pars)
-    prop_pars.squire[["start_date"]] <- offset_to_start_date(first_data_date, prop_pars[["start_date"]]) # convert to date
+    prop_pars.squire <- as.list(prop_for_eval)
+    prop_pars.squire[["start_date"]] <- offset_to_start_date(first_data_date, prop_for_eval[["start_date"]]) # convert to date
     p_filter_est <- calc_ll(pars = prop_pars.squire)
     prop_ll <- p_filter_est$log_likelihood
     prop_ss <- p_filter_est$sample_state
@@ -820,13 +823,15 @@ run_mcmc_chain <- function(inputs,
 
     if(runif(1) < accept_prob) { # MH step
       # update parameters and calculated likelihoods
-      curr_pars <- prop_pars
+      curr_pars <- prop_for_chain
       curr_lprior <- prop_lprior
       curr_ll <- prop_ll
       curr_lpost <- prop_lpost
       curr_ss <- prop_ss
       acceptances[iter] <- 1
     }
+
+    # print(curr_pars)
 
     # record results
     res[iter, ] <- c(curr_pars,
@@ -858,17 +863,17 @@ run_mcmc_chain <- function(inputs,
     }
 
     if(output_proposals) {
-      proposals[iter, ] <- c(prop_pars,
+      proposals[iter, ] <- c(prop_for_chain,
                              prop_lprior,
                              prop_ll,
                              prop_lpost,
                              min(accept_prob, 1))
     }
 
-    # if (iter %% 1 == 0) {
-    #   print(c(round(scaling_factor, 3), mean(acceptances, na.rm = TRUE), iter))
-    #   print(proposal_kernel)
-    # }
+    if (iter %% 100 == 0) {
+      print(c(round(scaling_factor, 3), round(sum(acceptances, na.rm = TRUE)/iter, 3), round(iter, 1)))
+      #print(proposal_kernel)
+    }
 
   }
 
@@ -878,7 +883,7 @@ run_mcmc_chain <- function(inputs,
   rejection_rate <- coda::rejectionRate(coda_res)
   ess <- coda::effectiveSize(coda_res)
 
-  res$start_date <- offset_to_start_date(first_data_date, res$start_date)
+  # res$start_date <- offset_to_start_date(first_data_date, res$start_date)
 
   out <- list('inputs' = inputs,
               'results' = as.data.frame(res),
@@ -1121,15 +1126,18 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
 propose_parameters <- function(pars, proposal_kernel, pars_discrete, pars_min, pars_max) {
 
   ## proposed jumps are normal with mean pars and sd as input for parameter
-  jumps <- pars + drop(rmvnorm(n = 1,  sigma = proposal_kernel))
+  proposed <- pars + drop(rmvnorm(n = 1,  sigma = proposal_kernel))
+  for_chain <- reflect_proposal(x = proposed,
+                                floor = pars_min,
+                                cap = pars_max)
 
   # discretise if necessary
-  jumps[pars_discrete] <- round(jumps[pars_discrete])
-  # reflect proposal if it exceeds upper or lower parameter boundary
-  jumps <- reflect_proposal(x = jumps,
-                            floor = pars_min,
-                            cap = pars_max)
-  jumps
+  for_eval <- proposed
+  for_eval[pars_discrete] <- round(for_eval[pars_discrete])
+  for_eval <- reflect_proposal(x = for_eval,
+                               floor = pars_min,
+                               cap = pars_max)
+  return(list(for_eval = for_eval, for_chain = for_chain))
 }
 
 
