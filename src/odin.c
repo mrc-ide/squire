@@ -753,6 +753,364 @@ typedef struct simple_SEIR_internal {
   double *tt_beta;
   double *tt_matrix;
 } simple_SEIR_internal;
+typedef struct updated_healthcare_rep_SEIR_internal {
+  double *beta_set;
+  double *D_Community_0;
+  double *D_Hospital_0;
+  double *delta_D_Community;
+  double *delta_D_Hospital;
+  double *delta_E1;
+  double *delta_E2;
+  double *delta_ICase1;
+  double *delta_ICase2;
+  double *delta_IMild;
+  double *delta_IMVGetDie1;
+  double *delta_IMVGetDie2;
+  double *delta_IMVGetLive1;
+  double *delta_IMVGetLive2;
+  double *delta_IMVNotGetDie1;
+  double *delta_IMVNotGetDie2;
+  double *delta_IMVNotGetLive1;
+  double *delta_IMVNotGetLive2;
+  double *delta_IOxGetDie1;
+  double *delta_IOxGetDie2;
+  double *delta_IOxGetLive1;
+  double *delta_IOxGetLive2;
+  double *delta_IOxNotGetDie1;
+  double *delta_IOxNotGetDie2;
+  double *delta_IOxNotGetLive1;
+  double *delta_IOxNotGetLive2;
+  double *delta_IRec1;
+  double *delta_IRec2;
+  double *delta_R;
+  int dim_beta_set;
+  int dim_D_Community;
+  int dim_D_Community_0;
+  int dim_D_Hospital;
+  int dim_D_Hospital_0;
+  int dim_delta_D_Community;
+  int dim_delta_D_Hospital;
+  int dim_delta_E1;
+  int dim_delta_E2;
+  int dim_delta_ICase1;
+  int dim_delta_ICase2;
+  int dim_delta_IMild;
+  int dim_delta_IMVGetDie1;
+  int dim_delta_IMVGetDie2;
+  int dim_delta_IMVGetLive1;
+  int dim_delta_IMVGetLive2;
+  int dim_delta_IMVNotGetDie1;
+  int dim_delta_IMVNotGetDie2;
+  int dim_delta_IMVNotGetLive1;
+  int dim_delta_IMVNotGetLive2;
+  int dim_delta_IOxGetDie1;
+  int dim_delta_IOxGetDie2;
+  int dim_delta_IOxGetLive1;
+  int dim_delta_IOxGetLive2;
+  int dim_delta_IOxNotGetDie1;
+  int dim_delta_IOxNotGetDie2;
+  int dim_delta_IOxNotGetLive1;
+  int dim_delta_IOxNotGetLive2;
+  int dim_delta_IRec1;
+  int dim_delta_IRec2;
+  int dim_delta_R;
+  int dim_E1;
+  int dim_E1_0;
+  int dim_E2;
+  int dim_E2_0;
+  int dim_hosp_beds;
+  int dim_ICase1;
+  int dim_ICase1_0;
+  int dim_ICase2;
+  int dim_ICase2_0;
+  int dim_ICU_beds;
+  int dim_IMild;
+  int dim_IMild_0;
+  int dim_IMVGetDie1;
+  int dim_IMVGetDie1_0;
+  int dim_IMVGetDie2;
+  int dim_IMVGetDie2_0;
+  int dim_IMVGetLive1;
+  int dim_IMVGetLive1_0;
+  int dim_IMVGetLive2;
+  int dim_IMVGetLive2_0;
+  int dim_IMVNotGetDie1;
+  int dim_IMVNotGetDie1_0;
+  int dim_IMVNotGetDie2;
+  int dim_IMVNotGetDie2_0;
+  int dim_IMVNotGetLive1;
+  int dim_IMVNotGetLive1_0;
+  int dim_IMVNotGetLive2;
+  int dim_IMVNotGetLive2_0;
+  int dim_IOxGetDie1;
+  int dim_IOxGetDie1_0;
+  int dim_IOxGetDie2;
+  int dim_IOxGetDie2_0;
+  int dim_IOxGetLive1;
+  int dim_IOxGetLive1_0;
+  int dim_IOxGetLive2;
+  int dim_IOxGetLive2_0;
+  int dim_IOxNotGetDie1;
+  int dim_IOxNotGetDie1_0;
+  int dim_IOxNotGetDie2;
+  int dim_IOxNotGetDie2_0;
+  int dim_IOxNotGetLive1;
+  int dim_IOxNotGetLive1_0;
+  int dim_IOxNotGetLive2;
+  int dim_IOxNotGetLive2_0;
+  int dim_IRec1;
+  int dim_IRec1_0;
+  int dim_IRec2;
+  int dim_IRec2_0;
+  int dim_lambda;
+  int dim_m;
+  int dim_m_1;
+  int dim_m_2;
+  int dim_mix_mat_set;
+  int dim_mix_mat_set_1;
+  int dim_mix_mat_set_12;
+  int dim_mix_mat_set_2;
+  int dim_mix_mat_set_3;
+  int dim_n_E1_E2;
+  int dim_n_E2_I;
+  int dim_n_E2_ICase1;
+  int dim_n_E2_IMild;
+  int dim_n_ICase1_ICase2;
+  int dim_n_ICase2_Hosp;
+  int dim_n_IMild_R;
+  int dim_n_IMVGetDie1;
+  int dim_n_IMVGetDie1_IMVGetDie2;
+  int dim_n_IMVGetDie2_D;
+  int dim_n_IMVGetLive1;
+  int dim_n_IMVGetLive1_IMVGetLive2;
+  int dim_n_IMVGetLive2_Rec;
+  int dim_n_IMVNotGetDie1;
+  int dim_n_IMVNotGetDie1_IMVNotGetDie2;
+  int dim_n_IMVNotGetDie2_D;
+  int dim_n_IMVNotGetLive1;
+  int dim_n_IMVNotGetLive1_IMVNotGetLive2;
+  int dim_n_IMVNotGetLive2_R;
+  int dim_n_IOxGetDie1;
+  int dim_n_IOxGetDie1_IOxGetDie2;
+  int dim_n_IOxGetDie2_D;
+  int dim_n_IOxGetLive1;
+  int dim_n_IOxGetLive1_IOxGetLive2;
+  int dim_n_IOxGetLive2_R;
+  int dim_n_IOxNotGetDie1;
+  int dim_n_IOxNotGetDie1_IOxNotGetDie2;
+  int dim_n_IOxNotGetDie2_D;
+  int dim_n_IOxNotGetLive1;
+  int dim_n_IOxNotGetLive1_IOxNotGetLive2;
+  int dim_n_IOxNotGetLive2_R;
+  int dim_n_IRec1_IRec2;
+  int dim_n_IRec2_R;
+  int dim_n_S_E1;
+  int dim_number_get_IMV;
+  int dim_number_get_Ox;
+  int dim_number_notget_IMV;
+  int dim_number_notget_Ox;
+  int dim_number_requiring_IMV;
+  int dim_number_requiring_Ox;
+  int dim_p_S_E1;
+  int dim_prob_hosp;
+  int dim_prob_non_severe_death_no_treatment;
+  int dim_prob_non_severe_death_treatment;
+  int dim_prob_severe;
+  int dim_prob_severe_death_no_treatment;
+  int dim_prob_severe_death_treatment;
+  int dim_R;
+  int dim_R_0;
+  int dim_S;
+  int dim_S_0;
+  int dim_s_ij;
+  int dim_s_ij_1;
+  int dim_s_ij_2;
+  int dim_temp;
+  int dim_tt_beta;
+  int dim_tt_hosp_beds;
+  int dim_tt_ICU_beds;
+  int dim_tt_matrix;
+  double dt;
+  double *E1_0;
+  double *E2_0;
+  double gamma_E;
+  double gamma_get_mv_die;
+  double gamma_get_mv_survive;
+  double gamma_get_ox_die;
+  double gamma_get_ox_survive;
+  double gamma_ICase;
+  double gamma_IMild;
+  double gamma_not_get_mv_die;
+  double gamma_not_get_mv_survive;
+  double gamma_not_get_ox_die;
+  double gamma_not_get_ox_survive;
+  double gamma_rec;
+  double *hosp_beds;
+  double *ICase1_0;
+  double *ICase2_0;
+  double *ICU_beds;
+  double *IMild_0;
+  double *IMVGetDie1_0;
+  double *IMVGetDie2_0;
+  double *IMVGetLive1_0;
+  double *IMVGetLive2_0;
+  double *IMVNotGetDie1_0;
+  double *IMVNotGetDie2_0;
+  double *IMVNotGetLive1_0;
+  double *IMVNotGetLive2_0;
+  double *initial_D_Community;
+  double *initial_D_Hospital;
+  double *initial_E1;
+  double *initial_E2;
+  double *initial_ICase1;
+  double *initial_ICase2;
+  double *initial_IMild;
+  double *initial_IMVGetDie1;
+  double *initial_IMVGetDie2;
+  double *initial_IMVGetLive1;
+  double *initial_IMVGetLive2;
+  double *initial_IMVNotGetDie1;
+  double *initial_IMVNotGetDie2;
+  double *initial_IMVNotGetLive1;
+  double *initial_IMVNotGetLive2;
+  double *initial_IOxGetDie1;
+  double *initial_IOxGetDie2;
+  double *initial_IOxGetLive1;
+  double *initial_IOxGetLive2;
+  double *initial_IOxNotGetDie1;
+  double *initial_IOxNotGetDie2;
+  double *initial_IOxNotGetLive1;
+  double *initial_IOxNotGetLive2;
+  double *initial_IRec1;
+  double *initial_IRec2;
+  double *initial_R;
+  double *initial_S;
+  void *interpolate_beta;
+  void *interpolate_hosp_bed_capacity;
+  void *interpolate_ICU_bed_capacity;
+  void *interpolate_m;
+  double *IOxGetDie1_0;
+  double *IOxGetDie2_0;
+  double *IOxGetLive1_0;
+  double *IOxGetLive2_0;
+  double *IOxNotGetDie1_0;
+  double *IOxNotGetDie2_0;
+  double *IOxNotGetLive1_0;
+  double *IOxNotGetLive2_0;
+  double *IRec1_0;
+  double *IRec2_0;
+  double *lambda;
+  double *m;
+  double *mix_mat_set;
+  int N_age;
+  double *n_E1_E2;
+  double *n_E2_I;
+  double *n_E2_ICase1;
+  double *n_E2_IMild;
+  double *n_ICase1_ICase2;
+  double *n_ICase2_Hosp;
+  double *n_IMild_R;
+  double *n_IMVGetDie1;
+  double *n_IMVGetDie1_IMVGetDie2;
+  double *n_IMVGetDie2_D;
+  double *n_IMVGetLive1;
+  double *n_IMVGetLive1_IMVGetLive2;
+  double *n_IMVGetLive2_Rec;
+  double *n_IMVNotGetDie1;
+  double *n_IMVNotGetDie1_IMVNotGetDie2;
+  double *n_IMVNotGetDie2_D;
+  double *n_IMVNotGetLive1;
+  double *n_IMVNotGetLive1_IMVNotGetLive2;
+  double *n_IMVNotGetLive2_R;
+  double *n_IOxGetDie1;
+  double *n_IOxGetDie1_IOxGetDie2;
+  double *n_IOxGetDie2_D;
+  double *n_IOxGetLive1;
+  double *n_IOxGetLive1_IOxGetLive2;
+  double *n_IOxGetLive2_R;
+  double *n_IOxNotGetDie1;
+  double *n_IOxNotGetDie1_IOxNotGetDie2;
+  double *n_IOxNotGetDie2_D;
+  double *n_IOxNotGetLive1;
+  double *n_IOxNotGetLive1_IOxNotGetLive2;
+  double *n_IOxNotGetLive2_R;
+  double *n_IRec1_IRec2;
+  double *n_IRec2_R;
+  double *n_S_E1;
+  int *number_get_IMV;
+  int *number_get_Ox;
+  double *number_notget_IMV;
+  double *number_notget_Ox;
+  double *number_requiring_IMV;
+  double *number_requiring_Ox;
+  int offset_output_delta_D_Hospital;
+  int offset_output_n_E2_ICase1;
+  int offset_output_n_E2_IMild;
+  int offset_output_number_requiring_IMV;
+  int offset_variable_D_Community;
+  int offset_variable_D_Hospital;
+  int offset_variable_E2;
+  int offset_variable_ICase1;
+  int offset_variable_ICase2;
+  int offset_variable_IMild;
+  int offset_variable_IMVGetDie1;
+  int offset_variable_IMVGetDie2;
+  int offset_variable_IMVGetLive1;
+  int offset_variable_IMVGetLive2;
+  int offset_variable_IMVNotGetDie1;
+  int offset_variable_IMVNotGetDie2;
+  int offset_variable_IMVNotGetLive1;
+  int offset_variable_IMVNotGetLive2;
+  int offset_variable_IOxGetDie1;
+  int offset_variable_IOxGetDie2;
+  int offset_variable_IOxGetLive1;
+  int offset_variable_IOxGetLive2;
+  int offset_variable_IOxNotGetDie1;
+  int offset_variable_IOxNotGetDie2;
+  int offset_variable_IOxNotGetLive1;
+  int offset_variable_IOxNotGetLive2;
+  int offset_variable_IRec1;
+  int offset_variable_IRec2;
+  int offset_variable_R;
+  double p_E1_E2;
+  double p_E2_I;
+  double p_ICase1_ICase2;
+  double p_ICase2_Hosp;
+  double p_IMild_R;
+  double p_IMVGetDie1_IMVGetDie2;
+  double p_IMVGetDie2_D;
+  double p_IMVGetLive1_IMVGetLive2;
+  double p_IMVGetLive2_Rec;
+  double p_IMVNotGetDie1_IMVNotGetDie2;
+  double p_IMVNotGetDie2_D;
+  double p_IMVNotGetLive1_IMVNotGetLive2;
+  double p_IMVNotGetLive2_R;
+  double p_IOxGetDie1_IOxGetDie2;
+  double p_IOxGetDie2_D;
+  double p_IOxGetLive1_IOxGetLive2;
+  double p_IOxGetLive2_R;
+  double p_IOxNotGetDie1_IOxNotGetDie2;
+  double p_IOxNotGetDie2_D;
+  double p_IOxNotGetLive1_IOxNotGetLive2;
+  double p_IOxNotGetLive2_R;
+  double p_Rec1_Rec2;
+  double p_Rec2_R;
+  double *p_S_E1;
+  double *prob_hosp;
+  double *prob_non_severe_death_no_treatment;
+  double *prob_non_severe_death_treatment;
+  double *prob_severe;
+  double *prob_severe_death_no_treatment;
+  double *prob_severe_death_treatment;
+  double *R_0;
+  double *S_0;
+  double *s_ij;
+  double *temp;
+  double *tt_beta;
+  double *tt_hosp_beds;
+  double *tt_ICU_beds;
+  double *tt_matrix;
+} updated_healthcare_rep_SEIR_internal;
 explicit_SEIR_internal* explicit_SEIR_get_internal(SEXP internal_p, int closed_error);
 static void explicit_SEIR_finalise(SEXP internal_p);
 SEXP explicit_SEIR_create(SEXP user);
@@ -799,6 +1157,17 @@ SEXP simple_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
 void simple_SEIR_rhs(simple_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
 void simple_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
 SEXP simple_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
+updated_healthcare_rep_SEIR_internal* updated_healthcare_rep_SEIR_get_internal(SEXP internal_p, int closed_error);
+static void updated_healthcare_rep_SEIR_finalise(SEXP internal_p);
+SEXP updated_healthcare_rep_SEIR_create(SEXP user);
+void updated_healthcare_rep_SEIR_initmod_desolve(void(* odeparms) (int *, double *));
+SEXP updated_healthcare_rep_SEIR_contents(SEXP internal_p);
+SEXP updated_healthcare_rep_SEIR_set_user(SEXP internal_p, SEXP user);
+SEXP updated_healthcare_rep_SEIR_metadata(SEXP internal_p);
+SEXP updated_healthcare_rep_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr);
+void updated_healthcare_rep_SEIR_rhs(updated_healthcare_rep_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output);
+void updated_healthcare_rep_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal);
+SEXP updated_healthcare_rep_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state);
 double user_get_scalar_double(SEXP user, const char *name,
                               double default_value, double min, double max);
 int user_get_scalar_int(SEXP user, const char *name,
@@ -5571,6 +5940,2412 @@ SEXP simple_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
   double *output = REAL(output_ptr);
   GetRNGstate();
   simple_SEIR_rhs(internal, INTEGER(step)[0], REAL(state), REAL(state_next), output);
+  PutRNGstate();
+  UNPROTECT(1);
+  return state_next;
+}
+updated_healthcare_rep_SEIR_internal* updated_healthcare_rep_SEIR_get_internal(SEXP internal_p, int closed_error) {
+  updated_healthcare_rep_SEIR_internal *internal = NULL;
+  if (TYPEOF(internal_p) != EXTPTRSXP) {
+    Rf_error("Expected an external pointer");
+  }
+  internal = (updated_healthcare_rep_SEIR_internal*) R_ExternalPtrAddr(internal_p);
+  if (!internal && closed_error) {
+    Rf_error("Pointer has been invalidated");
+  }
+  return internal;
+}
+void updated_healthcare_rep_SEIR_finalise(SEXP internal_p) {
+  updated_healthcare_rep_SEIR_internal *internal = updated_healthcare_rep_SEIR_get_internal(internal_p, 0);
+  if (internal_p) {
+    cinterpolate_free(internal->interpolate_beta);
+    cinterpolate_free(internal->interpolate_hosp_bed_capacity);
+    cinterpolate_free(internal->interpolate_ICU_bed_capacity);
+    cinterpolate_free(internal->interpolate_m);
+    internal->interpolate_beta = NULL;
+    internal->interpolate_hosp_bed_capacity = NULL;
+    internal->interpolate_ICU_bed_capacity = NULL;
+    internal->interpolate_m = NULL;
+    Free(internal->beta_set);
+    Free(internal->D_Community_0);
+    Free(internal->D_Hospital_0);
+    Free(internal->delta_D_Community);
+    Free(internal->delta_D_Hospital);
+    Free(internal->delta_E1);
+    Free(internal->delta_E2);
+    Free(internal->delta_ICase1);
+    Free(internal->delta_ICase2);
+    Free(internal->delta_IMild);
+    Free(internal->delta_IMVGetDie1);
+    Free(internal->delta_IMVGetDie2);
+    Free(internal->delta_IMVGetLive1);
+    Free(internal->delta_IMVGetLive2);
+    Free(internal->delta_IMVNotGetDie1);
+    Free(internal->delta_IMVNotGetDie2);
+    Free(internal->delta_IMVNotGetLive1);
+    Free(internal->delta_IMVNotGetLive2);
+    Free(internal->delta_IOxGetDie1);
+    Free(internal->delta_IOxGetDie2);
+    Free(internal->delta_IOxGetLive1);
+    Free(internal->delta_IOxGetLive2);
+    Free(internal->delta_IOxNotGetDie1);
+    Free(internal->delta_IOxNotGetDie2);
+    Free(internal->delta_IOxNotGetLive1);
+    Free(internal->delta_IOxNotGetLive2);
+    Free(internal->delta_IRec1);
+    Free(internal->delta_IRec2);
+    Free(internal->delta_R);
+    Free(internal->E1_0);
+    Free(internal->E2_0);
+    Free(internal->hosp_beds);
+    Free(internal->ICase1_0);
+    Free(internal->ICase2_0);
+    Free(internal->ICU_beds);
+    Free(internal->IMild_0);
+    Free(internal->IMVGetDie1_0);
+    Free(internal->IMVGetDie2_0);
+    Free(internal->IMVGetLive1_0);
+    Free(internal->IMVGetLive2_0);
+    Free(internal->IMVNotGetDie1_0);
+    Free(internal->IMVNotGetDie2_0);
+    Free(internal->IMVNotGetLive1_0);
+    Free(internal->IMVNotGetLive2_0);
+    Free(internal->initial_D_Community);
+    Free(internal->initial_D_Hospital);
+    Free(internal->initial_E1);
+    Free(internal->initial_E2);
+    Free(internal->initial_ICase1);
+    Free(internal->initial_ICase2);
+    Free(internal->initial_IMild);
+    Free(internal->initial_IMVGetDie1);
+    Free(internal->initial_IMVGetDie2);
+    Free(internal->initial_IMVGetLive1);
+    Free(internal->initial_IMVGetLive2);
+    Free(internal->initial_IMVNotGetDie1);
+    Free(internal->initial_IMVNotGetDie2);
+    Free(internal->initial_IMVNotGetLive1);
+    Free(internal->initial_IMVNotGetLive2);
+    Free(internal->initial_IOxGetDie1);
+    Free(internal->initial_IOxGetDie2);
+    Free(internal->initial_IOxGetLive1);
+    Free(internal->initial_IOxGetLive2);
+    Free(internal->initial_IOxNotGetDie1);
+    Free(internal->initial_IOxNotGetDie2);
+    Free(internal->initial_IOxNotGetLive1);
+    Free(internal->initial_IOxNotGetLive2);
+    Free(internal->initial_IRec1);
+    Free(internal->initial_IRec2);
+    Free(internal->initial_R);
+    Free(internal->initial_S);
+    Free(internal->IOxGetDie1_0);
+    Free(internal->IOxGetDie2_0);
+    Free(internal->IOxGetLive1_0);
+    Free(internal->IOxGetLive2_0);
+    Free(internal->IOxNotGetDie1_0);
+    Free(internal->IOxNotGetDie2_0);
+    Free(internal->IOxNotGetLive1_0);
+    Free(internal->IOxNotGetLive2_0);
+    Free(internal->IRec1_0);
+    Free(internal->IRec2_0);
+    Free(internal->lambda);
+    Free(internal->m);
+    Free(internal->mix_mat_set);
+    Free(internal->n_E1_E2);
+    Free(internal->n_E2_I);
+    Free(internal->n_E2_ICase1);
+    Free(internal->n_E2_IMild);
+    Free(internal->n_ICase1_ICase2);
+    Free(internal->n_ICase2_Hosp);
+    Free(internal->n_IMild_R);
+    Free(internal->n_IMVGetDie1);
+    Free(internal->n_IMVGetDie1_IMVGetDie2);
+    Free(internal->n_IMVGetDie2_D);
+    Free(internal->n_IMVGetLive1);
+    Free(internal->n_IMVGetLive1_IMVGetLive2);
+    Free(internal->n_IMVGetLive2_Rec);
+    Free(internal->n_IMVNotGetDie1);
+    Free(internal->n_IMVNotGetDie1_IMVNotGetDie2);
+    Free(internal->n_IMVNotGetDie2_D);
+    Free(internal->n_IMVNotGetLive1);
+    Free(internal->n_IMVNotGetLive1_IMVNotGetLive2);
+    Free(internal->n_IMVNotGetLive2_R);
+    Free(internal->n_IOxGetDie1);
+    Free(internal->n_IOxGetDie1_IOxGetDie2);
+    Free(internal->n_IOxGetDie2_D);
+    Free(internal->n_IOxGetLive1);
+    Free(internal->n_IOxGetLive1_IOxGetLive2);
+    Free(internal->n_IOxGetLive2_R);
+    Free(internal->n_IOxNotGetDie1);
+    Free(internal->n_IOxNotGetDie1_IOxNotGetDie2);
+    Free(internal->n_IOxNotGetDie2_D);
+    Free(internal->n_IOxNotGetLive1);
+    Free(internal->n_IOxNotGetLive1_IOxNotGetLive2);
+    Free(internal->n_IOxNotGetLive2_R);
+    Free(internal->n_IRec1_IRec2);
+    Free(internal->n_IRec2_R);
+    Free(internal->n_S_E1);
+    Free(internal->number_get_IMV);
+    Free(internal->number_get_Ox);
+    Free(internal->number_notget_IMV);
+    Free(internal->number_notget_Ox);
+    Free(internal->number_requiring_IMV);
+    Free(internal->number_requiring_Ox);
+    Free(internal->p_S_E1);
+    Free(internal->prob_hosp);
+    Free(internal->prob_non_severe_death_no_treatment);
+    Free(internal->prob_non_severe_death_treatment);
+    Free(internal->prob_severe);
+    Free(internal->prob_severe_death_no_treatment);
+    Free(internal->prob_severe_death_treatment);
+    Free(internal->R_0);
+    Free(internal->S_0);
+    Free(internal->s_ij);
+    Free(internal->temp);
+    Free(internal->tt_beta);
+    Free(internal->tt_hosp_beds);
+    Free(internal->tt_ICU_beds);
+    Free(internal->tt_matrix);
+    Free(internal);
+    R_ClearExternalPtr(internal_p);
+  }
+}
+SEXP updated_healthcare_rep_SEIR_create(SEXP user) {
+  updated_healthcare_rep_SEIR_internal *internal = (updated_healthcare_rep_SEIR_internal*) Calloc(1, updated_healthcare_rep_SEIR_internal);
+  internal->beta_set = NULL;
+  internal->D_Community_0 = NULL;
+  internal->D_Hospital_0 = NULL;
+  internal->delta_D_Community = NULL;
+  internal->delta_D_Hospital = NULL;
+  internal->delta_E1 = NULL;
+  internal->delta_E2 = NULL;
+  internal->delta_ICase1 = NULL;
+  internal->delta_ICase2 = NULL;
+  internal->delta_IMild = NULL;
+  internal->delta_IMVGetDie1 = NULL;
+  internal->delta_IMVGetDie2 = NULL;
+  internal->delta_IMVGetLive1 = NULL;
+  internal->delta_IMVGetLive2 = NULL;
+  internal->delta_IMVNotGetDie1 = NULL;
+  internal->delta_IMVNotGetDie2 = NULL;
+  internal->delta_IMVNotGetLive1 = NULL;
+  internal->delta_IMVNotGetLive2 = NULL;
+  internal->delta_IOxGetDie1 = NULL;
+  internal->delta_IOxGetDie2 = NULL;
+  internal->delta_IOxGetLive1 = NULL;
+  internal->delta_IOxGetLive2 = NULL;
+  internal->delta_IOxNotGetDie1 = NULL;
+  internal->delta_IOxNotGetDie2 = NULL;
+  internal->delta_IOxNotGetLive1 = NULL;
+  internal->delta_IOxNotGetLive2 = NULL;
+  internal->delta_IRec1 = NULL;
+  internal->delta_IRec2 = NULL;
+  internal->delta_R = NULL;
+  internal->E1_0 = NULL;
+  internal->E2_0 = NULL;
+  internal->hosp_beds = NULL;
+  internal->ICase1_0 = NULL;
+  internal->ICase2_0 = NULL;
+  internal->ICU_beds = NULL;
+  internal->IMild_0 = NULL;
+  internal->IMVGetDie1_0 = NULL;
+  internal->IMVGetDie2_0 = NULL;
+  internal->IMVGetLive1_0 = NULL;
+  internal->IMVGetLive2_0 = NULL;
+  internal->IMVNotGetDie1_0 = NULL;
+  internal->IMVNotGetDie2_0 = NULL;
+  internal->IMVNotGetLive1_0 = NULL;
+  internal->IMVNotGetLive2_0 = NULL;
+  internal->initial_D_Community = NULL;
+  internal->initial_D_Hospital = NULL;
+  internal->initial_E1 = NULL;
+  internal->initial_E2 = NULL;
+  internal->initial_ICase1 = NULL;
+  internal->initial_ICase2 = NULL;
+  internal->initial_IMild = NULL;
+  internal->initial_IMVGetDie1 = NULL;
+  internal->initial_IMVGetDie2 = NULL;
+  internal->initial_IMVGetLive1 = NULL;
+  internal->initial_IMVGetLive2 = NULL;
+  internal->initial_IMVNotGetDie1 = NULL;
+  internal->initial_IMVNotGetDie2 = NULL;
+  internal->initial_IMVNotGetLive1 = NULL;
+  internal->initial_IMVNotGetLive2 = NULL;
+  internal->initial_IOxGetDie1 = NULL;
+  internal->initial_IOxGetDie2 = NULL;
+  internal->initial_IOxGetLive1 = NULL;
+  internal->initial_IOxGetLive2 = NULL;
+  internal->initial_IOxNotGetDie1 = NULL;
+  internal->initial_IOxNotGetDie2 = NULL;
+  internal->initial_IOxNotGetLive1 = NULL;
+  internal->initial_IOxNotGetLive2 = NULL;
+  internal->initial_IRec1 = NULL;
+  internal->initial_IRec2 = NULL;
+  internal->initial_R = NULL;
+  internal->initial_S = NULL;
+  internal->interpolate_m = NULL;
+  internal->IOxGetDie1_0 = NULL;
+  internal->IOxGetDie2_0 = NULL;
+  internal->IOxGetLive1_0 = NULL;
+  internal->IOxGetLive2_0 = NULL;
+  internal->IOxNotGetDie1_0 = NULL;
+  internal->IOxNotGetDie2_0 = NULL;
+  internal->IOxNotGetLive1_0 = NULL;
+  internal->IOxNotGetLive2_0 = NULL;
+  internal->IRec1_0 = NULL;
+  internal->IRec2_0 = NULL;
+  internal->lambda = NULL;
+  internal->m = NULL;
+  internal->mix_mat_set = NULL;
+  internal->n_E1_E2 = NULL;
+  internal->n_E2_I = NULL;
+  internal->n_E2_ICase1 = NULL;
+  internal->n_E2_IMild = NULL;
+  internal->n_ICase1_ICase2 = NULL;
+  internal->n_ICase2_Hosp = NULL;
+  internal->n_IMild_R = NULL;
+  internal->n_IMVGetDie1 = NULL;
+  internal->n_IMVGetDie1_IMVGetDie2 = NULL;
+  internal->n_IMVGetDie2_D = NULL;
+  internal->n_IMVGetLive1 = NULL;
+  internal->n_IMVGetLive1_IMVGetLive2 = NULL;
+  internal->n_IMVGetLive2_Rec = NULL;
+  internal->n_IMVNotGetDie1 = NULL;
+  internal->n_IMVNotGetDie1_IMVNotGetDie2 = NULL;
+  internal->n_IMVNotGetDie2_D = NULL;
+  internal->n_IMVNotGetLive1 = NULL;
+  internal->n_IMVNotGetLive1_IMVNotGetLive2 = NULL;
+  internal->n_IMVNotGetLive2_R = NULL;
+  internal->n_IOxGetDie1 = NULL;
+  internal->n_IOxGetDie1_IOxGetDie2 = NULL;
+  internal->n_IOxGetDie2_D = NULL;
+  internal->n_IOxGetLive1 = NULL;
+  internal->n_IOxGetLive1_IOxGetLive2 = NULL;
+  internal->n_IOxGetLive2_R = NULL;
+  internal->n_IOxNotGetDie1 = NULL;
+  internal->n_IOxNotGetDie1_IOxNotGetDie2 = NULL;
+  internal->n_IOxNotGetDie2_D = NULL;
+  internal->n_IOxNotGetLive1 = NULL;
+  internal->n_IOxNotGetLive1_IOxNotGetLive2 = NULL;
+  internal->n_IOxNotGetLive2_R = NULL;
+  internal->n_IRec1_IRec2 = NULL;
+  internal->n_IRec2_R = NULL;
+  internal->n_S_E1 = NULL;
+  internal->number_get_IMV = NULL;
+  internal->number_get_Ox = NULL;
+  internal->number_notget_IMV = NULL;
+  internal->number_notget_Ox = NULL;
+  internal->number_requiring_IMV = NULL;
+  internal->number_requiring_Ox = NULL;
+  internal->p_S_E1 = NULL;
+  internal->prob_hosp = NULL;
+  internal->prob_non_severe_death_no_treatment = NULL;
+  internal->prob_non_severe_death_treatment = NULL;
+  internal->prob_severe = NULL;
+  internal->prob_severe_death_no_treatment = NULL;
+  internal->prob_severe_death_treatment = NULL;
+  internal->R_0 = NULL;
+  internal->S_0 = NULL;
+  internal->s_ij = NULL;
+  internal->temp = NULL;
+  internal->tt_beta = NULL;
+  internal->tt_hosp_beds = NULL;
+  internal->tt_ICU_beds = NULL;
+  internal->tt_matrix = NULL;
+  internal->beta_set = NULL;
+  internal->D_Community_0 = NULL;
+  internal->D_Hospital_0 = NULL;
+  internal->dt = NA_REAL;
+  internal->E1_0 = NULL;
+  internal->E2_0 = NULL;
+  internal->gamma_E = NA_REAL;
+  internal->gamma_get_mv_die = NA_REAL;
+  internal->gamma_get_mv_survive = NA_REAL;
+  internal->gamma_get_ox_die = NA_REAL;
+  internal->gamma_get_ox_survive = NA_REAL;
+  internal->gamma_ICase = NA_REAL;
+  internal->gamma_IMild = NA_REAL;
+  internal->gamma_not_get_mv_die = NA_REAL;
+  internal->gamma_not_get_mv_survive = NA_REAL;
+  internal->gamma_not_get_ox_die = NA_REAL;
+  internal->gamma_not_get_ox_survive = NA_REAL;
+  internal->gamma_rec = NA_REAL;
+  internal->hosp_beds = NULL;
+  internal->ICase1_0 = NULL;
+  internal->ICase2_0 = NULL;
+  internal->ICU_beds = NULL;
+  internal->IMild_0 = NULL;
+  internal->IMVGetDie1_0 = NULL;
+  internal->IMVGetDie2_0 = NULL;
+  internal->IMVGetLive1_0 = NULL;
+  internal->IMVGetLive2_0 = NULL;
+  internal->IMVNotGetDie1_0 = NULL;
+  internal->IMVNotGetDie2_0 = NULL;
+  internal->IMVNotGetLive1_0 = NULL;
+  internal->IMVNotGetLive2_0 = NULL;
+  internal->IOxGetDie1_0 = NULL;
+  internal->IOxGetDie2_0 = NULL;
+  internal->IOxGetLive1_0 = NULL;
+  internal->IOxGetLive2_0 = NULL;
+  internal->IOxNotGetDie1_0 = NULL;
+  internal->IOxNotGetDie2_0 = NULL;
+  internal->IOxNotGetLive1_0 = NULL;
+  internal->IOxNotGetLive2_0 = NULL;
+  internal->IRec1_0 = NULL;
+  internal->IRec2_0 = NULL;
+  internal->mix_mat_set = NULL;
+  internal->N_age = NA_INTEGER;
+  internal->prob_hosp = NULL;
+  internal->prob_non_severe_death_no_treatment = NULL;
+  internal->prob_non_severe_death_treatment = NULL;
+  internal->prob_severe = NULL;
+  internal->prob_severe_death_no_treatment = NULL;
+  internal->prob_severe_death_treatment = NULL;
+  internal->R_0 = NULL;
+  internal->S_0 = NULL;
+  internal->tt_beta = NULL;
+  internal->tt_hosp_beds = NULL;
+  internal->tt_ICU_beds = NULL;
+  internal->tt_matrix = NULL;
+  SEXP ptr = PROTECT(R_MakeExternalPtr(internal, R_NilValue, R_NilValue));
+  R_RegisterCFinalizer(ptr, updated_healthcare_rep_SEIR_finalise);
+  UNPROTECT(1);
+  return ptr;
+}
+static updated_healthcare_rep_SEIR_internal *updated_healthcare_rep_SEIR_internal_ds;
+void updated_healthcare_rep_SEIR_initmod_desolve(void(* odeparms) (int *, double *)) {
+  static DL_FUNC get_desolve_gparms = NULL;
+  if (get_desolve_gparms == NULL) {
+    get_desolve_gparms =
+      R_GetCCallable("deSolve", "get_deSolve_gparms");
+  }
+  updated_healthcare_rep_SEIR_internal_ds = updated_healthcare_rep_SEIR_get_internal(get_desolve_gparms(), 1);
+}
+SEXP updated_healthcare_rep_SEIR_contents(SEXP internal_p) {
+  updated_healthcare_rep_SEIR_internal *internal = updated_healthcare_rep_SEIR_get_internal(internal_p, 1);
+  SEXP contents = PROTECT(allocVector(VECSXP, 356));
+  SEXP beta_set = PROTECT(allocVector(REALSXP, internal->dim_beta_set));
+  memcpy(REAL(beta_set), internal->beta_set, internal->dim_beta_set * sizeof(double));
+  SET_VECTOR_ELT(contents, 0, beta_set);
+  SEXP D_Community_0 = PROTECT(allocVector(REALSXP, internal->dim_D_Community_0));
+  memcpy(REAL(D_Community_0), internal->D_Community_0, internal->dim_D_Community_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 1, D_Community_0);
+  SEXP D_Hospital_0 = PROTECT(allocVector(REALSXP, internal->dim_D_Hospital_0));
+  memcpy(REAL(D_Hospital_0), internal->D_Hospital_0, internal->dim_D_Hospital_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 2, D_Hospital_0);
+  SEXP delta_D_Community = PROTECT(allocVector(REALSXP, internal->dim_delta_D_Community));
+  memcpy(REAL(delta_D_Community), internal->delta_D_Community, internal->dim_delta_D_Community * sizeof(double));
+  SET_VECTOR_ELT(contents, 3, delta_D_Community);
+  SEXP delta_D_Hospital = PROTECT(allocVector(REALSXP, internal->dim_delta_D_Hospital));
+  memcpy(REAL(delta_D_Hospital), internal->delta_D_Hospital, internal->dim_delta_D_Hospital * sizeof(double));
+  SET_VECTOR_ELT(contents, 4, delta_D_Hospital);
+  SEXP delta_E1 = PROTECT(allocVector(REALSXP, internal->dim_delta_E1));
+  memcpy(REAL(delta_E1), internal->delta_E1, internal->dim_delta_E1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 5, delta_E1);
+  SEXP delta_E2 = PROTECT(allocVector(REALSXP, internal->dim_delta_E2));
+  memcpy(REAL(delta_E2), internal->delta_E2, internal->dim_delta_E2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 6, delta_E2);
+  SEXP delta_ICase1 = PROTECT(allocVector(REALSXP, internal->dim_delta_ICase1));
+  memcpy(REAL(delta_ICase1), internal->delta_ICase1, internal->dim_delta_ICase1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 7, delta_ICase1);
+  SEXP delta_ICase2 = PROTECT(allocVector(REALSXP, internal->dim_delta_ICase2));
+  memcpy(REAL(delta_ICase2), internal->delta_ICase2, internal->dim_delta_ICase2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 8, delta_ICase2);
+  SEXP delta_IMild = PROTECT(allocVector(REALSXP, internal->dim_delta_IMild));
+  memcpy(REAL(delta_IMild), internal->delta_IMild, internal->dim_delta_IMild * sizeof(double));
+  SET_VECTOR_ELT(contents, 9, delta_IMild);
+  SEXP delta_IMVGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IMVGetDie1));
+  memcpy(REAL(delta_IMVGetDie1), internal->delta_IMVGetDie1, internal->dim_delta_IMVGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 10, delta_IMVGetDie1);
+  SEXP delta_IMVGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IMVGetDie2));
+  memcpy(REAL(delta_IMVGetDie2), internal->delta_IMVGetDie2, internal->dim_delta_IMVGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 11, delta_IMVGetDie2);
+  SEXP delta_IMVGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IMVGetLive1));
+  memcpy(REAL(delta_IMVGetLive1), internal->delta_IMVGetLive1, internal->dim_delta_IMVGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 12, delta_IMVGetLive1);
+  SEXP delta_IMVGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IMVGetLive2));
+  memcpy(REAL(delta_IMVGetLive2), internal->delta_IMVGetLive2, internal->dim_delta_IMVGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 13, delta_IMVGetLive2);
+  SEXP delta_IMVNotGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IMVNotGetDie1));
+  memcpy(REAL(delta_IMVNotGetDie1), internal->delta_IMVNotGetDie1, internal->dim_delta_IMVNotGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 14, delta_IMVNotGetDie1);
+  SEXP delta_IMVNotGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IMVNotGetDie2));
+  memcpy(REAL(delta_IMVNotGetDie2), internal->delta_IMVNotGetDie2, internal->dim_delta_IMVNotGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 15, delta_IMVNotGetDie2);
+  SEXP delta_IMVNotGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IMVNotGetLive1));
+  memcpy(REAL(delta_IMVNotGetLive1), internal->delta_IMVNotGetLive1, internal->dim_delta_IMVNotGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 16, delta_IMVNotGetLive1);
+  SEXP delta_IMVNotGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IMVNotGetLive2));
+  memcpy(REAL(delta_IMVNotGetLive2), internal->delta_IMVNotGetLive2, internal->dim_delta_IMVNotGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 17, delta_IMVNotGetLive2);
+  SEXP delta_IOxGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IOxGetDie1));
+  memcpy(REAL(delta_IOxGetDie1), internal->delta_IOxGetDie1, internal->dim_delta_IOxGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 18, delta_IOxGetDie1);
+  SEXP delta_IOxGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IOxGetDie2));
+  memcpy(REAL(delta_IOxGetDie2), internal->delta_IOxGetDie2, internal->dim_delta_IOxGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 19, delta_IOxGetDie2);
+  SEXP delta_IOxGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IOxGetLive1));
+  memcpy(REAL(delta_IOxGetLive1), internal->delta_IOxGetLive1, internal->dim_delta_IOxGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 20, delta_IOxGetLive1);
+  SEXP delta_IOxGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IOxGetLive2));
+  memcpy(REAL(delta_IOxGetLive2), internal->delta_IOxGetLive2, internal->dim_delta_IOxGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 21, delta_IOxGetLive2);
+  SEXP delta_IOxNotGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IOxNotGetDie1));
+  memcpy(REAL(delta_IOxNotGetDie1), internal->delta_IOxNotGetDie1, internal->dim_delta_IOxNotGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 22, delta_IOxNotGetDie1);
+  SEXP delta_IOxNotGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IOxNotGetDie2));
+  memcpy(REAL(delta_IOxNotGetDie2), internal->delta_IOxNotGetDie2, internal->dim_delta_IOxNotGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 23, delta_IOxNotGetDie2);
+  SEXP delta_IOxNotGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IOxNotGetLive1));
+  memcpy(REAL(delta_IOxNotGetLive1), internal->delta_IOxNotGetLive1, internal->dim_delta_IOxNotGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 24, delta_IOxNotGetLive1);
+  SEXP delta_IOxNotGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IOxNotGetLive2));
+  memcpy(REAL(delta_IOxNotGetLive2), internal->delta_IOxNotGetLive2, internal->dim_delta_IOxNotGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 25, delta_IOxNotGetLive2);
+  SEXP delta_IRec1 = PROTECT(allocVector(REALSXP, internal->dim_delta_IRec1));
+  memcpy(REAL(delta_IRec1), internal->delta_IRec1, internal->dim_delta_IRec1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 26, delta_IRec1);
+  SEXP delta_IRec2 = PROTECT(allocVector(REALSXP, internal->dim_delta_IRec2));
+  memcpy(REAL(delta_IRec2), internal->delta_IRec2, internal->dim_delta_IRec2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 27, delta_IRec2);
+  SEXP delta_R = PROTECT(allocVector(REALSXP, internal->dim_delta_R));
+  memcpy(REAL(delta_R), internal->delta_R, internal->dim_delta_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 28, delta_R);
+  SET_VECTOR_ELT(contents, 29, ScalarInteger(internal->dim_beta_set));
+  SET_VECTOR_ELT(contents, 30, ScalarInteger(internal->dim_D_Community));
+  SET_VECTOR_ELT(contents, 31, ScalarInteger(internal->dim_D_Community_0));
+  SET_VECTOR_ELT(contents, 32, ScalarInteger(internal->dim_D_Hospital));
+  SET_VECTOR_ELT(contents, 33, ScalarInteger(internal->dim_D_Hospital_0));
+  SET_VECTOR_ELT(contents, 34, ScalarInteger(internal->dim_delta_D_Community));
+  SET_VECTOR_ELT(contents, 35, ScalarInteger(internal->dim_delta_D_Hospital));
+  SET_VECTOR_ELT(contents, 36, ScalarInteger(internal->dim_delta_E1));
+  SET_VECTOR_ELT(contents, 37, ScalarInteger(internal->dim_delta_E2));
+  SET_VECTOR_ELT(contents, 38, ScalarInteger(internal->dim_delta_ICase1));
+  SET_VECTOR_ELT(contents, 39, ScalarInteger(internal->dim_delta_ICase2));
+  SET_VECTOR_ELT(contents, 40, ScalarInteger(internal->dim_delta_IMild));
+  SET_VECTOR_ELT(contents, 41, ScalarInteger(internal->dim_delta_IMVGetDie1));
+  SET_VECTOR_ELT(contents, 42, ScalarInteger(internal->dim_delta_IMVGetDie2));
+  SET_VECTOR_ELT(contents, 43, ScalarInteger(internal->dim_delta_IMVGetLive1));
+  SET_VECTOR_ELT(contents, 44, ScalarInteger(internal->dim_delta_IMVGetLive2));
+  SET_VECTOR_ELT(contents, 45, ScalarInteger(internal->dim_delta_IMVNotGetDie1));
+  SET_VECTOR_ELT(contents, 46, ScalarInteger(internal->dim_delta_IMVNotGetDie2));
+  SET_VECTOR_ELT(contents, 47, ScalarInteger(internal->dim_delta_IMVNotGetLive1));
+  SET_VECTOR_ELT(contents, 48, ScalarInteger(internal->dim_delta_IMVNotGetLive2));
+  SET_VECTOR_ELT(contents, 49, ScalarInteger(internal->dim_delta_IOxGetDie1));
+  SET_VECTOR_ELT(contents, 50, ScalarInteger(internal->dim_delta_IOxGetDie2));
+  SET_VECTOR_ELT(contents, 51, ScalarInteger(internal->dim_delta_IOxGetLive1));
+  SET_VECTOR_ELT(contents, 52, ScalarInteger(internal->dim_delta_IOxGetLive2));
+  SET_VECTOR_ELT(contents, 53, ScalarInteger(internal->dim_delta_IOxNotGetDie1));
+  SET_VECTOR_ELT(contents, 54, ScalarInteger(internal->dim_delta_IOxNotGetDie2));
+  SET_VECTOR_ELT(contents, 55, ScalarInteger(internal->dim_delta_IOxNotGetLive1));
+  SET_VECTOR_ELT(contents, 56, ScalarInteger(internal->dim_delta_IOxNotGetLive2));
+  SET_VECTOR_ELT(contents, 57, ScalarInteger(internal->dim_delta_IRec1));
+  SET_VECTOR_ELT(contents, 58, ScalarInteger(internal->dim_delta_IRec2));
+  SET_VECTOR_ELT(contents, 59, ScalarInteger(internal->dim_delta_R));
+  SET_VECTOR_ELT(contents, 60, ScalarInteger(internal->dim_E1));
+  SET_VECTOR_ELT(contents, 61, ScalarInteger(internal->dim_E1_0));
+  SET_VECTOR_ELT(contents, 62, ScalarInteger(internal->dim_E2));
+  SET_VECTOR_ELT(contents, 63, ScalarInteger(internal->dim_E2_0));
+  SET_VECTOR_ELT(contents, 64, ScalarInteger(internal->dim_hosp_beds));
+  SET_VECTOR_ELT(contents, 65, ScalarInteger(internal->dim_ICase1));
+  SET_VECTOR_ELT(contents, 66, ScalarInteger(internal->dim_ICase1_0));
+  SET_VECTOR_ELT(contents, 67, ScalarInteger(internal->dim_ICase2));
+  SET_VECTOR_ELT(contents, 68, ScalarInteger(internal->dim_ICase2_0));
+  SET_VECTOR_ELT(contents, 69, ScalarInteger(internal->dim_ICU_beds));
+  SET_VECTOR_ELT(contents, 70, ScalarInteger(internal->dim_IMild));
+  SET_VECTOR_ELT(contents, 71, ScalarInteger(internal->dim_IMild_0));
+  SET_VECTOR_ELT(contents, 72, ScalarInteger(internal->dim_IMVGetDie1));
+  SET_VECTOR_ELT(contents, 73, ScalarInteger(internal->dim_IMVGetDie1_0));
+  SET_VECTOR_ELT(contents, 74, ScalarInteger(internal->dim_IMVGetDie2));
+  SET_VECTOR_ELT(contents, 75, ScalarInteger(internal->dim_IMVGetDie2_0));
+  SET_VECTOR_ELT(contents, 76, ScalarInteger(internal->dim_IMVGetLive1));
+  SET_VECTOR_ELT(contents, 77, ScalarInteger(internal->dim_IMVGetLive1_0));
+  SET_VECTOR_ELT(contents, 78, ScalarInteger(internal->dim_IMVGetLive2));
+  SET_VECTOR_ELT(contents, 79, ScalarInteger(internal->dim_IMVGetLive2_0));
+  SET_VECTOR_ELT(contents, 80, ScalarInteger(internal->dim_IMVNotGetDie1));
+  SET_VECTOR_ELT(contents, 81, ScalarInteger(internal->dim_IMVNotGetDie1_0));
+  SET_VECTOR_ELT(contents, 82, ScalarInteger(internal->dim_IMVNotGetDie2));
+  SET_VECTOR_ELT(contents, 83, ScalarInteger(internal->dim_IMVNotGetDie2_0));
+  SET_VECTOR_ELT(contents, 84, ScalarInteger(internal->dim_IMVNotGetLive1));
+  SET_VECTOR_ELT(contents, 85, ScalarInteger(internal->dim_IMVNotGetLive1_0));
+  SET_VECTOR_ELT(contents, 86, ScalarInteger(internal->dim_IMVNotGetLive2));
+  SET_VECTOR_ELT(contents, 87, ScalarInteger(internal->dim_IMVNotGetLive2_0));
+  SET_VECTOR_ELT(contents, 88, ScalarInteger(internal->dim_IOxGetDie1));
+  SET_VECTOR_ELT(contents, 89, ScalarInteger(internal->dim_IOxGetDie1_0));
+  SET_VECTOR_ELT(contents, 90, ScalarInteger(internal->dim_IOxGetDie2));
+  SET_VECTOR_ELT(contents, 91, ScalarInteger(internal->dim_IOxGetDie2_0));
+  SET_VECTOR_ELT(contents, 92, ScalarInteger(internal->dim_IOxGetLive1));
+  SET_VECTOR_ELT(contents, 93, ScalarInteger(internal->dim_IOxGetLive1_0));
+  SET_VECTOR_ELT(contents, 94, ScalarInteger(internal->dim_IOxGetLive2));
+  SET_VECTOR_ELT(contents, 95, ScalarInteger(internal->dim_IOxGetLive2_0));
+  SET_VECTOR_ELT(contents, 96, ScalarInteger(internal->dim_IOxNotGetDie1));
+  SET_VECTOR_ELT(contents, 97, ScalarInteger(internal->dim_IOxNotGetDie1_0));
+  SET_VECTOR_ELT(contents, 98, ScalarInteger(internal->dim_IOxNotGetDie2));
+  SET_VECTOR_ELT(contents, 99, ScalarInteger(internal->dim_IOxNotGetDie2_0));
+  SET_VECTOR_ELT(contents, 100, ScalarInteger(internal->dim_IOxNotGetLive1));
+  SET_VECTOR_ELT(contents, 101, ScalarInteger(internal->dim_IOxNotGetLive1_0));
+  SET_VECTOR_ELT(contents, 102, ScalarInteger(internal->dim_IOxNotGetLive2));
+  SET_VECTOR_ELT(contents, 103, ScalarInteger(internal->dim_IOxNotGetLive2_0));
+  SET_VECTOR_ELT(contents, 104, ScalarInteger(internal->dim_IRec1));
+  SET_VECTOR_ELT(contents, 105, ScalarInteger(internal->dim_IRec1_0));
+  SET_VECTOR_ELT(contents, 106, ScalarInteger(internal->dim_IRec2));
+  SET_VECTOR_ELT(contents, 107, ScalarInteger(internal->dim_IRec2_0));
+  SET_VECTOR_ELT(contents, 108, ScalarInteger(internal->dim_lambda));
+  SET_VECTOR_ELT(contents, 109, ScalarInteger(internal->dim_m));
+  SET_VECTOR_ELT(contents, 110, ScalarInteger(internal->dim_m_1));
+  SET_VECTOR_ELT(contents, 111, ScalarInteger(internal->dim_m_2));
+  SET_VECTOR_ELT(contents, 112, ScalarInteger(internal->dim_mix_mat_set));
+  SET_VECTOR_ELT(contents, 113, ScalarInteger(internal->dim_mix_mat_set_1));
+  SET_VECTOR_ELT(contents, 114, ScalarInteger(internal->dim_mix_mat_set_12));
+  SET_VECTOR_ELT(contents, 115, ScalarInteger(internal->dim_mix_mat_set_2));
+  SET_VECTOR_ELT(contents, 116, ScalarInteger(internal->dim_mix_mat_set_3));
+  SET_VECTOR_ELT(contents, 117, ScalarInteger(internal->dim_n_E1_E2));
+  SET_VECTOR_ELT(contents, 118, ScalarInteger(internal->dim_n_E2_I));
+  SET_VECTOR_ELT(contents, 119, ScalarInteger(internal->dim_n_E2_ICase1));
+  SET_VECTOR_ELT(contents, 120, ScalarInteger(internal->dim_n_E2_IMild));
+  SET_VECTOR_ELT(contents, 121, ScalarInteger(internal->dim_n_ICase1_ICase2));
+  SET_VECTOR_ELT(contents, 122, ScalarInteger(internal->dim_n_ICase2_Hosp));
+  SET_VECTOR_ELT(contents, 123, ScalarInteger(internal->dim_n_IMild_R));
+  SET_VECTOR_ELT(contents, 124, ScalarInteger(internal->dim_n_IMVGetDie1));
+  SET_VECTOR_ELT(contents, 125, ScalarInteger(internal->dim_n_IMVGetDie1_IMVGetDie2));
+  SET_VECTOR_ELT(contents, 126, ScalarInteger(internal->dim_n_IMVGetDie2_D));
+  SET_VECTOR_ELT(contents, 127, ScalarInteger(internal->dim_n_IMVGetLive1));
+  SET_VECTOR_ELT(contents, 128, ScalarInteger(internal->dim_n_IMVGetLive1_IMVGetLive2));
+  SET_VECTOR_ELT(contents, 129, ScalarInteger(internal->dim_n_IMVGetLive2_Rec));
+  SET_VECTOR_ELT(contents, 130, ScalarInteger(internal->dim_n_IMVNotGetDie1));
+  SET_VECTOR_ELT(contents, 131, ScalarInteger(internal->dim_n_IMVNotGetDie1_IMVNotGetDie2));
+  SET_VECTOR_ELT(contents, 132, ScalarInteger(internal->dim_n_IMVNotGetDie2_D));
+  SET_VECTOR_ELT(contents, 133, ScalarInteger(internal->dim_n_IMVNotGetLive1));
+  SET_VECTOR_ELT(contents, 134, ScalarInteger(internal->dim_n_IMVNotGetLive1_IMVNotGetLive2));
+  SET_VECTOR_ELT(contents, 135, ScalarInteger(internal->dim_n_IMVNotGetLive2_R));
+  SET_VECTOR_ELT(contents, 136, ScalarInteger(internal->dim_n_IOxGetDie1));
+  SET_VECTOR_ELT(contents, 137, ScalarInteger(internal->dim_n_IOxGetDie1_IOxGetDie2));
+  SET_VECTOR_ELT(contents, 138, ScalarInteger(internal->dim_n_IOxGetDie2_D));
+  SET_VECTOR_ELT(contents, 139, ScalarInteger(internal->dim_n_IOxGetLive1));
+  SET_VECTOR_ELT(contents, 140, ScalarInteger(internal->dim_n_IOxGetLive1_IOxGetLive2));
+  SET_VECTOR_ELT(contents, 141, ScalarInteger(internal->dim_n_IOxGetLive2_R));
+  SET_VECTOR_ELT(contents, 142, ScalarInteger(internal->dim_n_IOxNotGetDie1));
+  SET_VECTOR_ELT(contents, 143, ScalarInteger(internal->dim_n_IOxNotGetDie1_IOxNotGetDie2));
+  SET_VECTOR_ELT(contents, 144, ScalarInteger(internal->dim_n_IOxNotGetDie2_D));
+  SET_VECTOR_ELT(contents, 145, ScalarInteger(internal->dim_n_IOxNotGetLive1));
+  SET_VECTOR_ELT(contents, 146, ScalarInteger(internal->dim_n_IOxNotGetLive1_IOxNotGetLive2));
+  SET_VECTOR_ELT(contents, 147, ScalarInteger(internal->dim_n_IOxNotGetLive2_R));
+  SET_VECTOR_ELT(contents, 148, ScalarInteger(internal->dim_n_IRec1_IRec2));
+  SET_VECTOR_ELT(contents, 149, ScalarInteger(internal->dim_n_IRec2_R));
+  SET_VECTOR_ELT(contents, 150, ScalarInteger(internal->dim_n_S_E1));
+  SET_VECTOR_ELT(contents, 151, ScalarInteger(internal->dim_number_get_IMV));
+  SET_VECTOR_ELT(contents, 152, ScalarInteger(internal->dim_number_get_Ox));
+  SET_VECTOR_ELT(contents, 153, ScalarInteger(internal->dim_number_notget_IMV));
+  SET_VECTOR_ELT(contents, 154, ScalarInteger(internal->dim_number_notget_Ox));
+  SET_VECTOR_ELT(contents, 155, ScalarInteger(internal->dim_number_requiring_IMV));
+  SET_VECTOR_ELT(contents, 156, ScalarInteger(internal->dim_number_requiring_Ox));
+  SET_VECTOR_ELT(contents, 157, ScalarInteger(internal->dim_p_S_E1));
+  SET_VECTOR_ELT(contents, 158, ScalarInteger(internal->dim_prob_hosp));
+  SET_VECTOR_ELT(contents, 159, ScalarInteger(internal->dim_prob_non_severe_death_no_treatment));
+  SET_VECTOR_ELT(contents, 160, ScalarInteger(internal->dim_prob_non_severe_death_treatment));
+  SET_VECTOR_ELT(contents, 161, ScalarInteger(internal->dim_prob_severe));
+  SET_VECTOR_ELT(contents, 162, ScalarInteger(internal->dim_prob_severe_death_no_treatment));
+  SET_VECTOR_ELT(contents, 163, ScalarInteger(internal->dim_prob_severe_death_treatment));
+  SET_VECTOR_ELT(contents, 164, ScalarInteger(internal->dim_R));
+  SET_VECTOR_ELT(contents, 165, ScalarInteger(internal->dim_R_0));
+  SET_VECTOR_ELT(contents, 166, ScalarInteger(internal->dim_S));
+  SET_VECTOR_ELT(contents, 167, ScalarInteger(internal->dim_S_0));
+  SET_VECTOR_ELT(contents, 168, ScalarInteger(internal->dim_s_ij));
+  SET_VECTOR_ELT(contents, 169, ScalarInteger(internal->dim_s_ij_1));
+  SET_VECTOR_ELT(contents, 170, ScalarInteger(internal->dim_s_ij_2));
+  SET_VECTOR_ELT(contents, 171, ScalarInteger(internal->dim_temp));
+  SET_VECTOR_ELT(contents, 172, ScalarInteger(internal->dim_tt_beta));
+  SET_VECTOR_ELT(contents, 173, ScalarInteger(internal->dim_tt_hosp_beds));
+  SET_VECTOR_ELT(contents, 174, ScalarInteger(internal->dim_tt_ICU_beds));
+  SET_VECTOR_ELT(contents, 175, ScalarInteger(internal->dim_tt_matrix));
+  SET_VECTOR_ELT(contents, 176, ScalarReal(internal->dt));
+  SEXP E1_0 = PROTECT(allocVector(REALSXP, internal->dim_E1_0));
+  memcpy(REAL(E1_0), internal->E1_0, internal->dim_E1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 177, E1_0);
+  SEXP E2_0 = PROTECT(allocVector(REALSXP, internal->dim_E2_0));
+  memcpy(REAL(E2_0), internal->E2_0, internal->dim_E2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 178, E2_0);
+  SET_VECTOR_ELT(contents, 179, ScalarReal(internal->gamma_E));
+  SET_VECTOR_ELT(contents, 180, ScalarReal(internal->gamma_get_mv_die));
+  SET_VECTOR_ELT(contents, 181, ScalarReal(internal->gamma_get_mv_survive));
+  SET_VECTOR_ELT(contents, 182, ScalarReal(internal->gamma_get_ox_die));
+  SET_VECTOR_ELT(contents, 183, ScalarReal(internal->gamma_get_ox_survive));
+  SET_VECTOR_ELT(contents, 184, ScalarReal(internal->gamma_ICase));
+  SET_VECTOR_ELT(contents, 185, ScalarReal(internal->gamma_IMild));
+  SET_VECTOR_ELT(contents, 186, ScalarReal(internal->gamma_not_get_mv_die));
+  SET_VECTOR_ELT(contents, 187, ScalarReal(internal->gamma_not_get_mv_survive));
+  SET_VECTOR_ELT(contents, 188, ScalarReal(internal->gamma_not_get_ox_die));
+  SET_VECTOR_ELT(contents, 189, ScalarReal(internal->gamma_not_get_ox_survive));
+  SET_VECTOR_ELT(contents, 190, ScalarReal(internal->gamma_rec));
+  SEXP hosp_beds = PROTECT(allocVector(REALSXP, internal->dim_hosp_beds));
+  memcpy(REAL(hosp_beds), internal->hosp_beds, internal->dim_hosp_beds * sizeof(double));
+  SET_VECTOR_ELT(contents, 191, hosp_beds);
+  SEXP ICase1_0 = PROTECT(allocVector(REALSXP, internal->dim_ICase1_0));
+  memcpy(REAL(ICase1_0), internal->ICase1_0, internal->dim_ICase1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 192, ICase1_0);
+  SEXP ICase2_0 = PROTECT(allocVector(REALSXP, internal->dim_ICase2_0));
+  memcpy(REAL(ICase2_0), internal->ICase2_0, internal->dim_ICase2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 193, ICase2_0);
+  SEXP ICU_beds = PROTECT(allocVector(REALSXP, internal->dim_ICU_beds));
+  memcpy(REAL(ICU_beds), internal->ICU_beds, internal->dim_ICU_beds * sizeof(double));
+  SET_VECTOR_ELT(contents, 194, ICU_beds);
+  SEXP IMild_0 = PROTECT(allocVector(REALSXP, internal->dim_IMild_0));
+  memcpy(REAL(IMild_0), internal->IMild_0, internal->dim_IMild_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 195, IMild_0);
+  SEXP IMVGetDie1_0 = PROTECT(allocVector(REALSXP, internal->dim_IMVGetDie1_0));
+  memcpy(REAL(IMVGetDie1_0), internal->IMVGetDie1_0, internal->dim_IMVGetDie1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 196, IMVGetDie1_0);
+  SEXP IMVGetDie2_0 = PROTECT(allocVector(REALSXP, internal->dim_IMVGetDie2_0));
+  memcpy(REAL(IMVGetDie2_0), internal->IMVGetDie2_0, internal->dim_IMVGetDie2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 197, IMVGetDie2_0);
+  SEXP IMVGetLive1_0 = PROTECT(allocVector(REALSXP, internal->dim_IMVGetLive1_0));
+  memcpy(REAL(IMVGetLive1_0), internal->IMVGetLive1_0, internal->dim_IMVGetLive1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 198, IMVGetLive1_0);
+  SEXP IMVGetLive2_0 = PROTECT(allocVector(REALSXP, internal->dim_IMVGetLive2_0));
+  memcpy(REAL(IMVGetLive2_0), internal->IMVGetLive2_0, internal->dim_IMVGetLive2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 199, IMVGetLive2_0);
+  SEXP IMVNotGetDie1_0 = PROTECT(allocVector(REALSXP, internal->dim_IMVNotGetDie1_0));
+  memcpy(REAL(IMVNotGetDie1_0), internal->IMVNotGetDie1_0, internal->dim_IMVNotGetDie1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 200, IMVNotGetDie1_0);
+  SEXP IMVNotGetDie2_0 = PROTECT(allocVector(REALSXP, internal->dim_IMVNotGetDie2_0));
+  memcpy(REAL(IMVNotGetDie2_0), internal->IMVNotGetDie2_0, internal->dim_IMVNotGetDie2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 201, IMVNotGetDie2_0);
+  SEXP IMVNotGetLive1_0 = PROTECT(allocVector(REALSXP, internal->dim_IMVNotGetLive1_0));
+  memcpy(REAL(IMVNotGetLive1_0), internal->IMVNotGetLive1_0, internal->dim_IMVNotGetLive1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 202, IMVNotGetLive1_0);
+  SEXP IMVNotGetLive2_0 = PROTECT(allocVector(REALSXP, internal->dim_IMVNotGetLive2_0));
+  memcpy(REAL(IMVNotGetLive2_0), internal->IMVNotGetLive2_0, internal->dim_IMVNotGetLive2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 203, IMVNotGetLive2_0);
+  SEXP initial_D_Community = PROTECT(allocVector(REALSXP, internal->dim_D_Community));
+  memcpy(REAL(initial_D_Community), internal->initial_D_Community, internal->dim_D_Community * sizeof(double));
+  SET_VECTOR_ELT(contents, 204, initial_D_Community);
+  SEXP initial_D_Hospital = PROTECT(allocVector(REALSXP, internal->dim_D_Hospital));
+  memcpy(REAL(initial_D_Hospital), internal->initial_D_Hospital, internal->dim_D_Hospital * sizeof(double));
+  SET_VECTOR_ELT(contents, 205, initial_D_Hospital);
+  SEXP initial_E1 = PROTECT(allocVector(REALSXP, internal->dim_E1));
+  memcpy(REAL(initial_E1), internal->initial_E1, internal->dim_E1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 206, initial_E1);
+  SEXP initial_E2 = PROTECT(allocVector(REALSXP, internal->dim_E2));
+  memcpy(REAL(initial_E2), internal->initial_E2, internal->dim_E2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 207, initial_E2);
+  SEXP initial_ICase1 = PROTECT(allocVector(REALSXP, internal->dim_ICase1));
+  memcpy(REAL(initial_ICase1), internal->initial_ICase1, internal->dim_ICase1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 208, initial_ICase1);
+  SEXP initial_ICase2 = PROTECT(allocVector(REALSXP, internal->dim_ICase2));
+  memcpy(REAL(initial_ICase2), internal->initial_ICase2, internal->dim_ICase2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 209, initial_ICase2);
+  SEXP initial_IMild = PROTECT(allocVector(REALSXP, internal->dim_IMild));
+  memcpy(REAL(initial_IMild), internal->initial_IMild, internal->dim_IMild * sizeof(double));
+  SET_VECTOR_ELT(contents, 210, initial_IMild);
+  SEXP initial_IMVGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_IMVGetDie1));
+  memcpy(REAL(initial_IMVGetDie1), internal->initial_IMVGetDie1, internal->dim_IMVGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 211, initial_IMVGetDie1);
+  SEXP initial_IMVGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_IMVGetDie2));
+  memcpy(REAL(initial_IMVGetDie2), internal->initial_IMVGetDie2, internal->dim_IMVGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 212, initial_IMVGetDie2);
+  SEXP initial_IMVGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_IMVGetLive1));
+  memcpy(REAL(initial_IMVGetLive1), internal->initial_IMVGetLive1, internal->dim_IMVGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 213, initial_IMVGetLive1);
+  SEXP initial_IMVGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_IMVGetLive2));
+  memcpy(REAL(initial_IMVGetLive2), internal->initial_IMVGetLive2, internal->dim_IMVGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 214, initial_IMVGetLive2);
+  SEXP initial_IMVNotGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_IMVNotGetDie1));
+  memcpy(REAL(initial_IMVNotGetDie1), internal->initial_IMVNotGetDie1, internal->dim_IMVNotGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 215, initial_IMVNotGetDie1);
+  SEXP initial_IMVNotGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_IMVNotGetDie2));
+  memcpy(REAL(initial_IMVNotGetDie2), internal->initial_IMVNotGetDie2, internal->dim_IMVNotGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 216, initial_IMVNotGetDie2);
+  SEXP initial_IMVNotGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_IMVNotGetLive1));
+  memcpy(REAL(initial_IMVNotGetLive1), internal->initial_IMVNotGetLive1, internal->dim_IMVNotGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 217, initial_IMVNotGetLive1);
+  SEXP initial_IMVNotGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_IMVNotGetLive2));
+  memcpy(REAL(initial_IMVNotGetLive2), internal->initial_IMVNotGetLive2, internal->dim_IMVNotGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 218, initial_IMVNotGetLive2);
+  SEXP initial_IOxGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_IOxGetDie1));
+  memcpy(REAL(initial_IOxGetDie1), internal->initial_IOxGetDie1, internal->dim_IOxGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 219, initial_IOxGetDie1);
+  SEXP initial_IOxGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_IOxGetDie2));
+  memcpy(REAL(initial_IOxGetDie2), internal->initial_IOxGetDie2, internal->dim_IOxGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 220, initial_IOxGetDie2);
+  SEXP initial_IOxGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_IOxGetLive1));
+  memcpy(REAL(initial_IOxGetLive1), internal->initial_IOxGetLive1, internal->dim_IOxGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 221, initial_IOxGetLive1);
+  SEXP initial_IOxGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_IOxGetLive2));
+  memcpy(REAL(initial_IOxGetLive2), internal->initial_IOxGetLive2, internal->dim_IOxGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 222, initial_IOxGetLive2);
+  SEXP initial_IOxNotGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_IOxNotGetDie1));
+  memcpy(REAL(initial_IOxNotGetDie1), internal->initial_IOxNotGetDie1, internal->dim_IOxNotGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 223, initial_IOxNotGetDie1);
+  SEXP initial_IOxNotGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_IOxNotGetDie2));
+  memcpy(REAL(initial_IOxNotGetDie2), internal->initial_IOxNotGetDie2, internal->dim_IOxNotGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 224, initial_IOxNotGetDie2);
+  SEXP initial_IOxNotGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_IOxNotGetLive1));
+  memcpy(REAL(initial_IOxNotGetLive1), internal->initial_IOxNotGetLive1, internal->dim_IOxNotGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 225, initial_IOxNotGetLive1);
+  SEXP initial_IOxNotGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_IOxNotGetLive2));
+  memcpy(REAL(initial_IOxNotGetLive2), internal->initial_IOxNotGetLive2, internal->dim_IOxNotGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 226, initial_IOxNotGetLive2);
+  SEXP initial_IRec1 = PROTECT(allocVector(REALSXP, internal->dim_IRec1));
+  memcpy(REAL(initial_IRec1), internal->initial_IRec1, internal->dim_IRec1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 227, initial_IRec1);
+  SEXP initial_IRec2 = PROTECT(allocVector(REALSXP, internal->dim_IRec2));
+  memcpy(REAL(initial_IRec2), internal->initial_IRec2, internal->dim_IRec2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 228, initial_IRec2);
+  SEXP initial_R = PROTECT(allocVector(REALSXP, internal->dim_R));
+  memcpy(REAL(initial_R), internal->initial_R, internal->dim_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 229, initial_R);
+  SEXP initial_S = PROTECT(allocVector(REALSXP, internal->dim_S));
+  memcpy(REAL(initial_S), internal->initial_S, internal->dim_S * sizeof(double));
+  SET_VECTOR_ELT(contents, 230, initial_S);
+  SEXP IOxGetDie1_0 = PROTECT(allocVector(REALSXP, internal->dim_IOxGetDie1_0));
+  memcpy(REAL(IOxGetDie1_0), internal->IOxGetDie1_0, internal->dim_IOxGetDie1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 235, IOxGetDie1_0);
+  SEXP IOxGetDie2_0 = PROTECT(allocVector(REALSXP, internal->dim_IOxGetDie2_0));
+  memcpy(REAL(IOxGetDie2_0), internal->IOxGetDie2_0, internal->dim_IOxGetDie2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 236, IOxGetDie2_0);
+  SEXP IOxGetLive1_0 = PROTECT(allocVector(REALSXP, internal->dim_IOxGetLive1_0));
+  memcpy(REAL(IOxGetLive1_0), internal->IOxGetLive1_0, internal->dim_IOxGetLive1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 237, IOxGetLive1_0);
+  SEXP IOxGetLive2_0 = PROTECT(allocVector(REALSXP, internal->dim_IOxGetLive2_0));
+  memcpy(REAL(IOxGetLive2_0), internal->IOxGetLive2_0, internal->dim_IOxGetLive2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 238, IOxGetLive2_0);
+  SEXP IOxNotGetDie1_0 = PROTECT(allocVector(REALSXP, internal->dim_IOxNotGetDie1_0));
+  memcpy(REAL(IOxNotGetDie1_0), internal->IOxNotGetDie1_0, internal->dim_IOxNotGetDie1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 239, IOxNotGetDie1_0);
+  SEXP IOxNotGetDie2_0 = PROTECT(allocVector(REALSXP, internal->dim_IOxNotGetDie2_0));
+  memcpy(REAL(IOxNotGetDie2_0), internal->IOxNotGetDie2_0, internal->dim_IOxNotGetDie2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 240, IOxNotGetDie2_0);
+  SEXP IOxNotGetLive1_0 = PROTECT(allocVector(REALSXP, internal->dim_IOxNotGetLive1_0));
+  memcpy(REAL(IOxNotGetLive1_0), internal->IOxNotGetLive1_0, internal->dim_IOxNotGetLive1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 241, IOxNotGetLive1_0);
+  SEXP IOxNotGetLive2_0 = PROTECT(allocVector(REALSXP, internal->dim_IOxNotGetLive2_0));
+  memcpy(REAL(IOxNotGetLive2_0), internal->IOxNotGetLive2_0, internal->dim_IOxNotGetLive2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 242, IOxNotGetLive2_0);
+  SEXP IRec1_0 = PROTECT(allocVector(REALSXP, internal->dim_IRec1_0));
+  memcpy(REAL(IRec1_0), internal->IRec1_0, internal->dim_IRec1_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 243, IRec1_0);
+  SEXP IRec2_0 = PROTECT(allocVector(REALSXP, internal->dim_IRec2_0));
+  memcpy(REAL(IRec2_0), internal->IRec2_0, internal->dim_IRec2_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 244, IRec2_0);
+  SEXP lambda = PROTECT(allocVector(REALSXP, internal->dim_lambda));
+  memcpy(REAL(lambda), internal->lambda, internal->dim_lambda * sizeof(double));
+  SET_VECTOR_ELT(contents, 245, lambda);
+  SEXP m = PROTECT(allocVector(REALSXP, internal->dim_m));
+  memcpy(REAL(m), internal->m, internal->dim_m * sizeof(double));
+  odin_set_dim(m, 2, internal->dim_m_1, internal->dim_m_2);
+  SET_VECTOR_ELT(contents, 246, m);
+  SEXP mix_mat_set = PROTECT(allocVector(REALSXP, internal->dim_mix_mat_set));
+  memcpy(REAL(mix_mat_set), internal->mix_mat_set, internal->dim_mix_mat_set * sizeof(double));
+  odin_set_dim(mix_mat_set, 3, internal->dim_mix_mat_set_1, internal->dim_mix_mat_set_2, internal->dim_mix_mat_set_3);
+  SET_VECTOR_ELT(contents, 247, mix_mat_set);
+  SET_VECTOR_ELT(contents, 248, ScalarInteger(internal->N_age));
+  SEXP n_E1_E2 = PROTECT(allocVector(REALSXP, internal->dim_n_E1_E2));
+  memcpy(REAL(n_E1_E2), internal->n_E1_E2, internal->dim_n_E1_E2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 249, n_E1_E2);
+  SEXP n_E2_I = PROTECT(allocVector(REALSXP, internal->dim_n_E2_I));
+  memcpy(REAL(n_E2_I), internal->n_E2_I, internal->dim_n_E2_I * sizeof(double));
+  SET_VECTOR_ELT(contents, 250, n_E2_I);
+  SEXP n_E2_ICase1 = PROTECT(allocVector(REALSXP, internal->dim_n_E2_ICase1));
+  memcpy(REAL(n_E2_ICase1), internal->n_E2_ICase1, internal->dim_n_E2_ICase1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 251, n_E2_ICase1);
+  SEXP n_E2_IMild = PROTECT(allocVector(REALSXP, internal->dim_n_E2_IMild));
+  memcpy(REAL(n_E2_IMild), internal->n_E2_IMild, internal->dim_n_E2_IMild * sizeof(double));
+  SET_VECTOR_ELT(contents, 252, n_E2_IMild);
+  SEXP n_ICase1_ICase2 = PROTECT(allocVector(REALSXP, internal->dim_n_ICase1_ICase2));
+  memcpy(REAL(n_ICase1_ICase2), internal->n_ICase1_ICase2, internal->dim_n_ICase1_ICase2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 253, n_ICase1_ICase2);
+  SEXP n_ICase2_Hosp = PROTECT(allocVector(REALSXP, internal->dim_n_ICase2_Hosp));
+  memcpy(REAL(n_ICase2_Hosp), internal->n_ICase2_Hosp, internal->dim_n_ICase2_Hosp * sizeof(double));
+  SET_VECTOR_ELT(contents, 254, n_ICase2_Hosp);
+  SEXP n_IMild_R = PROTECT(allocVector(REALSXP, internal->dim_n_IMild_R));
+  memcpy(REAL(n_IMild_R), internal->n_IMild_R, internal->dim_n_IMild_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 255, n_IMild_R);
+  SEXP n_IMVGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_n_IMVGetDie1));
+  memcpy(REAL(n_IMVGetDie1), internal->n_IMVGetDie1, internal->dim_n_IMVGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 256, n_IMVGetDie1);
+  SEXP n_IMVGetDie1_IMVGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_n_IMVGetDie1_IMVGetDie2));
+  memcpy(REAL(n_IMVGetDie1_IMVGetDie2), internal->n_IMVGetDie1_IMVGetDie2, internal->dim_n_IMVGetDie1_IMVGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 257, n_IMVGetDie1_IMVGetDie2);
+  SEXP n_IMVGetDie2_D = PROTECT(allocVector(REALSXP, internal->dim_n_IMVGetDie2_D));
+  memcpy(REAL(n_IMVGetDie2_D), internal->n_IMVGetDie2_D, internal->dim_n_IMVGetDie2_D * sizeof(double));
+  SET_VECTOR_ELT(contents, 258, n_IMVGetDie2_D);
+  SEXP n_IMVGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_n_IMVGetLive1));
+  memcpy(REAL(n_IMVGetLive1), internal->n_IMVGetLive1, internal->dim_n_IMVGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 259, n_IMVGetLive1);
+  SEXP n_IMVGetLive1_IMVGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_n_IMVGetLive1_IMVGetLive2));
+  memcpy(REAL(n_IMVGetLive1_IMVGetLive2), internal->n_IMVGetLive1_IMVGetLive2, internal->dim_n_IMVGetLive1_IMVGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 260, n_IMVGetLive1_IMVGetLive2);
+  SEXP n_IMVGetLive2_Rec = PROTECT(allocVector(REALSXP, internal->dim_n_IMVGetLive2_Rec));
+  memcpy(REAL(n_IMVGetLive2_Rec), internal->n_IMVGetLive2_Rec, internal->dim_n_IMVGetLive2_Rec * sizeof(double));
+  SET_VECTOR_ELT(contents, 261, n_IMVGetLive2_Rec);
+  SEXP n_IMVNotGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_n_IMVNotGetDie1));
+  memcpy(REAL(n_IMVNotGetDie1), internal->n_IMVNotGetDie1, internal->dim_n_IMVNotGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 262, n_IMVNotGetDie1);
+  SEXP n_IMVNotGetDie1_IMVNotGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_n_IMVNotGetDie1_IMVNotGetDie2));
+  memcpy(REAL(n_IMVNotGetDie1_IMVNotGetDie2), internal->n_IMVNotGetDie1_IMVNotGetDie2, internal->dim_n_IMVNotGetDie1_IMVNotGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 263, n_IMVNotGetDie1_IMVNotGetDie2);
+  SEXP n_IMVNotGetDie2_D = PROTECT(allocVector(REALSXP, internal->dim_n_IMVNotGetDie2_D));
+  memcpy(REAL(n_IMVNotGetDie2_D), internal->n_IMVNotGetDie2_D, internal->dim_n_IMVNotGetDie2_D * sizeof(double));
+  SET_VECTOR_ELT(contents, 264, n_IMVNotGetDie2_D);
+  SEXP n_IMVNotGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_n_IMVNotGetLive1));
+  memcpy(REAL(n_IMVNotGetLive1), internal->n_IMVNotGetLive1, internal->dim_n_IMVNotGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 265, n_IMVNotGetLive1);
+  SEXP n_IMVNotGetLive1_IMVNotGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_n_IMVNotGetLive1_IMVNotGetLive2));
+  memcpy(REAL(n_IMVNotGetLive1_IMVNotGetLive2), internal->n_IMVNotGetLive1_IMVNotGetLive2, internal->dim_n_IMVNotGetLive1_IMVNotGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 266, n_IMVNotGetLive1_IMVNotGetLive2);
+  SEXP n_IMVNotGetLive2_R = PROTECT(allocVector(REALSXP, internal->dim_n_IMVNotGetLive2_R));
+  memcpy(REAL(n_IMVNotGetLive2_R), internal->n_IMVNotGetLive2_R, internal->dim_n_IMVNotGetLive2_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 267, n_IMVNotGetLive2_R);
+  SEXP n_IOxGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_n_IOxGetDie1));
+  memcpy(REAL(n_IOxGetDie1), internal->n_IOxGetDie1, internal->dim_n_IOxGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 268, n_IOxGetDie1);
+  SEXP n_IOxGetDie1_IOxGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_n_IOxGetDie1_IOxGetDie2));
+  memcpy(REAL(n_IOxGetDie1_IOxGetDie2), internal->n_IOxGetDie1_IOxGetDie2, internal->dim_n_IOxGetDie1_IOxGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 269, n_IOxGetDie1_IOxGetDie2);
+  SEXP n_IOxGetDie2_D = PROTECT(allocVector(REALSXP, internal->dim_n_IOxGetDie2_D));
+  memcpy(REAL(n_IOxGetDie2_D), internal->n_IOxGetDie2_D, internal->dim_n_IOxGetDie2_D * sizeof(double));
+  SET_VECTOR_ELT(contents, 270, n_IOxGetDie2_D);
+  SEXP n_IOxGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_n_IOxGetLive1));
+  memcpy(REAL(n_IOxGetLive1), internal->n_IOxGetLive1, internal->dim_n_IOxGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 271, n_IOxGetLive1);
+  SEXP n_IOxGetLive1_IOxGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_n_IOxGetLive1_IOxGetLive2));
+  memcpy(REAL(n_IOxGetLive1_IOxGetLive2), internal->n_IOxGetLive1_IOxGetLive2, internal->dim_n_IOxGetLive1_IOxGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 272, n_IOxGetLive1_IOxGetLive2);
+  SEXP n_IOxGetLive2_R = PROTECT(allocVector(REALSXP, internal->dim_n_IOxGetLive2_R));
+  memcpy(REAL(n_IOxGetLive2_R), internal->n_IOxGetLive2_R, internal->dim_n_IOxGetLive2_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 273, n_IOxGetLive2_R);
+  SEXP n_IOxNotGetDie1 = PROTECT(allocVector(REALSXP, internal->dim_n_IOxNotGetDie1));
+  memcpy(REAL(n_IOxNotGetDie1), internal->n_IOxNotGetDie1, internal->dim_n_IOxNotGetDie1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 274, n_IOxNotGetDie1);
+  SEXP n_IOxNotGetDie1_IOxNotGetDie2 = PROTECT(allocVector(REALSXP, internal->dim_n_IOxNotGetDie1_IOxNotGetDie2));
+  memcpy(REAL(n_IOxNotGetDie1_IOxNotGetDie2), internal->n_IOxNotGetDie1_IOxNotGetDie2, internal->dim_n_IOxNotGetDie1_IOxNotGetDie2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 275, n_IOxNotGetDie1_IOxNotGetDie2);
+  SEXP n_IOxNotGetDie2_D = PROTECT(allocVector(REALSXP, internal->dim_n_IOxNotGetDie2_D));
+  memcpy(REAL(n_IOxNotGetDie2_D), internal->n_IOxNotGetDie2_D, internal->dim_n_IOxNotGetDie2_D * sizeof(double));
+  SET_VECTOR_ELT(contents, 276, n_IOxNotGetDie2_D);
+  SEXP n_IOxNotGetLive1 = PROTECT(allocVector(REALSXP, internal->dim_n_IOxNotGetLive1));
+  memcpy(REAL(n_IOxNotGetLive1), internal->n_IOxNotGetLive1, internal->dim_n_IOxNotGetLive1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 277, n_IOxNotGetLive1);
+  SEXP n_IOxNotGetLive1_IOxNotGetLive2 = PROTECT(allocVector(REALSXP, internal->dim_n_IOxNotGetLive1_IOxNotGetLive2));
+  memcpy(REAL(n_IOxNotGetLive1_IOxNotGetLive2), internal->n_IOxNotGetLive1_IOxNotGetLive2, internal->dim_n_IOxNotGetLive1_IOxNotGetLive2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 278, n_IOxNotGetLive1_IOxNotGetLive2);
+  SEXP n_IOxNotGetLive2_R = PROTECT(allocVector(REALSXP, internal->dim_n_IOxNotGetLive2_R));
+  memcpy(REAL(n_IOxNotGetLive2_R), internal->n_IOxNotGetLive2_R, internal->dim_n_IOxNotGetLive2_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 279, n_IOxNotGetLive2_R);
+  SEXP n_IRec1_IRec2 = PROTECT(allocVector(REALSXP, internal->dim_n_IRec1_IRec2));
+  memcpy(REAL(n_IRec1_IRec2), internal->n_IRec1_IRec2, internal->dim_n_IRec1_IRec2 * sizeof(double));
+  SET_VECTOR_ELT(contents, 280, n_IRec1_IRec2);
+  SEXP n_IRec2_R = PROTECT(allocVector(REALSXP, internal->dim_n_IRec2_R));
+  memcpy(REAL(n_IRec2_R), internal->n_IRec2_R, internal->dim_n_IRec2_R * sizeof(double));
+  SET_VECTOR_ELT(contents, 281, n_IRec2_R);
+  SEXP n_S_E1 = PROTECT(allocVector(REALSXP, internal->dim_n_S_E1));
+  memcpy(REAL(n_S_E1), internal->n_S_E1, internal->dim_n_S_E1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 282, n_S_E1);
+  SEXP number_get_IMV = PROTECT(allocVector(INTSXP, internal->dim_number_get_IMV));
+  memcpy(INTEGER(number_get_IMV), internal->number_get_IMV, internal->dim_number_get_IMV * sizeof(int));
+  SET_VECTOR_ELT(contents, 283, number_get_IMV);
+  SEXP number_get_Ox = PROTECT(allocVector(INTSXP, internal->dim_number_get_Ox));
+  memcpy(INTEGER(number_get_Ox), internal->number_get_Ox, internal->dim_number_get_Ox * sizeof(int));
+  SET_VECTOR_ELT(contents, 284, number_get_Ox);
+  SEXP number_notget_IMV = PROTECT(allocVector(REALSXP, internal->dim_number_notget_IMV));
+  memcpy(REAL(number_notget_IMV), internal->number_notget_IMV, internal->dim_number_notget_IMV * sizeof(double));
+  SET_VECTOR_ELT(contents, 285, number_notget_IMV);
+  SEXP number_notget_Ox = PROTECT(allocVector(REALSXP, internal->dim_number_notget_Ox));
+  memcpy(REAL(number_notget_Ox), internal->number_notget_Ox, internal->dim_number_notget_Ox * sizeof(double));
+  SET_VECTOR_ELT(contents, 286, number_notget_Ox);
+  SEXP number_requiring_IMV = PROTECT(allocVector(REALSXP, internal->dim_number_requiring_IMV));
+  memcpy(REAL(number_requiring_IMV), internal->number_requiring_IMV, internal->dim_number_requiring_IMV * sizeof(double));
+  SET_VECTOR_ELT(contents, 287, number_requiring_IMV);
+  SEXP number_requiring_Ox = PROTECT(allocVector(REALSXP, internal->dim_number_requiring_Ox));
+  memcpy(REAL(number_requiring_Ox), internal->number_requiring_Ox, internal->dim_number_requiring_Ox * sizeof(double));
+  SET_VECTOR_ELT(contents, 288, number_requiring_Ox);
+  SET_VECTOR_ELT(contents, 289, ScalarInteger(internal->offset_output_delta_D_Hospital));
+  SET_VECTOR_ELT(contents, 290, ScalarInteger(internal->offset_output_n_E2_ICase1));
+  SET_VECTOR_ELT(contents, 291, ScalarInteger(internal->offset_output_n_E2_IMild));
+  SET_VECTOR_ELT(contents, 292, ScalarInteger(internal->offset_output_number_requiring_IMV));
+  SET_VECTOR_ELT(contents, 293, ScalarInteger(internal->offset_variable_D_Community));
+  SET_VECTOR_ELT(contents, 294, ScalarInteger(internal->offset_variable_D_Hospital));
+  SET_VECTOR_ELT(contents, 295, ScalarInteger(internal->offset_variable_E2));
+  SET_VECTOR_ELT(contents, 296, ScalarInteger(internal->offset_variable_ICase1));
+  SET_VECTOR_ELT(contents, 297, ScalarInteger(internal->offset_variable_ICase2));
+  SET_VECTOR_ELT(contents, 298, ScalarInteger(internal->offset_variable_IMild));
+  SET_VECTOR_ELT(contents, 299, ScalarInteger(internal->offset_variable_IMVGetDie1));
+  SET_VECTOR_ELT(contents, 300, ScalarInteger(internal->offset_variable_IMVGetDie2));
+  SET_VECTOR_ELT(contents, 301, ScalarInteger(internal->offset_variable_IMVGetLive1));
+  SET_VECTOR_ELT(contents, 302, ScalarInteger(internal->offset_variable_IMVGetLive2));
+  SET_VECTOR_ELT(contents, 303, ScalarInteger(internal->offset_variable_IMVNotGetDie1));
+  SET_VECTOR_ELT(contents, 304, ScalarInteger(internal->offset_variable_IMVNotGetDie2));
+  SET_VECTOR_ELT(contents, 305, ScalarInteger(internal->offset_variable_IMVNotGetLive1));
+  SET_VECTOR_ELT(contents, 306, ScalarInteger(internal->offset_variable_IMVNotGetLive2));
+  SET_VECTOR_ELT(contents, 307, ScalarInteger(internal->offset_variable_IOxGetDie1));
+  SET_VECTOR_ELT(contents, 308, ScalarInteger(internal->offset_variable_IOxGetDie2));
+  SET_VECTOR_ELT(contents, 309, ScalarInteger(internal->offset_variable_IOxGetLive1));
+  SET_VECTOR_ELT(contents, 310, ScalarInteger(internal->offset_variable_IOxGetLive2));
+  SET_VECTOR_ELT(contents, 311, ScalarInteger(internal->offset_variable_IOxNotGetDie1));
+  SET_VECTOR_ELT(contents, 312, ScalarInteger(internal->offset_variable_IOxNotGetDie2));
+  SET_VECTOR_ELT(contents, 313, ScalarInteger(internal->offset_variable_IOxNotGetLive1));
+  SET_VECTOR_ELT(contents, 314, ScalarInteger(internal->offset_variable_IOxNotGetLive2));
+  SET_VECTOR_ELT(contents, 315, ScalarInteger(internal->offset_variable_IRec1));
+  SET_VECTOR_ELT(contents, 316, ScalarInteger(internal->offset_variable_IRec2));
+  SET_VECTOR_ELT(contents, 317, ScalarInteger(internal->offset_variable_R));
+  SET_VECTOR_ELT(contents, 318, ScalarReal(internal->p_E1_E2));
+  SET_VECTOR_ELT(contents, 319, ScalarReal(internal->p_E2_I));
+  SET_VECTOR_ELT(contents, 320, ScalarReal(internal->p_ICase1_ICase2));
+  SET_VECTOR_ELT(contents, 321, ScalarReal(internal->p_ICase2_Hosp));
+  SET_VECTOR_ELT(contents, 322, ScalarReal(internal->p_IMild_R));
+  SET_VECTOR_ELT(contents, 323, ScalarReal(internal->p_IMVGetDie1_IMVGetDie2));
+  SET_VECTOR_ELT(contents, 324, ScalarReal(internal->p_IMVGetDie2_D));
+  SET_VECTOR_ELT(contents, 325, ScalarReal(internal->p_IMVGetLive1_IMVGetLive2));
+  SET_VECTOR_ELT(contents, 326, ScalarReal(internal->p_IMVGetLive2_Rec));
+  SET_VECTOR_ELT(contents, 327, ScalarReal(internal->p_IMVNotGetDie1_IMVNotGetDie2));
+  SET_VECTOR_ELT(contents, 328, ScalarReal(internal->p_IMVNotGetDie2_D));
+  SET_VECTOR_ELT(contents, 329, ScalarReal(internal->p_IMVNotGetLive1_IMVNotGetLive2));
+  SET_VECTOR_ELT(contents, 330, ScalarReal(internal->p_IMVNotGetLive2_R));
+  SET_VECTOR_ELT(contents, 331, ScalarReal(internal->p_IOxGetDie1_IOxGetDie2));
+  SET_VECTOR_ELT(contents, 332, ScalarReal(internal->p_IOxGetDie2_D));
+  SET_VECTOR_ELT(contents, 333, ScalarReal(internal->p_IOxGetLive1_IOxGetLive2));
+  SET_VECTOR_ELT(contents, 334, ScalarReal(internal->p_IOxGetLive2_R));
+  SET_VECTOR_ELT(contents, 335, ScalarReal(internal->p_IOxNotGetDie1_IOxNotGetDie2));
+  SET_VECTOR_ELT(contents, 336, ScalarReal(internal->p_IOxNotGetDie2_D));
+  SET_VECTOR_ELT(contents, 337, ScalarReal(internal->p_IOxNotGetLive1_IOxNotGetLive2));
+  SET_VECTOR_ELT(contents, 338, ScalarReal(internal->p_IOxNotGetLive2_R));
+  SET_VECTOR_ELT(contents, 339, ScalarReal(internal->p_Rec1_Rec2));
+  SET_VECTOR_ELT(contents, 340, ScalarReal(internal->p_Rec2_R));
+  SEXP p_S_E1 = PROTECT(allocVector(REALSXP, internal->dim_p_S_E1));
+  memcpy(REAL(p_S_E1), internal->p_S_E1, internal->dim_p_S_E1 * sizeof(double));
+  SET_VECTOR_ELT(contents, 341, p_S_E1);
+  SEXP prob_hosp = PROTECT(allocVector(REALSXP, internal->dim_prob_hosp));
+  memcpy(REAL(prob_hosp), internal->prob_hosp, internal->dim_prob_hosp * sizeof(double));
+  SET_VECTOR_ELT(contents, 342, prob_hosp);
+  SEXP prob_non_severe_death_no_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_non_severe_death_no_treatment));
+  memcpy(REAL(prob_non_severe_death_no_treatment), internal->prob_non_severe_death_no_treatment, internal->dim_prob_non_severe_death_no_treatment * sizeof(double));
+  SET_VECTOR_ELT(contents, 343, prob_non_severe_death_no_treatment);
+  SEXP prob_non_severe_death_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_non_severe_death_treatment));
+  memcpy(REAL(prob_non_severe_death_treatment), internal->prob_non_severe_death_treatment, internal->dim_prob_non_severe_death_treatment * sizeof(double));
+  SET_VECTOR_ELT(contents, 344, prob_non_severe_death_treatment);
+  SEXP prob_severe = PROTECT(allocVector(REALSXP, internal->dim_prob_severe));
+  memcpy(REAL(prob_severe), internal->prob_severe, internal->dim_prob_severe * sizeof(double));
+  SET_VECTOR_ELT(contents, 345, prob_severe);
+  SEXP prob_severe_death_no_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_severe_death_no_treatment));
+  memcpy(REAL(prob_severe_death_no_treatment), internal->prob_severe_death_no_treatment, internal->dim_prob_severe_death_no_treatment * sizeof(double));
+  SET_VECTOR_ELT(contents, 346, prob_severe_death_no_treatment);
+  SEXP prob_severe_death_treatment = PROTECT(allocVector(REALSXP, internal->dim_prob_severe_death_treatment));
+  memcpy(REAL(prob_severe_death_treatment), internal->prob_severe_death_treatment, internal->dim_prob_severe_death_treatment * sizeof(double));
+  SET_VECTOR_ELT(contents, 347, prob_severe_death_treatment);
+  SEXP R_0 = PROTECT(allocVector(REALSXP, internal->dim_R_0));
+  memcpy(REAL(R_0), internal->R_0, internal->dim_R_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 348, R_0);
+  SEXP S_0 = PROTECT(allocVector(REALSXP, internal->dim_S_0));
+  memcpy(REAL(S_0), internal->S_0, internal->dim_S_0 * sizeof(double));
+  SET_VECTOR_ELT(contents, 349, S_0);
+  SEXP s_ij = PROTECT(allocVector(REALSXP, internal->dim_s_ij));
+  memcpy(REAL(s_ij), internal->s_ij, internal->dim_s_ij * sizeof(double));
+  odin_set_dim(s_ij, 2, internal->dim_s_ij_1, internal->dim_s_ij_2);
+  SET_VECTOR_ELT(contents, 350, s_ij);
+  SEXP temp = PROTECT(allocVector(REALSXP, internal->dim_temp));
+  memcpy(REAL(temp), internal->temp, internal->dim_temp * sizeof(double));
+  SET_VECTOR_ELT(contents, 351, temp);
+  SEXP tt_beta = PROTECT(allocVector(REALSXP, internal->dim_tt_beta));
+  memcpy(REAL(tt_beta), internal->tt_beta, internal->dim_tt_beta * sizeof(double));
+  SET_VECTOR_ELT(contents, 352, tt_beta);
+  SEXP tt_hosp_beds = PROTECT(allocVector(REALSXP, internal->dim_tt_hosp_beds));
+  memcpy(REAL(tt_hosp_beds), internal->tt_hosp_beds, internal->dim_tt_hosp_beds * sizeof(double));
+  SET_VECTOR_ELT(contents, 353, tt_hosp_beds);
+  SEXP tt_ICU_beds = PROTECT(allocVector(REALSXP, internal->dim_tt_ICU_beds));
+  memcpy(REAL(tt_ICU_beds), internal->tt_ICU_beds, internal->dim_tt_ICU_beds * sizeof(double));
+  SET_VECTOR_ELT(contents, 354, tt_ICU_beds);
+  SEXP tt_matrix = PROTECT(allocVector(REALSXP, internal->dim_tt_matrix));
+  memcpy(REAL(tt_matrix), internal->tt_matrix, internal->dim_tt_matrix * sizeof(double));
+  SET_VECTOR_ELT(contents, 355, tt_matrix);
+  SEXP nms = PROTECT(allocVector(STRSXP, 356));
+  SET_STRING_ELT(nms, 0, mkChar("beta_set"));
+  SET_STRING_ELT(nms, 1, mkChar("D_Community_0"));
+  SET_STRING_ELT(nms, 2, mkChar("D_Hospital_0"));
+  SET_STRING_ELT(nms, 3, mkChar("delta_D_Community"));
+  SET_STRING_ELT(nms, 4, mkChar("delta_D_Hospital"));
+  SET_STRING_ELT(nms, 5, mkChar("delta_E1"));
+  SET_STRING_ELT(nms, 6, mkChar("delta_E2"));
+  SET_STRING_ELT(nms, 7, mkChar("delta_ICase1"));
+  SET_STRING_ELT(nms, 8, mkChar("delta_ICase2"));
+  SET_STRING_ELT(nms, 9, mkChar("delta_IMild"));
+  SET_STRING_ELT(nms, 10, mkChar("delta_IMVGetDie1"));
+  SET_STRING_ELT(nms, 11, mkChar("delta_IMVGetDie2"));
+  SET_STRING_ELT(nms, 12, mkChar("delta_IMVGetLive1"));
+  SET_STRING_ELT(nms, 13, mkChar("delta_IMVGetLive2"));
+  SET_STRING_ELT(nms, 14, mkChar("delta_IMVNotGetDie1"));
+  SET_STRING_ELT(nms, 15, mkChar("delta_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 16, mkChar("delta_IMVNotGetLive1"));
+  SET_STRING_ELT(nms, 17, mkChar("delta_IMVNotGetLive2"));
+  SET_STRING_ELT(nms, 18, mkChar("delta_IOxGetDie1"));
+  SET_STRING_ELT(nms, 19, mkChar("delta_IOxGetDie2"));
+  SET_STRING_ELT(nms, 20, mkChar("delta_IOxGetLive1"));
+  SET_STRING_ELT(nms, 21, mkChar("delta_IOxGetLive2"));
+  SET_STRING_ELT(nms, 22, mkChar("delta_IOxNotGetDie1"));
+  SET_STRING_ELT(nms, 23, mkChar("delta_IOxNotGetDie2"));
+  SET_STRING_ELT(nms, 24, mkChar("delta_IOxNotGetLive1"));
+  SET_STRING_ELT(nms, 25, mkChar("delta_IOxNotGetLive2"));
+  SET_STRING_ELT(nms, 26, mkChar("delta_IRec1"));
+  SET_STRING_ELT(nms, 27, mkChar("delta_IRec2"));
+  SET_STRING_ELT(nms, 28, mkChar("delta_R"));
+  SET_STRING_ELT(nms, 29, mkChar("dim_beta_set"));
+  SET_STRING_ELT(nms, 30, mkChar("dim_D_Community"));
+  SET_STRING_ELT(nms, 31, mkChar("dim_D_Community_0"));
+  SET_STRING_ELT(nms, 32, mkChar("dim_D_Hospital"));
+  SET_STRING_ELT(nms, 33, mkChar("dim_D_Hospital_0"));
+  SET_STRING_ELT(nms, 34, mkChar("dim_delta_D_Community"));
+  SET_STRING_ELT(nms, 35, mkChar("dim_delta_D_Hospital"));
+  SET_STRING_ELT(nms, 36, mkChar("dim_delta_E1"));
+  SET_STRING_ELT(nms, 37, mkChar("dim_delta_E2"));
+  SET_STRING_ELT(nms, 38, mkChar("dim_delta_ICase1"));
+  SET_STRING_ELT(nms, 39, mkChar("dim_delta_ICase2"));
+  SET_STRING_ELT(nms, 40, mkChar("dim_delta_IMild"));
+  SET_STRING_ELT(nms, 41, mkChar("dim_delta_IMVGetDie1"));
+  SET_STRING_ELT(nms, 42, mkChar("dim_delta_IMVGetDie2"));
+  SET_STRING_ELT(nms, 43, mkChar("dim_delta_IMVGetLive1"));
+  SET_STRING_ELT(nms, 44, mkChar("dim_delta_IMVGetLive2"));
+  SET_STRING_ELT(nms, 45, mkChar("dim_delta_IMVNotGetDie1"));
+  SET_STRING_ELT(nms, 46, mkChar("dim_delta_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 47, mkChar("dim_delta_IMVNotGetLive1"));
+  SET_STRING_ELT(nms, 48, mkChar("dim_delta_IMVNotGetLive2"));
+  SET_STRING_ELT(nms, 49, mkChar("dim_delta_IOxGetDie1"));
+  SET_STRING_ELT(nms, 50, mkChar("dim_delta_IOxGetDie2"));
+  SET_STRING_ELT(nms, 51, mkChar("dim_delta_IOxGetLive1"));
+  SET_STRING_ELT(nms, 52, mkChar("dim_delta_IOxGetLive2"));
+  SET_STRING_ELT(nms, 53, mkChar("dim_delta_IOxNotGetDie1"));
+  SET_STRING_ELT(nms, 54, mkChar("dim_delta_IOxNotGetDie2"));
+  SET_STRING_ELT(nms, 55, mkChar("dim_delta_IOxNotGetLive1"));
+  SET_STRING_ELT(nms, 56, mkChar("dim_delta_IOxNotGetLive2"));
+  SET_STRING_ELT(nms, 57, mkChar("dim_delta_IRec1"));
+  SET_STRING_ELT(nms, 58, mkChar("dim_delta_IRec2"));
+  SET_STRING_ELT(nms, 59, mkChar("dim_delta_R"));
+  SET_STRING_ELT(nms, 60, mkChar("dim_E1"));
+  SET_STRING_ELT(nms, 61, mkChar("dim_E1_0"));
+  SET_STRING_ELT(nms, 62, mkChar("dim_E2"));
+  SET_STRING_ELT(nms, 63, mkChar("dim_E2_0"));
+  SET_STRING_ELT(nms, 64, mkChar("dim_hosp_beds"));
+  SET_STRING_ELT(nms, 65, mkChar("dim_ICase1"));
+  SET_STRING_ELT(nms, 66, mkChar("dim_ICase1_0"));
+  SET_STRING_ELT(nms, 67, mkChar("dim_ICase2"));
+  SET_STRING_ELT(nms, 68, mkChar("dim_ICase2_0"));
+  SET_STRING_ELT(nms, 69, mkChar("dim_ICU_beds"));
+  SET_STRING_ELT(nms, 70, mkChar("dim_IMild"));
+  SET_STRING_ELT(nms, 71, mkChar("dim_IMild_0"));
+  SET_STRING_ELT(nms, 72, mkChar("dim_IMVGetDie1"));
+  SET_STRING_ELT(nms, 73, mkChar("dim_IMVGetDie1_0"));
+  SET_STRING_ELT(nms, 74, mkChar("dim_IMVGetDie2"));
+  SET_STRING_ELT(nms, 75, mkChar("dim_IMVGetDie2_0"));
+  SET_STRING_ELT(nms, 76, mkChar("dim_IMVGetLive1"));
+  SET_STRING_ELT(nms, 77, mkChar("dim_IMVGetLive1_0"));
+  SET_STRING_ELT(nms, 78, mkChar("dim_IMVGetLive2"));
+  SET_STRING_ELT(nms, 79, mkChar("dim_IMVGetLive2_0"));
+  SET_STRING_ELT(nms, 80, mkChar("dim_IMVNotGetDie1"));
+  SET_STRING_ELT(nms, 81, mkChar("dim_IMVNotGetDie1_0"));
+  SET_STRING_ELT(nms, 82, mkChar("dim_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 83, mkChar("dim_IMVNotGetDie2_0"));
+  SET_STRING_ELT(nms, 84, mkChar("dim_IMVNotGetLive1"));
+  SET_STRING_ELT(nms, 85, mkChar("dim_IMVNotGetLive1_0"));
+  SET_STRING_ELT(nms, 86, mkChar("dim_IMVNotGetLive2"));
+  SET_STRING_ELT(nms, 87, mkChar("dim_IMVNotGetLive2_0"));
+  SET_STRING_ELT(nms, 88, mkChar("dim_IOxGetDie1"));
+  SET_STRING_ELT(nms, 89, mkChar("dim_IOxGetDie1_0"));
+  SET_STRING_ELT(nms, 90, mkChar("dim_IOxGetDie2"));
+  SET_STRING_ELT(nms, 91, mkChar("dim_IOxGetDie2_0"));
+  SET_STRING_ELT(nms, 92, mkChar("dim_IOxGetLive1"));
+  SET_STRING_ELT(nms, 93, mkChar("dim_IOxGetLive1_0"));
+  SET_STRING_ELT(nms, 94, mkChar("dim_IOxGetLive2"));
+  SET_STRING_ELT(nms, 95, mkChar("dim_IOxGetLive2_0"));
+  SET_STRING_ELT(nms, 96, mkChar("dim_IOxNotGetDie1"));
+  SET_STRING_ELT(nms, 97, mkChar("dim_IOxNotGetDie1_0"));
+  SET_STRING_ELT(nms, 98, mkChar("dim_IOxNotGetDie2"));
+  SET_STRING_ELT(nms, 99, mkChar("dim_IOxNotGetDie2_0"));
+  SET_STRING_ELT(nms, 100, mkChar("dim_IOxNotGetLive1"));
+  SET_STRING_ELT(nms, 101, mkChar("dim_IOxNotGetLive1_0"));
+  SET_STRING_ELT(nms, 102, mkChar("dim_IOxNotGetLive2"));
+  SET_STRING_ELT(nms, 103, mkChar("dim_IOxNotGetLive2_0"));
+  SET_STRING_ELT(nms, 104, mkChar("dim_IRec1"));
+  SET_STRING_ELT(nms, 105, mkChar("dim_IRec1_0"));
+  SET_STRING_ELT(nms, 106, mkChar("dim_IRec2"));
+  SET_STRING_ELT(nms, 107, mkChar("dim_IRec2_0"));
+  SET_STRING_ELT(nms, 108, mkChar("dim_lambda"));
+  SET_STRING_ELT(nms, 109, mkChar("dim_m"));
+  SET_STRING_ELT(nms, 110, mkChar("dim_m_1"));
+  SET_STRING_ELT(nms, 111, mkChar("dim_m_2"));
+  SET_STRING_ELT(nms, 112, mkChar("dim_mix_mat_set"));
+  SET_STRING_ELT(nms, 113, mkChar("dim_mix_mat_set_1"));
+  SET_STRING_ELT(nms, 114, mkChar("dim_mix_mat_set_12"));
+  SET_STRING_ELT(nms, 115, mkChar("dim_mix_mat_set_2"));
+  SET_STRING_ELT(nms, 116, mkChar("dim_mix_mat_set_3"));
+  SET_STRING_ELT(nms, 117, mkChar("dim_n_E1_E2"));
+  SET_STRING_ELT(nms, 118, mkChar("dim_n_E2_I"));
+  SET_STRING_ELT(nms, 119, mkChar("dim_n_E2_ICase1"));
+  SET_STRING_ELT(nms, 120, mkChar("dim_n_E2_IMild"));
+  SET_STRING_ELT(nms, 121, mkChar("dim_n_ICase1_ICase2"));
+  SET_STRING_ELT(nms, 122, mkChar("dim_n_ICase2_Hosp"));
+  SET_STRING_ELT(nms, 123, mkChar("dim_n_IMild_R"));
+  SET_STRING_ELT(nms, 124, mkChar("dim_n_IMVGetDie1"));
+  SET_STRING_ELT(nms, 125, mkChar("dim_n_IMVGetDie1_IMVGetDie2"));
+  SET_STRING_ELT(nms, 126, mkChar("dim_n_IMVGetDie2_D"));
+  SET_STRING_ELT(nms, 127, mkChar("dim_n_IMVGetLive1"));
+  SET_STRING_ELT(nms, 128, mkChar("dim_n_IMVGetLive1_IMVGetLive2"));
+  SET_STRING_ELT(nms, 129, mkChar("dim_n_IMVGetLive2_Rec"));
+  SET_STRING_ELT(nms, 130, mkChar("dim_n_IMVNotGetDie1"));
+  SET_STRING_ELT(nms, 131, mkChar("dim_n_IMVNotGetDie1_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 132, mkChar("dim_n_IMVNotGetDie2_D"));
+  SET_STRING_ELT(nms, 133, mkChar("dim_n_IMVNotGetLive1"));
+  SET_STRING_ELT(nms, 134, mkChar("dim_n_IMVNotGetLive1_IMVNotGetLive2"));
+  SET_STRING_ELT(nms, 135, mkChar("dim_n_IMVNotGetLive2_R"));
+  SET_STRING_ELT(nms, 136, mkChar("dim_n_IOxGetDie1"));
+  SET_STRING_ELT(nms, 137, mkChar("dim_n_IOxGetDie1_IOxGetDie2"));
+  SET_STRING_ELT(nms, 138, mkChar("dim_n_IOxGetDie2_D"));
+  SET_STRING_ELT(nms, 139, mkChar("dim_n_IOxGetLive1"));
+  SET_STRING_ELT(nms, 140, mkChar("dim_n_IOxGetLive1_IOxGetLive2"));
+  SET_STRING_ELT(nms, 141, mkChar("dim_n_IOxGetLive2_R"));
+  SET_STRING_ELT(nms, 142, mkChar("dim_n_IOxNotGetDie1"));
+  SET_STRING_ELT(nms, 143, mkChar("dim_n_IOxNotGetDie1_IOxNotGetDie2"));
+  SET_STRING_ELT(nms, 144, mkChar("dim_n_IOxNotGetDie2_D"));
+  SET_STRING_ELT(nms, 145, mkChar("dim_n_IOxNotGetLive1"));
+  SET_STRING_ELT(nms, 146, mkChar("dim_n_IOxNotGetLive1_IOxNotGetLive2"));
+  SET_STRING_ELT(nms, 147, mkChar("dim_n_IOxNotGetLive2_R"));
+  SET_STRING_ELT(nms, 148, mkChar("dim_n_IRec1_IRec2"));
+  SET_STRING_ELT(nms, 149, mkChar("dim_n_IRec2_R"));
+  SET_STRING_ELT(nms, 150, mkChar("dim_n_S_E1"));
+  SET_STRING_ELT(nms, 151, mkChar("dim_number_get_IMV"));
+  SET_STRING_ELT(nms, 152, mkChar("dim_number_get_Ox"));
+  SET_STRING_ELT(nms, 153, mkChar("dim_number_notget_IMV"));
+  SET_STRING_ELT(nms, 154, mkChar("dim_number_notget_Ox"));
+  SET_STRING_ELT(nms, 155, mkChar("dim_number_requiring_IMV"));
+  SET_STRING_ELT(nms, 156, mkChar("dim_number_requiring_Ox"));
+  SET_STRING_ELT(nms, 157, mkChar("dim_p_S_E1"));
+  SET_STRING_ELT(nms, 158, mkChar("dim_prob_hosp"));
+  SET_STRING_ELT(nms, 159, mkChar("dim_prob_non_severe_death_no_treatment"));
+  SET_STRING_ELT(nms, 160, mkChar("dim_prob_non_severe_death_treatment"));
+  SET_STRING_ELT(nms, 161, mkChar("dim_prob_severe"));
+  SET_STRING_ELT(nms, 162, mkChar("dim_prob_severe_death_no_treatment"));
+  SET_STRING_ELT(nms, 163, mkChar("dim_prob_severe_death_treatment"));
+  SET_STRING_ELT(nms, 164, mkChar("dim_R"));
+  SET_STRING_ELT(nms, 165, mkChar("dim_R_0"));
+  SET_STRING_ELT(nms, 166, mkChar("dim_S"));
+  SET_STRING_ELT(nms, 167, mkChar("dim_S_0"));
+  SET_STRING_ELT(nms, 168, mkChar("dim_s_ij"));
+  SET_STRING_ELT(nms, 169, mkChar("dim_s_ij_1"));
+  SET_STRING_ELT(nms, 170, mkChar("dim_s_ij_2"));
+  SET_STRING_ELT(nms, 171, mkChar("dim_temp"));
+  SET_STRING_ELT(nms, 172, mkChar("dim_tt_beta"));
+  SET_STRING_ELT(nms, 173, mkChar("dim_tt_hosp_beds"));
+  SET_STRING_ELT(nms, 174, mkChar("dim_tt_ICU_beds"));
+  SET_STRING_ELT(nms, 175, mkChar("dim_tt_matrix"));
+  SET_STRING_ELT(nms, 176, mkChar("dt"));
+  SET_STRING_ELT(nms, 177, mkChar("E1_0"));
+  SET_STRING_ELT(nms, 178, mkChar("E2_0"));
+  SET_STRING_ELT(nms, 179, mkChar("gamma_E"));
+  SET_STRING_ELT(nms, 180, mkChar("gamma_get_mv_die"));
+  SET_STRING_ELT(nms, 181, mkChar("gamma_get_mv_survive"));
+  SET_STRING_ELT(nms, 182, mkChar("gamma_get_ox_die"));
+  SET_STRING_ELT(nms, 183, mkChar("gamma_get_ox_survive"));
+  SET_STRING_ELT(nms, 184, mkChar("gamma_ICase"));
+  SET_STRING_ELT(nms, 185, mkChar("gamma_IMild"));
+  SET_STRING_ELT(nms, 186, mkChar("gamma_not_get_mv_die"));
+  SET_STRING_ELT(nms, 187, mkChar("gamma_not_get_mv_survive"));
+  SET_STRING_ELT(nms, 188, mkChar("gamma_not_get_ox_die"));
+  SET_STRING_ELT(nms, 189, mkChar("gamma_not_get_ox_survive"));
+  SET_STRING_ELT(nms, 190, mkChar("gamma_rec"));
+  SET_STRING_ELT(nms, 191, mkChar("hosp_beds"));
+  SET_STRING_ELT(nms, 192, mkChar("ICase1_0"));
+  SET_STRING_ELT(nms, 193, mkChar("ICase2_0"));
+  SET_STRING_ELT(nms, 194, mkChar("ICU_beds"));
+  SET_STRING_ELT(nms, 195, mkChar("IMild_0"));
+  SET_STRING_ELT(nms, 196, mkChar("IMVGetDie1_0"));
+  SET_STRING_ELT(nms, 197, mkChar("IMVGetDie2_0"));
+  SET_STRING_ELT(nms, 198, mkChar("IMVGetLive1_0"));
+  SET_STRING_ELT(nms, 199, mkChar("IMVGetLive2_0"));
+  SET_STRING_ELT(nms, 200, mkChar("IMVNotGetDie1_0"));
+  SET_STRING_ELT(nms, 201, mkChar("IMVNotGetDie2_0"));
+  SET_STRING_ELT(nms, 202, mkChar("IMVNotGetLive1_0"));
+  SET_STRING_ELT(nms, 203, mkChar("IMVNotGetLive2_0"));
+  SET_STRING_ELT(nms, 204, mkChar("initial_D_Community"));
+  SET_STRING_ELT(nms, 205, mkChar("initial_D_Hospital"));
+  SET_STRING_ELT(nms, 206, mkChar("initial_E1"));
+  SET_STRING_ELT(nms, 207, mkChar("initial_E2"));
+  SET_STRING_ELT(nms, 208, mkChar("initial_ICase1"));
+  SET_STRING_ELT(nms, 209, mkChar("initial_ICase2"));
+  SET_STRING_ELT(nms, 210, mkChar("initial_IMild"));
+  SET_STRING_ELT(nms, 211, mkChar("initial_IMVGetDie1"));
+  SET_STRING_ELT(nms, 212, mkChar("initial_IMVGetDie2"));
+  SET_STRING_ELT(nms, 213, mkChar("initial_IMVGetLive1"));
+  SET_STRING_ELT(nms, 214, mkChar("initial_IMVGetLive2"));
+  SET_STRING_ELT(nms, 215, mkChar("initial_IMVNotGetDie1"));
+  SET_STRING_ELT(nms, 216, mkChar("initial_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 217, mkChar("initial_IMVNotGetLive1"));
+  SET_STRING_ELT(nms, 218, mkChar("initial_IMVNotGetLive2"));
+  SET_STRING_ELT(nms, 219, mkChar("initial_IOxGetDie1"));
+  SET_STRING_ELT(nms, 220, mkChar("initial_IOxGetDie2"));
+  SET_STRING_ELT(nms, 221, mkChar("initial_IOxGetLive1"));
+  SET_STRING_ELT(nms, 222, mkChar("initial_IOxGetLive2"));
+  SET_STRING_ELT(nms, 223, mkChar("initial_IOxNotGetDie1"));
+  SET_STRING_ELT(nms, 224, mkChar("initial_IOxNotGetDie2"));
+  SET_STRING_ELT(nms, 225, mkChar("initial_IOxNotGetLive1"));
+  SET_STRING_ELT(nms, 226, mkChar("initial_IOxNotGetLive2"));
+  SET_STRING_ELT(nms, 227, mkChar("initial_IRec1"));
+  SET_STRING_ELT(nms, 228, mkChar("initial_IRec2"));
+  SET_STRING_ELT(nms, 229, mkChar("initial_R"));
+  SET_STRING_ELT(nms, 230, mkChar("initial_S"));
+  SET_STRING_ELT(nms, 231, mkChar("interpolate_beta"));
+  SET_STRING_ELT(nms, 232, mkChar("interpolate_hosp_bed_capacity"));
+  SET_STRING_ELT(nms, 233, mkChar("interpolate_ICU_bed_capacity"));
+  SET_STRING_ELT(nms, 234, mkChar("interpolate_m"));
+  SET_STRING_ELT(nms, 235, mkChar("IOxGetDie1_0"));
+  SET_STRING_ELT(nms, 236, mkChar("IOxGetDie2_0"));
+  SET_STRING_ELT(nms, 237, mkChar("IOxGetLive1_0"));
+  SET_STRING_ELT(nms, 238, mkChar("IOxGetLive2_0"));
+  SET_STRING_ELT(nms, 239, mkChar("IOxNotGetDie1_0"));
+  SET_STRING_ELT(nms, 240, mkChar("IOxNotGetDie2_0"));
+  SET_STRING_ELT(nms, 241, mkChar("IOxNotGetLive1_0"));
+  SET_STRING_ELT(nms, 242, mkChar("IOxNotGetLive2_0"));
+  SET_STRING_ELT(nms, 243, mkChar("IRec1_0"));
+  SET_STRING_ELT(nms, 244, mkChar("IRec2_0"));
+  SET_STRING_ELT(nms, 245, mkChar("lambda"));
+  SET_STRING_ELT(nms, 246, mkChar("m"));
+  SET_STRING_ELT(nms, 247, mkChar("mix_mat_set"));
+  SET_STRING_ELT(nms, 248, mkChar("N_age"));
+  SET_STRING_ELT(nms, 249, mkChar("n_E1_E2"));
+  SET_STRING_ELT(nms, 250, mkChar("n_E2_I"));
+  SET_STRING_ELT(nms, 251, mkChar("n_E2_ICase1"));
+  SET_STRING_ELT(nms, 252, mkChar("n_E2_IMild"));
+  SET_STRING_ELT(nms, 253, mkChar("n_ICase1_ICase2"));
+  SET_STRING_ELT(nms, 254, mkChar("n_ICase2_Hosp"));
+  SET_STRING_ELT(nms, 255, mkChar("n_IMild_R"));
+  SET_STRING_ELT(nms, 256, mkChar("n_IMVGetDie1"));
+  SET_STRING_ELT(nms, 257, mkChar("n_IMVGetDie1_IMVGetDie2"));
+  SET_STRING_ELT(nms, 258, mkChar("n_IMVGetDie2_D"));
+  SET_STRING_ELT(nms, 259, mkChar("n_IMVGetLive1"));
+  SET_STRING_ELT(nms, 260, mkChar("n_IMVGetLive1_IMVGetLive2"));
+  SET_STRING_ELT(nms, 261, mkChar("n_IMVGetLive2_Rec"));
+  SET_STRING_ELT(nms, 262, mkChar("n_IMVNotGetDie1"));
+  SET_STRING_ELT(nms, 263, mkChar("n_IMVNotGetDie1_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 264, mkChar("n_IMVNotGetDie2_D"));
+  SET_STRING_ELT(nms, 265, mkChar("n_IMVNotGetLive1"));
+  SET_STRING_ELT(nms, 266, mkChar("n_IMVNotGetLive1_IMVNotGetLive2"));
+  SET_STRING_ELT(nms, 267, mkChar("n_IMVNotGetLive2_R"));
+  SET_STRING_ELT(nms, 268, mkChar("n_IOxGetDie1"));
+  SET_STRING_ELT(nms, 269, mkChar("n_IOxGetDie1_IOxGetDie2"));
+  SET_STRING_ELT(nms, 270, mkChar("n_IOxGetDie2_D"));
+  SET_STRING_ELT(nms, 271, mkChar("n_IOxGetLive1"));
+  SET_STRING_ELT(nms, 272, mkChar("n_IOxGetLive1_IOxGetLive2"));
+  SET_STRING_ELT(nms, 273, mkChar("n_IOxGetLive2_R"));
+  SET_STRING_ELT(nms, 274, mkChar("n_IOxNotGetDie1"));
+  SET_STRING_ELT(nms, 275, mkChar("n_IOxNotGetDie1_IOxNotGetDie2"));
+  SET_STRING_ELT(nms, 276, mkChar("n_IOxNotGetDie2_D"));
+  SET_STRING_ELT(nms, 277, mkChar("n_IOxNotGetLive1"));
+  SET_STRING_ELT(nms, 278, mkChar("n_IOxNotGetLive1_IOxNotGetLive2"));
+  SET_STRING_ELT(nms, 279, mkChar("n_IOxNotGetLive2_R"));
+  SET_STRING_ELT(nms, 280, mkChar("n_IRec1_IRec2"));
+  SET_STRING_ELT(nms, 281, mkChar("n_IRec2_R"));
+  SET_STRING_ELT(nms, 282, mkChar("n_S_E1"));
+  SET_STRING_ELT(nms, 283, mkChar("number_get_IMV"));
+  SET_STRING_ELT(nms, 284, mkChar("number_get_Ox"));
+  SET_STRING_ELT(nms, 285, mkChar("number_notget_IMV"));
+  SET_STRING_ELT(nms, 286, mkChar("number_notget_Ox"));
+  SET_STRING_ELT(nms, 287, mkChar("number_requiring_IMV"));
+  SET_STRING_ELT(nms, 288, mkChar("number_requiring_Ox"));
+  SET_STRING_ELT(nms, 289, mkChar("offset_output_delta_D_Hospital"));
+  SET_STRING_ELT(nms, 290, mkChar("offset_output_n_E2_ICase1"));
+  SET_STRING_ELT(nms, 291, mkChar("offset_output_n_E2_IMild"));
+  SET_STRING_ELT(nms, 292, mkChar("offset_output_number_requiring_IMV"));
+  SET_STRING_ELT(nms, 293, mkChar("offset_variable_D_Community"));
+  SET_STRING_ELT(nms, 294, mkChar("offset_variable_D_Hospital"));
+  SET_STRING_ELT(nms, 295, mkChar("offset_variable_E2"));
+  SET_STRING_ELT(nms, 296, mkChar("offset_variable_ICase1"));
+  SET_STRING_ELT(nms, 297, mkChar("offset_variable_ICase2"));
+  SET_STRING_ELT(nms, 298, mkChar("offset_variable_IMild"));
+  SET_STRING_ELT(nms, 299, mkChar("offset_variable_IMVGetDie1"));
+  SET_STRING_ELT(nms, 300, mkChar("offset_variable_IMVGetDie2"));
+  SET_STRING_ELT(nms, 301, mkChar("offset_variable_IMVGetLive1"));
+  SET_STRING_ELT(nms, 302, mkChar("offset_variable_IMVGetLive2"));
+  SET_STRING_ELT(nms, 303, mkChar("offset_variable_IMVNotGetDie1"));
+  SET_STRING_ELT(nms, 304, mkChar("offset_variable_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 305, mkChar("offset_variable_IMVNotGetLive1"));
+  SET_STRING_ELT(nms, 306, mkChar("offset_variable_IMVNotGetLive2"));
+  SET_STRING_ELT(nms, 307, mkChar("offset_variable_IOxGetDie1"));
+  SET_STRING_ELT(nms, 308, mkChar("offset_variable_IOxGetDie2"));
+  SET_STRING_ELT(nms, 309, mkChar("offset_variable_IOxGetLive1"));
+  SET_STRING_ELT(nms, 310, mkChar("offset_variable_IOxGetLive2"));
+  SET_STRING_ELT(nms, 311, mkChar("offset_variable_IOxNotGetDie1"));
+  SET_STRING_ELT(nms, 312, mkChar("offset_variable_IOxNotGetDie2"));
+  SET_STRING_ELT(nms, 313, mkChar("offset_variable_IOxNotGetLive1"));
+  SET_STRING_ELT(nms, 314, mkChar("offset_variable_IOxNotGetLive2"));
+  SET_STRING_ELT(nms, 315, mkChar("offset_variable_IRec1"));
+  SET_STRING_ELT(nms, 316, mkChar("offset_variable_IRec2"));
+  SET_STRING_ELT(nms, 317, mkChar("offset_variable_R"));
+  SET_STRING_ELT(nms, 318, mkChar("p_E1_E2"));
+  SET_STRING_ELT(nms, 319, mkChar("p_E2_I"));
+  SET_STRING_ELT(nms, 320, mkChar("p_ICase1_ICase2"));
+  SET_STRING_ELT(nms, 321, mkChar("p_ICase2_Hosp"));
+  SET_STRING_ELT(nms, 322, mkChar("p_IMild_R"));
+  SET_STRING_ELT(nms, 323, mkChar("p_IMVGetDie1_IMVGetDie2"));
+  SET_STRING_ELT(nms, 324, mkChar("p_IMVGetDie2_D"));
+  SET_STRING_ELT(nms, 325, mkChar("p_IMVGetLive1_IMVGetLive2"));
+  SET_STRING_ELT(nms, 326, mkChar("p_IMVGetLive2_Rec"));
+  SET_STRING_ELT(nms, 327, mkChar("p_IMVNotGetDie1_IMVNotGetDie2"));
+  SET_STRING_ELT(nms, 328, mkChar("p_IMVNotGetDie2_D"));
+  SET_STRING_ELT(nms, 329, mkChar("p_IMVNotGetLive1_IMVNotGetLive2"));
+  SET_STRING_ELT(nms, 330, mkChar("p_IMVNotGetLive2_R"));
+  SET_STRING_ELT(nms, 331, mkChar("p_IOxGetDie1_IOxGetDie2"));
+  SET_STRING_ELT(nms, 332, mkChar("p_IOxGetDie2_D"));
+  SET_STRING_ELT(nms, 333, mkChar("p_IOxGetLive1_IOxGetLive2"));
+  SET_STRING_ELT(nms, 334, mkChar("p_IOxGetLive2_R"));
+  SET_STRING_ELT(nms, 335, mkChar("p_IOxNotGetDie1_IOxNotGetDie2"));
+  SET_STRING_ELT(nms, 336, mkChar("p_IOxNotGetDie2_D"));
+  SET_STRING_ELT(nms, 337, mkChar("p_IOxNotGetLive1_IOxNotGetLive2"));
+  SET_STRING_ELT(nms, 338, mkChar("p_IOxNotGetLive2_R"));
+  SET_STRING_ELT(nms, 339, mkChar("p_Rec1_Rec2"));
+  SET_STRING_ELT(nms, 340, mkChar("p_Rec2_R"));
+  SET_STRING_ELT(nms, 341, mkChar("p_S_E1"));
+  SET_STRING_ELT(nms, 342, mkChar("prob_hosp"));
+  SET_STRING_ELT(nms, 343, mkChar("prob_non_severe_death_no_treatment"));
+  SET_STRING_ELT(nms, 344, mkChar("prob_non_severe_death_treatment"));
+  SET_STRING_ELT(nms, 345, mkChar("prob_severe"));
+  SET_STRING_ELT(nms, 346, mkChar("prob_severe_death_no_treatment"));
+  SET_STRING_ELT(nms, 347, mkChar("prob_severe_death_treatment"));
+  SET_STRING_ELT(nms, 348, mkChar("R_0"));
+  SET_STRING_ELT(nms, 349, mkChar("S_0"));
+  SET_STRING_ELT(nms, 350, mkChar("s_ij"));
+  SET_STRING_ELT(nms, 351, mkChar("temp"));
+  SET_STRING_ELT(nms, 352, mkChar("tt_beta"));
+  SET_STRING_ELT(nms, 353, mkChar("tt_hosp_beds"));
+  SET_STRING_ELT(nms, 354, mkChar("tt_ICU_beds"));
+  SET_STRING_ELT(nms, 355, mkChar("tt_matrix"));
+  setAttrib(contents, R_NamesSymbol, nms);
+  UNPROTECT(141);
+  return contents;
+}
+SEXP updated_healthcare_rep_SEIR_set_user(SEXP internal_p, SEXP user) {
+  updated_healthcare_rep_SEIR_internal *internal = updated_healthcare_rep_SEIR_get_internal(internal_p, 1);
+  internal->dt = user_get_scalar_double(user, "dt", internal->dt, NA_REAL, NA_REAL);
+  internal->gamma_E = user_get_scalar_double(user, "gamma_E", internal->gamma_E, NA_REAL, NA_REAL);
+  internal->gamma_get_mv_die = user_get_scalar_double(user, "gamma_get_mv_die", internal->gamma_get_mv_die, NA_REAL, NA_REAL);
+  internal->gamma_get_mv_survive = user_get_scalar_double(user, "gamma_get_mv_survive", internal->gamma_get_mv_survive, NA_REAL, NA_REAL);
+  internal->gamma_get_ox_die = user_get_scalar_double(user, "gamma_get_ox_die", internal->gamma_get_ox_die, NA_REAL, NA_REAL);
+  internal->gamma_get_ox_survive = user_get_scalar_double(user, "gamma_get_ox_survive", internal->gamma_get_ox_survive, NA_REAL, NA_REAL);
+  internal->gamma_ICase = user_get_scalar_double(user, "gamma_ICase", internal->gamma_ICase, NA_REAL, NA_REAL);
+  internal->gamma_IMild = user_get_scalar_double(user, "gamma_IMild", internal->gamma_IMild, NA_REAL, NA_REAL);
+  internal->gamma_not_get_mv_die = user_get_scalar_double(user, "gamma_not_get_mv_die", internal->gamma_not_get_mv_die, NA_REAL, NA_REAL);
+  internal->gamma_not_get_mv_survive = user_get_scalar_double(user, "gamma_not_get_mv_survive", internal->gamma_not_get_mv_survive, NA_REAL, NA_REAL);
+  internal->gamma_not_get_ox_die = user_get_scalar_double(user, "gamma_not_get_ox_die", internal->gamma_not_get_ox_die, NA_REAL, NA_REAL);
+  internal->gamma_not_get_ox_survive = user_get_scalar_double(user, "gamma_not_get_ox_survive", internal->gamma_not_get_ox_survive, NA_REAL, NA_REAL);
+  internal->gamma_rec = user_get_scalar_double(user, "gamma_rec", internal->gamma_rec, NA_REAL, NA_REAL);
+  internal->N_age = user_get_scalar_int(user, "N_age", internal->N_age, NA_REAL, NA_REAL);
+  internal->tt_beta = (double*) user_get_array_dim(user, false, internal->tt_beta, "tt_beta", 1, NA_REAL, NA_REAL, &internal->dim_tt_beta);
+  internal->tt_hosp_beds = (double*) user_get_array_dim(user, false, internal->tt_hosp_beds, "tt_hosp_beds", 1, NA_REAL, NA_REAL, &internal->dim_tt_hosp_beds);
+  internal->tt_ICU_beds = (double*) user_get_array_dim(user, false, internal->tt_ICU_beds, "tt_ICU_beds", 1, NA_REAL, NA_REAL, &internal->dim_tt_ICU_beds);
+  internal->tt_matrix = (double*) user_get_array_dim(user, false, internal->tt_matrix, "tt_matrix", 1, NA_REAL, NA_REAL, &internal->dim_tt_matrix);
+  internal->dim_D_Community = internal->N_age;
+  internal->dim_D_Community_0 = internal->N_age;
+  internal->dim_D_Hospital = internal->N_age;
+  internal->dim_D_Hospital_0 = internal->N_age;
+  internal->dim_delta_D_Community = internal->N_age;
+  internal->dim_delta_D_Hospital = internal->N_age;
+  internal->dim_delta_E1 = internal->N_age;
+  internal->dim_delta_E2 = internal->N_age;
+  internal->dim_delta_ICase1 = internal->N_age;
+  internal->dim_delta_ICase2 = internal->N_age;
+  internal->dim_delta_IMild = internal->N_age;
+  internal->dim_delta_IMVGetDie1 = internal->N_age;
+  internal->dim_delta_IMVGetDie2 = internal->N_age;
+  internal->dim_delta_IMVGetLive1 = internal->N_age;
+  internal->dim_delta_IMVGetLive2 = internal->N_age;
+  internal->dim_delta_IMVNotGetDie1 = internal->N_age;
+  internal->dim_delta_IMVNotGetDie2 = internal->N_age;
+  internal->dim_delta_IMVNotGetLive1 = internal->N_age;
+  internal->dim_delta_IMVNotGetLive2 = internal->N_age;
+  internal->dim_delta_IOxGetDie1 = internal->N_age;
+  internal->dim_delta_IOxGetDie2 = internal->N_age;
+  internal->dim_delta_IOxGetLive1 = internal->N_age;
+  internal->dim_delta_IOxGetLive2 = internal->N_age;
+  internal->dim_delta_IOxNotGetDie1 = internal->N_age;
+  internal->dim_delta_IOxNotGetDie2 = internal->N_age;
+  internal->dim_delta_IOxNotGetLive1 = internal->N_age;
+  internal->dim_delta_IOxNotGetLive2 = internal->N_age;
+  internal->dim_delta_IRec1 = internal->N_age;
+  internal->dim_delta_IRec2 = internal->N_age;
+  internal->dim_delta_R = internal->N_age;
+  internal->dim_E1 = internal->N_age;
+  internal->dim_E1_0 = internal->N_age;
+  internal->dim_E2 = internal->N_age;
+  internal->dim_E2_0 = internal->N_age;
+  internal->dim_ICase1 = internal->N_age;
+  internal->dim_ICase1_0 = internal->N_age;
+  internal->dim_ICase2 = internal->N_age;
+  internal->dim_ICase2_0 = internal->N_age;
+  internal->dim_IMild = internal->N_age;
+  internal->dim_IMild_0 = internal->N_age;
+  internal->dim_IMVGetDie1 = internal->N_age;
+  internal->dim_IMVGetDie1_0 = internal->N_age;
+  internal->dim_IMVGetDie2 = internal->N_age;
+  internal->dim_IMVGetDie2_0 = internal->N_age;
+  internal->dim_IMVGetLive1 = internal->N_age;
+  internal->dim_IMVGetLive1_0 = internal->N_age;
+  internal->dim_IMVGetLive2 = internal->N_age;
+  internal->dim_IMVGetLive2_0 = internal->N_age;
+  internal->dim_IMVNotGetDie1 = internal->N_age;
+  internal->dim_IMVNotGetDie1_0 = internal->N_age;
+  internal->dim_IMVNotGetDie2 = internal->N_age;
+  internal->dim_IMVNotGetDie2_0 = internal->N_age;
+  internal->dim_IMVNotGetLive1 = internal->N_age;
+  internal->dim_IMVNotGetLive1_0 = internal->N_age;
+  internal->dim_IMVNotGetLive2 = internal->N_age;
+  internal->dim_IMVNotGetLive2_0 = internal->N_age;
+  internal->dim_IOxGetDie1 = internal->N_age;
+  internal->dim_IOxGetDie1_0 = internal->N_age;
+  internal->dim_IOxGetDie2 = internal->N_age;
+  internal->dim_IOxGetDie2_0 = internal->N_age;
+  internal->dim_IOxGetLive1 = internal->N_age;
+  internal->dim_IOxGetLive1_0 = internal->N_age;
+  internal->dim_IOxGetLive2 = internal->N_age;
+  internal->dim_IOxGetLive2_0 = internal->N_age;
+  internal->dim_IOxNotGetDie1 = internal->N_age;
+  internal->dim_IOxNotGetDie1_0 = internal->N_age;
+  internal->dim_IOxNotGetDie2 = internal->N_age;
+  internal->dim_IOxNotGetDie2_0 = internal->N_age;
+  internal->dim_IOxNotGetLive1 = internal->N_age;
+  internal->dim_IOxNotGetLive1_0 = internal->N_age;
+  internal->dim_IOxNotGetLive2 = internal->N_age;
+  internal->dim_IOxNotGetLive2_0 = internal->N_age;
+  internal->dim_IRec1 = internal->N_age;
+  internal->dim_IRec1_0 = internal->N_age;
+  internal->dim_IRec2 = internal->N_age;
+  internal->dim_IRec2_0 = internal->N_age;
+  internal->dim_lambda = internal->N_age;
+  internal->dim_m_1 = internal->N_age;
+  internal->dim_m_2 = internal->N_age;
+  internal->dim_n_E1_E2 = internal->N_age;
+  internal->dim_n_E2_I = internal->N_age;
+  internal->dim_n_E2_ICase1 = internal->N_age;
+  internal->dim_n_E2_IMild = internal->N_age;
+  internal->dim_n_ICase1_ICase2 = internal->N_age;
+  internal->dim_n_ICase2_Hosp = internal->N_age;
+  internal->dim_n_IMild_R = internal->N_age;
+  internal->dim_n_IMVGetDie1 = internal->N_age;
+  internal->dim_n_IMVGetDie1_IMVGetDie2 = internal->N_age;
+  internal->dim_n_IMVGetDie2_D = internal->N_age;
+  internal->dim_n_IMVGetLive1 = internal->N_age;
+  internal->dim_n_IMVGetLive1_IMVGetLive2 = internal->N_age;
+  internal->dim_n_IMVGetLive2_Rec = internal->N_age;
+  internal->dim_n_IMVNotGetDie1 = internal->N_age;
+  internal->dim_n_IMVNotGetDie1_IMVNotGetDie2 = internal->N_age;
+  internal->dim_n_IMVNotGetDie2_D = internal->N_age;
+  internal->dim_n_IMVNotGetLive1 = internal->N_age;
+  internal->dim_n_IMVNotGetLive1_IMVNotGetLive2 = internal->N_age;
+  internal->dim_n_IMVNotGetLive2_R = internal->N_age;
+  internal->dim_n_IOxGetDie1 = internal->N_age;
+  internal->dim_n_IOxGetDie1_IOxGetDie2 = internal->N_age;
+  internal->dim_n_IOxGetDie2_D = internal->N_age;
+  internal->dim_n_IOxGetLive1 = internal->N_age;
+  internal->dim_n_IOxGetLive1_IOxGetLive2 = internal->N_age;
+  internal->dim_n_IOxGetLive2_R = internal->N_age;
+  internal->dim_n_IOxNotGetDie1 = internal->N_age;
+  internal->dim_n_IOxNotGetDie1_IOxNotGetDie2 = internal->N_age;
+  internal->dim_n_IOxNotGetDie2_D = internal->N_age;
+  internal->dim_n_IOxNotGetLive1 = internal->N_age;
+  internal->dim_n_IOxNotGetLive1_IOxNotGetLive2 = internal->N_age;
+  internal->dim_n_IOxNotGetLive2_R = internal->N_age;
+  internal->dim_n_IRec1_IRec2 = internal->N_age;
+  internal->dim_n_IRec2_R = internal->N_age;
+  internal->dim_n_S_E1 = internal->N_age;
+  internal->dim_number_get_IMV = internal->N_age;
+  internal->dim_number_get_Ox = internal->N_age;
+  internal->dim_number_notget_IMV = internal->N_age;
+  internal->dim_number_notget_Ox = internal->N_age;
+  internal->dim_number_requiring_IMV = internal->N_age;
+  internal->dim_number_requiring_Ox = internal->N_age;
+  internal->dim_p_S_E1 = internal->N_age;
+  internal->dim_prob_hosp = internal->N_age;
+  internal->dim_prob_non_severe_death_no_treatment = internal->N_age;
+  internal->dim_prob_non_severe_death_treatment = internal->N_age;
+  internal->dim_prob_severe = internal->N_age;
+  internal->dim_prob_severe_death_no_treatment = internal->N_age;
+  internal->dim_prob_severe_death_treatment = internal->N_age;
+  internal->dim_R = internal->N_age;
+  internal->dim_R_0 = internal->N_age;
+  internal->dim_S = internal->N_age;
+  internal->dim_S_0 = internal->N_age;
+  internal->dim_s_ij_1 = internal->N_age;
+  internal->dim_s_ij_2 = internal->N_age;
+  internal->dim_temp = internal->N_age;
+  internal->p_E1_E2 = 1 - exp(-(internal->gamma_E) * internal->dt);
+  internal->p_E2_I = 1 - exp(-(internal->gamma_E) * internal->dt);
+  internal->p_ICase1_ICase2 = 1 - exp(-(internal->gamma_ICase) * internal->dt);
+  internal->p_ICase2_Hosp = 1 - exp(-(internal->gamma_ICase) * internal->dt);
+  internal->p_IMild_R = 1 - exp(-(internal->gamma_IMild) * internal->dt);
+  internal->p_IMVGetDie1_IMVGetDie2 = 1 - exp(-(internal->gamma_get_mv_die) * internal->dt);
+  internal->p_IMVGetDie2_D = 1 - exp(-(internal->gamma_get_mv_die) * internal->dt);
+  internal->p_IMVGetLive1_IMVGetLive2 = 1 - exp(-(internal->gamma_get_mv_survive) * internal->dt);
+  internal->p_IMVGetLive2_Rec = 1 - exp(-(internal->gamma_get_mv_survive) * internal->dt);
+  internal->p_IMVNotGetDie1_IMVNotGetDie2 = 1 - exp(-(internal->gamma_not_get_mv_die) * internal->dt);
+  internal->p_IMVNotGetDie2_D = 1 - exp(-(internal->gamma_not_get_mv_die) * internal->dt);
+  internal->p_IMVNotGetLive1_IMVNotGetLive2 = 1 - exp(-(internal->gamma_not_get_mv_survive) * internal->dt);
+  internal->p_IMVNotGetLive2_R = 1 - exp(-(internal->gamma_not_get_mv_survive) * internal->dt);
+  internal->p_IOxGetDie1_IOxGetDie2 = 1 - exp(-(internal->gamma_get_ox_die) * internal->dt);
+  internal->p_IOxGetDie2_D = 1 - exp(-(internal->gamma_get_ox_die) * internal->dt);
+  internal->p_IOxGetLive1_IOxGetLive2 = 1 - exp(-(internal->gamma_get_ox_survive) * internal->dt);
+  internal->p_IOxGetLive2_R = 1 - exp(-(internal->gamma_get_ox_survive) * internal->dt);
+  internal->p_IOxNotGetDie1_IOxNotGetDie2 = 1 - exp(-(internal->gamma_not_get_ox_die) * internal->dt);
+  internal->p_IOxNotGetDie2_D = 1 - exp(-(internal->gamma_not_get_ox_die) * internal->dt);
+  internal->p_IOxNotGetLive1_IOxNotGetLive2 = 1 - exp(-(internal->gamma_not_get_ox_survive) * internal->dt);
+  internal->p_IOxNotGetLive2_R = 1 - exp(-(internal->gamma_not_get_ox_survive) * internal->dt);
+  internal->p_Rec1_Rec2 = 1 - exp(-(internal->gamma_rec) * internal->dt);
+  internal->p_Rec2_R = 1 - exp(-(internal->gamma_rec) * internal->dt);
+  Free(internal->delta_D_Community);
+  internal->delta_D_Community = (double*) Calloc(internal->dim_delta_D_Community, double);
+  Free(internal->delta_D_Hospital);
+  internal->delta_D_Hospital = (double*) Calloc(internal->dim_delta_D_Hospital, double);
+  Free(internal->delta_E1);
+  internal->delta_E1 = (double*) Calloc(internal->dim_delta_E1, double);
+  Free(internal->delta_E2);
+  internal->delta_E2 = (double*) Calloc(internal->dim_delta_E2, double);
+  Free(internal->delta_ICase1);
+  internal->delta_ICase1 = (double*) Calloc(internal->dim_delta_ICase1, double);
+  Free(internal->delta_ICase2);
+  internal->delta_ICase2 = (double*) Calloc(internal->dim_delta_ICase2, double);
+  Free(internal->delta_IMild);
+  internal->delta_IMild = (double*) Calloc(internal->dim_delta_IMild, double);
+  Free(internal->delta_IMVGetDie1);
+  internal->delta_IMVGetDie1 = (double*) Calloc(internal->dim_delta_IMVGetDie1, double);
+  Free(internal->delta_IMVGetDie2);
+  internal->delta_IMVGetDie2 = (double*) Calloc(internal->dim_delta_IMVGetDie2, double);
+  Free(internal->delta_IMVGetLive1);
+  internal->delta_IMVGetLive1 = (double*) Calloc(internal->dim_delta_IMVGetLive1, double);
+  Free(internal->delta_IMVGetLive2);
+  internal->delta_IMVGetLive2 = (double*) Calloc(internal->dim_delta_IMVGetLive2, double);
+  Free(internal->delta_IMVNotGetDie1);
+  internal->delta_IMVNotGetDie1 = (double*) Calloc(internal->dim_delta_IMVNotGetDie1, double);
+  Free(internal->delta_IMVNotGetDie2);
+  internal->delta_IMVNotGetDie2 = (double*) Calloc(internal->dim_delta_IMVNotGetDie2, double);
+  Free(internal->delta_IMVNotGetLive1);
+  internal->delta_IMVNotGetLive1 = (double*) Calloc(internal->dim_delta_IMVNotGetLive1, double);
+  Free(internal->delta_IMVNotGetLive2);
+  internal->delta_IMVNotGetLive2 = (double*) Calloc(internal->dim_delta_IMVNotGetLive2, double);
+  Free(internal->delta_IOxGetDie1);
+  internal->delta_IOxGetDie1 = (double*) Calloc(internal->dim_delta_IOxGetDie1, double);
+  Free(internal->delta_IOxGetDie2);
+  internal->delta_IOxGetDie2 = (double*) Calloc(internal->dim_delta_IOxGetDie2, double);
+  Free(internal->delta_IOxGetLive1);
+  internal->delta_IOxGetLive1 = (double*) Calloc(internal->dim_delta_IOxGetLive1, double);
+  Free(internal->delta_IOxGetLive2);
+  internal->delta_IOxGetLive2 = (double*) Calloc(internal->dim_delta_IOxGetLive2, double);
+  Free(internal->delta_IOxNotGetDie1);
+  internal->delta_IOxNotGetDie1 = (double*) Calloc(internal->dim_delta_IOxNotGetDie1, double);
+  Free(internal->delta_IOxNotGetDie2);
+  internal->delta_IOxNotGetDie2 = (double*) Calloc(internal->dim_delta_IOxNotGetDie2, double);
+  Free(internal->delta_IOxNotGetLive1);
+  internal->delta_IOxNotGetLive1 = (double*) Calloc(internal->dim_delta_IOxNotGetLive1, double);
+  Free(internal->delta_IOxNotGetLive2);
+  internal->delta_IOxNotGetLive2 = (double*) Calloc(internal->dim_delta_IOxNotGetLive2, double);
+  Free(internal->delta_IRec1);
+  internal->delta_IRec1 = (double*) Calloc(internal->dim_delta_IRec1, double);
+  Free(internal->delta_IRec2);
+  internal->delta_IRec2 = (double*) Calloc(internal->dim_delta_IRec2, double);
+  Free(internal->delta_R);
+  internal->delta_R = (double*) Calloc(internal->dim_delta_R, double);
+  Free(internal->initial_D_Community);
+  internal->initial_D_Community = (double*) Calloc(internal->dim_D_Community, double);
+  Free(internal->initial_D_Hospital);
+  internal->initial_D_Hospital = (double*) Calloc(internal->dim_D_Hospital, double);
+  Free(internal->initial_E1);
+  internal->initial_E1 = (double*) Calloc(internal->dim_E1, double);
+  Free(internal->initial_E2);
+  internal->initial_E2 = (double*) Calloc(internal->dim_E2, double);
+  Free(internal->initial_ICase1);
+  internal->initial_ICase1 = (double*) Calloc(internal->dim_ICase1, double);
+  Free(internal->initial_ICase2);
+  internal->initial_ICase2 = (double*) Calloc(internal->dim_ICase2, double);
+  Free(internal->initial_IMild);
+  internal->initial_IMild = (double*) Calloc(internal->dim_IMild, double);
+  Free(internal->initial_IMVGetDie1);
+  internal->initial_IMVGetDie1 = (double*) Calloc(internal->dim_IMVGetDie1, double);
+  Free(internal->initial_IMVGetDie2);
+  internal->initial_IMVGetDie2 = (double*) Calloc(internal->dim_IMVGetDie2, double);
+  Free(internal->initial_IMVGetLive1);
+  internal->initial_IMVGetLive1 = (double*) Calloc(internal->dim_IMVGetLive1, double);
+  Free(internal->initial_IMVGetLive2);
+  internal->initial_IMVGetLive2 = (double*) Calloc(internal->dim_IMVGetLive2, double);
+  Free(internal->initial_IMVNotGetDie1);
+  internal->initial_IMVNotGetDie1 = (double*) Calloc(internal->dim_IMVNotGetDie1, double);
+  Free(internal->initial_IMVNotGetDie2);
+  internal->initial_IMVNotGetDie2 = (double*) Calloc(internal->dim_IMVNotGetDie2, double);
+  Free(internal->initial_IMVNotGetLive1);
+  internal->initial_IMVNotGetLive1 = (double*) Calloc(internal->dim_IMVNotGetLive1, double);
+  Free(internal->initial_IMVNotGetLive2);
+  internal->initial_IMVNotGetLive2 = (double*) Calloc(internal->dim_IMVNotGetLive2, double);
+  Free(internal->initial_IOxGetDie1);
+  internal->initial_IOxGetDie1 = (double*) Calloc(internal->dim_IOxGetDie1, double);
+  Free(internal->initial_IOxGetDie2);
+  internal->initial_IOxGetDie2 = (double*) Calloc(internal->dim_IOxGetDie2, double);
+  Free(internal->initial_IOxGetLive1);
+  internal->initial_IOxGetLive1 = (double*) Calloc(internal->dim_IOxGetLive1, double);
+  Free(internal->initial_IOxGetLive2);
+  internal->initial_IOxGetLive2 = (double*) Calloc(internal->dim_IOxGetLive2, double);
+  Free(internal->initial_IOxNotGetDie1);
+  internal->initial_IOxNotGetDie1 = (double*) Calloc(internal->dim_IOxNotGetDie1, double);
+  Free(internal->initial_IOxNotGetDie2);
+  internal->initial_IOxNotGetDie2 = (double*) Calloc(internal->dim_IOxNotGetDie2, double);
+  Free(internal->initial_IOxNotGetLive1);
+  internal->initial_IOxNotGetLive1 = (double*) Calloc(internal->dim_IOxNotGetLive1, double);
+  Free(internal->initial_IOxNotGetLive2);
+  internal->initial_IOxNotGetLive2 = (double*) Calloc(internal->dim_IOxNotGetLive2, double);
+  Free(internal->initial_IRec1);
+  internal->initial_IRec1 = (double*) Calloc(internal->dim_IRec1, double);
+  Free(internal->initial_IRec2);
+  internal->initial_IRec2 = (double*) Calloc(internal->dim_IRec2, double);
+  Free(internal->initial_R);
+  internal->initial_R = (double*) Calloc(internal->dim_R, double);
+  Free(internal->initial_S);
+  internal->initial_S = (double*) Calloc(internal->dim_S, double);
+  Free(internal->lambda);
+  internal->lambda = (double*) Calloc(internal->dim_lambda, double);
+  Free(internal->n_E1_E2);
+  internal->n_E1_E2 = (double*) Calloc(internal->dim_n_E1_E2, double);
+  Free(internal->n_E2_I);
+  internal->n_E2_I = (double*) Calloc(internal->dim_n_E2_I, double);
+  Free(internal->n_E2_ICase1);
+  internal->n_E2_ICase1 = (double*) Calloc(internal->dim_n_E2_ICase1, double);
+  Free(internal->n_E2_IMild);
+  internal->n_E2_IMild = (double*) Calloc(internal->dim_n_E2_IMild, double);
+  Free(internal->n_ICase1_ICase2);
+  internal->n_ICase1_ICase2 = (double*) Calloc(internal->dim_n_ICase1_ICase2, double);
+  Free(internal->n_ICase2_Hosp);
+  internal->n_ICase2_Hosp = (double*) Calloc(internal->dim_n_ICase2_Hosp, double);
+  Free(internal->n_IMild_R);
+  internal->n_IMild_R = (double*) Calloc(internal->dim_n_IMild_R, double);
+  Free(internal->n_IMVGetDie1);
+  internal->n_IMVGetDie1 = (double*) Calloc(internal->dim_n_IMVGetDie1, double);
+  Free(internal->n_IMVGetDie1_IMVGetDie2);
+  internal->n_IMVGetDie1_IMVGetDie2 = (double*) Calloc(internal->dim_n_IMVGetDie1_IMVGetDie2, double);
+  Free(internal->n_IMVGetDie2_D);
+  internal->n_IMVGetDie2_D = (double*) Calloc(internal->dim_n_IMVGetDie2_D, double);
+  Free(internal->n_IMVGetLive1);
+  internal->n_IMVGetLive1 = (double*) Calloc(internal->dim_n_IMVGetLive1, double);
+  Free(internal->n_IMVGetLive1_IMVGetLive2);
+  internal->n_IMVGetLive1_IMVGetLive2 = (double*) Calloc(internal->dim_n_IMVGetLive1_IMVGetLive2, double);
+  Free(internal->n_IMVGetLive2_Rec);
+  internal->n_IMVGetLive2_Rec = (double*) Calloc(internal->dim_n_IMVGetLive2_Rec, double);
+  Free(internal->n_IMVNotGetDie1);
+  internal->n_IMVNotGetDie1 = (double*) Calloc(internal->dim_n_IMVNotGetDie1, double);
+  Free(internal->n_IMVNotGetDie1_IMVNotGetDie2);
+  internal->n_IMVNotGetDie1_IMVNotGetDie2 = (double*) Calloc(internal->dim_n_IMVNotGetDie1_IMVNotGetDie2, double);
+  Free(internal->n_IMVNotGetDie2_D);
+  internal->n_IMVNotGetDie2_D = (double*) Calloc(internal->dim_n_IMVNotGetDie2_D, double);
+  Free(internal->n_IMVNotGetLive1);
+  internal->n_IMVNotGetLive1 = (double*) Calloc(internal->dim_n_IMVNotGetLive1, double);
+  Free(internal->n_IMVNotGetLive1_IMVNotGetLive2);
+  internal->n_IMVNotGetLive1_IMVNotGetLive2 = (double*) Calloc(internal->dim_n_IMVNotGetLive1_IMVNotGetLive2, double);
+  Free(internal->n_IMVNotGetLive2_R);
+  internal->n_IMVNotGetLive2_R = (double*) Calloc(internal->dim_n_IMVNotGetLive2_R, double);
+  Free(internal->n_IOxGetDie1);
+  internal->n_IOxGetDie1 = (double*) Calloc(internal->dim_n_IOxGetDie1, double);
+  Free(internal->n_IOxGetDie1_IOxGetDie2);
+  internal->n_IOxGetDie1_IOxGetDie2 = (double*) Calloc(internal->dim_n_IOxGetDie1_IOxGetDie2, double);
+  Free(internal->n_IOxGetDie2_D);
+  internal->n_IOxGetDie2_D = (double*) Calloc(internal->dim_n_IOxGetDie2_D, double);
+  Free(internal->n_IOxGetLive1);
+  internal->n_IOxGetLive1 = (double*) Calloc(internal->dim_n_IOxGetLive1, double);
+  Free(internal->n_IOxGetLive1_IOxGetLive2);
+  internal->n_IOxGetLive1_IOxGetLive2 = (double*) Calloc(internal->dim_n_IOxGetLive1_IOxGetLive2, double);
+  Free(internal->n_IOxGetLive2_R);
+  internal->n_IOxGetLive2_R = (double*) Calloc(internal->dim_n_IOxGetLive2_R, double);
+  Free(internal->n_IOxNotGetDie1);
+  internal->n_IOxNotGetDie1 = (double*) Calloc(internal->dim_n_IOxNotGetDie1, double);
+  Free(internal->n_IOxNotGetDie1_IOxNotGetDie2);
+  internal->n_IOxNotGetDie1_IOxNotGetDie2 = (double*) Calloc(internal->dim_n_IOxNotGetDie1_IOxNotGetDie2, double);
+  Free(internal->n_IOxNotGetDie2_D);
+  internal->n_IOxNotGetDie2_D = (double*) Calloc(internal->dim_n_IOxNotGetDie2_D, double);
+  Free(internal->n_IOxNotGetLive1);
+  internal->n_IOxNotGetLive1 = (double*) Calloc(internal->dim_n_IOxNotGetLive1, double);
+  Free(internal->n_IOxNotGetLive1_IOxNotGetLive2);
+  internal->n_IOxNotGetLive1_IOxNotGetLive2 = (double*) Calloc(internal->dim_n_IOxNotGetLive1_IOxNotGetLive2, double);
+  Free(internal->n_IOxNotGetLive2_R);
+  internal->n_IOxNotGetLive2_R = (double*) Calloc(internal->dim_n_IOxNotGetLive2_R, double);
+  Free(internal->n_IRec1_IRec2);
+  internal->n_IRec1_IRec2 = (double*) Calloc(internal->dim_n_IRec1_IRec2, double);
+  Free(internal->n_IRec2_R);
+  internal->n_IRec2_R = (double*) Calloc(internal->dim_n_IRec2_R, double);
+  Free(internal->n_S_E1);
+  internal->n_S_E1 = (double*) Calloc(internal->dim_n_S_E1, double);
+  Free(internal->number_get_IMV);
+  internal->number_get_IMV = (int*) Calloc(internal->dim_number_get_IMV, int);
+  Free(internal->number_get_Ox);
+  internal->number_get_Ox = (int*) Calloc(internal->dim_number_get_Ox, int);
+  Free(internal->number_notget_IMV);
+  internal->number_notget_IMV = (double*) Calloc(internal->dim_number_notget_IMV, double);
+  Free(internal->number_notget_Ox);
+  internal->number_notget_Ox = (double*) Calloc(internal->dim_number_notget_Ox, double);
+  Free(internal->number_requiring_IMV);
+  internal->number_requiring_IMV = (double*) Calloc(internal->dim_number_requiring_IMV, double);
+  Free(internal->number_requiring_Ox);
+  internal->number_requiring_Ox = (double*) Calloc(internal->dim_number_requiring_Ox, double);
+  Free(internal->p_S_E1);
+  internal->p_S_E1 = (double*) Calloc(internal->dim_p_S_E1, double);
+  Free(internal->temp);
+  internal->temp = (double*) Calloc(internal->dim_temp, double);
+  internal->D_Community_0 = (double*) user_get_array(user, false, internal->D_Community_0, "D_Community_0", NA_REAL, NA_REAL, 1, internal->dim_D_Community_0);
+  internal->D_Hospital_0 = (double*) user_get_array(user, false, internal->D_Hospital_0, "D_Hospital_0", NA_REAL, NA_REAL, 1, internal->dim_D_Hospital_0);
+  internal->dim_beta_set = internal->dim_tt_beta;
+  internal->dim_hosp_beds = internal->dim_tt_hosp_beds;
+  internal->dim_ICU_beds = internal->dim_tt_ICU_beds;
+  internal->dim_m = internal->dim_m_1 * internal->dim_m_2;
+  internal->dim_mix_mat_set_1 = internal->dim_tt_matrix;
+  internal->dim_mix_mat_set_2 = internal->N_age;
+  internal->dim_mix_mat_set_3 = internal->N_age;
+  internal->dim_s_ij = internal->dim_s_ij_1 * internal->dim_s_ij_2;
+  internal->E1_0 = (double*) user_get_array(user, false, internal->E1_0, "E1_0", NA_REAL, NA_REAL, 1, internal->dim_E1_0);
+  internal->E2_0 = (double*) user_get_array(user, false, internal->E2_0, "E2_0", NA_REAL, NA_REAL, 1, internal->dim_E2_0);
+  internal->ICase1_0 = (double*) user_get_array(user, false, internal->ICase1_0, "ICase1_0", NA_REAL, NA_REAL, 1, internal->dim_ICase1_0);
+  internal->ICase2_0 = (double*) user_get_array(user, false, internal->ICase2_0, "ICase2_0", NA_REAL, NA_REAL, 1, internal->dim_ICase2_0);
+  internal->IMild_0 = (double*) user_get_array(user, false, internal->IMild_0, "IMild_0", NA_REAL, NA_REAL, 1, internal->dim_IMild_0);
+  internal->IMVGetDie1_0 = (double*) user_get_array(user, false, internal->IMVGetDie1_0, "IMVGetDie1_0", NA_REAL, NA_REAL, 1, internal->dim_IMVGetDie1_0);
+  internal->IMVGetDie2_0 = (double*) user_get_array(user, false, internal->IMVGetDie2_0, "IMVGetDie2_0", NA_REAL, NA_REAL, 1, internal->dim_IMVGetDie2_0);
+  internal->IMVGetLive1_0 = (double*) user_get_array(user, false, internal->IMVGetLive1_0, "IMVGetLive1_0", NA_REAL, NA_REAL, 1, internal->dim_IMVGetLive1_0);
+  internal->IMVGetLive2_0 = (double*) user_get_array(user, false, internal->IMVGetLive2_0, "IMVGetLive2_0", NA_REAL, NA_REAL, 1, internal->dim_IMVGetLive2_0);
+  internal->IMVNotGetDie1_0 = (double*) user_get_array(user, false, internal->IMVNotGetDie1_0, "IMVNotGetDie1_0", NA_REAL, NA_REAL, 1, internal->dim_IMVNotGetDie1_0);
+  internal->IMVNotGetDie2_0 = (double*) user_get_array(user, false, internal->IMVNotGetDie2_0, "IMVNotGetDie2_0", NA_REAL, NA_REAL, 1, internal->dim_IMVNotGetDie2_0);
+  internal->IMVNotGetLive1_0 = (double*) user_get_array(user, false, internal->IMVNotGetLive1_0, "IMVNotGetLive1_0", NA_REAL, NA_REAL, 1, internal->dim_IMVNotGetLive1_0);
+  internal->IMVNotGetLive2_0 = (double*) user_get_array(user, false, internal->IMVNotGetLive2_0, "IMVNotGetLive2_0", NA_REAL, NA_REAL, 1, internal->dim_IMVNotGetLive2_0);
+  internal->IOxGetDie1_0 = (double*) user_get_array(user, false, internal->IOxGetDie1_0, "IOxGetDie1_0", NA_REAL, NA_REAL, 1, internal->dim_IOxGetDie1_0);
+  internal->IOxGetDie2_0 = (double*) user_get_array(user, false, internal->IOxGetDie2_0, "IOxGetDie2_0", NA_REAL, NA_REAL, 1, internal->dim_IOxGetDie2_0);
+  internal->IOxGetLive1_0 = (double*) user_get_array(user, false, internal->IOxGetLive1_0, "IOxGetLive1_0", NA_REAL, NA_REAL, 1, internal->dim_IOxGetLive1_0);
+  internal->IOxGetLive2_0 = (double*) user_get_array(user, false, internal->IOxGetLive2_0, "IOxGetLive2_0", NA_REAL, NA_REAL, 1, internal->dim_IOxGetLive2_0);
+  internal->IOxNotGetDie1_0 = (double*) user_get_array(user, false, internal->IOxNotGetDie1_0, "IOxNotGetDie1_0", NA_REAL, NA_REAL, 1, internal->dim_IOxNotGetDie1_0);
+  internal->IOxNotGetDie2_0 = (double*) user_get_array(user, false, internal->IOxNotGetDie2_0, "IOxNotGetDie2_0", NA_REAL, NA_REAL, 1, internal->dim_IOxNotGetDie2_0);
+  internal->IOxNotGetLive1_0 = (double*) user_get_array(user, false, internal->IOxNotGetLive1_0, "IOxNotGetLive1_0", NA_REAL, NA_REAL, 1, internal->dim_IOxNotGetLive1_0);
+  internal->IOxNotGetLive2_0 = (double*) user_get_array(user, false, internal->IOxNotGetLive2_0, "IOxNotGetLive2_0", NA_REAL, NA_REAL, 1, internal->dim_IOxNotGetLive2_0);
+  internal->IRec1_0 = (double*) user_get_array(user, false, internal->IRec1_0, "IRec1_0", NA_REAL, NA_REAL, 1, internal->dim_IRec1_0);
+  internal->IRec2_0 = (double*) user_get_array(user, false, internal->IRec2_0, "IRec2_0", NA_REAL, NA_REAL, 1, internal->dim_IRec2_0);
+  internal->offset_output_delta_D_Hospital = 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild + internal->dim_number_requiring_IMV;
+  internal->offset_output_n_E2_ICase1 = 1 + internal->dim_n_E2_I;
+  internal->offset_output_n_E2_IMild = 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1;
+  internal->offset_output_number_requiring_IMV = 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild;
+  internal->offset_variable_D_Community = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1 + internal->dim_IMVNotGetLive2 + internal->dim_IMVNotGetDie1 + internal->dim_IMVNotGetDie2 + internal->dim_IRec1 + internal->dim_IRec2 + internal->dim_R;
+  internal->offset_variable_D_Hospital = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1 + internal->dim_IMVNotGetLive2 + internal->dim_IMVNotGetDie1 + internal->dim_IMVNotGetDie2 + internal->dim_IRec1 + internal->dim_IRec2 + internal->dim_R + internal->dim_D_Community;
+  internal->offset_variable_E2 = internal->dim_S + internal->dim_E1;
+  internal->offset_variable_ICase1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild;
+  internal->offset_variable_ICase2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1;
+  internal->offset_variable_IMild = internal->dim_S + internal->dim_E1 + internal->dim_E2;
+  internal->offset_variable_IMVGetDie1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2;
+  internal->offset_variable_IMVGetDie2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1;
+  internal->offset_variable_IMVGetLive1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2;
+  internal->offset_variable_IMVGetLive2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1;
+  internal->offset_variable_IMVNotGetDie1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1 + internal->dim_IMVNotGetLive2;
+  internal->offset_variable_IMVNotGetDie2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1 + internal->dim_IMVNotGetLive2 + internal->dim_IMVNotGetDie1;
+  internal->offset_variable_IMVNotGetLive1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2;
+  internal->offset_variable_IMVNotGetLive2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1;
+  internal->offset_variable_IOxGetDie1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2;
+  internal->offset_variable_IOxGetDie2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1;
+  internal->offset_variable_IOxGetLive1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2;
+  internal->offset_variable_IOxGetLive2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1;
+  internal->offset_variable_IOxNotGetDie1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2;
+  internal->offset_variable_IOxNotGetDie2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1;
+  internal->offset_variable_IOxNotGetLive1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2;
+  internal->offset_variable_IOxNotGetLive2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1;
+  internal->offset_variable_IRec1 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1 + internal->dim_IMVNotGetLive2 + internal->dim_IMVNotGetDie1 + internal->dim_IMVNotGetDie2;
+  internal->offset_variable_IRec2 = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1 + internal->dim_IMVNotGetLive2 + internal->dim_IMVNotGetDie1 + internal->dim_IMVNotGetDie2 + internal->dim_IRec1;
+  internal->offset_variable_R = internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1 + internal->dim_IMVNotGetLive2 + internal->dim_IMVNotGetDie1 + internal->dim_IMVNotGetDie2 + internal->dim_IRec1 + internal->dim_IRec2;
+  internal->prob_hosp = (double*) user_get_array(user, false, internal->prob_hosp, "prob_hosp", NA_REAL, NA_REAL, 1, internal->dim_prob_hosp);
+  internal->prob_non_severe_death_no_treatment = (double*) user_get_array(user, false, internal->prob_non_severe_death_no_treatment, "prob_non_severe_death_no_treatment", NA_REAL, NA_REAL, 1, internal->dim_prob_non_severe_death_no_treatment);
+  internal->prob_non_severe_death_treatment = (double*) user_get_array(user, false, internal->prob_non_severe_death_treatment, "prob_non_severe_death_treatment", NA_REAL, NA_REAL, 1, internal->dim_prob_non_severe_death_treatment);
+  internal->prob_severe = (double*) user_get_array(user, false, internal->prob_severe, "prob_severe", NA_REAL, NA_REAL, 1, internal->dim_prob_severe);
+  internal->prob_severe_death_no_treatment = (double*) user_get_array(user, false, internal->prob_severe_death_no_treatment, "prob_severe_death_no_treatment", NA_REAL, NA_REAL, 1, internal->dim_prob_severe_death_no_treatment);
+  internal->prob_severe_death_treatment = (double*) user_get_array(user, false, internal->prob_severe_death_treatment, "prob_severe_death_treatment", NA_REAL, NA_REAL, 1, internal->dim_prob_severe_death_treatment);
+  internal->R_0 = (double*) user_get_array(user, false, internal->R_0, "R_0", NA_REAL, NA_REAL, 1, internal->dim_R_0);
+  internal->S_0 = (double*) user_get_array(user, false, internal->S_0, "S_0", NA_REAL, NA_REAL, 1, internal->dim_S_0);
+  Free(internal->m);
+  internal->m = (double*) Calloc(internal->dim_m, double);
+  Free(internal->s_ij);
+  internal->s_ij = (double*) Calloc(internal->dim_s_ij, double);
+  internal->beta_set = (double*) user_get_array(user, false, internal->beta_set, "beta_set", NA_REAL, NA_REAL, 1, internal->dim_beta_set);
+  internal->dim_mix_mat_set = internal->dim_mix_mat_set_1 * internal->dim_mix_mat_set_2 * internal->dim_mix_mat_set_3;
+  internal->dim_mix_mat_set_12 = internal->dim_mix_mat_set_1 * internal->dim_mix_mat_set_2;
+  internal->hosp_beds = (double*) user_get_array(user, false, internal->hosp_beds, "hosp_beds", NA_REAL, NA_REAL, 1, internal->dim_hosp_beds);
+  internal->ICU_beds = (double*) user_get_array(user, false, internal->ICU_beds, "ICU_beds", NA_REAL, NA_REAL, 1, internal->dim_ICU_beds);
+  for (int i = 1; i <= internal->dim_D_Community; ++i) {
+    internal->initial_D_Community[i - 1] = internal->D_Community_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_D_Hospital; ++i) {
+    internal->initial_D_Hospital[i - 1] = internal->D_Hospital_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_E1; ++i) {
+    internal->initial_E1[i - 1] = internal->E1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_E2; ++i) {
+    internal->initial_E2[i - 1] = internal->E2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_ICase1; ++i) {
+    internal->initial_ICase1[i - 1] = internal->ICase1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_ICase2; ++i) {
+    internal->initial_ICase2[i - 1] = internal->ICase2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMild; ++i) {
+    internal->initial_IMild[i - 1] = internal->IMild_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVGetDie1; ++i) {
+    internal->initial_IMVGetDie1[i - 1] = internal->IMVGetDie1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVGetDie2; ++i) {
+    internal->initial_IMVGetDie2[i - 1] = internal->IMVGetDie2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVGetLive1; ++i) {
+    internal->initial_IMVGetLive1[i - 1] = internal->IMVGetLive1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVGetLive2; ++i) {
+    internal->initial_IMVGetLive2[i - 1] = internal->IMVGetLive2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVNotGetDie1; ++i) {
+    internal->initial_IMVNotGetDie1[i - 1] = internal->IMVNotGetDie1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVNotGetDie2; ++i) {
+    internal->initial_IMVNotGetDie2[i - 1] = internal->IMVNotGetDie2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVNotGetLive1; ++i) {
+    internal->initial_IMVNotGetLive1[i - 1] = internal->IMVNotGetLive1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVNotGetLive2; ++i) {
+    internal->initial_IMVNotGetLive2[i - 1] = internal->IMVNotGetLive2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxGetDie1; ++i) {
+    internal->initial_IOxGetDie1[i - 1] = internal->IOxGetDie1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxGetDie2; ++i) {
+    internal->initial_IOxGetDie2[i - 1] = internal->IOxGetDie2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxGetLive1; ++i) {
+    internal->initial_IOxGetLive1[i - 1] = internal->IOxGetLive1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxGetLive2; ++i) {
+    internal->initial_IOxGetLive2[i - 1] = internal->IOxGetLive2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxNotGetDie1; ++i) {
+    internal->initial_IOxNotGetDie1[i - 1] = internal->IOxNotGetDie1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxNotGetDie2; ++i) {
+    internal->initial_IOxNotGetDie2[i - 1] = internal->IOxNotGetDie2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxNotGetLive1; ++i) {
+    internal->initial_IOxNotGetLive1[i - 1] = internal->IOxNotGetLive1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxNotGetLive2; ++i) {
+    internal->initial_IOxNotGetLive2[i - 1] = internal->IOxNotGetLive2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IRec1; ++i) {
+    internal->initial_IRec1[i - 1] = internal->IRec1_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IRec2; ++i) {
+    internal->initial_IRec2[i - 1] = internal->IRec2_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_R; ++i) {
+    internal->initial_R[i - 1] = internal->R_0[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_S; ++i) {
+    internal->initial_S[i - 1] = internal->S_0[i - 1];
+  }
+  interpolate_check_y(internal->dim_tt_beta, internal->dim_beta_set, 0, "beta_set", "beta");
+  cinterpolate_free(internal->interpolate_beta);
+  internal->interpolate_beta = cinterpolate_alloc("constant", internal->dim_tt_beta, 1, internal->tt_beta, internal->beta_set, true, false);
+  interpolate_check_y(internal->dim_tt_hosp_beds, internal->dim_hosp_beds, 0, "hosp_beds", "hosp_bed_capacity");
+  cinterpolate_free(internal->interpolate_hosp_bed_capacity);
+  internal->interpolate_hosp_bed_capacity = cinterpolate_alloc("constant", internal->dim_tt_hosp_beds, 1, internal->tt_hosp_beds, internal->hosp_beds, true, false);
+  interpolate_check_y(internal->dim_tt_ICU_beds, internal->dim_ICU_beds, 0, "ICU_beds", "ICU_bed_capacity");
+  cinterpolate_free(internal->interpolate_ICU_bed_capacity);
+  internal->interpolate_ICU_bed_capacity = cinterpolate_alloc("constant", internal->dim_tt_ICU_beds, 1, internal->tt_ICU_beds, internal->ICU_beds, true, false);
+  internal->mix_mat_set = (double*) user_get_array(user, false, internal->mix_mat_set, "mix_mat_set", NA_REAL, NA_REAL, 3, internal->dim_mix_mat_set_1, internal->dim_mix_mat_set_2, internal->dim_mix_mat_set_3);
+  interpolate_check_y(internal->dim_tt_matrix, internal->dim_mix_mat_set_1, 1, "mix_mat_set", "m");
+  interpolate_check_y(internal->dim_m_1, internal->dim_mix_mat_set_2, 2, "mix_mat_set", "m");
+  interpolate_check_y(internal->dim_m_2, internal->dim_mix_mat_set_3, 3, "mix_mat_set", "m");
+  cinterpolate_free(internal->interpolate_m);
+  internal->interpolate_m = cinterpolate_alloc("constant", internal->dim_tt_matrix, internal->dim_m, internal->tt_matrix, internal->mix_mat_set, true, false);
+  return R_NilValue;
+}
+SEXP updated_healthcare_rep_SEIR_metadata(SEXP internal_p) {
+  updated_healthcare_rep_SEIR_internal *internal = updated_healthcare_rep_SEIR_get_internal(internal_p, 1);
+  SEXP ret = PROTECT(allocVector(VECSXP, 4));
+  SEXP nms = PROTECT(allocVector(STRSXP, 4));
+  SET_STRING_ELT(nms, 0, mkChar("variable_order"));
+  SET_STRING_ELT(nms, 1, mkChar("output_order"));
+  SET_STRING_ELT(nms, 2, mkChar("n_out"));
+  SET_STRING_ELT(nms, 3, mkChar("interpolate_t"));
+  setAttrib(ret, R_NamesSymbol, nms);
+  SEXP variable_length = PROTECT(allocVector(VECSXP, 27));
+  SEXP variable_names = PROTECT(allocVector(STRSXP, 27));
+  setAttrib(variable_length, R_NamesSymbol, variable_names);
+  SET_VECTOR_ELT(variable_length, 0, ScalarInteger(internal->dim_S));
+  SET_VECTOR_ELT(variable_length, 1, ScalarInteger(internal->dim_E1));
+  SET_VECTOR_ELT(variable_length, 2, ScalarInteger(internal->dim_E2));
+  SET_VECTOR_ELT(variable_length, 3, ScalarInteger(internal->dim_IMild));
+  SET_VECTOR_ELT(variable_length, 4, ScalarInteger(internal->dim_ICase1));
+  SET_VECTOR_ELT(variable_length, 5, ScalarInteger(internal->dim_ICase2));
+  SET_VECTOR_ELT(variable_length, 6, ScalarInteger(internal->dim_IOxGetLive1));
+  SET_VECTOR_ELT(variable_length, 7, ScalarInteger(internal->dim_IOxGetLive2));
+  SET_VECTOR_ELT(variable_length, 8, ScalarInteger(internal->dim_IOxGetDie1));
+  SET_VECTOR_ELT(variable_length, 9, ScalarInteger(internal->dim_IOxGetDie2));
+  SET_VECTOR_ELT(variable_length, 10, ScalarInteger(internal->dim_IOxNotGetLive1));
+  SET_VECTOR_ELT(variable_length, 11, ScalarInteger(internal->dim_IOxNotGetLive2));
+  SET_VECTOR_ELT(variable_length, 12, ScalarInteger(internal->dim_IOxNotGetDie1));
+  SET_VECTOR_ELT(variable_length, 13, ScalarInteger(internal->dim_IOxNotGetDie2));
+  SET_VECTOR_ELT(variable_length, 14, ScalarInteger(internal->dim_IMVGetLive1));
+  SET_VECTOR_ELT(variable_length, 15, ScalarInteger(internal->dim_IMVGetLive2));
+  SET_VECTOR_ELT(variable_length, 16, ScalarInteger(internal->dim_IMVGetDie1));
+  SET_VECTOR_ELT(variable_length, 17, ScalarInteger(internal->dim_IMVGetDie2));
+  SET_VECTOR_ELT(variable_length, 18, ScalarInteger(internal->dim_IMVNotGetLive1));
+  SET_VECTOR_ELT(variable_length, 19, ScalarInteger(internal->dim_IMVNotGetLive2));
+  SET_VECTOR_ELT(variable_length, 20, ScalarInteger(internal->dim_IMVNotGetDie1));
+  SET_VECTOR_ELT(variable_length, 21, ScalarInteger(internal->dim_IMVNotGetDie2));
+  SET_VECTOR_ELT(variable_length, 22, ScalarInteger(internal->dim_IRec1));
+  SET_VECTOR_ELT(variable_length, 23, ScalarInteger(internal->dim_IRec2));
+  SET_VECTOR_ELT(variable_length, 24, ScalarInteger(internal->dim_R));
+  SET_VECTOR_ELT(variable_length, 25, ScalarInteger(internal->dim_D_Community));
+  SET_VECTOR_ELT(variable_length, 26, ScalarInteger(internal->dim_D_Hospital));
+  SET_STRING_ELT(variable_names, 0, mkChar("S"));
+  SET_STRING_ELT(variable_names, 1, mkChar("E1"));
+  SET_STRING_ELT(variable_names, 2, mkChar("E2"));
+  SET_STRING_ELT(variable_names, 3, mkChar("IMild"));
+  SET_STRING_ELT(variable_names, 4, mkChar("ICase1"));
+  SET_STRING_ELT(variable_names, 5, mkChar("ICase2"));
+  SET_STRING_ELT(variable_names, 6, mkChar("IOxGetLive1"));
+  SET_STRING_ELT(variable_names, 7, mkChar("IOxGetLive2"));
+  SET_STRING_ELT(variable_names, 8, mkChar("IOxGetDie1"));
+  SET_STRING_ELT(variable_names, 9, mkChar("IOxGetDie2"));
+  SET_STRING_ELT(variable_names, 10, mkChar("IOxNotGetLive1"));
+  SET_STRING_ELT(variable_names, 11, mkChar("IOxNotGetLive2"));
+  SET_STRING_ELT(variable_names, 12, mkChar("IOxNotGetDie1"));
+  SET_STRING_ELT(variable_names, 13, mkChar("IOxNotGetDie2"));
+  SET_STRING_ELT(variable_names, 14, mkChar("IMVGetLive1"));
+  SET_STRING_ELT(variable_names, 15, mkChar("IMVGetLive2"));
+  SET_STRING_ELT(variable_names, 16, mkChar("IMVGetDie1"));
+  SET_STRING_ELT(variable_names, 17, mkChar("IMVGetDie2"));
+  SET_STRING_ELT(variable_names, 18, mkChar("IMVNotGetLive1"));
+  SET_STRING_ELT(variable_names, 19, mkChar("IMVNotGetLive2"));
+  SET_STRING_ELT(variable_names, 20, mkChar("IMVNotGetDie1"));
+  SET_STRING_ELT(variable_names, 21, mkChar("IMVNotGetDie2"));
+  SET_STRING_ELT(variable_names, 22, mkChar("IRec1"));
+  SET_STRING_ELT(variable_names, 23, mkChar("IRec2"));
+  SET_STRING_ELT(variable_names, 24, mkChar("R"));
+  SET_STRING_ELT(variable_names, 25, mkChar("D_Community"));
+  SET_STRING_ELT(variable_names, 26, mkChar("D_Hospital"));
+  SET_VECTOR_ELT(ret, 0, variable_length);
+  UNPROTECT(2);
+  SEXP output_length = PROTECT(allocVector(VECSXP, 6));
+  SEXP output_names = PROTECT(allocVector(STRSXP, 6));
+  setAttrib(output_length, R_NamesSymbol, output_names);
+  SET_VECTOR_ELT(output_length, 0, R_NilValue);
+  SET_VECTOR_ELT(output_length, 1, ScalarInteger(internal->dim_n_E2_I));
+  SET_VECTOR_ELT(output_length, 2, ScalarInteger(internal->dim_n_E2_ICase1));
+  SET_VECTOR_ELT(output_length, 3, ScalarInteger(internal->dim_n_E2_IMild));
+  SET_VECTOR_ELT(output_length, 4, ScalarInteger(internal->dim_number_requiring_IMV));
+  SET_VECTOR_ELT(output_length, 5, ScalarInteger(internal->dim_delta_D_Hospital));
+  SET_STRING_ELT(output_names, 0, mkChar("time"));
+  SET_STRING_ELT(output_names, 1, mkChar("n_E2_I"));
+  SET_STRING_ELT(output_names, 2, mkChar("n_E2_ICase1"));
+  SET_STRING_ELT(output_names, 3, mkChar("n_E2_IMild"));
+  SET_STRING_ELT(output_names, 4, mkChar("number_requiring_IMV"));
+  SET_STRING_ELT(output_names, 5, mkChar("delta_D_Hospital"));
+  SET_VECTOR_ELT(ret, 1, output_length);
+  UNPROTECT(2);
+  SET_VECTOR_ELT(ret, 2, ScalarInteger(1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild + internal->dim_number_requiring_IMV + internal->dim_delta_D_Hospital));
+  SEXP interpolate_t = PROTECT(allocVector(VECSXP, 3));
+  SEXP interpolate_t_nms = PROTECT(allocVector(STRSXP, 3));
+  setAttrib(interpolate_t, R_NamesSymbol, interpolate_t_nms);
+  SET_VECTOR_ELT(interpolate_t, 0, ScalarReal(fmax(internal->tt_beta[0], fmax(internal->tt_hosp_beds[0], fmax(internal->tt_ICU_beds[0], internal->tt_matrix[0])))));
+  SET_VECTOR_ELT(interpolate_t, 1, ScalarReal(R_PosInf));
+  SET_STRING_ELT(interpolate_t_nms, 0, mkChar("min"));
+  SET_STRING_ELT(interpolate_t_nms, 1, mkChar("max"));
+  SET_VECTOR_ELT(ret, 3, interpolate_t);
+  UNPROTECT(2);
+  UNPROTECT(2);
+  return ret;
+}
+SEXP updated_healthcare_rep_SEIR_initial_conditions(SEXP internal_p, SEXP step_ptr) {
+  updated_healthcare_rep_SEIR_internal *internal = updated_healthcare_rep_SEIR_get_internal(internal_p, 1);
+  SEXP r_state = PROTECT(allocVector(REALSXP, internal->dim_S + internal->dim_E1 + internal->dim_E2 + internal->dim_IMild + internal->dim_ICase1 + internal->dim_ICase2 + internal->dim_IOxGetLive1 + internal->dim_IOxGetLive2 + internal->dim_IOxGetDie1 + internal->dim_IOxGetDie2 + internal->dim_IOxNotGetLive1 + internal->dim_IOxNotGetLive2 + internal->dim_IOxNotGetDie1 + internal->dim_IOxNotGetDie2 + internal->dim_IMVGetLive1 + internal->dim_IMVGetLive2 + internal->dim_IMVGetDie1 + internal->dim_IMVGetDie2 + internal->dim_IMVNotGetLive1 + internal->dim_IMVNotGetLive2 + internal->dim_IMVNotGetDie1 + internal->dim_IMVNotGetDie2 + internal->dim_IRec1 + internal->dim_IRec2 + internal->dim_R + internal->dim_D_Community + internal->dim_D_Hospital));
+  double * state = REAL(r_state);
+  memcpy(state + 0, internal->initial_S, internal->dim_S * sizeof(double));
+  memcpy(state + internal->dim_S, internal->initial_E1, internal->dim_E1 * sizeof(double));
+  memcpy(state + internal->offset_variable_E2, internal->initial_E2, internal->dim_E2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMild, internal->initial_IMild, internal->dim_IMild * sizeof(double));
+  memcpy(state + internal->offset_variable_ICase1, internal->initial_ICase1, internal->dim_ICase1 * sizeof(double));
+  memcpy(state + internal->offset_variable_ICase2, internal->initial_ICase2, internal->dim_ICase2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IOxGetLive1, internal->initial_IOxGetLive1, internal->dim_IOxGetLive1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IOxGetLive2, internal->initial_IOxGetLive2, internal->dim_IOxGetLive2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IOxGetDie1, internal->initial_IOxGetDie1, internal->dim_IOxGetDie1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IOxGetDie2, internal->initial_IOxGetDie2, internal->dim_IOxGetDie2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IOxNotGetLive1, internal->initial_IOxNotGetLive1, internal->dim_IOxNotGetLive1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IOxNotGetLive2, internal->initial_IOxNotGetLive2, internal->dim_IOxNotGetLive2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IOxNotGetDie1, internal->initial_IOxNotGetDie1, internal->dim_IOxNotGetDie1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IOxNotGetDie2, internal->initial_IOxNotGetDie2, internal->dim_IOxNotGetDie2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMVGetLive1, internal->initial_IMVGetLive1, internal->dim_IMVGetLive1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMVGetLive2, internal->initial_IMVGetLive2, internal->dim_IMVGetLive2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMVGetDie1, internal->initial_IMVGetDie1, internal->dim_IMVGetDie1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMVGetDie2, internal->initial_IMVGetDie2, internal->dim_IMVGetDie2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMVNotGetLive1, internal->initial_IMVNotGetLive1, internal->dim_IMVNotGetLive1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMVNotGetLive2, internal->initial_IMVNotGetLive2, internal->dim_IMVNotGetLive2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMVNotGetDie1, internal->initial_IMVNotGetDie1, internal->dim_IMVNotGetDie1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IMVNotGetDie2, internal->initial_IMVNotGetDie2, internal->dim_IMVNotGetDie2 * sizeof(double));
+  memcpy(state + internal->offset_variable_IRec1, internal->initial_IRec1, internal->dim_IRec1 * sizeof(double));
+  memcpy(state + internal->offset_variable_IRec2, internal->initial_IRec2, internal->dim_IRec2 * sizeof(double));
+  memcpy(state + internal->offset_variable_R, internal->initial_R, internal->dim_R * sizeof(double));
+  memcpy(state + internal->offset_variable_D_Community, internal->initial_D_Community, internal->dim_D_Community * sizeof(double));
+  memcpy(state + internal->offset_variable_D_Hospital, internal->initial_D_Hospital, internal->dim_D_Hospital * sizeof(double));
+  UNPROTECT(1);
+  return r_state;
+}
+void updated_healthcare_rep_SEIR_rhs(updated_healthcare_rep_SEIR_internal* internal, size_t step, double * state, double * state_next, double * output) {
+  double * S = state + 0;
+  double * E1 = state + internal->dim_S;
+  double * E2 = state + internal->offset_variable_E2;
+  double * IMild = state + internal->offset_variable_IMild;
+  double * ICase1 = state + internal->offset_variable_ICase1;
+  double * ICase2 = state + internal->offset_variable_ICase2;
+  double * IOxGetLive1 = state + internal->offset_variable_IOxGetLive1;
+  double * IOxGetLive2 = state + internal->offset_variable_IOxGetLive2;
+  double * IOxGetDie1 = state + internal->offset_variable_IOxGetDie1;
+  double * IOxGetDie2 = state + internal->offset_variable_IOxGetDie2;
+  double * IOxNotGetLive1 = state + internal->offset_variable_IOxNotGetLive1;
+  double * IOxNotGetLive2 = state + internal->offset_variable_IOxNotGetLive2;
+  double * IOxNotGetDie1 = state + internal->offset_variable_IOxNotGetDie1;
+  double * IOxNotGetDie2 = state + internal->offset_variable_IOxNotGetDie2;
+  double * IMVGetLive1 = state + internal->offset_variable_IMVGetLive1;
+  double * IMVGetLive2 = state + internal->offset_variable_IMVGetLive2;
+  double * IMVGetDie1 = state + internal->offset_variable_IMVGetDie1;
+  double * IMVGetDie2 = state + internal->offset_variable_IMVGetDie2;
+  double * IMVNotGetLive1 = state + internal->offset_variable_IMVNotGetLive1;
+  double * IMVNotGetLive2 = state + internal->offset_variable_IMVNotGetLive2;
+  double * IMVNotGetDie1 = state + internal->offset_variable_IMVNotGetDie1;
+  double * IMVNotGetDie2 = state + internal->offset_variable_IMVNotGetDie2;
+  double * IRec1 = state + internal->offset_variable_IRec1;
+  double * IRec2 = state + internal->offset_variable_IRec2;
+  double * R = state + internal->offset_variable_R;
+  double * D_Community = state + internal->offset_variable_D_Community;
+  double * D_Hospital = state + internal->offset_variable_D_Hospital;
+  double hosp_occ = odin_sum1(IOxGetLive1, 0, internal->dim_IOxGetLive1) + odin_sum1(IOxGetLive2, 0, internal->dim_IOxGetLive2) + odin_sum1(IOxGetDie1, 0, internal->dim_IOxGetDie1) + odin_sum1(IOxGetDie2, 0, internal->dim_IOxGetDie2) + odin_sum1(IRec1, 0, internal->dim_IRec1) + odin_sum1(IRec2, 0, internal->dim_IRec2);
+  double ICU_occ = odin_sum1(IMVGetLive1, 0, internal->dim_IMVGetLive1) + odin_sum1(IMVGetLive2, 0, internal->dim_IMVGetLive2) + odin_sum1(IMVGetDie1, 0, internal->dim_IMVGetDie1) + odin_sum1(IMVGetDie2, 0, internal->dim_IMVGetDie2);
+  for (int i = 1; i <= internal->dim_n_E1_E2; ++i) {
+    internal->n_E1_E2[i - 1] = Rf_rbinom(round(E1[i - 1]), internal->p_E1_E2);
+  }
+  for (int i = 1; i <= internal->dim_n_E2_I; ++i) {
+    internal->n_E2_I[i - 1] = Rf_rbinom(round(E2[i - 1]), internal->p_E2_I);
+  }
+  for (int i = 1; i <= internal->dim_n_ICase1_ICase2; ++i) {
+    internal->n_ICase1_ICase2[i - 1] = Rf_rbinom(round(ICase1[i - 1]), internal->p_ICase1_ICase2);
+  }
+  for (int i = 1; i <= internal->dim_n_ICase2_Hosp; ++i) {
+    internal->n_ICase2_Hosp[i - 1] = Rf_rbinom(round(ICase2[i - 1]), internal->p_ICase2_Hosp);
+  }
+  for (int i = 1; i <= internal->dim_n_IMild_R; ++i) {
+    internal->n_IMild_R[i - 1] = Rf_rbinom(round(IMild[i - 1]), internal->p_IMild_R);
+  }
+  for (int i = 1; i <= internal->dim_n_IMVGetDie1_IMVGetDie2; ++i) {
+    internal->n_IMVGetDie1_IMVGetDie2[i - 1] = Rf_rbinom(round(IMVGetDie1[i - 1]), internal->p_IMVGetDie1_IMVGetDie2);
+  }
+  for (int i = 1; i <= internal->dim_n_IMVGetDie2_D; ++i) {
+    internal->n_IMVGetDie2_D[i - 1] = Rf_rbinom(round(IMVGetDie2[i - 1]), internal->p_IMVGetDie2_D);
+  }
+  for (int i = 1; i <= internal->dim_n_IMVGetLive1_IMVGetLive2; ++i) {
+    internal->n_IMVGetLive1_IMVGetLive2[i - 1] = Rf_rbinom(round(IMVGetLive1[i - 1]), internal->p_IMVGetLive1_IMVGetLive2);
+  }
+  for (int i = 1; i <= internal->dim_n_IMVGetLive2_Rec; ++i) {
+    internal->n_IMVGetLive2_Rec[i - 1] = Rf_rbinom(round(IMVGetLive2[i - 1]), internal->p_IMVGetLive2_Rec);
+  }
+  for (int i = 1; i <= internal->dim_n_IMVNotGetDie1_IMVNotGetDie2; ++i) {
+    internal->n_IMVNotGetDie1_IMVNotGetDie2[i - 1] = Rf_rbinom(round(IMVNotGetDie1[i - 1]), internal->p_IMVNotGetDie1_IMVNotGetDie2);
+  }
+  for (int i = 1; i <= internal->dim_n_IMVNotGetDie2_D; ++i) {
+    internal->n_IMVNotGetDie2_D[i - 1] = Rf_rbinom(round(IMVNotGetDie2[i - 1]), internal->p_IMVNotGetDie2_D);
+  }
+  for (int i = 1; i <= internal->dim_n_IMVNotGetLive1_IMVNotGetLive2; ++i) {
+    internal->n_IMVNotGetLive1_IMVNotGetLive2[i - 1] = Rf_rbinom(round(IMVNotGetLive1[i - 1]), internal->p_IMVNotGetLive1_IMVNotGetLive2);
+  }
+  for (int i = 1; i <= internal->dim_n_IMVNotGetLive2_R; ++i) {
+    internal->n_IMVNotGetLive2_R[i - 1] = Rf_rbinom(round(IMVNotGetLive2[i - 1]), internal->p_IMVNotGetLive2_R);
+  }
+  for (int i = 1; i <= internal->dim_n_IOxGetDie1_IOxGetDie2; ++i) {
+    internal->n_IOxGetDie1_IOxGetDie2[i - 1] = Rf_rbinom(round(IOxGetDie1[i - 1]), internal->p_IOxGetDie1_IOxGetDie2);
+  }
+  for (int i = 1; i <= internal->dim_n_IOxGetDie2_D; ++i) {
+    internal->n_IOxGetDie2_D[i - 1] = Rf_rbinom(round(IOxGetDie2[i - 1]), internal->p_IOxGetDie2_D);
+  }
+  for (int i = 1; i <= internal->dim_n_IOxGetLive1_IOxGetLive2; ++i) {
+    internal->n_IOxGetLive1_IOxGetLive2[i - 1] = Rf_rbinom(round(IOxGetLive1[i - 1]), internal->p_IOxGetLive1_IOxGetLive2);
+  }
+  for (int i = 1; i <= internal->dim_n_IOxGetLive2_R; ++i) {
+    internal->n_IOxGetLive2_R[i - 1] = Rf_rbinom(round(IOxGetLive2[i - 1]), internal->p_IOxGetLive2_R);
+  }
+  for (int i = 1; i <= internal->dim_n_IOxNotGetDie1_IOxNotGetDie2; ++i) {
+    internal->n_IOxNotGetDie1_IOxNotGetDie2[i - 1] = Rf_rbinom(round(IOxNotGetDie1[i - 1]), internal->p_IOxNotGetDie1_IOxNotGetDie2);
+  }
+  for (int i = 1; i <= internal->dim_n_IOxNotGetDie2_D; ++i) {
+    internal->n_IOxNotGetDie2_D[i - 1] = Rf_rbinom(round(IOxNotGetDie2[i - 1]), internal->p_IOxNotGetDie2_D);
+  }
+  for (int i = 1; i <= internal->dim_n_IOxNotGetLive1_IOxNotGetLive2; ++i) {
+    internal->n_IOxNotGetLive1_IOxNotGetLive2[i - 1] = Rf_rbinom(round(IOxNotGetLive1[i - 1]), internal->p_IOxNotGetLive1_IOxNotGetLive2);
+  }
+  for (int i = 1; i <= internal->dim_n_IOxNotGetLive2_R; ++i) {
+    internal->n_IOxNotGetLive2_R[i - 1] = Rf_rbinom(round(IOxNotGetLive2[i - 1]), internal->p_IOxNotGetLive2_R);
+  }
+  for (int i = 1; i <= internal->dim_n_IRec1_IRec2; ++i) {
+    internal->n_IRec1_IRec2[i - 1] = Rf_rbinom(round(IRec1[i - 1]), internal->p_Rec1_Rec2);
+  }
+  for (int i = 1; i <= internal->dim_n_IRec2_R; ++i) {
+    internal->n_IRec2_R[i - 1] = Rf_rbinom(round(IRec2[i - 1]), internal->p_Rec2_R);
+  }
+  for (int i = 1; i <= internal->dim_temp; ++i) {
+    internal->temp[i - 1] = IMild[i - 1] + ICase1[i - 1] + ICase2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_D_Community; ++i) {
+    internal->delta_D_Community[i - 1] = internal->n_IOxNotGetDie2_D[i - 1] + internal->n_IMVNotGetDie2_D[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_D_Hospital; ++i) {
+    internal->delta_D_Hospital[i - 1] = internal->n_IOxGetDie2_D[i - 1] + internal->n_IMVGetDie2_D[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_E2; ++i) {
+    internal->delta_E2[i - 1] = internal->n_E1_E2[i - 1] - internal->n_E2_I[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_ICase2; ++i) {
+    internal->delta_ICase2[i - 1] = internal->n_ICase1_ICase2[i - 1] - internal->n_ICase2_Hosp[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IMVGetDie2; ++i) {
+    internal->delta_IMVGetDie2[i - 1] = internal->n_IMVGetDie1_IMVGetDie2[i - 1] - internal->n_IMVGetDie2_D[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IMVGetLive2; ++i) {
+    internal->delta_IMVGetLive2[i - 1] = internal->n_IMVGetLive1_IMVGetLive2[i - 1] - internal->n_IMVGetLive2_Rec[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IMVNotGetDie2; ++i) {
+    internal->delta_IMVNotGetDie2[i - 1] = internal->n_IMVNotGetDie1_IMVNotGetDie2[i - 1] - internal->n_IMVNotGetDie2_D[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IMVNotGetLive2; ++i) {
+    internal->delta_IMVNotGetLive2[i - 1] = internal->n_IMVNotGetLive1_IMVNotGetLive2[i - 1] - internal->n_IMVNotGetLive2_R[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IOxGetDie2; ++i) {
+    internal->delta_IOxGetDie2[i - 1] = internal->n_IOxGetDie1_IOxGetDie2[i - 1] - internal->n_IOxGetDie2_D[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IOxGetLive2; ++i) {
+    internal->delta_IOxGetLive2[i - 1] = internal->n_IOxGetLive1_IOxGetLive2[i - 1] - internal->n_IOxGetLive2_R[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IOxNotGetDie2; ++i) {
+    internal->delta_IOxNotGetDie2[i - 1] = internal->n_IOxNotGetDie1_IOxNotGetDie2[i - 1] - internal->n_IOxNotGetDie2_D[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IOxNotGetLive2; ++i) {
+    internal->delta_IOxNotGetLive2[i - 1] = internal->n_IOxNotGetLive1_IOxNotGetLive2[i - 1] - internal->n_IOxNotGetLive2_R[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IRec1; ++i) {
+    internal->delta_IRec1[i - 1] = internal->n_IMVGetLive2_Rec[i - 1] - internal->n_IRec1_IRec2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IRec2; ++i) {
+    internal->delta_IRec2[i - 1] = internal->n_IRec1_IRec2[i - 1] - internal->n_IRec2_R[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_R; ++i) {
+    internal->delta_R[i - 1] = internal->n_IOxGetLive2_R[i - 1] + internal->n_IOxNotGetLive2_R[i - 1] + internal->n_IRec2_R[i - 1] + internal->n_IMVNotGetLive2_R[i - 1] + internal->n_IMild_R[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_n_E2_ICase1; ++i) {
+    internal->n_E2_ICase1[i - 1] = Rf_rbinom(round(internal->n_E2_I[i - 1]), internal->prob_hosp[i - 1]);
+  }
+  for (int i = 1; i <= internal->dim_number_requiring_IMV; ++i) {
+    internal->number_requiring_IMV[i - 1] = Rf_rbinom(round(internal->n_ICase2_Hosp[i - 1]), internal->prob_severe[i - 1]);
+  }
+  double beta = 0.0;
+  cinterpolate_eval(step, internal->interpolate_beta, &beta);
+  for (int i = 1; i <= internal->dim_delta_ICase1; ++i) {
+    internal->delta_ICase1[i - 1] = internal->n_E2_ICase1[i - 1] - internal->n_ICase1_ICase2[i - 1];
+  }
+  double hosp_bed_capacity = 0.0;
+  cinterpolate_eval(step, internal->interpolate_hosp_bed_capacity, &hosp_bed_capacity);
+  double ICU_bed_capacity = 0.0;
+  cinterpolate_eval(step, internal->interpolate_ICU_bed_capacity, &ICU_bed_capacity);
+  for (int i = 1; i <= internal->dim_n_E2_IMild; ++i) {
+    internal->n_E2_IMild[i - 1] = internal->n_E2_I[i - 1] - internal->n_E2_ICase1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_number_requiring_Ox; ++i) {
+    internal->number_requiring_Ox[i - 1] = internal->n_ICase2_Hosp[i - 1] - internal->number_requiring_IMV[i - 1];
+  }
+  double total_number_requiring_IMV = odin_sum1(internal->number_requiring_IMV, 0, internal->dim_number_requiring_IMV);
+  for (int i = 1; i <= internal->dim_D_Community; ++i) {
+    state_next[internal->offset_variable_D_Community + i - 1] = D_Community[i - 1] + internal->delta_D_Community[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_D_Hospital; ++i) {
+    state_next[internal->offset_variable_D_Hospital + i - 1] = D_Hospital[i - 1] + internal->delta_D_Hospital[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_E2; ++i) {
+    state_next[internal->offset_variable_E2 + i - 1] = E2[i - 1] + internal->delta_E2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_ICase2; ++i) {
+    state_next[internal->offset_variable_ICase2 + i - 1] = ICase2[i - 1] + internal->delta_ICase2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVGetDie2; ++i) {
+    state_next[internal->offset_variable_IMVGetDie2 + i - 1] = IMVGetDie2[i - 1] + internal->delta_IMVGetDie2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVGetLive2; ++i) {
+    state_next[internal->offset_variable_IMVGetLive2 + i - 1] = IMVGetLive2[i - 1] + internal->delta_IMVGetLive2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVNotGetDie2; ++i) {
+    state_next[internal->offset_variable_IMVNotGetDie2 + i - 1] = IMVNotGetDie2[i - 1] + internal->delta_IMVNotGetDie2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVNotGetLive2; ++i) {
+    state_next[internal->offset_variable_IMVNotGetLive2 + i - 1] = IMVNotGetLive2[i - 1] + internal->delta_IMVNotGetLive2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxGetDie2; ++i) {
+    state_next[internal->offset_variable_IOxGetDie2 + i - 1] = IOxGetDie2[i - 1] + internal->delta_IOxGetDie2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxGetLive2; ++i) {
+    state_next[internal->offset_variable_IOxGetLive2 + i - 1] = IOxGetLive2[i - 1] + internal->delta_IOxGetLive2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxNotGetDie2; ++i) {
+    state_next[internal->offset_variable_IOxNotGetDie2 + i - 1] = IOxNotGetDie2[i - 1] + internal->delta_IOxNotGetDie2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxNotGetLive2; ++i) {
+    state_next[internal->offset_variable_IOxNotGetLive2 + i - 1] = IOxNotGetLive2[i - 1] + internal->delta_IOxNotGetLive2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IRec1; ++i) {
+    state_next[internal->offset_variable_IRec1 + i - 1] = IRec1[i - 1] + internal->delta_IRec1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IRec2; ++i) {
+    state_next[internal->offset_variable_IRec2 + i - 1] = IRec2[i - 1] + internal->delta_IRec2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_R; ++i) {
+    state_next[internal->offset_variable_R + i - 1] = R[i - 1] + internal->delta_R[i - 1];
+  }
+  double current_free_hosp = hosp_bed_capacity + odin_sum1(internal->n_IOxGetDie2_D, 0, internal->dim_n_IOxGetDie2_D) + odin_sum1(internal->n_IOxGetLive2_R, 0, internal->dim_n_IOxGetLive2_R) + odin_sum1(internal->n_IRec2_R, 0, internal->dim_n_IRec2_R) - odin_sum1(internal->n_IMVGetLive2_Rec, 0, internal->dim_n_IMVGetLive2_Rec) - hosp_occ;
+  double current_free_ICUs = ICU_bed_capacity + odin_sum1(internal->n_IMVGetLive2_Rec, 0, internal->dim_n_IMVGetLive2_Rec) + odin_sum1(internal->n_IMVGetDie2_D, 0, internal->dim_n_IMVGetDie2_D) - ICU_occ;
+  for (int i = 1; i <= internal->dim_delta_IMild; ++i) {
+    internal->delta_IMild[i - 1] = internal->n_E2_IMild[i - 1] - internal->n_IMild_R[i - 1];
+  }
+  cinterpolate_eval(step, internal->interpolate_m, internal->m);
+  double total_number_requiring_Ox = odin_sum1(internal->number_requiring_Ox, 0, internal->dim_number_requiring_Ox);
+  for (int i = 1; i <= internal->dim_ICase1; ++i) {
+    state_next[internal->offset_variable_ICase1 + i - 1] = ICase1[i - 1] + internal->delta_ICase1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_s_ij_1; ++i) {
+    for (int j = 1; j <= internal->dim_s_ij_2; ++j) {
+      internal->s_ij[i - 1 + internal->dim_s_ij_1 * (j - 1)] = internal->m[internal->dim_m_1 * (j - 1) + i - 1] * internal->temp[j - 1];
+    }
+  }
+  double total_number_get_hosp = (current_free_hosp <= 0 ? 0 : ((current_free_hosp - total_number_requiring_Ox >= 0 ? total_number_requiring_Ox : (current_free_hosp))));
+  double total_number_get_IMV = (current_free_ICUs <= 0 ? 0 : ((current_free_ICUs - total_number_requiring_IMV >= 0 ? total_number_requiring_IMV : (current_free_ICUs))));
+  for (int i = 1; i <= internal->dim_IMild; ++i) {
+    state_next[internal->offset_variable_IMild + i - 1] = IMild[i - 1] + internal->delta_IMild[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_lambda; ++i) {
+    internal->lambda[i - 1] = beta * odin_sum2(internal->s_ij, i - 1, i, 0, internal->dim_s_ij_2, internal->dim_s_ij_1);
+  }
+  rmhyper_d(total_number_get_IMV, internal->number_requiring_IMV, internal->dim_number_get_IMV, internal->number_get_IMV);
+  rmhyper_d(total_number_get_hosp, internal->number_requiring_Ox, internal->dim_number_get_Ox, internal->number_get_Ox);
+  for (int i = 1; i <= internal->dim_n_IMVGetDie1; ++i) {
+    internal->n_IMVGetDie1[i - 1] = Rf_rbinom(round(internal->number_get_IMV[i - 1]), internal->prob_severe_death_treatment[i - 1]);
+  }
+  for (int i = 1; i <= internal->dim_n_IOxGetDie1; ++i) {
+    internal->n_IOxGetDie1[i - 1] = Rf_rbinom(round(internal->number_get_Ox[i - 1]), internal->prob_non_severe_death_treatment[i - 1]);
+  }
+  for (int i = 1; i <= internal->dim_number_notget_IMV; ++i) {
+    internal->number_notget_IMV[i - 1] = internal->number_requiring_IMV[i - 1] - internal->number_get_IMV[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_number_notget_Ox; ++i) {
+    internal->number_notget_Ox[i - 1] = internal->number_requiring_Ox[i - 1] - internal->number_get_Ox[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_p_S_E1; ++i) {
+    internal->p_S_E1[i - 1] = 1 - exp(-(internal->lambda[i - 1]) * internal->dt);
+  }
+  for (int i = 1; i <= internal->dim_delta_IMVGetDie1; ++i) {
+    internal->delta_IMVGetDie1[i - 1] = internal->n_IMVGetDie1[i - 1] - internal->n_IMVGetDie1_IMVGetDie2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IOxGetDie1; ++i) {
+    internal->delta_IOxGetDie1[i - 1] = internal->n_IOxGetDie1[i - 1] - internal->n_IOxGetDie1_IOxGetDie2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_n_IMVGetLive1; ++i) {
+    internal->n_IMVGetLive1[i - 1] = internal->number_get_IMV[i - 1] - internal->n_IMVGetDie1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_n_IMVNotGetDie1; ++i) {
+    internal->n_IMVNotGetDie1[i - 1] = Rf_rbinom(round(internal->number_notget_IMV[i - 1]), internal->prob_severe_death_no_treatment[i - 1]);
+  }
+  for (int i = 1; i <= internal->dim_n_IOxGetLive1; ++i) {
+    internal->n_IOxGetLive1[i - 1] = internal->number_get_Ox[i - 1] - internal->n_IOxGetDie1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_n_IOxNotGetDie1; ++i) {
+    internal->n_IOxNotGetDie1[i - 1] = Rf_rbinom(round(internal->number_notget_Ox[i - 1]), internal->prob_non_severe_death_no_treatment[i - 1]);
+  }
+  for (int i = 1; i <= internal->dim_n_S_E1; ++i) {
+    internal->n_S_E1[i - 1] = Rf_rbinom(round(S[i - 1]), internal->p_S_E1[i - 1]);
+  }
+  for (int i = 1; i <= internal->dim_delta_E1; ++i) {
+    internal->delta_E1[i - 1] = internal->n_S_E1[i - 1] - internal->n_E1_E2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IMVGetLive1; ++i) {
+    internal->delta_IMVGetLive1[i - 1] = internal->n_IMVGetLive1[i - 1] - internal->n_IMVGetLive1_IMVGetLive2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IMVNotGetDie1; ++i) {
+    internal->delta_IMVNotGetDie1[i - 1] = internal->n_IMVNotGetDie1[i - 1] - internal->n_IMVNotGetDie1_IMVNotGetDie2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IOxGetLive1; ++i) {
+    internal->delta_IOxGetLive1[i - 1] = internal->n_IOxGetLive1[i - 1] - internal->n_IOxGetLive1_IOxGetLive2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IOxNotGetDie1; ++i) {
+    internal->delta_IOxNotGetDie1[i - 1] = internal->n_IOxNotGetDie1[i - 1] - internal->n_IOxNotGetDie1_IOxNotGetDie2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_n_IMVNotGetLive1; ++i) {
+    internal->n_IMVNotGetLive1[i - 1] = internal->number_notget_IMV[i - 1] - internal->n_IMVNotGetDie1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_n_IOxNotGetLive1; ++i) {
+    internal->n_IOxNotGetLive1[i - 1] = internal->number_notget_Ox[i - 1] - internal->n_IOxNotGetDie1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVGetDie1; ++i) {
+    state_next[internal->offset_variable_IMVGetDie1 + i - 1] = IMVGetDie1[i - 1] + internal->delta_IMVGetDie1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxGetDie1; ++i) {
+    state_next[internal->offset_variable_IOxGetDie1 + i - 1] = IOxGetDie1[i - 1] + internal->delta_IOxGetDie1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_S; ++i) {
+    state_next[0 + i - 1] = S[i - 1] - internal->n_S_E1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IMVNotGetLive1; ++i) {
+    internal->delta_IMVNotGetLive1[i - 1] = internal->n_IMVNotGetLive1[i - 1] - internal->n_IMVNotGetLive1_IMVNotGetLive2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_delta_IOxNotGetLive1; ++i) {
+    internal->delta_IOxNotGetLive1[i - 1] = internal->n_IOxNotGetLive1[i - 1] - internal->n_IOxNotGetLive1_IOxNotGetLive2[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_E1; ++i) {
+    state_next[internal->dim_S + i - 1] = E1[i - 1] + internal->delta_E1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVGetLive1; ++i) {
+    state_next[internal->offset_variable_IMVGetLive1 + i - 1] = IMVGetLive1[i - 1] + internal->delta_IMVGetLive1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVNotGetDie1; ++i) {
+    state_next[internal->offset_variable_IMVNotGetDie1 + i - 1] = IMVNotGetDie1[i - 1] + internal->delta_IMVNotGetDie1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxGetLive1; ++i) {
+    state_next[internal->offset_variable_IOxGetLive1 + i - 1] = IOxGetLive1[i - 1] + internal->delta_IOxGetLive1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxNotGetDie1; ++i) {
+    state_next[internal->offset_variable_IOxNotGetDie1 + i - 1] = IOxNotGetDie1[i - 1] + internal->delta_IOxNotGetDie1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IMVNotGetLive1; ++i) {
+    state_next[internal->offset_variable_IMVNotGetLive1 + i - 1] = IMVNotGetLive1[i - 1] + internal->delta_IMVNotGetLive1[i - 1];
+  }
+  for (int i = 1; i <= internal->dim_IOxNotGetLive1; ++i) {
+    state_next[internal->offset_variable_IOxNotGetLive1 + i - 1] = IOxNotGetLive1[i - 1] + internal->delta_IOxNotGetLive1[i - 1];
+  }
+  double time = step * internal->dt;
+  output[0] = time;
+  memcpy(output + 1, internal->n_E2_I, internal->dim_n_E2_I * sizeof(double));
+  memcpy(output + internal->offset_output_delta_D_Hospital, internal->delta_D_Hospital, internal->dim_delta_D_Hospital * sizeof(double));
+  memcpy(output + internal->offset_output_n_E2_ICase1, internal->n_E2_ICase1, internal->dim_n_E2_ICase1 * sizeof(double));
+  memcpy(output + internal->offset_output_number_requiring_IMV, internal->number_requiring_IMV, internal->dim_number_requiring_IMV * sizeof(double));
+  memcpy(output + internal->offset_output_n_E2_IMild, internal->n_E2_IMild, internal->dim_n_E2_IMild * sizeof(double));
+}
+void updated_healthcare_rep_SEIR_rhs_dde(size_t n_eq, size_t step, double * state, double * state_next, size_t n_out, double * output, void * internal) {
+  updated_healthcare_rep_SEIR_rhs((updated_healthcare_rep_SEIR_internal*)internal, step, state, state_next, output);
+}
+SEXP updated_healthcare_rep_SEIR_rhs_r(SEXP internal_p, SEXP step, SEXP state) {
+  SEXP state_next = PROTECT(allocVector(REALSXP, LENGTH(state)));
+  updated_healthcare_rep_SEIR_internal *internal = updated_healthcare_rep_SEIR_get_internal(internal_p, 1);
+  SEXP output_ptr = PROTECT(allocVector(REALSXP, 1 + internal->dim_n_E2_I + internal->dim_n_E2_ICase1 + internal->dim_n_E2_IMild + internal->dim_number_requiring_IMV + internal->dim_delta_D_Hospital));
+  setAttrib(state_next, install("output"), output_ptr);
+  UNPROTECT(1);
+  double *output = REAL(output_ptr);
+  GetRNGstate();
+  updated_healthcare_rep_SEIR_rhs(internal, INTEGER(step)[0], REAL(state), REAL(state_next), output);
   PutRNGstate();
   UNPROTECT(1);
   return state_next;
