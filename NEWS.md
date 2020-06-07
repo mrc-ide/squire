@@ -1,6 +1,6 @@
 # squire 0.4.16
 
-* `pmcmc` method for 4 parameter 
+* `pmcmc` method for 4 parameter estimation.
 
 # squire 0.4.15
 
