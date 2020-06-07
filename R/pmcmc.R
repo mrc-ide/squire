@@ -102,7 +102,7 @@
 #'
 #' @export
 #' @import coda
-#' @importFrom stats rnorm
+#' @importFrom stats rnorm plogis
 #' @importFrom mvtnorm rmvnorm
 
 pmcmc <- function(data,
@@ -117,7 +117,7 @@ pmcmc <- function(data,
                   Rt_func = function (R0_change, R0, Meff) {
                        R0 * (2 * plogis(-(R0_change - 1) * -Meff))
                     },
-                  pars_obs = list(phi_cases = 0.1,
+                  pars_obs = list(phi_cases = 1,
                                   k_cases = 2,
                                   phi_death = 1,
                                   k_death = 2,
@@ -163,12 +163,14 @@ pmcmc <- function(data,
                   initial_scaling_factor = 1
 ) {
 
-  #............................................................
+  #------------------------------------------------------------
   # Section 1 of pMCMC Wrapper: Checks & Setup
-  #...........................................................
-  #..................
+  #--------------------------------------------------------...
+
+  #----------------..
   # assertions & checks
-  #..................
+  #----------------..
+
   # data
   assert_dataframe(data)
   assert_in("date", names(data))
@@ -240,13 +242,6 @@ pmcmc <- function(data,
   assert_numeric(reporting_fraction)
   assert_bounded(reporting_fraction, 0, 1, inclusive_left = FALSE, inclusive_right = TRUE)
   assert_pos_int(replicates)
-  #TODO talk to OJ about country vs. explicit model vs. population
-  assert_string(country)
-  #assert_numeric(population)
-  #if (is.null(squire_model)) {
-  #  assert_string(country)
-  #  assert_numeric(population)
-  #}
 
   # date change items
   assert_same_length(R0_change, date_R0_change)
@@ -399,13 +394,16 @@ pmcmc <- function(data,
     hosp_bed_capacity <- baseline_hosp_bed_capacity
   }
 
-  #..................
+  #----------------
   # Generate Odin items
-  #..................
+  #----------------
+
   # make the date definitely a date
   data$date <- as.Date(as.character(data$date))
+
   # adjust for reporting fraction
-  data$deaths <- (data$deaths/reporting_fraction)
+  pars_obs$phi_cases <- reporting_fraction
+  pars_obs$phi_death <- reporting_fraction
 
   # build model parameters
   model_params <- squire_model$parameter_func(country = country,
@@ -417,6 +415,7 @@ pmcmc <- function(data,
                                               tt_hosp_beds = tt_hosp_beds,
                                               ICU_bed_capacity = ICU_bed_capacity,
                                               tt_ICU_beds = tt_ICU_beds)
+
   # collect interventions for odin model likelihood
   interventions <- list(R0_change = R0_change,
                         date_R0_change = date_R0_change,
@@ -428,10 +427,9 @@ pmcmc <- function(data,
                         date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
                         hosp_bed_capacity = hosp_bed_capacity)
 
-
-  #..................
+  #----------------..
   # Collect Odin and MCMC Inputs
-  #..................
+  #----------------..
   inputs <- list(
     data = data,
     n_mcmc = n_mcmc,
@@ -444,15 +442,16 @@ pmcmc <- function(data,
                 pars_init = pars_init,
                 pars_min = pars_min,
                 pars_max = pars_max,
-                proposal_kernel = proposal_kernel,  # does this need to be changed??? Don't think so, but would be good for someone else to check
+                proposal_kernel = proposal_kernel,
                 pars_discrete = pars_discrete),
     n_particles = n_particles)
 
 
 
-  #..................
+  #----------------
   # create prior and likelihood functions given the inputs
-  #..................
+  #----------------
+
   if(is.null(log_prior)) {
     # set improper, uninformative prior
     log_prior <- function(pars) log(1e-10)
@@ -481,34 +480,23 @@ pmcmc <- function(data,
     X
   }
 
-  #..................
+  #----------------
   # proposals
-  #..................
-  # NB, squire set up for date input, but proposal either for MCMC as numeric
-  # need to update proposal bounds
-  pars_min[["start_date"]] <- -(start_date_to_offset(data$date[1], pars_min[["start_date"]])) # negative here because we are working backwards in time
-  pars_max[["start_date"]] <- -(start_date_to_offset(data$date[1], pars_max[["start_date"]]))
+  #----------------
 
   # needs to be a vector to pass to reflecting boundary function
   pars_min <- unlist(pars_min)
   pars_max <- unlist(pars_max)
   pars_discrete <- unlist(pars_discrete)
 
-  # create shorthand function to propose new pars given main inputs
-  # propose_jump <- function(pars) {
-  #   propose_parameters(pars = pars,
-  #                      proposal_kernel = proposal_kernel,
-  #                      pars_discrete = pars_discrete,
-  #                      pars_min = pars_min,
-  #                      pars_max = pars_max)
-  # }
-
-  #............................................................
+  #--------------------------------------------------------
   # Section 2 of pMCMC Wrapper: Run pMCMC
-  #...........................................................
+  #--------------------------------------------------------
+
   # Run the chains in parallel
   message("Running pMCMC...")
   if (Sys.getenv("SQUIRE_PARALLEL_DEBUG") == "TRUE") {
+
     chains <- purrr::pmap(
       .l =  list(n_mcmc = rep(n_mcmc, n_chains)),
       .f = run_mcmc_chain,
@@ -526,7 +514,9 @@ pmcmc <- function(data,
       pars_min = pars_min,
       pars_max = pars_max,
       initial_scaling_factor = initial_scaling_factor)
+
   } else {
+
     chains <- furrr::future_pmap(
       .l =  list(n_mcmc = rep(n_mcmc, n_chains)),
       .f = run_mcmc_chain,
@@ -545,11 +535,13 @@ pmcmc <- function(data,
       pars_max = pars_max,
       initial_scaling_factor = initial_scaling_factor,
       .progress = TRUE)
+
   }
 
-  #..................
+  #----------------
   # MCMC diagnostics and tidy
-  #..................
+  #----------------
+
   if (n_chains > 1) {
     names(chains) <- paste0('chain', seq_len(n_chains))
 
@@ -578,13 +570,16 @@ pmcmc <- function(data,
                   chains = lapply(chains, '[', -1))
 
     class(pmcmc) <- 'squire_pmcmc_list'
+
   } else {
+
     pmcmc <- chains[[1]]
     class(pmcmc) <- "squire_pmcmc"
+
   }
-  #............................................................
+  #--------------------------------------------------------
   # Section 3 of pMCMC Wrapper: Sample PMCMC Results
-  #...........................................................
+  #--------------------------------------------------------
   pmcmc_samples <- sample_pmcmc(pmcmc_results = pmcmc,
                                 burnin = burnin,
                                 n_chains = n_chains,
@@ -592,12 +587,14 @@ pmcmc <- function(data,
                                 n_particles = n_particles,
                                 forecast_days = forecast)
 
-  #............................................................
+  #--------------------------------------------------------
   # Section 4 of pMCMC Wrapper: Tidy Output
-  #...........................................................
-  #..................
+  #--------------------------------------------------------
+
+  #----------------
   # Pull Sampled results and "recreate" squire models
-  #..................
+  #----------------
+
   if (inherits(squire_model, "stochastic")) {
 
     # create a fake run object and fill in the required elements
@@ -615,8 +612,10 @@ pmcmc <- function(data,
     # first let's add our pmcmc results for a nice return
     # we'll save our inputs so it is easy to recreate later
     r$inputs <- pmcmc_samples$inputs
+
     # and add the parameters that changed between each simulation, i.e. posterior draws
     r$replicate_parameters <- pmcmc_samples$sampled_PMCMC_Results
+
     # as well as adding the pmcmc chains so it's easy to draw from the chains again in the future
     r$pmcmc_results <- pmcmc
 
@@ -660,15 +659,20 @@ pmcmc <- function(data,
   r$parameters$replicates <- replicates
   r$parameters$time_period <- as.numeric(diff(as.Date(range(rownames(r$output)))))
 
-  #......................
+  #--------------------..
   # out
-  #......................
+  #--------------------..
   return(r)
 }
 
 
-
-# Run a single pMCMC chain
+#' Run a single pMCMC chain
+#'
+#' Helper function to run the particle filter with a
+#' new R0 and start date for given interventions within the pmcmc
+#'
+#' @importFrom stats cov
+#' @noRd
 run_mcmc_chain <- function(inputs,
                            curr_pars,
                            calc_lprior,
@@ -686,9 +690,12 @@ run_mcmc_chain <- function(inputs,
                            pars_max) {
 
 
-  #..................
+  #----------------..
   # Set initial state
-  #..................
+  #----------------..
+
+
+
   # run particle filter on initial parameters
   p_filter_est <- calc_ll(pars = curr_pars)
 
@@ -700,9 +707,9 @@ run_mcmc_chain <- function(inputs,
   ## calculate initial prior
   curr_lprior <- calc_lprior(pars = curr_pars)
 
-  #..................
+  #----------------..
   # assertions and checks on log_prior and log_likelihood functions
-  #..................
+  #----------------..
   if(length(curr_lprior) > 1) {
     stop('log_prior must return a single numeric representing the log prior')
   }
@@ -728,9 +735,9 @@ run_mcmc_chain <- function(inputs,
             matrix adaptation')
   }
 
-  #..................
+  #----------------..
   # Create objects to store outputs
-  #..................
+  #----------------..
   # extract loglikelihood estimate and sample state
   # calculate posterior
   curr_ll <- p_filter_est$log_likelihood
@@ -794,11 +801,11 @@ run_mcmc_chain <- function(inputs,
   pars_min[["start_date"]] <- -(start_date_to_offset(first_data_date, pars_min[["start_date"]])) # negative here because we are working backwards in time
   pars_max[["start_date"]] <- -(start_date_to_offset(first_data_date, pars_max[["start_date"]]))
 
-  #..................
+  #----------------..
   # main pmcmc loop
-  #..................
+  #----------------..
   for(iter in seq_len(n_mcmc) + 1L) {
-
+    message(iter)
     prop_pars <- propose_parameters(curr_pars,
                                     proposal_kernel * scaling_factor,
                                     unlist(pars_discrete),
@@ -912,9 +919,9 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                pars_obs, n_particles, Rt_func,
                                forecast_days = 0, return = "ll",
                                interventions) {
-  #..................
+  #----------------..
   # specify particle setup
-  #..................
+  #----------------..
   switch(return,
          "full" = {
            save_particles <- TRUE
@@ -932,30 +939,30 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
          }
   )
 
-  #..................
+  #----------------..
   # (potentially redundant) assertion
-  #..................
+  #----------------..
   assert_in(c("R0", "start_date", "Meff", "Meff_pl"), names(pars),
             message = "Must specify R0, start date, and Movement effect size during and after lockdown as parameters to infer")
-  #..................
+  #----------------..
   # unpack current params
-  #..................
+  #----------------..
   R0 <- pars[["R0"]]
   start_date <- pars[["start_date"]]
   Meff <- pars[["Meff"]]
   Meff_pl <- pars[["Meff_pl"]]
 
-  #..................
-  # more (potentially redundant) assertions
-  #..................
+  #----------------..
+  # more assertions
+  #----------------..
   assert_pos(R0)
   assert_date(start_date)
   assert_pos(Meff)
   assert_pos(Meff_pl)
 
-  #..................
+  #----------------..
   # setup model based on inputs and interventions
-  #..................
+  #----------------..
   R0_change <- interventions$R0_change
   date_R0_change <- interventions$date_R0_change
   date_Meff_change <- interventions$date_Meff_change
@@ -970,7 +977,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
     tt_list <- intervention_dates_for_odin(dates = date_R0_change,
                                            change = R0_change,
                                            start_date = start_date,
-                                           steps_per_day = round(1/model_params$dt)) # NB, dt and steps_per_day redundant but kept for posterity
+                                           steps_per_day = round(1/model_params$dt))
     model_params$tt_beta <- unique(c(0, tt_list$tt))
     R0_change <- tt_list$change
   }
@@ -1009,9 +1016,9 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
     model_params$hosp_beds <- c(model_params$hosp_beds[1], tt_list$change)
   }
 
-  #......................
+  #--------------------..
   # update new R0s based on R0_change and R0_date_change, and Meff_date_change
-  #......................
+  #--------------------..
   # and now get new R0s for the R0
   if (!is.null(R0_change)) {
     if (is.null(date_Meff_change)) {
@@ -1037,14 +1044,14 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                        model_params = model_params,
                        R0 = R0)
 
-  #..................
+  #----------------..
   # update the model params accordingly from new inputs
-  #..................
+  #----------------..
   model_params$beta_set <- beta_set
 
-  #..................
+  #----------------..
   # run the particle filter
-  #..................
+  #----------------..
   if (inherits(squire_model, "stochastic")) {
 
     pf_result <- run_particle_filter(data = data,
