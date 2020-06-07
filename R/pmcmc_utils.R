@@ -53,24 +53,38 @@ sample_pmcmc <- function(pmcmc_results,
     res <- pmcmc_results$results
   }
 
-  assert_neg(res$log_posterior, zero_allowed = FALSE) # Log Posterior must be negative and nonzero -- the later because the posterior should never be P(1)
-  logpos.prob <- 1/abs(res$log_posterior) # convert to probability, larger values -- i.e. less likely values --  have less "weight"
-  logpos.prob <- logpos.prob/sum(logpos.prob) # standardize
-  # sample rows and then
-  if (n_trajectories > nrow(res)) {
-    warning("Sampling more trajectories than MCMC iterations. Consider running your MCMC for longer or reducing your burnin")
-    params_smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob, replace = TRUE)
-  } else {
-    params_smpl <- sample(1:nrow(res), size = n_trajectories, prob = logpos.prob, replace = FALSE)
+  # Log Posterior must be negative and nonzero -- the later because the posterior should never be P(1)
+  assert_neg(res$log_posterior, zero_allowed = FALSE)
+
+  # convert to probability by exponentiating it
+  res <- unique(res)
+  probs <- exp(res$log_posterior)
+  probs <- probs/sum(probs)
+
+  # occasionally the likelihoods are so low that this creates NAs so just decrease
+  drop <- 0.9
+  while(any(is.na(probs))) {
+    probs <- exp(res$log_posterior*drop)
+    probs <- probs/sum(probs)
+    drop <- drop^2
   }
+
+  # draw our sample from the unique posterior probaility space
+  params_smpl <- sample(x =  length(probs), size = n_trajectories,
+                  replace = TRUE, prob = probs)
   params_smpl <- res[params_smpl, !grepl("log", colnames(res))]
 
-  # TODO relax this limitation?
   # catch
   assert_in(colnames(params_smpl), c("start_date", "R0", "Meff", "Meff_pl"),
-            message = "Currently only allow for the start date, R0, and Meff during and after the lockdown to be inferred. All four must be included,
-            although the Meff parameters can be fixed at 1 (and therefore not inferred).")
+            message = paste0(
+            "Currently only allow for the start date, R0, and Meff during and ",
+            "after the lockdown to be inferred. All four must be included,",
+            "although the Meff parameters can be fixed at 1 (and therefore not inferred)."
+            ))
+
   # put this in format for calc_loglikelihood
+  params_smpl$start_date <- offset_to_start_date(pmcmc_results$inputs$data$date[1],
+                                                 round(params_smpl$start_date))
   pars.list <- split(params_smpl, 1:nrow(params_smpl))
   names(pars.list) <- rep("pars", length(pars.list))
 
@@ -205,6 +219,8 @@ offset_to_start_date <- function(first_data_date, start_date)
 #' @param probability the required acceptance probability
 #' @param i the iteration number
 #' @param number_of_parameters the number of parameters currently being estimated
+#'
+#' @importFrom stats qnorm
 
 update_scaling_factor <- function(scaling_factor, acceptance, probability, i, number_of_parameters) {
   alpha <- -qnorm(probability / 2)

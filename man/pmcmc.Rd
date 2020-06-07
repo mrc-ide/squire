@@ -16,7 +16,7 @@ pmcmc(
   squire_model = explicit_model(),
   Rt_func = function(R0_change, R0, Meff) {     R0 * (2 * plogis(-(R0_change - 1) *
     -Meff)) },
-  pars_obs = list(phi_cases = 0.1, k_cases = 2, phi_death = 1, k_death = 2, exp_noise =
+  pars_obs = list(phi_cases = 1, k_cases = 2, phi_death = 1, k_death = 2, exp_noise =
     1e+06),
   pars_init = list(start_date = as.Date("2020-02-07"), R0 = 2.5, Meff = 2, Meff_pl = 3),
   pars_min = list(start_date = as.Date("2020-02-01"), R0 = 0, Meff = 1, Meff_pl = 2),

@@ -29,7 +29,7 @@ test_that("pmcmc fitting works", {
                   phi_death = 1,
                   k_death = 2,
                   exp_noise = 1e6)
-  steps_per_day = 1
+  steps_per_day = 2
   R0_change = int_unique$change
   date_R0_change = as.Date(int_unique$dates_change)
   date_contact_matrix_set_change = NULL
@@ -42,8 +42,8 @@ test_that("pmcmc fitting works", {
   rownames(proposal_kernel) <- colnames(proposal_kernel) <- names(pars_init)
 
   set.seed(93L)
-  out <- pmcmc(data = data,
-               n_mcmc = 100,
+  expect_warning(out <- pmcmc(data = data,
+               n_mcmc = 5,
                log_likelihood = NULL,
                log_prior = NULL,
                n_particles = 2,
@@ -62,7 +62,8 @@ test_that("pmcmc fitting works", {
                R0_change = R0_change,
                date_R0_change = date_R0_change,
                date_Meff_change = NULL,
-               country = country)
+               country = country),
+               "recommend starting to adapt scaling factor at least 100")
 
   expect_named(out, c("output", "parameters", "model", "inputs", "replicate_parameters", "pmcmc_results", "interventions"))
   expect_warning(expect_s3_class(plot(out, what = "cases", particle_fit = TRUE), "gg"))
@@ -73,7 +74,7 @@ test_that("pmcmc fitting works", {
   # DATE CHECKS DATE_R0
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -99,7 +100,7 @@ test_that("pmcmc fitting works", {
 
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -128,7 +129,7 @@ test_that("pmcmc fitting works", {
 
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -152,7 +153,7 @@ test_that("pmcmc fitting works", {
 
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -176,7 +177,7 @@ test_that("pmcmc fitting works", {
   # DATE CHECKS DATE_CONTACT
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -202,7 +203,7 @@ test_that("pmcmc fitting works", {
 
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -224,8 +225,9 @@ test_that("pmcmc fitting works", {
                  contact_matrix_set = list(contact_matrices[[1]]),
                  date_contact_matrix_set_change = date_R0_change[1])
   )
-  out <- pmcmc(data = data,
-               n_mcmc = 100,
+
+  expect_warning(out <- pmcmc(data = data,
+               n_mcmc = 5,
                log_likelihood = NULL,
                log_prior = NULL,
                n_particles = 2,
@@ -247,12 +249,14 @@ test_that("pmcmc fitting works", {
                country = country,
                baseline_contact_matrix = contact_matrices[[1]],
                contact_matrix_set = list(contact_matrices[[1]]),
-               date_contact_matrix_set_change = date_R0_change[1])
+               date_contact_matrix_set_change = date_R0_change[1]),
+               "recommend starting to adapt scaling factor at least 100")
+
 
 
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -279,7 +283,7 @@ test_that("pmcmc fitting works", {
   # DATE CHECKS date_hosp
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -305,7 +309,7 @@ test_that("pmcmc fitting works", {
 
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -331,7 +335,7 @@ test_that("pmcmc fitting works", {
 
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -354,8 +358,8 @@ test_that("pmcmc fitting works", {
                  country = country)
   )
 
-  out <- pmcmc(data = data,
-               n_mcmc = 100,
+  expect_warning(out <- pmcmc(data = data,
+               n_mcmc = 5,
                log_likelihood = NULL,
                log_prior = NULL,
                n_particles = 2,
@@ -377,13 +381,14 @@ test_that("pmcmc fitting works", {
                R0_change = R0_change,
                date_R0_change = date_R0_change,
                date_Meff_change = NULL,
-               country = country)
+               country = country),
+               "recommend starting to adapt scaling factor at least 100")
 
 
   # DATE CHECKS DATE_ICU
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -409,7 +414,7 @@ test_that("pmcmc fitting works", {
 
   expect_error(
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -436,7 +441,7 @@ test_that("pmcmc fitting works", {
   expect_error(
 
     out <- pmcmc(data = data,
-                 n_mcmc = 100,
+                 n_mcmc = 5,
                  log_likelihood = NULL,
                  log_prior = NULL,
                  n_particles = 2,
@@ -459,8 +464,8 @@ test_that("pmcmc fitting works", {
                  date_ICU_bed_capacity_change = date_R0_change[1])
   )
 
-  out <- pmcmc(data = data,
-               n_mcmc = 100,
+  expect_warning(out <- pmcmc(data = data,
+               n_mcmc = 5,
                log_likelihood = NULL,
                log_prior = NULL,
                n_particles = 2,
@@ -482,7 +487,8 @@ test_that("pmcmc fitting works", {
                baseline_ICU_bed_capacity = 5,
                ICU_bed_capacity = 10,
                date_ICU_bed_capacity_change = date_R0_change[1]
-  )
+  ),
+  "recommend starting to adapt scaling factor at least 100")
 
 })
 
@@ -530,8 +536,8 @@ test_that("pmcmc non future works", {
 
 
   Sys.setenv("SQUIRE_PARALLEL_DEBUG"=TRUE)
-  out <- pmcmc(data = data,
-               n_mcmc = 100,
+  expect_warning(out <- pmcmc(data = data,
+               n_mcmc = 5,
                log_likelihood = NULL,
                log_prior = NULL,
                n_particles = 2,
@@ -549,7 +555,8 @@ test_that("pmcmc non future works", {
                proposal_kernel = proposal_kernel,
                R0_change = R0_change,
                date_R0_change = date_R0_change,
-               country = country)
+               country = country),
+               "recommend starting to adapt scaling factor at least 100")
 
 
 })
@@ -597,8 +604,8 @@ test_that("pmcmc deterministic", {
   squire_model = explicit_model()
   n_particles = 2
 
-  out <- pmcmc(data = data,
-               n_mcmc = 100,
+  expect_warning(out <- pmcmc(data = data,
+               n_mcmc = 5,
                log_likelihood = NULL,
                log_prior = NULL,
                n_particles = 2,
@@ -617,7 +624,8 @@ test_that("pmcmc deterministic", {
                R0_change = R0_change,
                date_R0_change = date_R0_change,
                date_Meff_change = NULL,
-               country = country)
+               country = country),
+               "recommend starting to adapt scaling factor at least 100")
 
 
   expect_true(inherits(out$pmcmc_results$inputs$squire_model, "deterministic"))
@@ -670,8 +678,8 @@ test_that("pmcmc user pop and contact", {
   squire_model = explicit_model()
   n_particles = 2
 
-  out <- pmcmc(data = data,
-               n_mcmc = 100,
+  expect_warning(out <- pmcmc(data = data,
+               n_mcmc = 5,
                log_likelihood = NULL,
                log_prior = NULL,
                n_particles = 2,
@@ -691,7 +699,8 @@ test_that("pmcmc user pop and contact", {
                date_R0_change = date_R0_change,
                country = country,
                population = pop$n,
-               baseline_contact_matrix = mat)
+               baseline_contact_matrix = mat),
+               "recommend starting to adapt scaling factor at least 100")
 
   expect_true(
     identical(out$pmcmc_results$inputs$model_params$contact_matrix_set[[1]], mat)
