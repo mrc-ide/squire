@@ -561,7 +561,7 @@ pmcmc <- function(data,
       x <- coda::gelman.diag(chains_coda)
       x
     }, error = function(e) {
-      print('unable to calculate rhat')
+      message('unable to calculate rhat')
     })
 
 
@@ -805,7 +805,7 @@ run_mcmc_chain <- function(inputs,
   # main pmcmc loop
   #----------------..
   for(iter in seq_len(n_mcmc) + 1L) {
-    message(iter)
+
     prop_pars <- propose_parameters(curr_pars,
                                     proposal_kernel * scaling_factor,
                                     unlist(pars_discrete),

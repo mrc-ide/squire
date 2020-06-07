@@ -326,7 +326,7 @@ plot.squire_pmcmc_list <- function(x, burn_in = 1, ...) {
              font.main = 1
         )
 
-        mapply(FUN = plot_hists,
+        map_out <- mapply(FUN = plot_hists,
                h = hists[[par_name]],
                breaks = bs,
                col = cols_trace)
@@ -353,7 +353,7 @@ plot.squire_pmcmc_list <- function(x, burn_in = 1, ...) {
   # print traces in final column
   n_iter <- nrow(master_chain) / n_chains
 
-  mapply(FUN = function(par_name, leg) {
+  map_out <- mapply(FUN = function(par_name, leg) {
     plot(x = 1,
          y = breaks[[par_name]][1],
          type = 'n',
@@ -362,7 +362,7 @@ plot.squire_pmcmc_list <- function(x, burn_in = 1, ...) {
          xlim = c(0, n_iter),
          ylim <- range(master_chain[, par_name]))
 
-    mapply(FUN = plot_traces,
+  map_out <- mapply(FUN = plot_traces,
            trace = traces[[par_name]],
            col = cols_trace)
 
@@ -375,7 +375,7 @@ plot.squire_pmcmc_list <- function(x, burn_in = 1, ...) {
     }
   },
   par_name = par_names,
-  leg = c(TRUE, FALSE, FALSE))
+  leg = c(TRUE, FALSE, FALSE, FALSE))
 
 }
 
