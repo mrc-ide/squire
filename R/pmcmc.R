@@ -102,7 +102,7 @@
 #'
 #' @export
 #' @import coda
-#' @importFrom stats rnorm plogis
+#' @importFrom stats rnorm plogis qnorm cov
 #' @importFrom mvtnorm rmvnorm
 
 pmcmc <- function(data,
