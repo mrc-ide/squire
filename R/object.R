@@ -100,7 +100,9 @@ plot.squire_simulation <- function(x, var_select = NULL,
                                    ...){
 
   # are we just wanting to plot the fit to data
-  if (particle_fit) {
+  if (particle_fit & !is.null(x$pmcmc_results)) {
+    return(plot_pmcmc_sample(x, ...))
+  } else if (particle_fit & !is.null(x$scan_results)) {
     return(plot_sample_grid_search(x, ...))
   }
 

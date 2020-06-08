@@ -262,7 +262,7 @@ parameters_explicit_SEEIR <- function(
     if (!is.null(country)) {
       beds <- get_healthcare_capacity(country)
       hosp_beds <- beds$hosp_beds
-      hosp_bed_capacity <- round(rep(round(hosp_beds * sum(population)/1000), length(tt_hosp_beds)))
+      hosp_bed_capacity <- rep(round(hosp_beds * sum(population)/1000), length(tt_hosp_beds))
     } else {
       hosp_bed_capacity <- round(5 * sum(population)/1000)
     }
@@ -271,7 +271,7 @@ parameters_explicit_SEEIR <- function(
     if (!is.null(country)) {
       beds <- get_healthcare_capacity(country)
       ICU_beds <- beds$ICU_beds
-      ICU_bed_capacity <- round(rep(round(ICU_beds * sum(population)/1000), length(tt_ICU_beds)))
+      ICU_bed_capacity <- rep(round(ICU_beds * sum(population)/1000), length(tt_ICU_beds))
     } else {
       ICU_bed_capacity <- round(3 * hosp_bed_capacity/100)
     }

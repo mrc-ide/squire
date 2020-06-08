@@ -78,9 +78,21 @@ projections <- function(r,
   ## assertion checks on parameters
   # ----------------------------------------------------------------------------
   assert_custom_class(r, "squire_simulation")
-  if (inherits(r$scan_results$inputs$model, "deterministic")) {
-    stop("projections unlikely to work with deterministic squire model currently")
+  # TODO future asserts if these are our "end" classes
+  if (is.null(r$output) & is.null(r$scan_results) & is.null(r$pmcmc_results)) {
+    stop("Model must have been produced either with Squire Default, Scan Grid (calibrate), or pMCMC (pmcmcm) Approach")
   }
+
+  if (!is.null(r$pmcmc_results)) {
+    if (inherits(r$pmcmc_results$inputs$squire_model, "deterministic")) {
+      stop("projections unlikely to work with deterministic squire model currently")
+    }
+  } else if (!is.null(r$scan_results)) {
+    if (inherits(r$scan_results$inputs$model, "deterministic")) {
+      stop("projections unlikely to work with deterministic squire model currently")
+    }
+  }
+
   assert_pos_int(tt_R0)
   if(!0 %in% tt_R0) {
     stop("tt_R0 must start with 0")
@@ -301,11 +313,20 @@ projections <- function(r,
                               R0 = R0)
 
     # Is the model still valid
-    if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {
-      r$model <- r$scan_results$inputs$model$odin_model(
-        user = r$scan_results$inputs$model_params,
-        unused_user_action = "ignore")
+    if (!is.null(r$scan_results)) { # check if scan grid approach
+      if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {
+        r$model <- r$scan_results$inputs$model$odin_model(
+          user = r$scan_results$inputs$model_params,
+          unused_user_action = "ignore")
+      }
+    } else if (!is.null(r$pmcmc_results)) { # check if pmcmc approach
+      if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {
+        r$model <- r$pmcmc_results$inputs$model$odin_model(
+          user = r$pmcmc_results$inputs$model_params,
+          unused_user_action = "ignore")
+      }
     }
+
 
     # change these user params
     r$model$set_user(tt_beta = round(tt_R0/r$parameters$dt))

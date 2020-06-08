@@ -638,12 +638,16 @@ run_deterministic_comparison <- function(data,
                                          return = "ll") {
 
   # parameter checks
-  if (!(return %in% c("full", "ll", "sample"))) {
-    stop("return argument must be full, ll, sample")
+  if (!(return %in% c("full", "ll", "sample", "single"))) {
+    stop("return argument must be full, ll, sample", "single")
   }
   if (as.Date(data$date[data$deaths > 0][1], "%Y-%m-%d") < as.Date(model_start_date, "%Y-%m-%d")) {
     stop("Model start date is later than data start date")
   }
+  if ((return %in% c("full", "sample", "single") & !save_history)) {
+    stop("If full, sample, or single specified, must save history")
+  }
+
 
   # convert data into particle-filter form
   data <- particle_filter_data(data = data,
@@ -678,16 +682,23 @@ run_deterministic_comparison <- function(data,
 
   # start the return object creation with likelihoods and other return options
   ret <- list(log_likelihood = log_likelihood)
-    if (save_history) {
-      date <- data$date[[1]] + seq_len(nrow(out)) - 1L
-      rownames(out) <- as.character(date)
-      attr(out, "date") <- date
+  if (save_history) {
+    date <- data$date[[1]] + seq_len(nrow(out)) - 1L
+    rownames(out) <- as.character(date)
+    attr(out, "date") <- date
+
+    # single returns final state
+    if (return == "single") {
+      ret$states <- out[nrow(out), ]
+    } else {
       ret$states <- out
     }
 
+  }
+
   if (return == "ll") {
     ret <- ret$log_likelihood
-  } else if (return == "full" || return == "sample") {
+  } else if (return == "full" || return == "sample" || return == "single") {
     ret <- ret$states
   }
 

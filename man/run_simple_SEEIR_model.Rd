@@ -49,7 +49,7 @@ Run the SEEIR model
 }
 \examples{
 \dontrun{
-pop <- get_population("Afghanistan")
+pop <- get_population("Afghanistan", simple_SEIR = TRUE)
 m1 <- run_simple_SEEIR_model(population = pop$n, dt = 1,
 R0 = 2,
 contact_matrix_set=contact_matrices[[1]])

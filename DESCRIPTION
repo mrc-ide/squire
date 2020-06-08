@@ -1,7 +1,7 @@
 Package: squire
 Type: Package
 Title: SEIR transmission model of COVID-19
-Version: 0.4.15
+Version: 0.4.16
 Authors@R: c(
   person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut", "cre")),
   person("Patrick", "Walker", email = "patrick.walker06@imperial.ac.uk", role = c("aut")),
@@ -35,7 +35,10 @@ Imports:
     purrr,
     crayon,
     methods,
-    ggplot2
+    ggplot2,
+    viridis,
+    coda,
+    mvtnorm
 Depends: R (>= 3.1.0)
 VignetteBuilder: knitr
 Remotes:
