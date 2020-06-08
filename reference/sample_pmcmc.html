@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute age-adjusted eigenvalue for mixing matrix — adjusted_eigen • squire</title>
+<title>Sample PMCMC — sample_pmcmc • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="Compute age-adjusted eigenvalue for mixing matrix — adjusted_eigen" />
-<meta property="og:description" content="Compute age-adjusted eigenvalue for mixing matrix" />
+<meta property="og:title" content="Sample PMCMC — sample_pmcmc" />
+<meta property="og:description" content="Sample from the posterior probability results produced by run_mcmc_chain
+to select parameter set. For each parmater set sampled, run particle
+filter with num_particles and sample 1 trajectory" />
 
 
 
@@ -114,41 +116,65 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute age-adjusted eigenvalue for mixing matrix</h1>
+    <h1>Sample PMCMC</h1>
     
-    <div class="hidden name"><code>adjusted_eigen.Rd</code></div>
+    <div class="hidden name"><code>sample_pmcmc.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute age-adjusted eigenvalue for mixing matrix</p>
+    <p>Sample from the posterior probability results produced by <code>run_mcmc_chain</code>
+to select parameter set. For each parmater set sampled, run particle
+filter with <code>num_particles</code> and sample 1 trajectory</p>
     </div>
 
-    <pre class="usage"><span class='fu'>adjusted_eigen</span>(<span class='no'>dur_IMild</span>, <span class='no'>dur_ICase</span>, <span class='no'>prob_hosp</span>, <span class='no'>mixing_matrix</span>)</pre>
+    <pre class="usage"><span class='fu'>sample_pmcmc</span>(
+  <span class='no'>pmcmc_results</span>,
+  <span class='kw'>burnin</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='no'>n_chains</span>,
+  <span class='kw'>n_trajectories</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>n_particles</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>forecast_days</span> <span class='kw'>=</span> <span class='fl'>0</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>dur_IMild</th>
-      <td><p>Duration of mild infectiousness (days)</p></td>
+      <th>pmcmc_results</th>
+      <td><p>output of <code>run_mcmc_chain</code>; The results from the PMCMC run -- can have mutliple chains.</p></td>
     </tr>
     <tr>
-      <th>dur_ICase</th>
-      <td><p>Delay between symptom onset and requiring hospitalisation (days)</p></td>
+      <th>burnin</th>
+      <td><p>integer; Number of iterations to discard from the start of MCMC run. Default = 0</p></td>
     </tr>
     <tr>
-      <th>prob_hosp</th>
-      <td><p>Probability of hospitilisation by ages</p></td>
+      <th>n_chains</th>
+      <td><p>number of chains that considered. Should inherent from pmcmc.</p></td>
     </tr>
     <tr>
-      <th>mixing_matrix</th>
-      <td><p>Mixing matrix</p></td>
+      <th>n_trajectories</th>
+      <td><p>interger; Number of trajectories to be returned. Integer. Default = 10.</p></td>
+    </tr>
+    <tr>
+      <th>n_particles</th>
+      <td><p>integer; Number of particles to be considered in the particle filter. Default = 100</p></td>
+    </tr>
+    <tr>
+      <th>forecast_days</th>
+      <td><p>integer; number of days being forecast. Default = 0</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Eigenvalue</p>
+    
+<dl>
+  <dt>trajectories</dt><dd><p>A 3-dimensional array of trajectories (time, state, tranjectories).</p></dd>
+  <dt>sampled_PMCMC_Results</dt><dd><p>The parameters chosen when sampling from the <code>pmcmc</code> posteriors</p></dd>
+  <dt>inputs</dt><dd><p>A list of model inputs.</p></dd>
+  
+</dl>
+
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

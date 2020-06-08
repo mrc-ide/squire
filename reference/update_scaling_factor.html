@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute age-adjusted eigenvalue for mixing matrix — adjusted_eigen • squire</title>
+<title>update_sigma — update_scaling_factor • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Compute age-adjusted eigenvalue for mixing matrix — adjusted_eigen" />
-<meta property="og:description" content="Compute age-adjusted eigenvalue for mixing matrix" />
+<meta property="og:title" content="update_sigma — update_scaling_factor" />
+<meta property="og:description" content="Involved in the Robbins-Munro optimisation within the Metropolis-Hastings MCMC.
+Function to iteratively update the scaling factor of the covariance matrix." />
 
 
 
@@ -114,41 +115,49 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute age-adjusted eigenvalue for mixing matrix</h1>
+    <h1>update_sigma</h1>
     
-    <div class="hidden name"><code>adjusted_eigen.Rd</code></div>
+    <div class="hidden name"><code>update_scaling_factor.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute age-adjusted eigenvalue for mixing matrix</p>
+    <p>Involved in the Robbins-Munro optimisation within the Metropolis-Hastings MCMC.
+Function to iteratively update the scaling factor of the covariance matrix.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>adjusted_eigen</span>(<span class='no'>dur_IMild</span>, <span class='no'>dur_ICase</span>, <span class='no'>prob_hosp</span>, <span class='no'>mixing_matrix</span>)</pre>
+    <pre class="usage"><span class='fu'>update_scaling_factor</span>(
+  <span class='no'>scaling_factor</span>,
+  <span class='no'>acceptance</span>,
+  <span class='no'>probability</span>,
+  <span class='no'>i</span>,
+  <span class='no'>number_of_parameters</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>dur_IMild</th>
-      <td><p>Duration of mild infectiousness (days)</p></td>
+      <th>scaling_factor</th>
+      <td><p>the scaling factor involved in the Robbins-Munro optimisation</p></td>
     </tr>
     <tr>
-      <th>dur_ICase</th>
-      <td><p>Delay between symptom onset and requiring hospitalisation (days)</p></td>
+      <th>acceptance</th>
+      <td><p>whether or not the most recent parameter proposal was accepted</p></td>
     </tr>
     <tr>
-      <th>prob_hosp</th>
-      <td><p>Probability of hospitilisation by ages</p></td>
+      <th>probability</th>
+      <td><p>the required acceptance probability</p></td>
     </tr>
     <tr>
-      <th>mixing_matrix</th>
-      <td><p>Mixing matrix</p></td>
+      <th>i</th>
+      <td><p>the iteration number</p></td>
+    </tr>
+    <tr>
+      <th>number_of_parameters</th>
+      <td><p>the number of parameters currently being estimated</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Eigenvalue</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

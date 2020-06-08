@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute age-adjusted eigenvalue for mixing matrix — adjusted_eigen • squire</title>
+<title>create a master chain from a pmcmc_list object — create_master_chain • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Compute age-adjusted eigenvalue for mixing matrix — adjusted_eigen" />
-<meta property="og:description" content="Compute age-adjusted eigenvalue for mixing matrix" />
+<meta property="og:title" content="create a master chain from a pmcmc_list object — create_master_chain" />
+<meta property="og:description" content="create a master chain from a pmcmc_list object" />
 
 
 
@@ -114,41 +114,30 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute age-adjusted eigenvalue for mixing matrix</h1>
+    <h1>create a master chain from a pmcmc_list object</h1>
     
-    <div class="hidden name"><code>adjusted_eigen.Rd</code></div>
+    <div class="hidden name"><code>create_master_chain.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute age-adjusted eigenvalue for mixing matrix</p>
+    <p>create a master chain from a pmcmc_list object</p>
     </div>
 
-    <pre class="usage"><span class='fu'>adjusted_eigen</span>(<span class='no'>dur_IMild</span>, <span class='no'>dur_ICase</span>, <span class='no'>prob_hosp</span>, <span class='no'>mixing_matrix</span>)</pre>
+    <pre class="usage"><span class='fu'>create_master_chain</span>(<span class='no'>x</span>, <span class='no'>burn_in</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>dur_IMild</th>
-      <td><p>Duration of mild infectiousness (days)</p></td>
+      <th>x</th>
+      <td><p>a pmcmc_list object</p></td>
     </tr>
     <tr>
-      <th>dur_ICase</th>
-      <td><p>Delay between symptom onset and requiring hospitalisation (days)</p></td>
-    </tr>
-    <tr>
-      <th>prob_hosp</th>
-      <td><p>Probability of hospitilisation by ages</p></td>
-    </tr>
-    <tr>
-      <th>mixing_matrix</th>
-      <td><p>Mixing matrix</p></td>
+      <th>burn_in</th>
+      <td><p>an integer denoting the number of samples to discard from each chain</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Eigenvalue</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

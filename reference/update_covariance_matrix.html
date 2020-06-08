@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute age-adjusted eigenvalue for mixing matrix — adjusted_eigen • squire</title>
+<title>update_cov — update_covariance_matrix • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="Compute age-adjusted eigenvalue for mixing matrix — adjusted_eigen" />
-<meta property="og:description" content="Compute age-adjusted eigenvalue for mixing matrix" />
+<meta property="og:title" content="update_cov — update_covariance_matrix" />
+<meta property="og:description" content="Involved in the Robbins-Munro optimisation within the Metropolis-Hastings MCMC.
+Function to iteratively update the covariance matrix used to propose new parameter
+values." />
 
 
 
@@ -114,41 +116,51 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute age-adjusted eigenvalue for mixing matrix</h1>
+    <h1>update_cov</h1>
     
-    <div class="hidden name"><code>adjusted_eigen.Rd</code></div>
+    <div class="hidden name"><code>update_covariance_matrix.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute age-adjusted eigenvalue for mixing matrix</p>
+    <p>Involved in the Robbins-Munro optimisation within the Metropolis-Hastings MCMC.
+Function to iteratively update the covariance matrix used to propose new parameter
+values.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>adjusted_eigen</span>(<span class='no'>dur_IMild</span>, <span class='no'>dur_ICase</span>, <span class='no'>prob_hosp</span>, <span class='no'>mixing_matrix</span>)</pre>
+    <pre class="usage"><span class='fu'>update_covariance_matrix</span>(
+  <span class='no'>covariance_matrix</span>,
+  <span class='no'>i</span>,
+  <span class='no'>mean_vector</span>,
+  <span class='no'>current_parameters</span>,
+  <span class='no'>number_of_parameters</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>dur_IMild</th>
-      <td><p>Duration of mild infectiousness (days)</p></td>
+      <th>covariance_matrix</th>
+      <td><p>the current covariance matrix being used to propose new parameter values</p></td>
     </tr>
     <tr>
-      <th>dur_ICase</th>
-      <td><p>Delay between symptom onset and requiring hospitalisation (days)</p></td>
+      <th>i</th>
+      <td><p>the number of iterations since covariance matrix adaptation began</p></td>
     </tr>
     <tr>
-      <th>prob_hosp</th>
-      <td><p>Probability of hospitilisation by ages</p></td>
+      <th>mean_vector</th>
+      <td><p>initially this the mean of the columns of the MCMC chain. sequentially updated
+by this function.</p></td>
     </tr>
     <tr>
-      <th>mixing_matrix</th>
-      <td><p>Mixing matrix</p></td>
+      <th>current_parameters</th>
+      <td><p>the current parameter values in the MCMC chain</p></td>
+    </tr>
+    <tr>
+      <th>number_of_parameters</th>
+      <td><p>the number of parameters currently being estimated</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Eigenvalue</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
