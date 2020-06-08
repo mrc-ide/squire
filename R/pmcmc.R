@@ -175,7 +175,7 @@ pmcmc <- function(data,
   assert_dataframe(data)
   assert_in("date", names(data))
   assert_in("deaths", names(data))
-  assert_date(data$dat)
+  assert_date(data$date)
   assert_increasing(as.numeric(as.Date(data$date)),
                     message = "Dates must be in increasing order")
 
