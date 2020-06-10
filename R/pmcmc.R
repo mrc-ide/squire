@@ -1023,7 +1023,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   #--------------------..
   # and now get new R0s for the R0
   R0 <- evaluate_Rt(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
-                    date_R0_change = date_R0_change,
+                    date_R0_change = date_R0_change[date_R0_change>start_date],
                     date_Meff_change = date_Meff_change, Rt_func = Rt_func)
 
   # which allow us to work out our beta
