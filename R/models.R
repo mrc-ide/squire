@@ -1,3 +1,28 @@
+#' Create an explicit environmental model
+#'
+#' @title Explicit environmental SEEIR model creation.
+#'
+#' We will use this structure to ensure that model fitting is flexible in the
+#' future as more models are added
+#'
+#' @export
+explicit_env_model <- function() {
+
+  model_class <- "explicit_env_SEEIR_model"
+  compare_model <- function(model, pars_obs, data) {
+    compare_output(model, pars_obs, data, type=model_class)
+  }
+
+  explicit_model <- list(odin_model = explicit_env_SEIR,
+                         generate_beta_func = beta_est_env_explicit,
+                         parameter_func = parameters_explicit_env_SEEIR,
+                         run_func = run_explicit_env_SEEIR_model,
+                         compare_model = compare_model)
+  class(explicit_model) <- c(model_class, "stochastic", "squire_model")
+  explicit_model
+
+}
+
 #' Create an explicit model
 #'
 #' @title Explicit SEEIR model creation.

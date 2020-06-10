@@ -76,6 +76,26 @@ beta_est_explicit <- function(dur_IMild, dur_ICase, prob_hosp, mixing_matrix, R0
   R0 / adjusted_eigen(dur_IMild, dur_ICase, prob_hosp, mixing_matrix)
 }
 
+#' Estimate beta parameter for explicit environmental model
+#'
+#' @param dur_IMild Duration of mild infectiousness (days)
+#' @param dur_ICase Delay between symptom onset and requiring hospitalisation (days)
+#' @param prob_hosp Probability of hospitilisation by ages
+#' @param mixing_matrix Mixing matrix
+#' @param R0 Basic reproduction number
+#' @param env_slp Slope of environmental effect on R0
+#' @param env_dat Daily environmental data
+#'
+#' @return Beta parameter
+#' @export
+#'
+# #' @examples
+beta_est_env_explicit <- function(dur_IMild, dur_ICase, prob_hosp, mixing_matrix, R0, env_slp, env_dat) {
+  assert_pos(R0, zero_allowed = FALSE)
+  (R0 +env_slp*env_dat) / adjusted_eigen(dur_IMild, dur_ICase, prob_hosp, mixing_matrix)
+}
+
+
 #' Estimate beta for a squire model using model parameters
 #' @param squire_model A squire model. Default = \code{explicit_SEEIR()}
 #' @param model_params Squire model parameters, from a call to
