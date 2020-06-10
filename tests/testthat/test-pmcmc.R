@@ -65,7 +65,7 @@ test_that("pmcmc fitting works", {
                country = country),
                "recommend starting to adapt scaling factor at least 100")
 
-  expect_named(out, c("output", "parameters", "model", "inputs", "replicate_parameters", "pmcmc_results", "interventions"))
+  expect_named(out, c("output", "parameters", "model", "replicate_parameters", "pmcmc_results", "interventions"))
   expect_warning(expect_s3_class(plot(out, what = "cases", particle_fit = TRUE), "gg"))
   expect_warning(expect_s3_class(plot(out, what = "deaths", particle_fit = TRUE), "gg"))
   expect_error(plot(out, what = "rubbish", particle_fit = TRUE),"must be one of")
@@ -147,30 +147,6 @@ test_that("pmcmc fitting works", {
                  proposal_kernel = proposal_kernel,
                  R0_change = 0.5,
                  date_R0_change = "2022-05-10",
-                 country = country)
-  )
-
-
-  expect_error(
-    out <- pmcmc(data = data,
-                 n_mcmc = 5,
-                 log_likelihood = NULL,
-                 log_prior = NULL,
-                 n_particles = 2,
-                 steps_per_day = steps_per_day,
-                 output_proposals = FALSE,
-                 n_chains = 1,
-                 replicates = 2,
-                 burnin = 0,
-                 squire_model = squire_model,
-                 pars_init = pars_init,
-                 pars_min = pars_min,
-                 pars_max = pars_max,
-                 pars_discrete = pars_discrete,
-                 pars_obs = pars_obs,
-                 proposal_kernel = proposal_kernel,
-                 R0_change = 0.5,
-                 date_R0_change = "2020-02-01",
                  country = country)
   )
 
@@ -1091,3 +1067,32 @@ test_that("offsetting", {
   expect_equal(offset_to_start_date(("2020-04-01"), -31), as.Date("2020-03-01"))
 
 })
+
+#-------------------------------------
+test_that("evaluate_Rt", {
+
+  R0 <- 3
+R0_change <- c(seq(0.9,0.5,-0.1),0.7)
+date_R0_change <- c("2020-03-12","2020-03-18","2020-03-22",
+                    "2020-03-25","2020-03-27","2020-03-29")
+date_Meff_change <- c("2020-03-26")
+Rt_func <- function (R0_change, R0, Meff) {
+  R0 * (2 * plogis(-(R0_change - 1) * -Meff))
+}
+Meff <- 2
+Meff_pl <- 6
+
+Rt <- evaluate_Rt(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
+                  date_R0_change = date_R0_change,
+                  date_Meff_change = date_Meff_change, Rt_func = Rt_func)
+
+expect_lt(Rt[7], Rt[4])
+
+Rt <- evaluate_Rt(R0_change = NULL, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
+                  date_R0_change = date_R0_change,
+                  date_Meff_change = date_Meff_change, Rt_func = Rt_func)
+expect_equal(R0, Rt)
+
+
+})
+

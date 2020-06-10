@@ -1,3 +1,7 @@
+# squire 0.4.17
+
+* `pars_init` for `pmcmc` can be provided as a list to 
+
 # squire 0.4.16
 
 * `pmcmc` method for 4 parameter estimation.

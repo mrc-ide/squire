@@ -41,6 +41,9 @@
 #' @param start_covariance_adaptation Iteration number to begin covariance matrix adaptation at
 #' @param start_scaling_factor_adaptation Iteration number to begin RM optimisation of scaling factor at
 #' @param initial_scaling_factor Initial scaling factor for RM opitmisation if implemented
+#' @param ... Further aguments for the model parameter function. If using the
+#'   \code{\link{explicit_model}} (default) this will be
+#'   \code{parameters_explicit_SEEIR}.
 #'
 #' @return squire_simulation \describe{
 #'   \item{output}{Trajectories from the sampled pMCMC parameter iterations.}
@@ -115,8 +118,8 @@ pmcmc <- function(data,
                   n_chains = 1,
                   squire_model = explicit_model(),
                   Rt_func = function (R0_change, R0, Meff) {
-                       R0 * (2 * plogis(-(R0_change - 1) * -Meff))
-                    },
+                    R0 * (2 * plogis(-(R0_change - 1) * -Meff))
+                  },
                   pars_obs = list(phi_cases = 1,
                                   k_cases = 2,
                                   phi_death = 1,
@@ -160,7 +163,8 @@ pmcmc <- function(data,
                   required_acceptance_ratio = 0.23,
                   start_covariance_adaptation = round(n_mcmc/2),
                   start_scaling_factor_adaptation = 1,
-                  initial_scaling_factor = 1
+                  initial_scaling_factor = 1,
+                  ...
 ) {
 
   #------------------------------------------------------------
@@ -170,6 +174,18 @@ pmcmc <- function(data,
   #----------------..
   # assertions & checks
   #----------------..
+
+  # we work with pars_init being a list of inital conditions for starting
+  # each chain
+  if(any(c("start_date", "R0", "Meff", "Meff_pl") %in% names(pars_init))) {
+    pars_init <- list(pars_init)
+  }
+
+  # make it long enough if not
+  if(length(pars_init) != n_chains) {
+    pars_init <- rep(pars_init, n_chains)
+    pars_init <- pars_init[seq_len(n_chains)]
+  }
 
   # data
   assert_dataframe(data)
@@ -181,43 +197,44 @@ pmcmc <- function(data,
 
   # check input pars df
   assert_list(pars_init)
+  assert_list(pars_init[[1]])
   assert_list(pars_min)
   assert_list(pars_max)
   assert_list(pars_discrete)
-  assert_eq(names(pars_init), names(pars_min))
+  assert_eq(names(pars_init[[1]]), names(pars_min))
   assert_eq(names(pars_min), names(pars_max))
   assert_eq(names(pars_max), names(pars_discrete))
-  assert_in(names(pars_init), c("R0", "start_date", "Meff", "Meff_pl"),
+  assert_in(names(pars_init[[1]]), c("R0", "start_date", "Meff", "Meff_pl"),
             message = "Params to infer must include R0, start_date, and Effective Mobility during and after lockdown")
-  assert_date(pars_init$start_date)
+  assert_date(pars_init[[1]]$start_date)
   assert_date(pars_min$start_date)
   assert_date(pars_max$start_date)
   if (pars_max$start_date >= as.Date(data$date[1])-1) {
     stop("Maximum start date must be at least 2 days before the first date in data")
   }
-  assert_bounded(as.numeric(pars_init$start_date), left = as.numeric(pars_min$start_date), right = as.numeric(pars_max$start_date))
+  assert_bounded(as.numeric(pars_init[[1]]$start_date), left = as.numeric(pars_min$start_date), right = as.numeric(pars_max$start_date))
 
   assert_pos(pars_min$R0)
   assert_pos(pars_max$R0)
-  assert_pos(pars_init$R0)
-  assert_bounded(pars_init$R0, left = pars_min$R0, right = pars_max$R0)
+  assert_pos(pars_init[[1]]$R0)
+  assert_bounded(pars_init[[1]]$R0, left = pars_min$R0, right = pars_max$R0)
 
   assert_pos(pars_min$Meff)
   assert_pos(pars_max$Meff)
-  assert_pos(pars_init$Meff)
-  assert_bounded(pars_init$Meff, left = pars_min$Meff, right = pars_max$Meff)
+  assert_pos(pars_init[[1]]$Meff)
+  assert_bounded(pars_init[[1]]$Meff, left = pars_min$Meff, right = pars_max$Meff)
 
   assert_pos(pars_min$Meff_pl)
   assert_pos(pars_max$Meff_pl)
-  assert_pos(pars_init$Meff_pl)
-  assert_bounded(pars_init$Meff_pl, left = pars_min$Meff_pl, right = pars_max$Meff_pl)
+  assert_pos(pars_init[[1]]$Meff_pl)
+  assert_bounded(pars_init[[1]]$Meff_pl, left = pars_min$Meff_pl, right = pars_max$Meff_pl)
 
   assert_logical(unlist(pars_discrete))
 
   # check proposal kernel
   assert_matrix(proposal_kernel)
-  assert_eq(colnames(proposal_kernel), names(pars_init))
-  assert_eq(rownames(proposal_kernel), names(pars_init))
+  assert_eq(colnames(proposal_kernel), names(pars_init[[1]]))
+  assert_eq(rownames(proposal_kernel), names(pars_init[[1]]))
 
   # check likelihood items
   if ( !(is.null(log_likelihood) | inherits(log_likelihood, "function")) ) {
@@ -251,25 +268,12 @@ pmcmc <- function(data,
     if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_R0_change is greater than the last date in data")
     }
-    if (as.Date(pars_max$start_date) >= as.Date(head(date_R0_change, 1))) {
-      stop("First date in date_R0_change is earlier than maximum start date allowed in pars search")
-    }
-  }
-
-  if (!is.null(date_R0_change)) {
-    assert_date(date_R0_change)
-    if(as.Date(tail(date_R0_change,1)) > as.Date(tail(data$date, 1))) {
-      stop("Last date in date_R0_change is greater than the last date in data")
-    }
-    if (as.Date(pars_max$start_date) >= as.Date(head(date_R0_change, 1))) {
-      stop("First date in date_R0_change is earlier than maximum start date allowed in pars search")
-    }
   }
 
   # catch that if date_R0_change isn't set, Meff isn't doing anything -- not to confuse user
   if (is.null(date_R0_change)) {
-    if (pars_min[["Meff"]] != 1 & pars_max[["Meff"]] != 1 & pars_init[["Meff"]] != 1 &
-        pars_min[["Meff_pl"]] != 1 & pars_max[["Meff_pl"]] != 1 & pars_init[["Meff_pl"]] != 1) {
+    if (pars_min[["Meff"]] != 1 & pars_max[["Meff"]] != 1 & pars_init[[1]][["Meff"]] != 1 &
+        pars_min[["Meff_pl"]] != 1 & pars_max[["Meff_pl"]] != 1 & pars_init[[1]][["Meff_pl"]] != 1) {
       stop("Without an R0 date change, Meff during and post lockdown is not being used. Set Meff during and after lockdow to 1 in all pars lists")
     } else {
       # this slight tweak, so it still works with reflect proposal but won't move since it's not being estimated
@@ -286,7 +290,7 @@ pmcmc <- function(data,
 
   # meff change
   if (is.null(date_Meff_change)) {
-    if (pars_min[["Meff_pl"]] != 1 & pars_max[["Meff_pl"]] != 1 & pars_init[["Meff_pl"]] != 1) {
+    if (pars_min[["Meff_pl"]] != 1 & pars_max[["Meff_pl"]] != 1 & pars_init[[1]][["Meff_pl"]] != 1) {
       stop("Without date of Meff change, Meff after lockdown is not being used. Set Meff after lockdow to 1 in all pars lists")
     } else {
       # this slight tweak, so it still works with reflect proposal but won't move since it's not being estimated
@@ -296,6 +300,7 @@ pmcmc <- function(data,
 
     }
   }
+
   if (!is.null(date_Meff_change)) {
     assert_date(date_Meff_change)
     if(as.Date(date_Meff_change) >= as.Date(tail(date_R0_change, 1))) {
@@ -414,7 +419,8 @@ pmcmc <- function(data,
                                               hosp_bed_capacity = hosp_bed_capacity,
                                               tt_hosp_beds = tt_hosp_beds,
                                               ICU_bed_capacity = ICU_bed_capacity,
-                                              tt_ICU_beds = tt_ICU_beds)
+                                              tt_ICU_beds = tt_ICU_beds,
+                                              ...)
 
   # collect interventions for odin model likelihood
   interventions <- list(R0_change = R0_change,
@@ -498,10 +504,10 @@ pmcmc <- function(data,
   if (Sys.getenv("SQUIRE_PARALLEL_DEBUG") == "TRUE") {
 
     chains <- purrr::pmap(
-      .l =  list(n_mcmc = rep(n_mcmc, n_chains)),
+      .l =  list(n_mcmc = rep(n_mcmc, n_chains),
+                 curr_pars = pars_init),
       .f = run_mcmc_chain,
       inputs = inputs,
-      curr_pars = pars_init,
       calc_lprior = calc_lprior,
       calc_ll = calc_ll,
       first_data_date = data$date[1],
@@ -518,10 +524,10 @@ pmcmc <- function(data,
   } else {
 
     chains <- furrr::future_pmap(
-      .l =  list(n_mcmc = rep(n_mcmc, n_chains)),
+      .l =  list(n_mcmc = rep(n_mcmc, n_chains),
+                 curr_pars = pars_init),
       .f = run_mcmc_chain,
       inputs = inputs,
-      curr_pars = pars_init,
       calc_lprior = calc_lprior,
       calc_ll = calc_ll,
       first_data_date = data$date[1],
@@ -550,11 +556,11 @@ pmcmc <- function(data,
     chains_coda <- lapply(chains, function(x) {
 
       traces <- x$results
-      if('start_date' %in% names(pars_init)) {
+      if('start_date' %in% names(pars_init[[1]])) {
         traces$start_date <- start_date_to_offset(data$date[1], traces$start_date)
       }
 
-      coda::as.mcmc(traces[, names(pars_init)])
+      coda::as.mcmc(traces[, names(pars_init[[1]])])
     })
 
     rhat <- tryCatch(expr = {
@@ -609,10 +615,6 @@ pmcmc <- function(data,
                                replicates = 1,
                                time_period = max(tt_contact_matrix,tt_hosp_beds,tt_ICU_beds,1))
 
-    # first let's add our pmcmc results for a nice return
-    # we'll save our inputs so it is easy to recreate later
-    r$inputs <- pmcmc_samples$inputs
-
     # and add the parameters that changed between each simulation, i.e. posterior draws
     r$replicate_parameters <- pmcmc_samples$sampled_PMCMC_Results
 
@@ -649,7 +651,7 @@ pmcmc <- function(data,
   }
 
   # second let's recreate the output
-  r$model <- pmcmc_samples$inputs$model$odin_model(
+  r$model <- pmcmc_samples$inputs$squire_model$odin_model(
     user = pmcmc_samples$inputs$model_params, unused_user_action = "ignore"
   )
   # we will add the interventions here so that we know what times are needed for projection
@@ -658,6 +660,7 @@ pmcmc <- function(data,
   # and fix the replicates
   r$parameters$replicates <- replicates
   r$parameters$time_period <- as.numeric(diff(as.Date(range(rownames(r$output)))))
+  r$parameters$dt <- model_params$dt
 
   #--------------------..
   # out
@@ -801,9 +804,9 @@ run_mcmc_chain <- function(inputs,
   pars_min[["start_date"]] <- -(start_date_to_offset(first_data_date, pars_min[["start_date"]])) # negative here because we are working backwards in time
   pars_max[["start_date"]] <- -(start_date_to_offset(first_data_date, pars_max[["start_date"]]))
 
-  #----------------..
+  #----------------
   # main pmcmc loop
-  #----------------..
+  #----------------
   for(iter in seq_len(n_mcmc) + 1L) {
 
     prop_pars <- propose_parameters(curr_pars,
@@ -879,7 +882,6 @@ run_mcmc_chain <- function(inputs,
 
     if (iter %% 100 == 0) {
       print(c(round(scaling_factor, 3), round(sum(acceptances, na.rm = TRUE)/iter, 3), round(iter, 1)))
-      #print(proposal_kernel)
     }
 
   }
@@ -1020,24 +1022,9 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   # update new R0s based on R0_change and R0_date_change, and Meff_date_change
   #--------------------..
   # and now get new R0s for the R0
-  if (!is.null(R0_change)) {
-    if (is.null(date_Meff_change)) {
-      R0 <- c(R0, vapply(R0_change, function(x){
-        Rt_func(R0_change = x, R0 = R0, Meff = Meff)
-      }, FUN.VALUE = numeric(1)))
-    } else if (!is.null(date_Meff_change)) {
-      # when does mobility change take place
-      swtchdates <- which(date_R0_change >= date_Meff_change)
-      R0 <- c(R0,
-              vapply(R0_change[1:(min(swtchdates)-1)], function(x){
-                Rt_func(R0_change = x, R0 = R0, Meff = Meff)
-              }, FUN.VALUE = numeric(1)),
-              vapply(R0_change[min(swtchdates):(length(R0_change))], function(x){
-                Rt_func(R0_change = x, R0 = R0, Meff = Meff_pl)
-              }, FUN.VALUE = numeric(1))
-              )
-    }
-  }
+  R0 <- evaluate_Rt(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
+                    date_R0_change = date_R0_change,
+                    date_Meff_change = date_Meff_change, Rt_func = Rt_func)
 
   # which allow us to work out our beta
   beta_set <- beta_est(squire_model = squire_model,
@@ -1067,65 +1054,54 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
 
   } else if (inherits(squire_model, "deterministic")) {
 
-    # a bit of an ugly work-around to keep pMCMC sample state and log-likelihood framework consistent
-    # with scan results as well
-    # need states for pMCMC
-    switch(pf_return,
-           "single"={
-             pf_result <- list()
-             pf_result$log_likelihood <- run_deterministic_comparison(data = data,
-                                                                      squire_model = squire_model,
-                                                                      model_params = model_params,
-                                                                      model_start_date = start_date,
-                                                                      obs_params = pars_obs,
-                                                                      forecast_days = 0,
-                                                                      save_history = FALSE,
-                                                                      return = "ll")
-             # need states for pMCMC
-             pf_result$sample_state <- run_deterministic_comparison(data = data,
-                                                                    squire_model = squire_model,
-                                                                    model_params = model_params,
-                                                                    model_start_date = start_date,
-                                                                    obs_params = pars_obs,
-                                                                    forecast_days = forecast_days,
-                                                                    save_history = TRUE,
-                                                                    return = "single")
-           },
-           "full" = {
-             pf_result <- run_deterministic_comparison(data = data,
-                                                       squire_model = squire_model,
-                                                       model_params = model_params,
-                                                       model_start_date = start_date,
-                                                       obs_params = pars_obs,
-                                                       forecast_days = forecast_days,
-                                                       save_history = TRUE,
-                                                       return = "full")
-           },
-           "ll" = {
-             pf_result$log_likelihood <- run_deterministic_comparison(data = data,
-                                                                      squire_model = squire_model,
-                                                                      model_params = model_params,
-                                                                      model_start_date = start_date,
-                                                                      obs_params = pars_obs,
-                                                                      forecast_days = 0,
-                                                                      save_history = FALSE,
-                                                                      return = "ll")
-           },
-           "sample" = {
-             pf_result <- run_deterministic_comparison(data = data,
-                                                       squire_model = squire_model,
-                                                       model_params = model_params,
-                                                       model_start_date = start_date,
-                                                       obs_params = pars_obs,
-                                                       forecast_days = forecast_days,
-                                                       save_history = TRUE,
-                                                       return = "sample")
-           }
-    )
+    pf_result <- run_deterministic_comparison(data = data,
+                                              squire_model = squire_model,
+                                              model_params = model_params,
+                                              model_start_date = start_date,
+                                              obs_params = pars_obs,
+                                              forecast_days = forecast_days,
+                                              save_history = save_particles,
+                                              return = pf_return)
+
   }
 
   # out
   pf_result
+}
+
+# R0 with Meff
+#' @noRd
+evaluate_Rt <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
+                        date_Meff_change, Rt_func) {
+
+  # and now get new R0s for the R0
+  if (!is.null(R0_change)) {
+
+    if (is.null(date_Meff_change)) {
+      R0 <- c(R0, vapply(R0_change, function(x){
+        Rt_func(R0_change = x, R0 = R0, Meff = Meff)
+      }, FUN.VALUE = numeric(1)))
+
+    } else if (!is.null(date_Meff_change)) {
+
+      date_Meff_change <- as.Date(date_Meff_change)
+      date_R0_change <- as.Date(date_R0_change)
+
+      # when does mobility change take place
+      swtchdates <- which(date_R0_change >= date_Meff_change)
+      R0 <- c(R0,
+              vapply(R0_change[1:(min(swtchdates)-1)], function(x){
+                Rt_func(R0_change = x, R0 = R0, Meff = Meff)
+              }, FUN.VALUE = numeric(1)),
+              vapply(R0_change[min(swtchdates):(length(R0_change))], function(x){
+                Rt_func(R0_change = x, R0 = R0, Meff = Meff_pl)
+              }, FUN.VALUE = numeric(1))
+      )
+    }
+  }
+
+  return(R0)
+
 }
 
 

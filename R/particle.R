@@ -644,10 +644,6 @@ run_deterministic_comparison <- function(data,
   if (as.Date(data$date[data$deaths > 0][1], "%Y-%m-%d") < as.Date(model_start_date, "%Y-%m-%d")) {
     stop("Model start date is later than data start date")
   }
-  if ((return %in% c("full", "sample", "single") & !save_history)) {
-    stop("If full, sample, or single specified, must save history")
-  }
-
 
   # convert data into particle-filter form
   data <- particle_filter_data(data = data,
@@ -677,29 +673,32 @@ run_deterministic_comparison <- function(data,
   Ds <- Ds[data$day_end[-1]]
   deaths <- data$deaths[-1]
 
+  # calculate ll
   ll <- ll_nbinom(deaths, Ds, obs_params$phi_death, obs_params$k_death, obs_params$exp_noise)
-  log_likelihood <- sum(ll)
 
-  # start the return object creation with likelihoods and other return options
-  ret <- list(log_likelihood = log_likelihood)
+  # format the out object
+  date <- data$date[[1]] + seq_len(nrow(out)) - 1L
+  rownames(out) <- as.character(date)
+  attr(out, "date") <- date
+
+  # format similar to particle_filter nomenclature
+  pf_results <- list()
+  pf_results$log_likelihood <- sum(ll)
+
+  # single returns final state
   if (save_history) {
-    date <- data$date[[1]] + seq_len(nrow(out)) - 1L
-    rownames(out) <- as.character(date)
-    attr(out, "date") <- date
-
-    # single returns final state
-    if (return == "single") {
-      ret$states <- out[nrow(out), ]
-    } else {
-      ret$states <- out
-    }
-
+    pf_results$states <- out
+  } else if (return == "single") {
+    pf_results$sample_state <- out[nrow(out), ]
   }
 
+  # create returned object
   if (return == "ll") {
-    ret <- ret$log_likelihood
-  } else if (return == "full" || return == "sample" || return == "single") {
-    ret <- ret$states
+    ret <- pf_results$log_likelihood
+  } else if (return == "sample") {
+    ret <- pf_results$states
+  } else if (return == "single" || return == "full") {
+    ret <- pf_results
   }
 
   ret
