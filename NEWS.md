@@ -1,6 +1,6 @@
 # squire 0.4.17
 
-* `pars_init` for `pmcmc` can be provided as a list to 
+* `pars_init` for `pmcmc` can be provided as a list for where each chain starts
 
 # squire 0.4.16
 
