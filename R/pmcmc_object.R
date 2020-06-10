@@ -23,12 +23,12 @@ plot_pmcmc_sample  <- function(x, what = "deaths") {
     names(quants)[1:2] <- c("ymin","ymax")
 
     base_plot <- plot(x, "infections", ci = FALSE, replicates = TRUE, x_var = "date",
-                      date_0 = max(x$inputs$data$date))
+                      date_0 = max(x$pmcmc_results$inputs$data$date))
     base_plot <- base_plot +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=.data$cases/x$inputs$pars_obs$phi_cases,
-                                       x=as.Date(.data$date)), x$inputs$data)
+      ggplot2::geom_point(ggplot2::aes(y=.data$cases/x$pmcmc_results$inputs$pars_obs$phi_cases,
+                                       x=as.Date(.data$date)), x$pmcmc_results$inputs$data)
 
   }
 
@@ -47,12 +47,12 @@ plot_pmcmc_sample  <- function(x, what = "deaths") {
     names(quants)[1:2] <- c("ymin","ymax")
 
     base_plot <- plot(x, "deaths", ci = FALSE, replicates = TRUE, x_var = "date",
-                      date_0 = max(x$inputs$data$date))
+                      date_0 = max(x$pmcmc_results$inputs$data$date))
     base_plot <- base_plot +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=.data$deaths/x$inputs$pars_obs$phi_death,
-                                       x=as.Date(.data$date)), x$inputs$data)
+      ggplot2::geom_point(ggplot2::aes(y=.data$deaths/x$pmcmc_results$inputs$pars_obs$phi_death,
+                                       x=as.Date(.data$date)), x$pmcmc_results$inputs$data)
 
   } else {
 
@@ -109,7 +109,7 @@ create_master_chain <- function(x, burn_in) {
 #' @importFrom stats cor sd
 summary.squire_pmcmc <- function(object, ...) {
 
-  par_names <- names(object$inputs$pars$pars_init)
+  par_names <- names(object$inputs$pars$pars_init[[1]])
 
   ## convert start_date to numeric to calculate stats
   data_start_date <- as.Date(object$inputs$data$date[1])
@@ -159,7 +159,7 @@ summary.squire_pmcmc_list <- function(object, ..., burn_in = 101) {
 plot.squire_pmcmc <- function(x, ...) {
 
   summ <- summary(x)
-  par_names <- names(x$inputs$pars$pars_init)
+  par_names <- names(x$inputs$pars$pars_init[[1]])
 
   traces <- x$results[, par_names]
   cols <- viridis::cividis(nrow(traces))
@@ -235,7 +235,7 @@ plot.squire_pmcmc <- function(x, ...) {
 plot.squire_pmcmc_list <- function(x, burn_in = 1, ...) {
 
   summ <- summary(x, burn_in = burn_in)
-  par_names <- names(x$inputs$pars$pars_init)
+  par_names <- names(x$inputs$pars$pars_init[[1]])
   n_pars <- length(par_names)
 
   chains <- x$chains

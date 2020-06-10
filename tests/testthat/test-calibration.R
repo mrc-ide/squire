@@ -320,7 +320,7 @@ out <- calibrate(
   forecast = 0
 )
 
-expect_true(inherits(out$scan_results$inputs$model, "deterministic"))
+expect_true(inherits(out$scan_results$inputs$squire_model, "deterministic"))
 expect_error(get <- projections(out), "unlikely to work with deterministic")
 
 })
