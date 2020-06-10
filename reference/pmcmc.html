@@ -102,7 +102,7 @@ the squire_model framework." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.16</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.17</span>
       </span>
     </div>
 
@@ -223,7 +223,8 @@ the <code>squire_model</code> framework.</p>
   <span class='kw'>required_acceptance_ratio</span> <span class='kw'>=</span> <span class='fl'>0.23</span>,
   <span class='kw'>start_covariance_adaptation</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span>(<span class='no'>n_mcmc</span>/<span class='fl'>2</span>),
   <span class='kw'>start_scaling_factor_adaptation</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>initial_scaling_factor</span> <span class='kw'>=</span> <span class='fl'>1</span>
+  <span class='kw'>initial_scaling_factor</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='no'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -424,6 +425,12 @@ to select parameter set. For each parmater set sampled, run particle filter with
     <tr>
       <th>initial_scaling_factor</th>
       <td><p>Initial scaling factor for RM opitmisation if implemented</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Further aguments for the model parameter function. If using the
+<code><a href='explicit_model.html'>explicit_model</a></code> (default) this will be
+<code>parameters_explicit_SEEIR</code>.</p></td>
     </tr>
     </table>
 
