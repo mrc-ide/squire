@@ -1,3 +1,7 @@
+# squire 0.4.18
+
+* `calc_loglikelihood` fix for reduced date vectors
+
 # squire 0.4.17
 
 * `pars_init` for `pmcmc` can be provided as a list for where each chain starts
