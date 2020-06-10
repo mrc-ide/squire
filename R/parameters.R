@@ -784,9 +784,10 @@ parameters_explicit_env_SEEIR <- function(
                beta_set = beta_set,
                dt = dt,
                population = population,
-               contact_matrix_set = contact_matrix_set)
+               contact_matrix_set = contact_matrix_set,
+               env_slp = env_slp)
 
-  class(pars) <- c("explicit_SEEIR_parameters", "squire_parameters")
+  class(pars) <- c("explicit_env_SEEIR_parameters", "squire_parameters")
 
   return(pars)
 
