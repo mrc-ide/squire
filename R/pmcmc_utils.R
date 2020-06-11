@@ -148,7 +148,7 @@ sample_pmcmc <- function(pmcmc_results,
   out <- list("trajectories" = trajectories,
               "sampled_PMCMC_Results" = params_smpl,
               inputs = list(
-                model = pmcmc_results$inputs$squire_model,
+                squire_model = pmcmc_results$inputs$squire_model,
                 model_params = pmcmc_results$inputs$model_params,
                 interventions = pmcmc_results$inputs$interventions,
                 data = pmcmc_results$inputs$data,

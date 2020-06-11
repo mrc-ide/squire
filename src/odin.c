@@ -764,6 +764,7 @@ SEXP explicit_SEIR_deterministic_initial_conditions(SEXP internal_p, SEXP t_ptr)
 void explicit_SEIR_deterministic_rhs(explicit_SEIR_deterministic_internal* internal, double t, double * state, double * dstatedt, double * output);
 void explicit_SEIR_deterministic_rhs_dde(size_t neq, double t, double * state, double * dstatedt, void * internal);
 void explicit_SEIR_deterministic_rhs_desolve(int * neq, double * t, double * state, double * dstatedt, double * output, int * np);
+void explicit_SEIR_deterministic_output_dde(size_t n_eq, double t, double * state, size_t n_output, double * output, void * internal_p);
 SEXP explicit_SEIR_deterministic_rhs_r(SEXP internal_p, SEXP t, SEXP state);
 explicit_SEIR_internal* explicit_SEIR_get_internal(SEXP internal_p, int closed_error);
 static void explicit_SEIR_finalise(SEXP internal_p);
@@ -1993,8 +1994,14 @@ SEXP explicit_SEIR_deterministic_metadata(SEXP internal_p) {
   SET_STRING_ELT(variable_names, 25, mkChar("D"));
   SET_VECTOR_ELT(ret, 0, variable_length);
   UNPROTECT(2);
-  SET_VECTOR_ELT(ret, 1, R_NilValue);
-  SET_VECTOR_ELT(ret, 2, ScalarInteger(0));
+  SEXP output_length = PROTECT(allocVector(VECSXP, 1));
+  SEXP output_names = PROTECT(allocVector(STRSXP, 1));
+  setAttrib(output_length, R_NamesSymbol, output_names);
+  SET_VECTOR_ELT(output_length, 0, R_NilValue);
+  SET_STRING_ELT(output_names, 0, mkChar("time"));
+  SET_VECTOR_ELT(ret, 1, output_length);
+  UNPROTECT(2);
+  SET_VECTOR_ELT(ret, 2, ScalarInteger(1));
   SEXP interpolate_t = PROTECT(allocVector(VECSXP, 3));
   SEXP interpolate_t_nms = PROTECT(allocVector(STRSXP, 3));
   setAttrib(interpolate_t, R_NamesSymbol, interpolate_t_nms);
@@ -2183,6 +2190,10 @@ void explicit_SEIR_deterministic_rhs(explicit_SEIR_deterministic_internal* inter
   for (int i = 1; i <= internal->dim_S; ++i) {
     dstatedt[0 + i - 1] = -(S[i - 1]) * internal->lambda[i - 1];
   }
+  if (output) {
+    double time = t;
+    output[0] = time;
+  }
 }
 void explicit_SEIR_deterministic_rhs_dde(size_t neq, double t, double * state, double * dstatedt, void * internal) {
   explicit_SEIR_deterministic_rhs((explicit_SEIR_deterministic_internal*)internal, t, state, dstatedt, NULL);
@@ -2190,10 +2201,18 @@ void explicit_SEIR_deterministic_rhs_dde(size_t neq, double t, double * state, d
 void explicit_SEIR_deterministic_rhs_desolve(int * neq, double * t, double * state, double * dstatedt, double * output, int * np) {
   explicit_SEIR_deterministic_rhs(explicit_SEIR_deterministic_internal_ds, *t, state, dstatedt, output);
 }
+void explicit_SEIR_deterministic_output_dde(size_t n_eq, double t, double * state, size_t n_output, double * output, void * internal_p) {
+  explicit_SEIR_deterministic_internal *internal = (explicit_SEIR_deterministic_internal*) internal_p;
+  double time = t;
+  output[0] = time;
+}
 SEXP explicit_SEIR_deterministic_rhs_r(SEXP internal_p, SEXP t, SEXP state) {
   SEXP dstatedt = PROTECT(allocVector(REALSXP, LENGTH(state)));
   explicit_SEIR_deterministic_internal *internal = explicit_SEIR_deterministic_get_internal(internal_p, 1);
-  double *output = NULL;
+  SEXP output_ptr = PROTECT(allocVector(REALSXP, 1));
+  setAttrib(dstatedt, install("output"), output_ptr);
+  UNPROTECT(1);
+  double *output = REAL(output_ptr);
   explicit_SEIR_deterministic_rhs(internal, REAL(t)[0], REAL(state), REAL(dstatedt), output);
   UNPROTECT(1);
   return dstatedt;

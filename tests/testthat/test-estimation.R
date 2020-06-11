@@ -55,7 +55,7 @@ test_that("scan_R0_date works", {
   expect_is(scan_results, "squire_scan")
   expect_true("inputs" %in% names(scan_results))
   expect_setequal(names(scan_results$inputs),
-                  c("model", "model_params", "interventions", "pars_obs", "data", "Rt_func"))
+                  c("squire_model", "model_params", "interventions", "pars_obs", "data", "Rt_func"))
 
   R0_grid <- seq(R0_min, R0_max, R0_step)
   date_grid <- seq(as.Date(first_start_date), as.Date(last_start_date), day_step)
@@ -202,7 +202,7 @@ test_that("sample_grid_scan works", {
                           n_sample_pairs = n_sample_pairs,
                           n_particles = 2)
 
-  model <- res$inputs$model$odin_model(user = res$inputs$model_params,
+  model <- res$inputs$squire_model$odin_model(user = res$inputs$model_params,
                                        unused_user_action = "ignore")
   # check length based on model and dates
   days_between <- length( min(as.Date(res$param_grid$start_date)) : as.Date(tail(rownames(res$trajectories[,,1]),1)))
@@ -229,7 +229,7 @@ test_that("sample_grid_scan works", {
                           n_sample_pairs = n_sample_pairs,
                           n_particles = 2,forecast_days = 5,
                           full_output = FALSE)
-  model <- res$inputs$model$odin_model(user = res$inputs$model_params,
+  model <- res$inputs$squire_model$odin_model(user = res$inputs$model_params,
                                        unused_user_action = "ignore")
   expect_is(model,"odin_model")
   expect_is(odin_index(model),"list")

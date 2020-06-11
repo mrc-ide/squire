@@ -44,7 +44,8 @@ pmcmc(
   required_acceptance_ratio = 0.23,
   start_covariance_adaptation = round(n_mcmc/2),
   start_scaling_factor_adaptation = 1,
-  initial_scaling_factor = 1
+  initial_scaling_factor = 1,
+  ...
 )
 }
 \arguments{
@@ -167,6 +168,10 @@ to select parameter set. For each parmater set sampled, run particle filter with
 \item{start_scaling_factor_adaptation}{Iteration number to begin RM optimisation of scaling factor at}
 
 \item{initial_scaling_factor}{Initial scaling factor for RM opitmisation if implemented}
+
+\item{...}{Further aguments for the model parameter function. If using the
+\code{\link{explicit_model}} (default) this will be
+\code{parameters_explicit_SEEIR}.}
 }
 \value{
 squire_simulation \describe{

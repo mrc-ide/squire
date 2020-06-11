@@ -337,7 +337,7 @@ calibrate <- function(data,
   }
 
   # second let's recreate the output
-  r$model <- res$inputs$model$odin_model(
+  r$model <- res$inputs$squire_model$odin_model(
     user = res$inputs$model_params, unused_user_action = "ignore"
   )
 
@@ -353,6 +353,7 @@ calibrate <- function(data,
   # and fix the replicates
   r$parameters$replicates <- replicates
   r$parameters$time_period <- as.numeric(diff(as.Date(range(rownames(r$output)))))
+  r$parameters$dt <- model_params$dt
 
   return(r)
 }

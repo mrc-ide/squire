@@ -88,7 +88,7 @@ projections <- function(r,
       stop("projections unlikely to work with deterministic squire model currently")
     }
   } else if (!is.null(r$scan_results)) {
-    if (inherits(r$scan_results$inputs$model, "deterministic")) {
+    if (inherits(r$scan_results$inputs$squire_model, "deterministic")) {
       stop("projections unlikely to work with deterministic squire model currently")
     }
   }
@@ -315,13 +315,13 @@ projections <- function(r,
     # Is the model still valid
     if (!is.null(r$scan_results)) { # check if scan grid approach
       if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {
-        r$model <- r$scan_results$inputs$model$odin_model(
+        r$model <- r$scan_results$inputs$squire_model$odin_model(
           user = r$scan_results$inputs$model_params,
           unused_user_action = "ignore")
       }
     } else if (!is.null(r$pmcmc_results)) { # check if pmcmc approach
       if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {
-        r$model <- r$pmcmc_results$inputs$model$odin_model(
+        r$model <- r$pmcmc_results$inputs$squire_model$odin_model(
           user = r$pmcmc_results$inputs$model_params,
           unused_user_action = "ignore")
       }
@@ -483,6 +483,12 @@ projection_plotting <- function(r_list,
 t0_variables <- function(r) {
 
   dims <- dim(r$output)
+  if("pmcmc_results" %in% names(r)) {
+    wh <- "pmcmc_results"
+  } else {
+    wh <- "scan_results"
+  }
+
 
   # is this the outputs of a grid scan
   if("scan_results" %in% names(r)) {
@@ -494,7 +500,7 @@ t0_variables <- function(r) {
         if (is.null(r$replicate_parameters$Meff)) {
           R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change, 1)
         } else {
-          R0 <- r$scan_results$inputs$Rt_func(R0 = r$replicate_parameters$R0[x],
+          R0 <- r[[wh]]$inputs$Rt_func(R0 = r$replicate_parameters$R0[x],
                                               R0_change = tail(r$interventions$R0_change, 1),
                                               Meff = r$replicate_parameters$Meff[x])
         }
