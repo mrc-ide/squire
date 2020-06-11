@@ -1,3 +1,7 @@
+# KNOWN ISSUES OR RELATED:
+# 1) WHAT TO DO ABOUT IREC CASES AND THEIR OXYGEN REQUIREMENTS (AND THEIR HOSPITAL BED REQUIREMENTS, PER THE PREVIOUS ISSUE)???
+# 2)
+
 ## TIMESTEP RELATED PARAMETERS
 ##------------------------------------------------------------------------------
 dt <- user() # Specified timestep
@@ -10,26 +14,26 @@ gamma_E <- user() # passage through latent infection
 gamma_IMild <- user() # mild infection to recovery
 gamma_ICase <- user() # symptom onset to requiring hospitalisation
 gamma_rec <- user() # rate of progression through post-ICU recovery compartment
-gamma_moderate_get_hosp_get_ox_survive <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed and oxygen and surviving
-gamma_moderate_get_hosp_get_ox_die <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed and oxygen and dying
-gamma_moderate_get_hosp_no_ox_survive <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed but NOT oxygen and surviving
-gamma_moderate_get_hosp_no_ox_die <- user() # through requiring hosp bed and oxygen compartment conditional on getting  hosp bed but NOT oxygen and dying
-gamma_moderate_no_hosp_no_ox_survive <- user() # through requiring hosp bed and oxygen compartment conditional on NOT getting hosp bed and NOT oxygen and surviving
-gamma_moderate_no_hosp_no_ox_die <- user() # through requiring hosp bed and oxygen compartment conditional on NOT getting hosp bed and NOT oxygen and dying
-gamma_severe_get_ICU_get_ox_survive <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed and oxygen and surviving
-gamma_severe_get_ICU_get_ox_die <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed and oxygen and dying
-gamma_severe_get_ICU_no_ox_survive <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed but NOT oxygen and surviving
-gamma_severe_get_ICU_no_ox_die <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed but NOT oxygen and dying
-gamma_severe_no_ICU_no_ox_survive <- user() # through requiring ICU bed and oxygen compartment conditional on NOT getting ICU bed and NOT oxygen and surviving
-gamma_severe_no_ICU_no_ox_die <- user() # through requiring ICU bed and oxygen compartment conditional on NOT getting ICU bed and NOT oxygen and dying
-gamma_critical_get_ICU_get_ox_get_mv_survive <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, oxygen and MV and surviving
-gamma_critical_get_ICU_get_ox_get_mv_die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, oxygen and MV and dying
-gamma_critical_get_ICU_get_ox_no_mv_survive <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed and oxygen, but NOT MV and surviving
-gamma_critical_get_ICU_get_ox_no_mv_die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed and oxygen, but NOT MV and dying
-gamma_critical_get_ICU_no_ox_no_mv_survive <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, but NOT oxygen and NOT MV and surviving
-gamma_critical_get_ICU_no_ox_no_mv_die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, but NOT oxygen and NOT MV and dying
-gamma_critical_no_ICU_no_ox_no_mv_survive <- user() # through requiring ICU bed, oxygen and MV compartment conditional on NOT getting ICU bed, NOT oxygen and NOT MV and surviving
-gamma_critical_no_ICU_no_ox_no_mv_die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on NOT getting ICU bed, NOT oxygen and NOT MV and dying
+gamma_IMod_GetHosp_GetOx_Surv <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed and oxygen and surviving
+gamma_IMod_GetHosp_GetOx_Die <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed and oxygen and dying
+gamma_IMod_GetHosp_NoOx_Surv <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed but NOT oxygen and surviving
+gamma_IMod_GetHosp_NoOx_Die <- user() # through requiring hosp bed and oxygen compartment conditional on getting  hosp bed but NOT oxygen and dying
+gamma_IMod_NoHosp_NoOx_Surv <- user() # through requiring hosp bed and oxygen compartment conditional on NOT getting hosp bed and NOT oxygen and surviving
+gamma_IMod_NoHosp_NoOx_Die <- user() # through requiring hosp bed and oxygen compartment conditional on NOT getting hosp bed and NOT oxygen and dying
+gamma_ISev_GetICU_GetOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed and oxygen and surviving
+gamma_ISev_GetICU_GetOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed and oxygen and dying
+gamma_ISev_GetICU_NoOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed but NOT oxygen and surviving
+gamma_ISev_GetICU_NoOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed but NOT oxygen and dying
+gamma_ISev_NoICU_NoOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on NOT getting ICU bed and NOT oxygen and surviving
+gamma_ISev_NoICU_NoOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on NOT getting ICU bed and NOT oxygen and dying
+gamma_ICrit_GetICU_GetOx_GetMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, oxygen and MV and surviving
+gamma_ICrit_GetICU_GetOx_GetMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, oxygen and MV and dying
+gamma_ICrit_GetICU_GetOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed and oxygen, but NOT MV and surviving
+gamma_ICrit_GetICU_GetOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed and oxygen, but NOT MV and dying
+gamma_ICrit_GetICU_NoOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, but NOT oxygen and NOT MV and surviving
+gamma_ICrit_GetICU_NoOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, but NOT oxygen and NOT MV and dying
+gamma_ICrit_NoICU_NoOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on NOT getting ICU bed, NOT oxygen and NOT MV and surviving
+gamma_ICrit_NoICU_NoOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on NOT getting ICU bed, NOT oxygen and NOT MV and dying
 
 ## PROBABILITIES
 ##------------------------------------------------------------------------------
@@ -58,50 +62,57 @@ update(ICase1[]) <- ICase1[i] + delta_ICase1[i] # First of the compartments for 
 update(ICase2[]) <- ICase2[i] + delta_ICase2[i] # Second of the compartments for infections that will require hospitalisation (2 comps)
 
 # Passage Through Requiring Hospital Bed and Oxygen, Either Receiving Both, Oxygen or Neither, and Surviving or Not
-update(IModerate_Get_Hosp_Get_Ox_Survive1) <- IModerate_Get_Hosp_Get_Ox_Survive1[i] + delta_IModerate_Get_Hosp_Get_Ox_Survive1[i] # Require hosp bed and oxygen, get both, survive (1st)
-update(IModerate_Get_Hosp_Get_Ox_Survive2) <- IModerate_Get_Hosp_Get_Ox_Survive2[i] + delta_IModerate_Get_Hosp_Get_Ox_Survive2[i] # Require hosp bed and oxygen, get both, survive (2nd)
-update(IModerate_Get_Hosp_Get_Ox_Die1) <- IModerate_Get_Hosp_Get_Ox_Die1[i] + delta_IModerate_Get_Hosp_Get_Ox_Die1[i] # Require hosp bed and oxygen, get both, die (1st)
-update(IModerate_Get_Hosp_Get_Ox_Die2) <- IModerate_Get_Hosp_Get_Ox_Die2[i] + delta_IModerate_Get_Hosp_Get_Ox_Die2[i] # Require hosp bed and oxygen, get both, die (2nd)
-update(IModerate_Get_Hosp_No_Ox_Survive1) <- IModerate_Get_Hosp_No_Ox_Survive1[i] + delta_IModerate_Get_Hosp_No_Ox_Survive1[i] # Require hosp bed and oxygen, get bed only, survive (1st)
-update(IModerate_Get_Hosp_No_Ox_Survive2) <- IModerate_Get_Hosp_No_Ox_Survive2[i] + delta_IModerate_Get_Hosp_No_Ox_Survive2[i] # Require hosp bed and oxygen, get bed only, survive (2nd)
-update(IModerate_Get_Hosp_No_Ox_Die1) <- IModerate_Get_Hosp_No_Ox_Die1[i] + delta_IModerate_Get_Hosp_No_Ox_Die1[i] # Require hosp bed and oxygen, get bed only, die (1st)
-update(IModerate_Get_Hosp_No_Ox_Die2) <- IModerate_Get_Hosp_No_Ox_Die2[i] + delta_IModerate_Get_Hosp_No_Ox_Die2[i] # Require hosp bed and oxygen, get bed only, die (2nd)
-update(IModerate_No_Hosp_No_Ox_Survive1) <- IModerate_No_Hosp_No_Ox_Survive1[i] + delta_IModerate_No_Hosp_No_Ox_Survive1[i] # Require hosp bed and oxygen, get neither, survive (1st)
-update(IModerate_No_Hosp_No_Ox_Survive2) <- IModerate_No_Hosp_No_Ox_Survive2[i] + delta_IModerate_No_Hosp_No_Ox_Survive2[i] # Require hosp bed and oxygen, get neither, survive (2nd)
-update(IModerate_No_Hosp_No_Ox_Die1) <- IModerate_No_Hosp_No_Ox_Die1[i] + delta_IModerate_No_Hosp_No_Ox_Die1[i] # Require hosp bed and oxygen, get neither, die (1st)
-update(IModerate_No_Hosp_No_Ox_Die2) <- IModerate_No_Hosp_No_Ox_Die2[i] + delta_IModerate_No_Hosp_No_Ox_Die2[i] # Require hosp bed and oxygen, get neither, survive (2nd)
+update(IMod_GetHosp_GetOx_Die1[]) <- IMod_GetHosp_GetOx_Die1[i] + delta_IMod_GetHosp_GetOx_Die1[i] # Require hosp bed and oxygen, get both, die (1st)
+update(IMod_GetHosp_GetOx_Die2[]) <- IMod_GetHosp_GetOx_Die2[i] + delta_IMod_GetHosp_GetOx_Die2[i] # Require hosp bed and oxygen, get both, die (2nd)
+update(IMod_GetHosp_GetOx_Surv1[]) <- IMod_GetHosp_GetOx_Surv1[i] + delta_IMod_GetHosp_GetOx_Surv1[i] # Require hosp bed and oxygen, get both, survive (1st)
+update(IMod_GetHosp_GetOx_Surv2[]) <- IMod_GetHosp_GetOx_Surv2[i] + delta_IMod_GetHosp_GetOx_Surv2[i] # Require hosp bed and oxygen, get both, survive (2nd)
+
+update(IMod_GetHosp_NoOx_Die1[]) <- IMod_GetHosp_NoOx_Die1[i] + delta_IMod_GetHosp_NoOx_Die1[i] # Require hosp bed and oxygen, get bed only, die (1st)
+update(IMod_GetHosp_NoOx_Die2[]) <- IMod_GetHosp_NoOx_Die2[i] + delta_IMod_GetHosp_NoOx_Die2[i] # Require hosp bed and oxygen, get bed only, die (2nd)
+update(IMod_GetHosp_NoOx_Surv1[]) <- IMod_GetHosp_NoOx_Surv1[i] + delta_IMod_GetHosp_NoOx_Surv1[i] # Require hosp bed and oxygen, get bed only, survive (1st)
+update(IMod_GetHosp_NoOx_Surv2[]) <- IMod_GetHosp_NoOx_Surv2[i] + delta_IMod_GetHosp_NoOx_Surv2[i] # Require hosp bed and oxygen, get bed only, survive (2nd)
+
+update(IMod_NoHosp_NoOx_Die1[]) <- IMod_NoHosp_NoOx_Die1[i] + delta_IMod_NoHosp_NoOx_Die1[i] # Require hosp bed and oxygen, get neither, die (1st)
+update(IMod_NoHosp_NoOx_Die2[]) <- IMod_NoHosp_NoOx_Die2[i] + delta_IMod_NoHosp_NoOx_Die2[i] # Require hosp bed and oxygen, get neither, survive (2nd)
+update(IMod_NoHosp_NoOx_Surv1[]) <- IMod_NoHosp_NoOx_Surv1[i] + delta_IMod_NoHosp_NoOx_Surv1[i] # Require hosp bed and oxygen, get neither, survive (1st)
+update(IMod_NoHosp_NoOx_Surv2[]) <- IMod_NoHosp_NoOx_Surv2[i] + delta_IMod_NoHosp_NoOx_Surv2[i] # Require hosp bed and oxygen, get neither, survive (2nd)
 
 # Passage Through Requiring ICU Bed and Oxygen, Either Receiving Both, Oxygen or Neither, and Surviving or Not
-update(ISevere_Get_ICU_Get_Ox_Survive1) <- ISevere_Get_ICU_Get_Ox_Survive1[i] + delta_ISevere_Get_ICU_Get_Ox_Survive1[i] # Require ICU bed and oxygen, get both, survive (1st)
-update(ISevere_Get_ICU_Get_Ox_Survive2) <- ISevere_Get_ICU_Get_Ox_Survive2[i] + delta_ISevere_Get_ICU_Get_Ox_Survive2[i] # Require ICU bed and oxygen, get both, survive (2nd)
-update(ISevere_Get_ICU_Get_Ox_Die1) <- ISevere_Get_ICU_Get_Ox_Die1[i] + delta_ISevere_Get_ICU_Get_Ox_Die1[i] # Require ICU bed and oxygen, get both, die (1st)
-update(ISevere_Get_ICU_Get_Ox_Die2) <- ISevere_Get_ICU_Get_Ox_Die2[i] + delta_ISevere_Get_ICU_Get_Ox_Die2[i] # Require ICU bed and oxygen, get both, die (2nd)
-update(ISevere_Get_ICU_No_Ox_Survive1) <- ISevere_Get_ICU_No_Ox_Survive1[i] + delta_ISevere_Get_ICU_No_Ox_Survive1[i] # Require ICU bed and oxygen, get ICU bed only, survive (1st)
-update(ISevere_Get_ICU_No_Ox_Survive2) <- ISevere_Get_ICU_No_Ox_Survive2[i] + delta_ISevere_Get_ICU_No_Ox_Survive2[i] # Require ICU bed and oxygen, get ICU bed only, survive (2nd)
-update(ISevere_Get_ICU_No_Ox_Die1) <- ISevere_Get_ICU_No_Ox_Die1[i] + delta_ISevere_Get_ICU_No_Ox_Die1[i] # Require ICU bed and oxygen, get ICU bed only, die (1st)
-update(ISevere_Get_ICU_No_Ox_Die2) <- ISevere_Get_ICU_No_Ox_Die2[i] + delta_ISevere_Get_ICU_No_Ox_Die2[i] # Require ICU bed and oxygen, get ICU bed only, die (2nd)
-update(ISevere_No_ICU_No_Ox_Survive1) <- ISevere_No_ICU_No_Ox_Survive1[i] + delta_ISevere_No_ICU_No_Ox_Survive1[i] # Require ICU bed and oxygen, get neither, suvive (1st)
-update(ISevere_No_ICU_No_Ox_Survive2) <- ISevere_No_ICU_No_Ox_Survive2[i] + delta_ISevere_No_ICU_No_Ox_Survive2[i] # Require ICU bed and oxygen, get neither, suvive (2nd)
-update(ISevere_No_ICU_No_Ox_Die1) <- ISevere_No_ICU_No_Ox_Die1[i] + delta_ISevere_No_ICU_No_Ox_Die1[i] # Require ICU bed and oxygen, get neither, die (1st)
-update(ISevere_No_ICU_No_Ox_Die2) <- ISevere_No_ICU_No_Ox_Die2[i] + delta_ISevere_No_ICU_No_Ox_Die2[i] # Require ICU bed and oxygen, get neither, die (2nd)
+update(ISev_GetICU_GetOx_Die1[]) <- ISev_GetICU_GetOx_Die1[i] + delta_ISev_GetICU_GetOx_Die1[i] # Require ICU bed and oxygen, get both, die (1st)
+update(ISev_GetICU_GetOx_Die2[]) <- ISev_GetICU_GetOx_Die2[i] + delta_ISev_GetICU_GetOx_Die2[i] # Require ICU bed and oxygen, get both, die (2nd)
+update(ISev_GetICU_GetOx_Surv1[]) <- ISev_GetICU_GetOx_Surv1[i] + delta_ISev_GetICU_GetOx_Surv1[i] # Require ICU bed and oxygen, get both, survive (1st)
+update(ISev_GetICU_GetOx_Surv2[]) <- ISev_GetICU_GetOx_Surv2[i] + delta_ISev_GetICU_GetOx_Surv2[i] # Require ICU bed and oxygen, get both, survive (2nd)
+
+update(ISev_GetICU_NoOx_Die1[]) <- ISev_GetICU_NoOx_Die1[i] + delta_ISev_GetICU_NoOx_Die1[i] # Require ICU bed and oxygen, get ICU bed only, die (1st)
+update(ISev_GetICU_NoOx_Die2[]) <- ISev_GetICU_NoOx_Die2[i] + delta_ISev_GetICU_NoOx_Die2[i] # Require ICU bed and oxygen, get ICU bed only, die (2nd)
+update(ISev_GetICU_NoOx_Surv1[]) <- ISev_GetICU_NoOx_Surv1[i] + delta_ISev_GetICU_NoOx_Surv1[i] # Require ICU bed and oxygen, get ICU bed only, survive (1st)
+update(ISev_GetICU_NoOx_Surv2[]) <- ISev_GetICU_NoOx_Surv2[i] + delta_ISev_GetICU_NoOx_Surv2[i] # Require ICU bed and oxygen, get ICU bed only, survive (2nd)
+
+update(ISev_NoICU_NoOx_Die1[]) <- ISev_NoICU_NoOx_Die1[i] + delta_ISev_NoICU_NoOx_Die1[i] # Require ICU bed and oxygen, get neither, die (1st)
+update(ISev_NoICU_NoOx_Die2[]) <- ISev_NoICU_NoOx_Die2[i] + delta_ISev_NoICU_NoOx_Die2[i] # Require ICU bed and oxygen, get neither, die (2nd)
+update(ISev_NoICU_NoOx_Surv1[]) <- ISev_NoICU_NoOx_Surv1[i] + delta_ISev_NoICU_NoOx_Surv1[i] # Require ICU bed and oxygen, get neither, suvive (1st)
+update(ISev_NoICU_NoOx_Surv2[]) <- ISev_NoICU_NoOx_Surv2[i] + delta_ISev_NoICU_NoOx_Surv2[i] # Require ICU bed and oxygen, get neither, suvive (2nd)
 
 # Passage Through Requiring ICU Bed, Oxygen and Mechanical Ventilation, Either Receiving All, ICU Bed and Oxygen, ICU Bed Only or Nothing, and Surviving or Not
-update(ICritical_Get_ICU_Get_Ox_Get_MV_Survive1) <- ICritical_Get_ICU_Get_Ox_Get_MV_Survive1[i] + delta_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1[i] # Require ICU bed, oxygen and MV, get all, survive (1st)
-update(ICritical_Get_ICU_Get_Ox_Get_MV_Survive2) <- ICritical_Get_ICU_Get_Ox_Get_MV_Survive2[i] + delta_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2[i] # Require ICU bed, oxygen and MV, get all, survive (2nd)
-update(ICritical_Get_ICU_Get_Ox_Get_MV_Die1) <- ICritical_Get_ICU_Get_Ox_Get_MV_Die1[i] + delta_ICritical_Get_ICU_Get_Ox_Get_MV_Die1[i] # Require ICU bed, oxygen and MV, get all, die (1st)
-update(ICritical_Get_ICU_Get_Ox_Get_MV_Die2) <- ICritical_Get_ICU_Get_Ox_Get_MV_Die2[i] + delta_ICritical_Get_ICU_Get_Ox_Get_MV_Die2[i] # Require ICU bed, oxygen and MV, get all, die (2nd)
-update(ICritical_Get_ICU_Get_Ox_No_MV_Survive1) <- ICritical_Get_ICU_Get_Ox_No_MV_Survive1[i] + delta_ICritical_Get_ICU_Get_Ox_No_MV_Survive1[i] # Require ICU bed, oxygen and MV, get ICU bed and oxygen only, survive (1st)
-update(ICritical_Get_ICU_Get_Ox_No_MV_Survive2) <- ICritical_Get_ICU_Get_Ox_No_MV_Survive2[i] + delta_ICritical_Get_ICU_Get_Ox_No_MV_Survive2[i] # Require ICU bed, oxygen and MV, get ICU bed and oxygen only, survive (2nd)
-update(ICritical_Get_ICU_Get_Ox_No_MV_Die1) <- ICritical_Get_ICU_Get_Ox_No_MV_Die1[i] + delta_ICritical_Get_ICU_Get_Ox_No_MV_Die1[i] # Require ICU bed, oxygen and MV, get ICU bed and oxygen only, die (1st)
-update(ICritical_Get_ICU_Get_Ox_No_MV_Die2) <- ICritical_Get_ICU_Get_Ox_No_MV_Die2[i] + delta_ICritical_Get_ICU_Get_Ox_No_MV_Die2[i] # Require ICU bed, oxygen and MV, get ICU bed and oxygen only, die (2nd)
-update(ICritical_Get_ICU_No_Ox_No_MV_Survive1) <- ICritical_Get_ICU_No_Ox_No_MV_Survive1[i] + delta_ICritical_Get_ICU_No_Ox_No_MV_Survive1[i] # Require ICU bed, oxygen and MV, get ICU bed only, survive (1st)
-update(ICritical_Get_ICU_No_Ox_No_MV_Survive2) <- ICritical_Get_ICU_No_Ox_No_MV_Survive2[i] + delta_ICritical_Get_ICU_No_Ox_No_MV_Survive2[i] # Require ICU bed, oxygen and MV, get ICU bed only, survive (2nd)
-update(ICritical_Get_ICU_No_Ox_No_MV_Die1) <- ICritical_Get_ICU_No_Ox_No_MV_Die1[i] + delta_ICritical_Get_ICU_No_Ox_No_MV_Die1[i] # Require ICU bed, oxygen and MV, get ICU bed only, die (1st)
-update(ICritical_Get_ICU_No_Ox_No_MV_Die2) <- ICritical_Get_ICU_No_Ox_No_MV_Die2[i] + delta_ICritical_Get_ICU_No_Ox_No_MV_Die2[i] # Require ICU bed, oxygen and MV, get ICU bed only, die (2nd)
-update(ICritical_No_ICU_No_Ox_No_MV_Survive1) <- ICritical_No_ICU_No_Ox_No_MV_Survive1[i] + delta_ICritical_No_ICU_No_Ox_No_MV_Survive1[i] # Require ICU bed, oxygen and MV, get nothing, survive (1st)
-update(ICritical_No_ICU_No_Ox_No_MV_Survive2) <- ICritical_No_ICU_No_Ox_No_MV_Survive2[i] + delta_ICritical_No_ICU_No_Ox_No_MV_Survive2[i] # Require ICU bed, oxygen and MV, get nothing, survive (2nd)
-update(ICritical_No_ICU_No_Ox_No_MV_Die1) <- ICritical_No_ICU_No_Ox_No_MV_Die1[i] + delta_ICritical_No_ICU_No_Ox_No_MV_Die1[i] # Require ICU bed, oxygen and MV, get nothing, die (1st)
-update(ICritical_No_ICU_No_Ox_No_MV_Die2) <- ICritical_No_ICU_No_Ox_No_MV_Die2[i] + delta_ICritical_No_ICU_No_Ox_No_MV_Die2[i] # Require ICU bed, oxygen and MV, get nothing, die (2nd)
+update(ICrit_GetICU_GetOx_GetMV_Die1[]) <- ICrit_GetICU_GetOx_GetMV_Die1[i] + delta_ICrit_GetICU_GetOx_GetMV_Die1[i] # Require ICU bed, oxygen and MV, get all, die (1st)
+update(ICrit_GetICU_GetOx_GetMV_Die2[]) <- ICrit_GetICU_GetOx_GetMV_Die2[i] + delta_ICrit_GetICU_GetOx_GetMV_Die2[i] # Require ICU bed, oxygen and MV, get all, die (2nd)
+update(ICrit_GetICU_GetOx_GetMV_Surv1[]) <- ICrit_GetICU_GetOx_GetMV_Surv1[i] + delta_ICrit_GetICU_GetOx_GetMV_Surv1[i] # Require ICU bed, oxygen and MV, get all, survive (1st)
+update(ICrit_GetICU_GetOx_GetMV_Surv2[]) <- ICrit_GetICU_GetOx_GetMV_Surv2[i] + delta_ICrit_GetICU_GetOx_GetMV_Surv2[i] # Require ICU bed, oxygen and MV, get all, survive (2nd)
+
+update(ICrit_GetICU_GetOx_NoMV_Die1[]) <- ICrit_GetICU_GetOx_NoMV_Die1[i] + delta_ICrit_GetICU_GetOx_NoMV_Die1[i] # Require ICU bed, oxygen and MV, get ICU bed and oxygen only, die (1st)
+update(ICrit_GetICU_GetOx_NoMV_Die2[]) <- ICrit_GetICU_GetOx_NoMV_Die2[i] + delta_ICrit_GetICU_GetOx_NoMV_Die2[i] # Require ICU bed, oxygen and MV, get ICU bed and oxygen only, die (2nd)
+update(ICrit_GetICU_GetOx_NoMV_Surv1[]) <- ICrit_GetICU_GetOx_NoMV_Survive1[i] + delta_ICrit_GetICU_GetOx_NoMV_Surv1[i] # Require ICU bed, oxygen and MV, get ICU bed and oxygen only, survive (1st)
+update(ICrit_GetICU_GetOx_NoMV_Surv2[]) <- ICrit_GetICU_GetOx_NoMV_Survive2[i] + delta_ICrit_GetICU_GetOx_NoMV_Surv2[i] # Require ICU bed, oxygen and MV, get ICU bed and oxygen only, survive (2nd)
+
+update(ICrit_GetICU_NoOx_NoMV_Die1[]) <- ICrit_GetICU_NoOx_NoMV_Die1[i] + delta_ICrit_GetICU_NoOx_NoMV_Die1[i] # Require ICU bed, oxygen and MV, get ICU bed only, die (1st)
+update(ICrit_GetICU_NoOx_NoMV_Die2[]) <- ICrit_GetICU_NoOx_NoMV_Die2[i] + delta_ICrit_GetICU_NoOx_NoMV_Die2[i] # Require ICU bed, oxygen and MV, get ICU bed only, die (2nd)
+update(ICrit_GetICU_NoOx_NoMV_Surv1[]) <- ICrit_GetICU_NoOx_NoMV_Surv1[i] + delta_ICrit_GetICU_NoOx_NoMV_Surv1[i] # Require ICU bed, oxygen and MV, get ICU bed only, survive (1st)
+update(ICrit_GetICU_NoOx_NoMV_Surv2[]) <- ICrit_GetICU_NoOx_NoMV_Surv2[i] + delta_ICrit_GetICU_NoOx_NoMV_Surv2[i] # Require ICU bed, oxygen and MV, get ICU bed only, survive (2nd)
+
+update(ICrit_NoICU_NoOx_NoMV_Die1[]) <- ICrit_NoICU_NoOx_NoMV_Die1[i] + delta_ICrit_NoICU_NoOx_NoMV_Die1[i] # Require ICU bed, oxygen and MV, get nothing, die (1st)
+update(ICrit_NoICU_NoOx_NoMV_Die2[]) <- ICrit_NoICU_NoOx_NoMV_Die2[i] + delta_ICrit_NoICU_NoOx_NoMV_Die2[i] # Require ICU bed, oxygen and MV, get nothing, die (2nd)
+update(ICrit_NoICU_NoOx_NoMV_Surv1[]) <- ICrit_NoICU_NoOx_NoMV_Surv1[i] + delta_ICrit_NoICU_NoOx_NoMV_Surv1[i] # Require ICU bed, oxygen and MV, get nothing, survive (1st)
+update(ICrit_NoICU_NoOx_NoMV_Surv2[]) <- ICrit_NoICU_NoOx_NoMV_Surv2[i] + delta_ICrit_NoICU_NoOx_NoMV_Surv2[i] # Require ICU bed, oxygen and MV, get nothing, survive (2nd)
 
 # Passage Through Recovery, from Mild Infection, Requiring Oxygen or From ICU Post-Requiring Mechanical Ventilation
 update(IRec1[]) <- IRec1[i] + delta_IRec1[i] # First of the compartments for those recovering from ICU (2 comps)
@@ -125,10 +136,29 @@ p_ICase2_Hosp <- 1 - exp(-gamma_ICase * dt) # Progression to requiring hospitali
 p_Rec1_Rec2 <- 1 - exp(-gamma_rec * dt) # Progression through recovery from ICU in hospital bed to eventual discharge (R)
 p_Rec2_R <- 1 - exp(-gamma_rec * dt) # Progression through recovery from ICU in hospital bed to eventual discharge (R)
 
+gamma_IMod_GetHosp_NoOx_Surv <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed but NOT oxygen and surviving
+gamma_IMod_GetHosp_NoOx_Die <- user() # through requiring hosp bed and oxygen compartment conditional on getting  hosp bed but NOT oxygen and dying
+gamma_IMod_NoHosp_NoOx_Surv <- user() # through requiring hosp bed and oxygen compartment conditional on NOT getting hosp bed and NOT oxygen and surviving
+gamma_IMod_NoHosp_NoOx_Die <- user() # through requiring hosp bed and oxygen compartment conditional on NOT getting hosp bed and NOT oxygen and dying
+gamma_ISev_GetICU_GetOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed and oxygen and surviving
+gamma_ISev_GetICU_GetOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed and oxygen and dying
+gamma_ISev_GetICU_NoOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed but NOT oxygen and surviving
+gamma_ISev_GetICU_NoOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed but NOT oxygen and dying
+gamma_ISev_NoICU_NoOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on NOT getting ICU bed and NOT oxygen and surviving
+gamma_ISev_NoICU_NoOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on NOT getting ICU bed and NOT oxygen and dying
+gamma_ICrit_GetICU_GetOx_GetMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, oxygen and MV and surviving
+gamma_ICrit_GetICU_GetOx_GetMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, oxygen and MV and dying
+gamma_ICrit_GetICU_GetOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed and oxygen, but NOT MV and surviving
+gamma_ICrit_GetICU_GetOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed and oxygen, but NOT MV and dying
+gamma_ICrit_GetICU_NoOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, but NOT oxygen and NOT MV and surviving
+gamma_ICrit_GetICU_NoOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, but NOT oxygen and NOT MV and dying
+gamma_ICrit_NoICU_NoOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on NOT getting ICU bed, NOT oxygen and NOT MV and surviving
+gamma_ICrit_NoICU_NoOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on NOT getting ICU bed, NOT oxygen and NOT MV and dying
+
 # Transition Probabilities for Those Requiring Hospital Bed and Oxygen -> Recovery/Death
-p_IModerate_Get_Hosp_Get_Ox_Survive1_IModerate_Get_Hosp_Get_Ox_Survive2 <- 1 - exp(-gamma_moderate_get_hosp_get_ox_survive * dt) # Progression through requiring hosp bed and oxygen and receiving both -> Recovery
-p_IModerate_Get_Hosp_Get_Ox_Survive2_R <- 1 - exp(-gamma_moderate_get_hosp_get_ox_survive * dt) # Progression through requiring hosp bed and oxygen and receiving both -> Recovery
-p_IModerate_Get_Hosp_Get_Ox_Die1_IModerate_Get_Hosp_Get_Ox_Die2 <- 1 - exp(-gamma_moderate_get_hosp_get_ox_die * dt) # Progression through requiring hosp bed and oxygen and receiving both -> Dying
+p_IMod_GetHosp_GetOx_Surv <- 1 - exp(-gamma_IMod_GetHosp_GetOx_Surv * dt) # Progression through requiring hosp bed and oxygen and receiving both -> Recovery
+p_IMod_GetHosp_GetOx_Die <- 1 - exp(-gamma_IMod_GetHosp_GetOx_Die * dt) # Progression through requiring hosp bed and oxygen and receiving both -> Dying
+
 p_IModerate_Get_Hosp_Get_Ox_Die2_D_Hospital <- 1 - exp(-gamma_moderate_get_hosp_get_ox_die * dt) # Progression through requiring hosp bed and oxygen and receiving both -> Dying
 p_IModerate_Get_Hosp_No_Ox_Survive1_IModerate_Get_Hosp_No_Ox_Survive2 <- 1 - exp(-gamma_moderate_get_hosp_no_ox_survive * dt) # Progression through requiring hosp bed and oxygen, receiving hosp bed only -> Recovery
 p_IModerate_Get_Hosp_No_Ox_Survive2_R <- 1 - exp(-gamma_moderate_get_hosp_no_ox_survive * dt) # Progression through requiring hosp bed and oxygen, receiving hosp bed only -> Recovery
@@ -186,22 +216,88 @@ n_ICase2_Hosp[] <- rbinom(ICase2[i], p_ICase2_Hosp) # Number progressing to requ
 n_IRec1_IRec2[] <- rbinom(IRec1[i], p_Rec1_Rec2) # Number progressing through ICU recovery compartment
 n_IRec2_R[] <- rbinom(IRec2[i], p_Rec2_R) # Number recovering completely
 
+# Working Out Number of ICU Beds Available and How Many Individuals Receive Them
+ICU_occ <- sum(ISevere_Get_ICU_Get_Ox_Survive1) + sum(ISevere_Get_ICU_Get_Ox_Survive2) + sum(ISevere_Get_ICU_Get_Ox_Die1) + sum(ISevere_Get_ICU_Get_Ox_Die2) +
+  sum(ISevere_Get_ICU_No_Ox_Survive1) + sum(ISevere_Get_ICU_No_Ox_Survive2) + sum(ISevere_Get_ICU_No_Ox_Die1) + sum(ISevere_Get_ICU_No_Ox_Die2) +
+  sum(ICritical_Get_ICU_Get_Ox_Get_MV_Survive1) + sum(ICritical_Get_ICU_Get_Ox_Get_MV_Survive2) + sum(ICritical_Get_ICU_Get_Ox_Get_MV_Die1) +
+  sum(ICritical_Get_ICU_Get_Ox_Get_MV_Die2) + sum(ICritical_Get_ICU_Get_Ox_No_MV_Survive1) + sum(ICritical_Get_ICU_Get_Ox_No_MV_Survive2) +
+  sum(ICritical_Get_ICU_Get_Ox_No_MV_Die1) + sum(ICritical_Get_ICU_Get_Ox_No_MV_Die2) + sum(ICritical_Get_ICU_No_Ox_No_MV_Survive1) +
+  sum(ICritical_Get_ICU_No_Ox_No_MV_Survive2) + sum(ICritical_Get_ICU_No_Ox_No_MV_Die1) + sum(ICritical_Get_ICU_No_Ox_No_MV_Die2)
+number_requiring_ICU[] <- rbinom(n_ICase2_Hosp[i], prob_severe[i]) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
+total_number_requiring_ICU <- sum(number_requiring_ICU) # Totalling number newly requiring an ICU bed over age groups
+current_free_ICU <- ICU_bed_capacity + sum(n_ISevere_Get_ICU_Get_Ox_Survive2_R) + sum(n_ISevere_Get_ICU_Get_Ox_Die2_D_Hospital) +
+  sum(n_ISevere_Get_ICU_No_Ox_Survive2_R) + sum(n_ISevere_Get_ICU_No_Ox_Die2_D_Hospital) + sum(n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2_R) +
+  sum(n_ICritical_Get_ICU_Get_Ox_Get_MV_Die2_D_Hospital) + sum(n_ICritical_Get_ICU_Get_Ox_No_MV_Survive2_R) + sum(n_ICritical_Get_ICU_Get_Ox_No_MV_Die2_D_Hospital) +
+  sum(n_ICritical_Get_ICU_No_Ox_No_MV_Survive2_R) + sum(n_ICritical_Get_ICU_No_Ox_No_MV_Die2_D_Hospital) - ICU_occ # Number of ICU beds that are currently free
+total_number_get_ICU <- if(current_free_ICU <= 0) 0 else(if(current_free_ICU - total_number_requiring_ICU >= 0) total_number_requiring_ICU else(current_free_ICU)) # Working out the number of new ICU requiring infections that get a bed
+number_get_ICU[] <- rmhyper(total_number_get_ICU, number_requiring_ICU)
+number_not_get_ICU[] <- number_requiring_ICU[i] - number_get_ICU[i]
+number_not_get_ICU_not_ox_not_mv[] <- rbinom(number_not_get_ICU[i], prob_critical[i])
+number_not_get_ICU_not_ox[] <- number_not_get_ICU[i] - number_not_get_ICU_not_ox_not_mv[i]
+
+# Working Out Number of Hospital Beds Available and How Many Individuals Receive Them
+hosp_bed_occ <- sum(IModerate_Get_Hosp_Get_Ox_Survive1) + sum(IModerate_Get_Hosp_Get_Ox_Survive2) + sum(IModerate_Get_Hosp_Get_Ox_Die1) +
+  sum(IModerate_Get_Hosp_Get_Ox_Die2) + sum(IModerate_Get_Hosp_No_Ox_Survive1) + sum(IModerate_Get_Hosp_No_Ox_Survive2) +
+  sum(IModerate_Get_Hosp_No_Ox_Die1) + sum(IModerate_Get_Hosp_No_Ox_Die2) + sum(IRec1) + sum(IRec2)
+number_requiring_hosp_bed[] <- n_ICase2_Hosp[i] - number_requiring_ICU[i]  # Number of new hospitalisations that are going to require a hospital bed
+total_number_requiring_hosp_bed <- sum(number_requiring_hosp_bed) # Totalling number newly requiring a hospital bed over age groups
+current_free_hosp_beds <- hosp_bed_capacity + sum(n_IModerate_Get_Hosp_Get_Ox_Survive2_R) + sum(n_IModerate_Get_Hosp_Get_Ox_Die2_D_Hospital) +
+  sum(n_IModerate_Get_Hosp_No_Ox_Survive2_R) + sum(n_IModerate_Get_Hosp_No_Ox_Die2_D_Hospital) + sum(n_IRec2_R) -
+  sum(n_ISevere_Get_ICU_Get_Ox_Survive2_R) - sum(n_ISevere_Get_ICU_No_Ox_Survive2_R) - hosp_occ # Number of hospital beds that are currently free
+total_number_get_hosp_beds <- if (current_free_hosp_beds <= 0) 0 else (if(current_free_hosp_beds - total_number_requiring_hosp_bed >= 0) total_number_requiring_hosp_bed else(current_free_hosp_beds)) # Working out the number of new hospital bed requiring infections that get a bed
+number_get_hosp_bed[] <- rmhyper(total_number_get_hosp_beds, number_requiring_hosp_bed)
+number_not_hosp_bed[] <- number_requiring_hosp_bed[i] - number_get_hosp_bed[i]
+
+# Working Out How Much Oxygen There Is Available and How Many Individuals Requiring Hospital/ICU Bed Receive Them
+oxygen_availability <- oxygen_supply + previous_reserves - oxygen_demand
+prop_ox_hosp_beds <- total_number_get_hosp_beds/(total_number_get_hosp_beds + total_number_get_ICU * severe_critical_case_oxygen_consumption_multiplier)
+available_oxygen_for_hosp_beds <- floor(prop_ox_hosp_beds * oxygen_availability)
+available_oxygen_for_ICU_beds <- floor((oxygen_availability - available_oxygen_for_hosp_beds)/severe_critical_case_oxygen_consumption_multiplier)
+number_get_hosp_Ox[] <- rmhyper(available_oxygen_for_hosp_beds, number_get_hosp_bed)
+number_get_hosp_no_Ox[] <- number_get_hosp_bed[i] - number_get_hosp_Ox[i]
+
+# Working Out Number of Mechanical Ventilators Available and How Many Individuals Requiring ICU Bed and MV Receive Them
+number_get_ICU_Ox[] <- rmhyper(available_oxygen_for_ICU_beds, number_get_ICU)
+
+number_requiring_ICU_MV[] <- rbinom(number_get_ICU_Ox[i], prob_critical[i]) # Number of new ICU admissions that are going to require oxygen and mechanical ventilation
+number_requiring_ICU_Ox[] <- number_get_ICU_Ox[i] - number_requiring_ICU_MV[i] # Number of new ICU admissions that going to require oxygen only
+total_number_requiring_ICU_MV <- sum(number_requiring_ICU_MV)
+total_number_requiring_ICU_Ox <- sum(number_requiring_ICU_Ox)
+
+MV_occ <- sum(ICritical_Get_ICU_Get_Ox_Get_MV_Survive1) + sum(ICritical_Get_ICU_Get_Ox_Get_MV_Survive2) + sum(ICritical_Get_ICU_Get_Ox_Get_MV_Die1) + sum(ICritical_Get_ICU_Get_Ox_Get_MV_Die2) # Summing over compartments that use mechanical ventilators
+current_free_ICU_MV <- MV_capacity + sum(n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2_R) + sum(n_ICritical_Get_ICU_Get_Ox_Get_MV_Die2_D_Hospital) - MV_occ # Number of mechanical ventilators that are currently free
+
+available_oxygen_for_ICU_MV <- round(available_oxygen_for_ICU_beds * total_number_requiring_ICU_MV/(total_number_requiring_ICU_MV + total_number_requiring_ICU_Ox))
+available_oxygen_for_ICU_Ox <- available_oxygen_for_ICU_beds - available_oxygen_for_ICU_MV
+
+number_get_ICU_get_Ox_need_MV[] <- rmhyper(available_oxygen_for_ICU_MV, number_requiring_ICU_MV)
+number_get_ICU_get_Ox_get_MV[] <- rmhyper(current_free_ICU_MV, number_get_ICU_get_Ox_need_MV)
+number_get_ICU_get_Ox_no_MV[] <- number_get_ICU_get_Ox_need_MV[i] - number_get_ICU_get_Ox_get_MV[i]
+number_get_ICU_get_Ox[] <- rmhyper(available_oxygen_for_ICU_Ox, number_requiring_ICU_Ox)
+
+overall_number_get_ICU_not_Ox[] <- number_get_ICU[i] - number_get_ICU_Ox
+number_get_ICU_not_Ox_not_MV[] <- rbinom(overall_number_get_ICU_not_Ox[i], prob_critical[i])
+number_get_ICU_not_Ox[] <- overall_number_get_ICU_not_Ox[i] - number_get_ICU_not_Ox_not_MV[i]
+
+ICU_leftover <- available_oxygen_for_ICU_Ox + available_oxygen_for_ICU_MV - sum(number_get_ICU_get_Ox_need_MV) - sum(number_get_ICU_get_Ox)
+previous_reserves <- oxygen_availability - min(available_oxygen_for_hosp_beds, sum(number_get_hosp_Ox)) + ICU_leftover # check this doesn't go below 0
+
 # Numbers changing between hospital bed related compartments
-n_IModerate_Get_Hosp_Get_Ox_Die1[] <- rbinom(number_get_hosp_Ox[i], prob_moderate_death_get_hosp_get_ox)
+n_IModerate_Get_Hosp_Get_Ox_Die1[] <- rbinom(number_get_hosp_Ox[i], prob_moderate_death_get_hosp_get_ox[i])
 n_IModerate_Get_Hosp_Get_Ox_Die1_IModerate_Get_Hosp_Get_Ox_Die2[] <- rbinom(IModerate_Get_Hosp_Get_Ox_Die1[i], p_IModerate_Get_Hosp_Get_Ox_Die1_IModerate_Get_Hosp_Get_Ox_Die2) # Number progressing through requiring hosp bed and oxygen and receiving both -> Dying
 n_IModerate_Get_Hosp_Get_Ox_Die2_D_Hospital[] <- rbinom(IModerate_Get_Hosp_Get_Ox_Die2[i], p_IModerate_Get_Hosp_Get_Ox_Die2_D_Hospital) # Number progressing through requiring hosp bed and oxygen and receiving both -> Dying
 n_IModerate_Get_Hosp_Get_Ox_Survive1[] <- number_get_hosp_Ox[i] - n_IModerate_Get_Hosp_Get_Ox_Die1[i]
 n_IModerate_Get_Hosp_Get_Ox_Survive1_IModerate_Get_Hosp_Get_Ox_Survive2[] <- rbinom(IModerate_Get_Hosp_Get_Ox_Survive1[i], p_IModerate_Get_Hosp_Get_Ox_Survive1_IModerate_Get_Hosp_Get_Ox_Survive2) # Number progressing through requiring hosp bed and oxygen and receiving both -> Recovery
 n_IModerate_Get_Hosp_Get_Ox_Survive2_R[] <- rbinom(IModerate_Get_Hosp_Get_Ox_Survive2_R[i], p_IModerate_Get_Hosp_Get_Ox_Survive2_R) # Number progressing through requiring hosp bed and oxygen and receiving both -> Recovery
 
-n_IModerate_Get_Hosp_No_Ox_Die1[] <- rbinom(number_get_hosp_no_Ox[i], prob_moderate_death_get_hosp_no_ox)
+n_IModerate_Get_Hosp_No_Ox_Die1[] <- rbinom(number_get_hosp_no_Ox[i], prob_moderate_death_get_hosp_no_ox[i])
 n_IModerate_Get_Hosp_No_Ox_Die1_IModerate_Get_Hosp_No_Ox_Die2[] <- rbinom(IModerate_Get_Hosp_No_Ox_Die1[i], p_IModerate_Get_Hosp_No_Ox_Die1_IModerate_Get_Hosp_No_Ox_Die2) # Number progressing through requiring hosp bed and oxygen, receiving hosp bed only -> Dying
 n_IModerate_Get_Hosp_No_Ox_Die2_D_Hospital[] <- rbinom(IModerate_Get_Hosp_No_Ox_Die2[i], p_IModerate_Get_Hosp_No_Ox_Die2_D_Hospital) # Number progressing through requiring hosp bed and oxygen, receiving hosp bed only -> Dying
 n_IModerate_Get_Hosp_No_Ox_Survive1[] <- number_get_hosp_no_Ox[i] - n_IModerate_Get_Hosp_No_Ox_Die1[i]
 n_IModerate_Get_Hosp_No_Ox_Survive1_IModerate_Get_Hosp_No_Ox_Survive2[] <- rbinom(IModerate_Get_Hosp_No_Ox_Survive1[i], p_IModerate_Get_Hosp_No_Ox_Survive1_IModerate_Get_Hosp_No_Ox_Survive2) # Number progressing through requiring hosp bed and oxygen, receiving hosp bed only -> Recovery
 n_IModerate_Get_Hosp_No_Ox_Survive2_R[] <- rbinom(IModerate_Get_Hosp_No_Ox_Survive2[i], p_IModerate_Get_Hosp_No_Ox_Survive2_R) # Number progressing through requiring hosp bed and oxygen, receiving hosp bed only -> Recovery
 
-n_IModerate_No_Hosp_No_Ox_Die1[] <- rbinom(number_not_hosp_bed[i], prob_moderate_death_no_hosp_no_ox)
+n_IModerate_No_Hosp_No_Ox_Die1[] <- rbinom(number_not_hosp_bed[i], prob_moderate_death_no_hosp_no_ox[i])
 n_IModerate_No_Hosp_No_Ox_Die1_IModerate_No_Hosp_No_Ox_Die2[] <- rbinom(IModerate_No_Hosp_No_Ox_Die1[i], p_IModerate_No_Hosp_No_Ox_Die1_IModerate_No_Hosp_No_Ox_Die2) # Number progressing through requiring hosp bed and oxygen, receiving neither -> Dying
 n_IModerate_No_Hosp_No_Ox_Die2_D_Community[] <- rbinom(IModerate_No_Hosp_No_Ox_Die2[i], p_IModerate_No_Hosp_No_Ox_Die2_D_Community) # Number progressing through requiring hosp bed and oxygen, receiving neither -> Dying
 n_IModerate_No_Hosp_No_Ox_Survive1[] <- number_not_hosp_bed[i] - n_IModerate_No_Hosp_No_Ox_Die1[i]
@@ -209,166 +305,119 @@ n_IModerate_No_Hosp_No_Ox_Survive1_IModerate_No_Hosp_No_Ox_Survive2[] <- rbinom(
 n_IModerate_No_Hosp_No_Ox_Survive2_R[] <- rbinom(IModerate_No_Hosp_No_Ox_Survive2[i], p_IModerate_No_Hosp_No_Ox_Survive2_R) # Number progressing through requiring hosp bed and oxygen, receiving neither -> Recovery
 
 # Numbers changing between ICU bed/non-mechanical ventilation related compartments
-###n_ISevere_Get_ICU_Get_Ox_Die1[] <- rbinom(number_get_ICU_Ox[i], prob_severe_death_get_ICU_get_ox)
+n_ISevere_Get_ICU_Get_Ox_Die1[] <- rbinom(number_get_ICU_Ox[i], prob_severe_death_get_ICU_get_ox[i])
 n_ISevere_Get_ICU_Get_Ox_Die1_ISevere_Get_ICU_Get_Ox_Die2[] <- rbinom(ISevere_Get_ICU_Get_Ox_Die1[i], p_ISevere_Get_ICU_Get_Ox_Die1_ISevere_Get_ICU_Get_Ox_Die2) # Number progressing through requiring ICU bed and oxygen and receiving both -> Dying
 n_ISevere_Get_ICU_Get_Ox_Die2_D_Hospital[] <- rbinom(ISevere_Get_ICU_Get_Ox_Die2[i], p_ISevere_Get_ICU_Get_Ox_Die2_D_Hospital) # Number progressing through requiring ICU bed and oxygen and receiving both -> Dying
-
-###n_ISevere_Get_ICU_Get_Ox_Survive1[] <- number_get_ICU_Ox[i] - n_ISevere_Get_ICU_Get_Ox_Die1[i]
+n_ISevere_Get_ICU_Get_Ox_Survive1[] <- number_get_ICU_Ox[i] - n_ISevere_Get_ICU_Get_Ox_Die1[i]
 n_ISevere_Get_ICU_Get_Ox_Survive1_ISevere_Get_ICU_Get_Ox_Survive2[] <- rbinom(ISevere_Get_ICU_Get_Ox_Survive1[i], p_ISevere_Get_ICU_Get_Ox_Survive1_ISevere_Get_ICU_Get_Ox_Survive2) # Number progressing through requiring ICU bed and oxygen and receiving both -> Recovery
-n_ISevere_Get_ICU_Get_Ox_Survive2_R[] <- rbinom(ISevere_Get_ICU_Get_Ox_Survive2[i], p_ISevere_Get_ICU_Get_Ox_Survive2_R) # Number progressing through requiring ICU bed and oxygen and receiving both -> Recovery
+n_ISevere_Get_ICU_Get_Ox_Survive2_Rec[] <- rbinom(ISevere_Get_ICU_Get_Ox_Survive2[i], p_ISevere_Get_ICU_Get_Ox_Survive2_R) # Number progressing through requiring ICU bed and oxygen and receiving both -> Recovery
 
-###n_ISevere_Get_ICU_No_Ox_Survive1[] <- rbinom( , prob_severe_death_get_ICU_no_ox)
-n_ISevere_Get_ICU_No_Ox_Survive1_ISevere_Get_ICU_No_Ox_Survive2[] <- rbinom(ISevere_Get_ICU_No_Ox_Survive1[i], p_ISevere_Get_ICU_No_Ox_Survive1_ISevere_Get_ICU_No_Ox_Survive2) # Number progressing through requiring ICU bed and oxygen, receiving ICU bed only -> Recovery
-n_ISevere_Get_ICU_No_Ox_Survive2_R[] <- rbinom(ISevere_Get_ICU_No_Ox_Survive2[i], p_ISevere_Get_ICU_No_Ox_Survive2_R) # Number progressing through requiring ICU bed and oxygen, receiving ICU bed only -> Recovery
-
-
+n_ISevere_Get_ICU_No_Ox_Die1[] <-  rbinom(number_get_ICU_not_Ox[i], prob_severe_death_get_ICU_no_ox[i])
 n_ISevere_Get_ICU_No_Ox_Die1_ISevere_Get_ICU_No_Ox_Die2[] <- rbinom(ISevere_Get_ICU_No_Ox_Die1[i], p_ISevere_Get_ICU_No_Ox_Die1_ISevere_Get_ICU_No_Ox_Die2) # Number progressing through requiring hosp bed and oxygen, receiving ICU bed only -> Dying
 n_ISevere_Get_ICU_No_Ox_Die2_D_Hospital[] <- rbinom(ISevere_Get_ICU_No_Ox_Die2[i], p_ISevere_Get_ICU_No_Ox_Die2_D_Hospital) # Number progressing through requiring hosp bed and oxygen, receiving ICU bed only -> Dying
+n_ISevere_Get_ICU_No_Ox_Survive1[] <- number_get_ICU_not_Ox[i] - n_ISevere_Get_ICU_No_Ox_Die1[i]
+n_ISevere_Get_ICU_No_Ox_Survive1_ISevere_Get_ICU_No_Ox_Survive2[] <- rbinom(ISevere_Get_ICU_No_Ox_Survive1[i], p_ISevere_Get_ICU_No_Ox_Survive1_ISevere_Get_ICU_No_Ox_Survive2) # Number progressing through requiring ICU bed and oxygen, receiving ICU bed only -> Recovery
+n_ISevere_Get_ICU_No_Ox_Survive2_Rec[] <- rbinom(ISevere_Get_ICU_No_Ox_Survive2[i], p_ISevere_Get_ICU_No_Ox_Survive2_R) # Number progressing through requiring ICU bed and oxygen, receiving ICU bed only -> Recovery
 
-
+n_ISevere_No_ICU_No_Ox_Die1[] <- rbinom(number_not_get_ICU_not_ox[i], prob_severe_death_no_ICU_no_ox[i])
+n_ISevere_No_ICU_No_Ox_Die1_ISevere_No_ICU_No_Ox_Die2[] <- rbinom(ISevere_No_ICU_No_Ox_Die1[i], p_ISevere_No_ICU_No_Ox_Die1_ISevere_No_ICU_No_Ox_Die2) # Number progressing through requiring ICU bed and oxygen, receiving neither -> Dying
+n_ISevere_No_ICU_No_Ox_Die2_D_Community[] <- rbinom(ISevere_No_ICU_No_Ox_Die2[i], p_ISevere_No_ICU_No_Ox_Die2_D_Community) # Number progressing through requiring ICU bed and oxygen, receiving neither -> Dying
+n_ISevere_No_ICU_No_Ox_Survive1[] <- number_not_get_ICU_not_ox[i] - n_ISevere_No_ICU_No_Ox_Die1
 n_ISevere_No_ICU_No_Ox_Survive1_ISevere_No_ICU_No_Ox_Survive2[] <- rbinom(ISevere_No_ICU_No_Ox_Survive1[i], p_ISevere_No_ICU_No_Ox_Survive1_ISevere_No_ICU_No_Ox_Survive2) # Number progressing through requiring ICU bed and oxygen, receiving neither -> Recovery
 n_ISevere_No_ICU_No_Ox_Survive2_R[] <- rbinom(ISevere_No_ICU_No_Ox_Survive2[i], p_ISevere_No_ICU_No_Ox_Survive2_R) # Number progressing through requiring ICU bed and oxygen, receiving neither -> Recovery
 
-
-n_ISevere_No_ICU_No_Ox_Die1_ISevere_No_ICU_No_Ox_Die2[] <- rbinom(ISevere_No_ICU_No_Ox_Die1[i], p_ISevere_No_ICU_No_Ox_Die1_ISevere_No_ICU_No_Ox_Die2) # Number progressing through requiring ICU bed and oxygen, receiving neither -> Dying
-n_ISevere_No_ICU_No_Ox_Die2_D_Community[] <- rbinom(ISevere_No_ICU_No_Ox_Die2[i], p_ISevere_No_ICU_No_Ox_Die2_D_Community) # Number progressing through requiring ICU bed and oxygen, receiving neither -> Dying
-
-n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2[] <- rbinom(ICritical_Get_ICU_Get_Ox_Get_MV_Survive1[i], p_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2) # Number progressing through requiring ICU bed, oxygen and MV, and receiving all -> Recovery
-n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2_R[] <- rbinom(ICritical_Get_ICU_Get_Ox_Get_MV_Survive2[i], p_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2_R) # Number progressing through requiring ICU bed, oxygen and MV, and receiving all -> Recovery
+# Numbers changing between ICU bed/mechanical ventilation related compartments
+n_ICritical_Get_ICU_Get_Ox_Get_MV_Die1[] <- rbinom(number_get_ICU_get_Ox_get_MV[i], prob_critical_death_get_ICU_get_ox_get_MV[i])
 n_ICritical_Get_ICU_Get_Ox_Get_MV_Die1_ICritical_Get_ICU_Get_Ox_Get_MV_Die2[] <- rbinom(ICritical_Get_ICU_Get_Ox_Get_MV_Die1[i], p_ICritical_Get_ICU_Get_Ox_Get_MV_Die1_ICritical_Get_ICU_Get_Ox_Get_MV_Die2) # Number progressing through requiring ICU bed, oxygen and MV, and receiving all -> Dying
 n_ICritical_Get_ICU_Get_Ox_Get_MV_Die2_D_Hospital[] <- rbinom(ICritical_Get_ICU_Get_Ox_Get_MV_Die2[i], p_ICritical_Get_ICU_Get_Ox_Get_MV_Die2_D_Hospital) # Number progressing through requiring ICU bed, oxygen and MV, and receiving all -> Recovery
-n_ICritical_Get_ICU_Get_Ox_No_MV_Survive1_ICritical_Get_ICU_Get_Ox_No_MV_Survive2[] <- rbinom(ICritical_Get_ICU_Get_Ox_No_MV_Survive1[i], p_ICritical_Get_ICU_Get_Ox_No_MV_Survive1_ICritical_Get_ICU_Get_Ox_No_MV_Survive2) # Number progressing through requiring ICU bed, oxygen and MV, and receiving ICU bed and oxygen only -> Recovery
-n_ICritical_Get_ICU_Get_Ox_No_MV_Survive2_R[] <- rbinom(ICritical_Get_ICU_Get_Ox_No_MV_Survive2[i], p_ICritical_Get_ICU_Get_Ox_No_MV_Survive2_R) # Number progressing through requiring ICU bed, oxygen and MV, and receiving ICU bed and oxygen only -> Recovery
+n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1[] <- number_get_ICU_get_Ox_get_MV[i] - n_ICritical_Get_ICU_Get_Ox_Get_MV_Die1[i]
+n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2[] <- rbinom(ICritical_Get_ICU_Get_Ox_Get_MV_Survive1[i], p_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2) # Number progressing through requiring ICU bed, oxygen and MV, and receiving all -> Recovery
+n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2_Rec[] <- rbinom(ICritical_Get_ICU_Get_Ox_Get_MV_Survive2[i], p_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2_R) # Number progressing through requiring ICU bed, oxygen and MV, and receiving all -> Recovery
+
+n_ICritical_Get_ICU_Get_Ox_No_MV_Die1[] <- rbinom(number_get_ICU_get_Ox_no_MV[i], prob_critical_death_get_ICU_get_ox_no_MV[i])
 n_ICritical_Get_ICU_Get_Ox_No_MV_Die1_ICritical_Get_ICU_Get_Ox_No_MV_Die2[] <- rbinom(ICritical_Get_ICU_Get_Ox_No_MV_Die1[i], p_ICritical_Get_ICU_Get_Ox_No_MV_Die1_ICritical_Get_ICU_Get_Ox_No_MV_Die2) # Number progressing through requiring ICU bed, oxygen and MV, and receiving ICU bed and oxygen only -> Dying
 n_ICritical_Get_ICU_Get_Ox_No_MV_Die2_D_Hospital[] <- rbinom(ICritical_Get_ICU_Get_Ox_No_MV_Die2[i], p_ICritical_Get_ICU_Get_Ox_No_MV_Die2_D_Hospital) # Number progressing through requiring ICU bed, oxygen and MV, and receiving ICU bed and oxygen only -> Dying
-n_ICritical_Get_ICU_No_Ox_No_MV_Survive1_ICritical_Get_ICU_No_Ox_No_MV_Survive2[] <- rbinom(ICritical_Get_ICU_No_Ox_No_MV_Survive1[i], ICritical_Get_ICU_No_Ox_No_MV_Survive1_ICritical_Get_ICU_No_Ox_No_MV_Survive2) # Number progressing through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Recovery
-n_ICritical_Get_ICU_No_Ox_No_MV_Survive2_R[] <- rbinom(ICritical_Get_ICU_No_Ox_No_MV_Survive2[i], p_ICritical_Get_ICU_No_Ox_No_MV_Survive2_R) # Number progressing through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Recovery
+n_ICritical_Get_ICU_Get_Ox_No_MV_Survive1[] <- number_get_ICU_get_Ox_no_MV[i] - n_ICritical_Get_ICU_Get_Ox_No_MV_Die1[i]
+n_ICritical_Get_ICU_Get_Ox_No_MV_Survive1_ICritical_Get_ICU_Get_Ox_No_MV_Survive2[] <- rbinom(ICritical_Get_ICU_Get_Ox_No_MV_Survive1[i], p_ICritical_Get_ICU_Get_Ox_No_MV_Survive1_ICritical_Get_ICU_Get_Ox_No_MV_Survive2) # Number progressing through requiring ICU bed, oxygen and MV, and receiving ICU bed and oxygen only -> Recovery
+n_ICritical_Get_ICU_Get_Ox_No_MV_Survive2_Rec[] <- rbinom(ICritical_Get_ICU_Get_Ox_No_MV_Survive2[i], p_ICritical_Get_ICU_Get_Ox_No_MV_Survive2_R) # Number progressing through requiring ICU bed, oxygen and MV, and receiving ICU bed and oxygen only -> Recovery
+
+n_ICritical_Get_ICU_No_Ox_No_MV_Die1[] <- rbinom(number_get_ICU_not_Ox_not_MV[i], prob_critical_death_get_ICU_no_ox_no_MV[i])
 n_ICritical_Get_ICU_No_Ox_No_MV_Die1_ICritical_Get_ICU_No_Ox_No_MV_Die2[] <- rbinom(ICritical_Get_ICU_No_Ox_No_MV_Die1[i], p_ICritical_Get_ICU_No_Ox_No_MV_Die1_ICritical_Get_ICU_No_Ox_No_MV_Die2) # Number progressing through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Dying
 n_ICritical_Get_ICU_No_Ox_No_MV_Die2_D_Hospital[] <- rbinom(ICritical_Get_ICU_No_Ox_No_MV_Die2[i], p_ICritical_Get_ICU_No_Ox_No_MV_Die2_D_Hospital) # Number progressing through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Dying
-n_ICritical_No_ICU_No_Ox_No_MV_Survive1_ICritical_No_ICU_No_Ox_No_MV_Survive2[] <- rbinom(ICritical_No_ICU_No_Ox_No_MV_Survive1[i], p_ICritical_No_ICU_No_Ox_No_MV_Survive1_ICritical_No_ICU_No_Ox_No_MV_Survive2) # Number progressing through requiring ICU bed, oxygen and MV, receiving nothing -> Recovery
-n_ICritical_No_ICU_No_Ox_No_MV_Survive2_R[] <- rbinom(ICritical_No_ICU_No_Ox_No_MV_Survive2[i], p_ICritical_No_ICU_No_Ox_No_MV_Survive2_R) # Number progressing through requiring ICU bed, oxygen and MV, receiving nothing -> Recovery
+n_ICritical_Get_ICU_No_Ox_No_MV_Survive1[] <- number_get_ICU_not_Ox_not_MV[i] - n_ICritical_Get_ICU_No_Ox_No_MV_Die1[i]
+n_ICritical_Get_ICU_No_Ox_No_MV_Survive1_ICritical_Get_ICU_No_Ox_No_MV_Survive2[] <- rbinom(ICritical_Get_ICU_No_Ox_No_MV_Survive1[i], ICritical_Get_ICU_No_Ox_No_MV_Survive1_ICritical_Get_ICU_No_Ox_No_MV_Survive2) # Number progressing through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Recovery
+n_ICritical_Get_ICU_No_Ox_No_MV_Survive2_Rec[] <- rbinom(ICritical_Get_ICU_No_Ox_No_MV_Survive2[i], p_ICritical_Get_ICU_No_Ox_No_MV_Survive2_R) # Number progressing through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Recovery
+
+n_ICritical_No_ICU_No_Ox_No_MV_Die1[] <- rbinom(number_not_get_ICU_not_ox_not_mv[i], prob_critical_death_no_ICU_no_ox_no_MV[i])
 n_ICritical_No_ICU_No_Ox_No_MV_Die1_ICritical_No_ICU_No_Ox_No_MV_Die2[] <- rbinom(ICritical_No_ICU_No_Ox_No_MV_Die1[i], p_ICritical_No_ICU_No_Ox_No_MV_Die1_ICritical_No_ICU_No_Ox_No_MV_Die2) # Number progressing through requiring ICU bed, oxygen and MV, receiving nothing -> Dying
 n_ICritical_No_ICU_No_Ox_No_MV_Die2_D_Community[] <- rbinom(ICritical_No_ICU_No_Ox_No_MV_Die2[i], p_ICritical_No_ICU_No_Ox_No_MV_Die2_D_Community) # Number progressing through requiring ICU bed, oxygen and MV, receiving nothing -> Dying
+n_ICritical_No_ICU_No_Ox_No_MV_Survive1[] <- number_not_get_ICU_not_ox_not_mv[i] - n_ICritical_No_ICU_No_Ox_No_MV_Die1[i]
+n_ICritical_No_ICU_No_Ox_No_MV_Survive1_ICritical_No_ICU_No_Ox_No_MV_Survive2[] <- rbinom(ICritical_No_ICU_No_Ox_No_MV_Survive1[i], p_ICritical_No_ICU_No_Ox_No_MV_Survive1_ICritical_No_ICU_No_Ox_No_MV_Survive2) # Number progressing through requiring ICU bed, oxygen and MV, receiving nothing -> Recovery
+n_ICritical_No_ICU_No_Ox_No_MV_Survive2_R[] <- rbinom(ICritical_No_ICU_No_Ox_No_MV_Survive2[i], p_ICritical_No_ICU_No_Ox_No_MV_Survive2_R) # Number progressing through requiring ICU bed, oxygen and MV, receiving nothing -> Recovery
 
-# Working Out Number of ICU Beds Available and How Many Individuals Receive Them
-ICU_occ <- sum(ISevere_Get_ICU_Get_Ox_Survive1) + sum(ISevere_Get_ICU_Get_Ox_Survive2) + sum(ISevere_Get_ICU_Get_Ox_Die1) + sum(ISevere_Get_ICU_Get_Ox_Die2) +
-           sum(ISevere_Get_ICU_No_Ox_Survive1) + sum(ISevere_Get_ICU_No_Ox_Survive2) + sum(ISevere_Get_ICU_No_Ox_Die1) + sum(ISevere_Get_ICU_No_Ox_Die2) +
-           sum(ICritical_Get_ICU_Get_Ox_Get_MV_Survive1) + sum(ICritical_Get_ICU_Get_Ox_Get_MV_Survive2) + sum(ICritical_Get_ICU_Get_Ox_Get_MV_Die1) +
-           sum(ICritical_Get_ICU_Get_Ox_Get_MV_Die2) + sum(ICritical_Get_ICU_Get_Ox_No_MV_Survive1) + sum(ICritical_Get_ICU_Get_Ox_No_MV_Survive2) +
-           sum(ICritical_Get_ICU_Get_Ox_No_MV_Die1) + sum(ICritical_Get_ICU_Get_Ox_No_MV_Die2) + sum(ICritical_Get_ICU_No_Ox_No_MV_Survive1) +
-           sum(ICritical_Get_ICU_No_Ox_No_MV_Survive2) + sum(ICritical_Get_ICU_No_Ox_No_MV_Die1) + sum(ICritical_Get_ICU_No_Ox_No_MV_Die2)
-number_requiring_ICU[] <- rbinom(n_ICase2_Hosp[i], prob_severe[i]) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
-total_number_requiring_ICU <- sum(number_requiring_ICU) # Totalling number newly requiring an ICU bed over age groups
-current_free_ICU <- ICU_bed_capacity + sum(n_ISevere_Get_ICU_Get_Ox_Survive2_R) + sum(n_ISevere_Get_ICU_Get_Ox_Die2_D_Hospital) +
-                    sum(n_ISevere_Get_ICU_No_Ox_Survive2_R) + sum(n_ISevere_Get_ICU_No_Ox_Die2_D_Hospital) + sum(n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2_R) +
-                    sum(n_ICritical_Get_ICU_Get_Ox_Get_MV_Die2_D_Hospital) + sum(n_ICritical_Get_ICU_Get_Ox_No_MV_Survive2_R) + sum(n_ICritical_Get_ICU_Get_Ox_No_MV_Die2_D_Hospital) +
-                    sum(n_ICritical_Get_ICU_No_Ox_No_MV_Survive2_R) + sum(n_ICritical_Get_ICU_No_Ox_No_MV_Die2_D_Hospital) - ICU_occ # Number of ICU beds that are currently free
-total_number_get_ICU <- if(current_free_ICU <= 0) 0 else(if(current_free_ICU - total_number_requiring_ICU >= 0) total_number_requiring_ICU else(current_free_ICU)) # Working out the number of new ICU requiring infections that get a bed
-number_get_ICU[] <- rmhyper(total_number_get_ICU, number_requiring_ICU)
-
-# Working Out Number of Hospital Beds Available and How Many Individuals Receive Them
-hosp_bed_occ <- sum(IModerate_Get_Hosp_Get_Ox_Survive1) + sum(IModerate_Get_Hosp_Get_Ox_Survive2) + sum(IModerate_Get_Hosp_Get_Ox_Die1) +
-                sum(IModerate_Get_Hosp_Get_Ox_Die2) + sum(IModerate_Get_Hosp_No_Ox_Survive1) + sum(IModerate_Get_Hosp_No_Ox_Survive2) +
-                sum(IModerate_Get_Hosp_No_Ox_Die1) + sum(IModerate_Get_Hosp_No_Ox_Die2) + sum(IRec1) + sum(IRec2)
-number_requiring_hosp_bed[] <- n_ICase2_Hosp[i] - number_requiring_ICU[i]  # Number of new hospitalisations that are going to require a hospital bed
-total_number_requiring_hosp_bed <- sum(number_requiring_hosp_bed) # Totalling number newly requiring a hospital bed over age groups
-current_free_hosp_beds <- hosp_bed_capacity + sum(n_IModerate_Get_Hosp_Get_Ox_Survive2_R) + sum(n_IModerate_Get_Hosp_Get_Ox_Die2_D_Hospital) +
-                          sum(n_IModerate_Get_Hosp_No_Ox_Survive2_R) + sum(n_IModerate_Get_Hosp_No_Ox_Die2_D_Hospital) + sum(n_IRec2_R) -
-                          sum(n_ISevere_Get_ICU_Get_Ox_Survive2_R) - sum(n_ISevere_Get_ICU_No_Ox_Survive2_R) - hosp_occ # Number of hospital beds that are currently free
-total_number_get_hosp_beds <- if (current_free_hosp_beds <= 0) 0 else (if(current_free_hosp_beds - total_number_requiring_hosp_bed >= 0) total_number_requiring_hosp_bed else(current_free_hosp_beds)) # Working out the number of new hospital bed requiring infections that get a bed
-number_get_hosp_bed[] <- rmhyper(total_number_get_hosp_beds, number_requiring_hosp_bed)
-number_not_hosp_bed[] <- number_requiring_hosp_bed[i] - number_get_hosp_bed[i]
-
-# Working Out How Much Oxygen There Is Available and How Many Individuals Requiring Hospital/ICU Bed Receive Them
-oxygen_availability <- oxygen_supply + previous_reserves
-prop_ox_hosp_beds <- total_number_get_hosp_beds/(total_number_get_hosp_beds + total_number_get_ICU * severe_critical_case_oxygen_consumption_multiplier)
-available_oxygen_for_hosp_beds <- floor(prop_ox_hosp_beds * oxygen_availability)
-available_oxygen_for_ICU_beds <- floor((oxygen_availability - available_oxygen_for_hosp_beds)/severe_critical_case_oxygen_consumption_multiplier)
-previous_reserves <- oxygen_availability - available_oxygen_for_hosp_beds - available_oxygen_for_ICU_beds # check this doesn't go below 0
-number_get_hosp_Ox[] <- rmhyper(available_oxygen_for_hosp_beds, number_get_hosp_bed)
-number_get_hosp_no_Ox[] <- number_get_hosp_bed[i] - number_get_hosp_Ox[i]
-
-# Working Out Number of Mechanical Ventilators Available and How Many Individuals Requiring ICU Bed and MV Receive Them
-MV_occ <- sum(ICritical_Get_ICU_Get_Ox_Get_MV_Survive1) + sum(ICritical_Get_ICU_Get_Ox_Get_MV_Survive2) + sum(ICritical_Get_ICU_Get_Ox_Get_MV_Die1) + sum(ICritical_Get_ICU_Get_Ox_Get_MV_Die2) # Summing over compartments that use mechanical ventilators
-current_free_ICU_MV <- MV_capacity + sum(n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2_R) + sum(n_ICritical_Get_ICU_Get_Ox_Get_MV_Die2_D_Hospital) - MV_occ # Number of mechanical ventilators that are currently free
-
-number_requiring_ICU_MV[] <- rbinom(number_requiring_ICU[i], prob_critical[i]) # Number of new ICU admissions that are going to require mechanical ventilation
-total_number_requiring_ICU_MV <- sum(number_requiring_ICU_MV) # Totalling number newly requiring an ICU bed and mechanical ventilation over age groups
-available_oxygen_for_ICU_MV <- available_oxygen_for_ICU_beds * round(total_number_requiring_ICU_MV/(total_number_requiring_ICU_MV + total_number_requiring_ICU_Ox))
-initial_initial_number_get_ICU_Ox_MV[] <- rmhyper(available_oxygen_for_ICU_MV, number_requiring_ICU_MV)
-initial_number_get_ICU_Ox_MV[] <- rmhyper(current_free_ICU_MV, initial_initial_number_get_ICU_Ox_MV)  # NEED TO CHECK, NOT SURE RIGHT, POSSIBLY LARGER NUMBER THAN SAMPLED #
-initial_number_not_get_ICU_Ox_MV[] <- number_requiring_ICU_MV[i] - initial_number_get_ICU_Ox_MV[i]
-spare_MV <- current_free_ICU_MV - sum(initial_number_get_ICU_Ox_MV[i])
-extra_ICU_Ox_MV[] <- rmhyper(min(remainder_ICU_Ox, spare_MV), initial_number_not_get_ICU_Ox_MV)
-number_get_ICU_Ox_MV[] <- initial_number_get_ICU_Ox_MV[i] + extra_ICU_Ox_MV[i]
-number_not_get_ICU_Ox_MV[] <- initial_number_not_get_ICU_Ox_MV[i] - extra_ICU_Ox_MV[i]
-remainder_ICU_MV <- available_oxygen_for_ICU_MV - sum(initial_number_get_ICU_Ox_MV[i]) # this means there is spare oxygen available - CHECK STRICLTY = OR GREATER THAN 0
-
-number_requiring_ICU_Ox[] <- number_requiring_ICU[i] - number_requiring_ICU_MV[i]
-total_number_requiring_ICU_Ox <- sum(number_requiring_ICU_Ox) # Totalling number newly requiring an ICU bed and oxygen over age groups
-available_oxygen_for_ICU_Ox <- available_oxygen_for_ICU_beds - available_oxygen_for_ICU_MV
-initial_number_get_ICU_Ox[] <- rmhyper(available_oxygen_for_ICU_Ox, number_requiring_ICU_Ox)
-initial_number_not_get_ICU_Ox[] <- number_requiring_ICU_Ox[i] - number_get_ICU_Ox[i]
-extra_get_ICU_Ox[] <- rmhyper(remainder_ICU_MV, initial_number_not_get_ICU_Ox)
-number_get_ICU_Ox <- initial_number_get_ICU_Ox[i] + extra_get_ICU_Ox[i]
-number_not_get_ICU_Ox <- initial_number_not_get_ICU_Ox[i] - extra_get_ICU_Ox[i]
-remainder_ICU_Ox <- available_oxygen_for_ICU_Ox - sum(initial_number_get_ICU_Ox[i]) # this means there is spare oxygen available - CHECK STRICLTY = OR GREATER THAN 0
 
 ## TOTALLING UP THE FLOWS IN AND OUT OF EACH COMPARTMENT
 ##------------------------------------------------------------------------------
+
+
 delta_E1[] <- n_S_E1[i] - n_E1_E2[i]
 delta_E2[] <- n_E1_E2[i] - n_E2_I[i]
 delta_IMild[] <- n_E2_IMild[i] - n_IMild_R[i]
 delta_ICase1[] <- n_E2_ICase1[i] - n_ICase1_ICase2[i]
 delta_ICase2[] <- n_ICase1_ICase2[i] - n_ICase2_Hosp[i]
-delta_IRec1[] <- n_IMVGetLive2_Rec[i] - n_IRec1_IRec2[i]
+delta_IRec1[] <- n_ISevere_Get_ICU_Get_Ox_Survive2_Rec[i] + n_ISevere_Get_ICU_No_Ox_Survive2_Rec[i] + n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2_Rec[i]  +
+  n_ICritical_Get_ICU_Get_Ox_No_MV_Survive2_Rec[i] + n_ICritical_Get_ICU_No_Ox_No_MV_Survive2_Rec[i] - n_IRec1_IRec2[i]
 delta_IRec2[] <- n_IRec1_IRec2[i] - n_IRec2_R[i]
-delta_R[] <- n_IOxGetLive2_R[i] + n_IOxNotGetLive2_R[i] + n_IRec2_R[i] + n_IMVNotGetLive2_R[i] + n_IMild_R[i]
-delta_D_Community[] <- n_IOxNotGetDie2_D[i] + n_IMVNotGetDie2_D[i]
-delta_D_Hospital[] <- n_IOxGetDie2_D[i] + n_IMVGetDie2_D[i]
+delta_R[] <- n_IModerate_Get_Hosp_Get_Ox_Survive2_R[i] + n_IModerate_Get_Hosp_No_Ox_Survive2_R[i] + n_IModerate_No_Hosp_No_Ox_Survive2_R[i] +
+  n_ISevere_No_ICU_No_Ox_Survive2_R[i] + n_ICritical_No_ICU_No_Ox_No_MV_Survive2_R[i]
+delta_D_Community[] <- n_IModerate_No_Hosp_No_Ox_Die2_D_Community[i] + n_ISevere_No_ICU_No_Ox_Die2_D_Community[i] + n_ICritical_No_ICU_No_Ox_No_MV_Die2_D_Community[i]
+delta_D_Hospital[] <- n_IModerate_Get_Hosp_Get_Ox_Die2_D_Hospital[i] + n_IModerate_Get_Hosp_No_Ox_Die2_D_Hospital[i] +
+  n_ISevere_Get_ICU_Get_Ox_Die2_D_Hospital[i] + n_ISevere_Get_ICU_No_Ox_Die2_D_Hospital[i] +
+  n_ICritical_Get_ICU_Get_Ox_Get_MV_Die2_D_Hospital[i] + n_ICritical_Get_ICU_Get_Ox_No_MV_Die2_D_Hospital[i] + n_ICritical_Get_ICU_No_Ox_No_MV_Die2_D_Hospital[i] +
 
-delta_IModerate_Get_Hosp_Get_Ox_Survive1[] <-
-delta_IModerate_Get_Hosp_Get_Ox_Survive2[] <-
-delta_IModerate_Get_Hosp_Get_Ox_Die1[] <-
-delta_IModerate_Get_Hosp_Get_Ox_Die2[] <-
-delta_IModerate_Get_Hosp_No_Ox_Survive1[] <-
-delta_IModerate_Get_Hosp_No_Ox_Survive2[] <-
-delta_IModerate_Get_Hosp_No_Ox_Die1[] <-
-delta_IModerate_Get_Hosp_No_Ox_Die2[] <-
-delta_IModerate_No_Hosp_No_Ox_Survive1[] <-
-delta_IModerate_No_Hosp_No_Ox_Survive2[] <-
-delta_IModerate_No_Hosp_No_Ox_Die1[] <-
-delta_IModerate_No_Hosp_No_Ox_Die2[] <-
+delta_IModerate_Get_Hosp_Get_Ox_Die1[] <- n_IModerate_Get_Hosp_Get_Ox_Die1[i] - n_IModerate_Get_Hosp_Get_Ox_Die1_IModerate_Get_Hosp_Get_Ox_Die2[i]
+delta_IModerate_Get_Hosp_Get_Ox_Die2[] <- n_IModerate_Get_Hosp_Get_Ox_Die1_IModerate_Get_Hosp_Get_Ox_Die2[i] - n_IModerate_Get_Hosp_Get_Ox_Die2_D_Hospital[i]
+delta_IModerate_Get_Hosp_Get_Ox_Survive1[] <- n_IModerate_Get_Hosp_Get_Ox_Survive1[i] - n_IModerate_Get_Hosp_Get_Ox_Survive1_IModerate_Get_Hosp_Get_Ox_Survive2[i]
+delta_IModerate_Get_Hosp_Get_Ox_Survive2[] <- n_IModerate_Get_Hosp_Get_Ox_Survive1_IModerate_Get_Hosp_Get_Ox_Survive2[i] - n_IModerate_Get_Hosp_Get_Ox_Survive2_R[i]
+delta_IModerate_Get_Hosp_No_Ox_Die1[] <- n_IModerate_Get_Hosp_No_Ox_Die1[i] - n_IModerate_Get_Hosp_No_Ox_Die1_IModerate_Get_Hosp_No_Ox_Die2[i]
+delta_IModerate_Get_Hosp_No_Ox_Die2[] <- n_IModerate_Get_Hosp_No_Ox_Die1_IModerate_Get_Hosp_No_Ox_Die2[i] - n_IModerate_Get_Hosp_No_Ox_Die2_D_Hospital[i]
+delta_IModerate_Get_Hosp_No_Ox_Survive1[] <- n_IModerate_Get_Hosp_No_Ox_Survive1[i] - n_IModerate_Get_Hosp_No_Ox_Survive1_IModerate_Get_Hosp_No_Ox_Survive2[i]
+delta_IModerate_Get_Hosp_No_Ox_Survive2[] <- n_IModerate_Get_Hosp_No_Ox_Survive1_IModerate_Get_Hosp_No_Ox_Survive2[i] - n_IModerate_Get_Hosp_No_Ox_Survive2_R[i]
+delta_IModerate_No_Hosp_No_Ox_Die1[] <- n_IModerate_No_Hosp_No_Ox_Die1[i] - n_IModerate_No_Hosp_No_Ox_Die1_IModerate_No_Hosp_No_Ox_Die2[i]
+delta_IModerate_No_Hosp_No_Ox_Die2[] <- n_IModerate_No_Hosp_No_Ox_Die1_IModerate_No_Hosp_No_Ox_Die2[i] - n_IModerate_No_Hosp_No_Ox_Die2_D_Community[i]
+delta_IModerate_No_Hosp_No_Ox_Survive1[] <- n_IModerate_No_Hosp_No_Ox_Survive1[i] - n_IModerate_No_Hosp_No_Ox_Survive1_IModerate_No_Hosp_No_Ox_Survive2[i]
+delta_IModerate_No_Hosp_No_Ox_Survive2[] <- n_IModerate_No_Hosp_No_Ox_Survive1_IModerate_No_Hosp_No_Ox_Survive2[i] - n_IModerate_No_Hosp_No_Ox_Survive2_R[i]
 
-delta_ISevere_Get_ICU_Get_Ox_Survive1[] <-
-delta_ISevere_Get_ICU_Get_Ox_Survive2[] <-
-delta_ISevere_Get_ICU_Get_Ox_Die1[] <-
-delta_ISevere_Get_ICU_Get_Ox_Die2[] <-
-delta_ISevere_Get_ICU_No_Ox_Survive1[] <-
-delta_ISevere_Get_ICU_No_Ox_Survive2[] <-
-delta_ISevere_Get_ICU_No_Ox_Die1[] <-
-delta_ISevere_Get_ICU_No_Ox_Die2[] <-
-delta_ISevere_No_ICU_No_Ox_Survive1[] <-
-delta_ISevere_No_ICU_No_Ox_Survive2[] <-
-delta_ISevere_No_ICU_No_Ox_Die1[] <-
-delta_ISevere_No_ICU_No_Ox_Die2[] <-
+delta_ISevere_Get_ICU_Get_Ox_Die1[] <- n_ISevere_Get_ICU_Get_Ox_Die1[i] - n_ISevere_Get_ICU_Get_Ox_Die1_ISevere_Get_ICU_Get_Ox_Die2[i]
+delta_ISevere_Get_ICU_Get_Ox_Die2[] <- n_ISevere_Get_ICU_Get_Ox_Die1_ISevere_Get_ICU_Get_Ox_Die2[i] - n_ISevere_Get_ICU_Get_Ox_Die2_D_Hospital[i]
+delta_ISevere_Get_ICU_Get_Ox_Survive1[] <- n_ISevere_Get_ICU_Get_Ox_Survive1[i] - n_ISevere_Get_ICU_Get_Ox_Survive1_ISevere_Get_ICU_Get_Ox_Survive2[i]
+delta_ISevere_Get_ICU_Get_Ox_Survive2[] <- n_ISevere_Get_ICU_Get_Ox_Survive1_ISevere_Get_ICU_Get_Ox_Survive2[i] - n_ISevere_Get_ICU_Get_Ox_Survive2_R[i]
+delta_ISevere_Get_ICU_No_Ox_Die1[] <- n_ISevere_Get_ICU_No_Ox_Die1[i] - n_ISevere_Get_ICU_No_Ox_Die1_ISevere_Get_ICU_No_Ox_Die2[i]
+delta_ISevere_Get_ICU_No_Ox_Die2[] <- n_ISevere_Get_ICU_No_Ox_Die1_ISevere_Get_ICU_No_Ox_Die2[i] - n_ISevere_Get_ICU_No_Ox_Die2_D_Hospital[i]
+delta_ISevere_Get_ICU_No_Ox_Survive1[] <- n_ISevere_Get_ICU_No_Ox_Survive1[i] - n_ISevere_Get_ICU_No_Ox_Survive1_ISevere_Get_ICU_No_Ox_Survive2[i]
+delta_ISevere_Get_ICU_No_Ox_Survive2[] <- n_ISevere_Get_ICU_No_Ox_Survive1_ISevere_Get_ICU_No_Ox_Survive2[i] - n_ISevere_Get_ICU_No_Ox_Survive2_R[i]
+delta_ISevere_No_ICU_No_Ox_Die1[] <- n_ISevere_No_ICU_No_Ox_Die1[i] - n_ISevere_No_ICU_No_Ox_Die1_ISevere_No_ICU_No_Ox_Die2[i]
+delta_ISevere_No_ICU_No_Ox_Die2[] <- n_ISevere_No_ICU_No_Ox_Die1_ISevere_No_ICU_No_Ox_Die2[i] - n_ISevere_No_ICU_No_Ox_Die2_D_Community[i]
+delta_ISevere_No_ICU_No_Ox_Survive1[] <- n_ISevere_No_ICU_No_Ox_Survive1[i] - n_ISevere_No_ICU_No_Ox_Survive1_ISevere_No_ICU_No_Ox_Survive2[i]
+delta_ISevere_No_ICU_No_Ox_Survive2[] <- n_ISevere_No_ICU_No_Ox_Survive1_ISevere_No_ICU_No_Ox_Survive2[i] - n_ISevere_No_ICU_No_Ox_Survive2_R[i]
 
-delta_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1[] <-
-delta_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2[] <-
-delta_ICritical_Get_ICU_Get_Ox_Get_MV_Die1[] <-
-delta_ICritical_Get_ICU_Get_Ox_Get_MV_Die2[] <-
-delta_ICritical_Get_ICU_Get_Ox_No_MV_Survive1[] <-
-delta_ICritical_Get_ICU_Get_Ox_No_MV_Survive2[] <-
-delta_ICritical_Get_ICU_Get_Ox_No_MV_Die1[] <-
-delta_ICritical_Get_ICU_Get_Ox_No_MV_Die2[] <-
-delta_ICritical_Get_ICU_No_Ox_No_MV_Survive1[] <-
-delta_ICritical_Get_ICU_No_Ox_No_MV_Survive2[] <-
-delta_ICritical_Get_ICU_No_Ox_No_MV_Die1[] <-
-delta_ICritical_Get_ICU_No_Ox_No_MV_Die2[] <-
-delta_ICritical_No_ICU_No_Ox_No_MV_Survive1[] <-
-delta_ICritical_No_ICU_No_Ox_No_MV_Survive2[] <-
-delta_ICritical_No_ICU_No_Ox_No_MV_Die1[] <-
-delta_ICritical_No_ICU_No_Ox_No_MV_Die2[] <-
+delta_ICritical_Get_ICU_Get_Ox_Get_MV_Die1[] <- n_ICritical_Get_ICU_Get_Ox_Get_MV_Die1[i] - n_ICritical_Get_ICU_Get_Ox_Get_MV_Die1_ICritical_Get_ICU_Get_Ox_Get_MV_Die2[i]
+delta_ICritical_Get_ICU_Get_Ox_Get_MV_Die2[] <- n_ICritical_Get_ICU_Get_Ox_Get_MV_Die1_ICritical_Get_ICU_Get_Ox_Get_MV_Die2[i] - n_ICritical_Get_ICU_Get_Ox_Get_MV_Die2_D_Hospital[i]
+delta_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1[] <- n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1[i] - n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2[i]
+delta_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2[] <- n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2[i] - n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2_R[i]
+delta_ICritical_Get_ICU_Get_Ox_No_MV_Die1[] <- n_ICritical_Get_ICU_Get_Ox_No_MV_Die1[i] - n_ICritical_Get_ICU_Get_Ox_No_MV_Die1_ICritical_Get_ICU_Get_Ox_No_MV_Die2[i]
+delta_ICritical_Get_ICU_Get_Ox_No_MV_Die2[] <- n_ICritical_Get_ICU_Get_Ox_No_MV_Die1_ICritical_Get_ICU_Get_Ox_No_MV_Die2[i] - n_ICritical_Get_ICU_Get_Ox_No_MV_Die2_D_Hospital[i]
+delta_ICritical_Get_ICU_Get_Ox_No_MV_Survive1[] <- n_ICritical_Get_ICU_Get_Ox_No_MV_Survive1[i] - n_ICritical_Get_ICU_Get_Ox_No_MV_Survive1_ICritical_Get_ICU_Get_Ox_No_MV_Survive2[i]
+delta_ICritical_Get_ICU_Get_Ox_No_MV_Survive2[] <- n_ICritical_Get_ICU_Get_Ox_No_MV_Survive1_ICritical_Get_ICU_Get_Ox_No_MV_Survive2[i] - n_ICritical_Get_ICU_Get_Ox_No_MV_Survive2_R[i]
+delta_ICritical_Get_ICU_No_Ox_No_MV_Die1[] <- n_ICritical_Get_ICU_No_Ox_No_MV_Die1[i] - n_ICritical_Get_ICU_No_Ox_No_MV_Die1_ICritical_Get_ICU_No_Ox_No_MV_Die2[i]
+delta_ICritical_Get_ICU_No_Ox_No_MV_Die2[] <- n_ICritical_Get_ICU_No_Ox_No_MV_Die1_ICritical_Get_ICU_No_Ox_No_MV_Die2[i] - n_ICritical_Get_ICU_No_Ox_No_MV_Die2_D_Hospital[i]
+delta_ICritical_Get_ICU_No_Ox_No_MV_Survive1[] <- n_ICritical_Get_ICU_No_Ox_No_MV_Survive1[i] - n_ICritical_Get_ICU_No_Ox_No_MV_Survive1_ICritical_Get_ICU_No_Ox_No_MV_Survive2[i]
+delta_ICritical_Get_ICU_No_Ox_No_MV_Survive2[] <- n_ICritical_Get_ICU_No_Ox_No_MV_Survive1_ICritical_Get_ICU_No_Ox_No_MV_Survive2[i] - n_ICritical_Get_ICU_No_Ox_No_MV_Survive2_R[i]
+delta_ICritical_No_ICU_No_Ox_No_MV_Die1[] <- n_ICritical_No_ICU_No_Ox_No_MV_Die1[i] - n_ICritical_No_ICU_No_Ox_No_MV_Die1_ICritical_No_ICU_No_Ox_No_MV_Die2[i]
+delta_ICritical_No_ICU_No_Ox_No_MV_Die2[] <- n_ICritical_No_ICU_No_Ox_No_MV_Die1_ICritical_No_ICU_No_Ox_No_MV_Die2[i] - n_ICritical_No_ICU_No_Ox_No_MV_Die2_D_Community[i]
+delta_ICritical_No_ICU_No_Ox_No_MV_Survive1[] <- n_ICritical_No_ICU_No_Ox_No_MV_Survive1[i] - n_ICritical_No_ICU_No_Ox_No_MV_Survive1_ICritical_No_ICU_No_Ox_No_MV_Survive2[i]
+delta_ICritical_No_ICU_No_Ox_No_MV_Survive2[] <- n_ICritical_No_ICU_No_Ox_No_MV_Survive1_ICritical_No_ICU_No_Ox_No_MV_Survive2[i] - n_ICritical_No_ICU_No_Ox_No_MV_Survive2_R[i]
+
 
 
 ## COMPUTING THE FORCE OF INFECTION
@@ -409,7 +458,8 @@ dim(ICU_beds) <- length(tt_ICU_beds)
 
 ## PARAMETERS DESCRIBING THE AVAILABILITY OF HEALTHCARE MATERIALS
 ##------------------------------------------------------------------------------
-supply_oxygen <- user() # rate of resupply of oxygen
+oxygen_supply <- user() # rate of resupply of oxygen
+oxygen_demand <- user() # rate of baseline demand for oxygen
 total_number_mv <- user() # number of mechanical ventilators available
 severe_critical_case_oxygen_consumption_multiplier <- user() # consumption of oxygen for severe/critical covid-19 cases compared to moderate cases
 
@@ -679,8 +729,7 @@ dim(delta_ICritical_No_ICU_No_Ox_No_MV_Survive2) <- N_age
 dim(delta_ICritical_No_ICU_No_Ox_No_MV_Die1) <- N_age
 dim(delta_ICritical_No_ICU_No_Ox_No_MV_Die2) <- N_age
 
-##############################################
-########################## For the Number of People Moving In and Out of Compartments STILL TO DO!!!!!!!!
+# For the Number of People Moving In and Out of Compartments
 dim(n_E1_E2) <- N_age
 dim(n_E2_I) <- N_age
 dim(n_E2_ICase1) <- N_age
@@ -691,40 +740,89 @@ dim(n_ICase2_Hosp) <- N_age
 dim(n_IRec1_IRec2) <- N_age
 dim(n_IRec2_R) <- N_age
 
-dim(n_IMVGetDie1) <- N_age
-dim(n_IMVGetDie1_IMVGetDie2) <- N_age
-dim(n_IMVGetDie2_D) <- N_age
-dim(n_IMVGetLive1) <- N_age
-dim(n_IMVGetLive1_IMVGetLive2) <- N_age
-dim(n_IMVGetLive2_Rec) <- N_age
-dim(n_IMVNotGetDie1) <- N_age
-dim(n_IMVNotGetDie1_IMVNotGetDie2) <- N_age
-dim(n_IMVNotGetDie2_D) <- N_age
-dim(n_IMVNotGetLive1) <- N_age
-dim(n_IMVNotGetLive1_IMVNotGetLive2) <- N_age
-dim(n_IMVNotGetLive2_R) <- N_age
+dim(n_IModerate_Get_Hosp_Get_Ox_Die1) <- N_age
+dim(n_IModerate_Get_Hosp_Get_Ox_Die1_IModerate_Get_Hosp_Get_Ox_Die2) <- N_age
+dim(n_IModerate_Get_Hosp_Get_Ox_Die2_D_Hospital) <- N_age
+dim(n_IModerate_Get_Hosp_Get_Ox_Survive1) <- N_age
+dim(n_IModerate_Get_Hosp_Get_Ox_Survive1_IModerate_Get_Hosp_Get_Ox_Survive2) <- N_age
+dim(n_IModerate_Get_Hosp_Get_Ox_Survive2_R) <- N_age
+dim(n_IModerate_Get_Hosp_No_Ox_Die1) <- N_age
+dim(n_IModerate_Get_Hosp_No_Ox_Die1_IModerate_Get_Hosp_No_Ox_Die2) <- N_age
+dim(n_IModerate_Get_Hosp_No_Ox_Die2_D_Hospital) <- N_age
+dim(n_IModerate_Get_Hosp_No_Ox_Survive1) <- N_age
+dim(n_IModerate_Get_Hosp_No_Ox_Survive1_IModerate_Get_Hosp_No_Ox_Survive2) <- N_age
+dim(n_IModerate_Get_Hosp_No_Ox_Survive2_R) <- N_age
+dim(n_IModerate_No_Hosp_No_Ox_Die1) <- N_age
+dim(n_IModerate_No_Hosp_No_Ox_Die1_IModerate_No_Hosp_No_Ox_Die2) <- N_age
+dim(n_IModerate_No_Hosp_No_Ox_Die2_D_Community) <- N_age
+dim(n_IModerate_No_Hosp_No_Ox_Survive1) <- N_age
+dim(n_IModerate_No_Hosp_No_Ox_Survive1_IModerate_No_Hosp_No_Ox_Survive2) <- N_age
+dim(n_IModerate_No_Hosp_No_Ox_Survive2_R) <- N_age
 
-dim(n_IOxGetDie1) <- N_age
-dim(n_IOxGetDie1_IOxGetDie2) <- N_age
-dim(n_IOxGetDie2_D) <- N_age
-dim(n_IOxGetLive1) <- N_age
-dim(n_IOxGetLive1_IOxGetLive2) <- N_age
-dim(n_IOxGetLive2_R) <- N_age
-dim(n_IOxNotGetDie1) <- N_age
-dim(n_IOxNotGetDie1_IOxNotGetDie2) <- N_age
-dim(n_IOxNotGetDie2_D) <- N_age
-dim(n_IOxNotGetLive1) <- N_age
-dim(n_IOxNotGetLive1_IOxNotGetLive2) <- N_age
-dim(n_IOxNotGetLive2_R) <- N_age
+dim(n_ISevere_Get_ICU_Get_Ox_Die1) <- N_age
+dim(n_ISevere_Get_ICU_Get_Ox_Die1_ISevere_Get_ICU_Get_Ox_Die2) <- N_age
+dim(n_ISevere_Get_ICU_Get_Ox_Die2_D_Hospital) <- N_age
+dim(n_ISevere_Get_ICU_Get_Ox_Survive1) <- N_age
+dim(n_ISevere_Get_ICU_Get_Ox_Survive1_ISevere_Get_ICU_Get_Ox_Survive2) <- N_age
+dim(n_ISevere_Get_ICU_Get_Ox_Survive2_Rec) <- N_age
+dim(n_ISevere_Get_ICU_No_Ox_Die1) <- N_age
+dim(n_ISevere_Get_ICU_No_Ox_Die1_ISevere_Get_ICU_No_Ox_Die2) <- N_age
+dim(n_ISevere_Get_ICU_No_Ox_Die2_D_Hospital) <- N_age
+dim(n_ISevere_Get_ICU_No_Ox_Survive1) <- N_age
+dim(n_ISevere_Get_ICU_No_Ox_Survive1_ISevere_Get_ICU_No_Ox_Survive2) <- N_age
+dim(n_ISevere_Get_ICU_No_Ox_Survive2_Rec) <- N_age
+dim(n_ISevere_No_ICU_No_Ox_Die1) <- N_age
+dim(n_ISevere_No_ICU_No_Ox_Die1_ISevere_No_ICU_No_Ox_Die2) <- N_age
+dim(n_ISevere_No_ICU_No_Ox_Die2_D_Community) <- N_age
+dim(n_ISevere_No_ICU_No_Ox_Survive1) <- N_age
+dim(n_ISevere_No_ICU_No_Ox_Survive1_ISevere_No_ICU_No_Ox_Survive2) <- N_age
+dim(n_ISevere_No_ICU_No_Ox_Survive2_R) <- N_age
 
-dim(number_requiring_IMV) <- N_age
-dim(number_get_IMV) <- N_age
-dim(number_notget_IMV) <- N_age
-dim(number_requiring_Ox) <- N_age
-dim(number_get_Ox) <- N_age
-dim(number_notget_Ox) <- N_age
-###############################################################
-################################################################
+dim(n_ICritical_Get_ICU_Get_Ox_Get_MV_Die1) <- N_age
+dim(n_ICritical_Get_ICU_Get_Ox_Get_MV_Die1_ICritical_Get_ICU_Get_Ox_Get_MV_Die2) <- N_age
+dim(n_ICritical_Get_ICU_Get_Ox_Get_MV_Die2_D_Hospital) <- N_age
+dim(n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1) <- N_age
+dim(n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive1_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2) <- N_age
+dim(n_ICritical_Get_ICU_Get_Ox_Get_MV_Survive2_Rec) <- N_age
+dim(n_ICritical_Get_ICU_Get_Ox_No_MV_Die1) <- N_age
+dim(n_ICritical_Get_ICU_Get_Ox_No_MV_Die1_ICritical_Get_ICU_Get_Ox_No_MV_Die2) <- N_age
+dim(n_ICritical_Get_ICU_Get_Ox_No_MV_Die2_D_Hospital) <- N_age
+dim(n_ICritical_Get_ICU_Get_Ox_No_MV_Survive1) <- N_age
+dim(n_ICritical_Get_ICU_Get_Ox_No_MV_Survive1_ICritical_Get_ICU_Get_Ox_No_MV_Survive2) <- N_age
+dim(n_ICritical_Get_ICU_Get_Ox_No_MV_Survive2_Rec) <- N_age
+dim(n_ICritical_Get_ICU_No_Ox_No_MV_Die1) <- N_age
+dim(n_ICritical_Get_ICU_No_Ox_No_MV_Die1_ICritical_Get_ICU_No_Ox_No_MV_Die2) <- N_age
+dim(n_ICritical_Get_ICU_No_Ox_No_MV_Die2_D_Hospital) <- N_age
+dim(n_ICritical_Get_ICU_No_Ox_No_MV_Survive1) <- N_age
+dim(n_ICritical_Get_ICU_No_Ox_No_MV_Survive1_ICritical_Get_ICU_No_Ox_No_MV_Survive2) <- N_age
+dim(n_ICritical_Get_ICU_No_Ox_No_MV_Survive2_Rec) <- N_age
+dim(n_ICritical_No_ICU_No_Ox_No_MV_Die1) <- N_age
+dim(n_ICritical_No_ICU_No_Ox_No_MV_Die1_ICritical_No_ICU_No_Ox_No_MV_Die2) <- N_age
+dim(n_ICritical_No_ICU_No_Ox_No_MV_Die2_D_Community) <- N_age
+dim(n_ICritical_No_ICU_No_Ox_No_MV_Survive1) <- N_age
+dim(n_ICritical_No_ICU_No_Ox_No_MV_Survive1_ICritical_No_ICU_No_Ox_No_MV_Survive2) <- N_age
+dim(n_ICritical_No_ICU_No_Ox_No_MV_Survive2_R) <- N_age
+
+dim(number_requiring_ICU) <- N_age
+dim(number_get_ICU) <- N_age
+dim(number_not_get_ICU) <- N_age
+dim(number_not_get_ICU_not_ox_not_mv) <- N_age
+dim(number_not_get_ICU_not_ox) <- N_age
+dim(number_requiring_hosp_bed) <- N_age
+dim(number_get_hosp_bed) <- N_age
+dim(number_not_hosp_bed) <- N_age
+dim(number_get_hosp_Ox) <- N_age
+dim(number_get_hosp_no_Ox) <- N_age
+dim(number_get_ICU_Ox) <- N_age
+dim(number_requiring_ICU_MV) <- N_age
+dim(number_requiring_ICU_Ox) <- N_age
+dim(number_get_ICU_get_Ox_need_MV) <- N_age
+dim(number_get_ICU_get_Ox_get_MV) <- N_age
+dim(number_get_ICU_get_Ox_no_MV) <- N_age
+dim(number_get_ICU_get_Ox) <- N_age
+dim(overall_number_get_ICU_not_Ox) <- N_age
+dim(number_get_ICU_not_Ox_not_MV) <- N_age
+dim(number_get_ICU_not_Ox) <- N_age
 
 # Related to Calculating Age-Structured Force of Infection
 dim(p_S_E1) <- N_age
