@@ -133,6 +133,20 @@ beta_est <- function(squire_model, model_params, R0) {
                                                 mixing_matrix = mat,
                                                 R0 = R0)
 
+  } else if (class(squire_model)[1] == "explicit_env_SEEIR_model") {
+
+    mat <- process_contact_matrix(model_params$contact_matrix_set[[1]],
+                                  model_params$population)
+
+    assert_custom_class(model_params, "explicit_env_SEEIR_parameters")
+    new_beta <- squire_model$generate_beta_func(dur_IMild = 1/model_params$gamma_IMild,
+                                                dur_ICase = 2/model_params$gamma_ICase,
+                                                prob_hosp = model_params$prob_hosp,
+                                                mixing_matrix = mat,
+                                                R0 = R0,
+                                                env_dat = model_params$env_dat,
+                                                end_slp = model_params$env_slp)
+
   }
 
   return(new_beta)

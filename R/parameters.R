@@ -639,7 +639,7 @@ parameters_explicit_env_SEEIR <- function(
   # ----------------------------------------------------------------------------
   mc <- matrix_check(population[-1], contact_matrix_set)
   stopifnot(length(R0) == length(tt_R0))
-  stopifnot(length(env_slp) == 1)    
+  stopifnot(length(env_slp) == 1)
   stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
   stopifnot(length(hosp_bed_capacity) == length(tt_hosp_beds))
   stopifnot(length(ICU_bed_capacity) == length(tt_ICU_beds))
@@ -693,7 +693,7 @@ parameters_explicit_env_SEEIR <- function(
   assert_greq(prob_severe_death_treatment, 0)
   assert_greq(prob_severe_death_no_treatment, 0)
   assert_greq(p_dist, 0)
-  
+
   assert_numeric(env_slp, 1)
   assert_numeric(env_dat, time_period)
 
@@ -717,11 +717,13 @@ parameters_explicit_env_SEEIR <- function(
 
   if (is.null(beta_set)) {
     baseline_matrix <- process_contact_matrix_scaled_age(contact_matrix_set[[1]], population)
-    beta_set <- beta_est_explicit(dur_IMild = dur_IMild,
+    beta_set <- beta_est_env_explicit(dur_IMild = dur_IMild,
                                   dur_ICase = dur_ICase,
                                   prob_hosp = prob_hosp,
                                   mixing_matrix = baseline_matrix,
-                                  R0 = R0)
+                                  R0 = R0,
+                                  env_slp = env_slp,
+                                  env_dat = env_dat)
   }
 
   # normalise to sum to 1
@@ -785,7 +787,8 @@ parameters_explicit_env_SEEIR <- function(
                dt = dt,
                population = population,
                contact_matrix_set = contact_matrix_set,
-               env_slp = env_slp)
+               env_slp = env_slp,
+               env_dat = env_dat)
 
   class(pars) <- c("explicit_env_SEEIR_parameters", "squire_parameters")
 

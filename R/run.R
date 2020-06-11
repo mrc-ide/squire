@@ -460,7 +460,7 @@ run_explicit_env_SEEIR_model <- function(
   set.seed(seed)
 
   # create parameter list
-  pars <- parameters_explicit_SEEIR(country=country,
+  pars <- parameters_explicit_env_SEEIR(country=country,
                                     population=population,
                                     tt_contact_matrix=tt_contact_matrix,
                                     contact_matrix_set=contact_matrix_set,
@@ -498,7 +498,7 @@ run_explicit_env_SEEIR_model <- function(
                                     env_slp=env_slp)
 
   # Running the Model
-  mod <- explicit_env_SEIR(user = pars, unused_user_action = "ignore")
+  mod <- explicit_model(user = pars, unused_user_action = "ignore")
   t <- seq(from = 1, to = time_period/dt)
 
   # if we ar doing day return then proceed in steps of day length
