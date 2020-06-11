@@ -491,7 +491,7 @@ t0_variables <- function(r) {
 
 
   # is this the outputs of a grid scan
-  if("scan_results" %in% names(r)) {
+  if("scan_results" %in% names(r) || "pmcmc_results" %in% names(r)) {
 
     # grab the final R0, contact matrix and bed capacity.
     ret <- lapply(seq_len(dims[3]), function(x) {
@@ -499,10 +499,19 @@ t0_variables <- function(r) {
       if(!is.null(r$interventions$R0_change)) {
         if (is.null(r$replicate_parameters$Meff)) {
           R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change, 1)
-        } else {
+        } else if (is.null(r$replicate_parameters$Meff_pl)) {
           R0 <- r[[wh]]$inputs$Rt_func(R0 = r$replicate_parameters$R0[x],
                                               R0_change = tail(r$interventions$R0_change, 1),
                                               Meff = r$replicate_parameters$Meff[x])
+        } else {
+          R0 <- tail(evaluate_Rt(R0_change = r$interventions$R0_change,
+                            R0 = r$replicate_parameters$R0[x],
+                            Meff = r$replicate_parameters$Meff[x],
+                            Meff_pl = r$replicate_parameters$Meff_pl[x],
+                            date_R0_change = r$interventions$date_R0_change,
+                            date_Meff_change = r$interventions$date_Meff_change,
+                            Rt_func = r[[wh]]$inputs$Rt_func
+                            ),1)
         }
       } else {
         R0 <- r$replicate_parameters$R0[x]
