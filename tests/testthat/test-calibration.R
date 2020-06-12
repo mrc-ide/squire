@@ -321,7 +321,9 @@ out <- calibrate(
 )
 
 expect_true(inherits(out$scan_results$inputs$squire_model, "deterministic"))
-expect_error(get <- projections(out), "unlikely to work with deterministic")
+expect_error(get <- projections(out), "projections needs either time")
+
+get <- projections(out, time_period = 5)
 
 })
 

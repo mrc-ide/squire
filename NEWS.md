@@ -1,3 +1,7 @@
+# squire 0.4.19
+
+* Large overhaul to make `projections` and plotting work with deterministic models
+
 # squire 0.4.18
 
 * `calc_loglikelihood` fix for reduced date vectors

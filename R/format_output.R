@@ -106,8 +106,45 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
             "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
             "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
 
+  ## Fix for handling deterministic outputs
+  # ----------------------------------------------------------------------------
+
+  # is this output without n_E2_I
+  if(!any(grepl("n_E2_I",colnames(x$output))) && !grepl("simple", x$model$ir[2])) {
+
+    index$n_E2_I <- seq(tail(unlist(index),1)+1, tail(unlist(index),1)+length(index$S),1)
+    dimnms <- dimnames(x$output)
+    dimnms[[2]] <- c(dimnms[[2]], paste0("n_E2_I[", seq_len(length(index$S)),"]"))
+    new_data <- array(data = NA,
+                      dim = c(dim(x$output) + c(0, length(index$n_E2_I), 0)),
+                      dimnames = dimnms)
+
+    new_data[, seq_len(dim(x$output)[2]), ] <- x$output
+    x$output <- new_data
+
+  }
+
+  # is this output without delta_D
+  if(!any(grepl("delta_D",colnames(x$output))) && !grepl("simple", x$model$ir[2])) {
+
+    index$delta_D <- seq(tail(unlist(index),1)+1, tail(unlist(index),1)+length(index$S),1)
+    dimnms <- dimnames(x$output)
+    dimnms[[2]] <- c(dimnms[[2]], paste0("delta_D[", seq_len(length(index$S)),"]"))
+    new_data <- array(data = NA,
+                      dim = c(dim(x$output) + c(0, length(index$delta_D), 0)),
+                      dimnames = dimnms)
+
+    new_data[, seq_len(dim(x$output)[2]), ] <- x$output
+    x$output <- new_data
+
+  }
+
+
+  ## Fix for handling day_return outputs
+  # ----------------------------------------------------------------------------
+
   # are the steps not 1 apart? if so we need to sum the incident variables (infecions/deaths)
-  if(diff(tail(x$output[,"step",1],2)) != 1) {
+  if (x$parameters$day_return || !x$model$.__enclos_env__$private$discrete) {
 
     # assign the infections
     for(i in seq_along(x$parameters$population)) {
@@ -130,7 +167,6 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
     }
 
   }
-
 
   # Summary Values and Relevant Compartments
   summary_variables <- c("deaths", "infections", "hospital_occupancy",

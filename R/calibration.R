@@ -298,8 +298,7 @@ calibrate <- function(data,
                                full_output = TRUE)
   }
 
-  # recreate model output for each type of model(ish)
-  if (inherits(squire_model, "stochastic")) {
+  # recreate model output for each type of model
 
     # create a fake run object and fill in the required elements
     r <- squire_model$run_func(country = country,
@@ -309,6 +308,7 @@ calibrate <- function(data,
                                tt_hosp_beds = tt_hosp_beds,
                                ICU_bed_capacity = ICU_bed_capacity,
                                tt_ICU_beds = tt_ICU_beds,
+                               day_return = TRUE,
                                population = population,
                                replicates = 1,
                                time_period = nrow(res$trajectories),
@@ -319,21 +319,16 @@ calibrate <- function(data,
     dimnames(res$output) <- list(dimnames(res$output)[[1]], dimnames(r$output)[[2]], NULL)
     r$output <- res$output
 
-    # and adjust the time as before
-    full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
-    saved_full <- r$output[,"time",full_row]
-    for(i in seq_len(replicates)) {
-      na_pos <- which(is.na(r$output[,"time",i]))
-      full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
-      if(length(na_pos) > 0) {
-        full_to_place[na_pos] <- NA
-      }
-      r$output[,"time",i] <- full_to_place
+  # and adjust the time as before
+  full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
+  saved_full <- r$output[,"time",full_row]
+  for(i in seq_len(replicates)) {
+    na_pos <- which(is.na(r$output[,"time",i]))
+    full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
+    if(length(na_pos) > 0) {
+      full_to_place[na_pos] <- NA
     }
-
-  } else if (inherits(squire_model, "deterministic")) {
-    r <- list("output" = res$trajectories)
-    r <- structure(r, class = "squire_simulation")
+    r$output[,"time",i] <- full_to_place
   }
 
   # second let's recreate the output

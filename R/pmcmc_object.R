@@ -114,7 +114,6 @@ summary.squire_pmcmc <- function(object, ...) {
   ## convert start_date to numeric to calculate stats
   data_start_date <- as.Date(object$inputs$data$date[1])
   traces <- object$results[,par_names]
-  traces$start_date <- start_date_to_offset(data_start_date, traces$start_date)
 
   # calculate correlation matrix
   corr_mat <- round(cor(traces),2)
@@ -130,7 +129,7 @@ summary.squire_pmcmc <- function(object, ...) {
 
   sds <- round(apply(traces, 2, sd), 3)
   # convert start_date back into dates
-  summ$start_date <- as.Date(-summ$start_date, data_start_date)
+  summ$start_date <- as.Date(summ$start_date, data_start_date)
   summ[c('2.5%', '97.5%', 'min', 'max'), 'start_date'] <- summ[c('97.5%', '2.5%', 'max', 'min'), 'start_date']
 
   out <- list('summary' = summ,
@@ -232,7 +231,7 @@ plot.squire_pmcmc <- function(x, ...) {
 #' @importFrom viridis cividis
 #' @importFrom graphics hist par plot.new text lines legend
 #'
-plot.squire_pmcmc_list <- function(x, burn_in = 1, ...) {
+plot.squire_pmcmc_list <- function(x, burn_in = 1, thin = 1, ...) {
 
   summ <- summary(x, burn_in = burn_in)
   par_names <- names(x$inputs$pars$pars_init[[1]])
@@ -327,17 +326,22 @@ plot.squire_pmcmc_list <- function(x, burn_in = 1, ...) {
         )
 
         map_out <- mapply(FUN = plot_hists,
-               h = hists[[par_name]],
-               breaks = bs,
-               col = cols_trace)
+                          h = hists[[par_name]],
+                          col = cols_trace,
+                          MoreArgs = list(breaks = bs))
 
 
       } else if (i < j) {  # plot correlations on lower triangle
-        plot(x = master_chain[[i]],
-             y = master_chain[[j]],
+        if (thin == 1) {
+          smp <- seq_along(length(master_chain[[i]]))
+        } else {
+        smp <- sample(length(master_chain[[i]]),size = round(length(master_chain[[i]])*thin), replace = FALSE)
+        }
+        plot(x = master_chain[[i]][smp],
+             y = master_chain[[j]][smp],
              xlab = par_names[i],
              ylab = par_names[j],
-             col = cols,
+             col = cols[smp],
              pch = 20)
       } else if (i > j) { # print rho on upper triangle
         plot.new()
@@ -362,9 +366,9 @@ plot.squire_pmcmc_list <- function(x, burn_in = 1, ...) {
          xlim = c(0, n_iter),
          ylim <- range(master_chain[, par_name]))
 
-  map_out <- mapply(FUN = plot_traces,
-           trace = traces[[par_name]],
-           col = cols_trace)
+    map_out <- mapply(FUN = plot_traces,
+                      trace = traces[[par_name]],
+                      col = cols_trace)
 
     if(leg) {
       legend('top',
@@ -375,7 +379,7 @@ plot.squire_pmcmc_list <- function(x, burn_in = 1, ...) {
     }
   },
   par_name = par_names,
-  leg = c(TRUE, FALSE, FALSE, FALSE))
+  leg = c(FALSE, FALSE, FALSE, FALSE))
 
 }
 

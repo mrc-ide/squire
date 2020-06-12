@@ -11,6 +11,8 @@
 #' @param contact_matrix_set Contact matrices used in simulation
 #' @param tt_contact_matrix Time change points for matrix change
 #' @param time_period Length of simulation
+#' @param day_return Logical, do we want to return outut after each day rather
+#'   than each dt. Default = FALSE
 #'
 #' @return Paramater List
 #' @export
@@ -21,6 +23,7 @@ parameters_simple_SEEIR <- function(R0 = 3,
                                    init = NULL,
                                    dur_E  = 4.58,
                                    dur_I = 2.09,
+                                   day_return = FALSE,
                                    population,
                                    contact_matrix_set,
                                    tt_contact_matrix = 0,
@@ -75,6 +78,7 @@ parameters_simple_SEEIR <- function(R0 = 3,
                mix_mat_set = matrices_set,
                contact_matrix_set = contact_matrix_set,
                population = population,
+               day_return = day_return,
                dt = dt)
 
   class(pars) <- c("simple_SEEIR_parameters", "squire_parameters")
