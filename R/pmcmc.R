@@ -610,6 +610,7 @@ pmcmc <- function(data,
                              tt_ICU_beds = tt_ICU_beds,
                              population = population,
                              replicates = 1,
+                             day_return = TRUE,
                              time_period = nrow(pmcmc_samples$trajectories))
 
   # and add the parameters that changed between each simulation, i.e. posterior draws
