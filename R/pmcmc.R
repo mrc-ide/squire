@@ -600,54 +600,40 @@ pmcmc <- function(data,
   #----------------
   # Pull Sampled results and "recreate" squire models
   #----------------
+  # create a fake run object and fill in the required elements
+  r <- squire_model$run_func(country = country,
+                             contact_matrix_set = contact_matrix_set,
+                             tt_contact_matrix = tt_contact_matrix,
+                             hosp_bed_capacity = hosp_bed_capacity,
+                             tt_hosp_beds = tt_hosp_beds,
+                             ICU_bed_capacity = ICU_bed_capacity,
+                             tt_ICU_beds = tt_ICU_beds,
+                             population = population,
+                             replicates = 1,
+                             time_period = nrow(pmcmc_samples$trajectories))
 
-  if (inherits(squire_model, "stochastic")) {
+  # and add the parameters that changed between each simulation, i.e. posterior draws
+  r$replicate_parameters <- pmcmc_samples$sampled_PMCMC_Results
 
-    # create a fake run object and fill in the required elements
-    r <- squire_model$run_func(country = country,
-                               contact_matrix_set = contact_matrix_set,
-                               tt_contact_matrix = tt_contact_matrix,
-                               hosp_bed_capacity = hosp_bed_capacity,
-                               tt_hosp_beds = tt_hosp_beds,
-                               ICU_bed_capacity = ICU_bed_capacity,
-                               tt_ICU_beds = tt_ICU_beds,
-                               population = population,
-                               replicates = 1,
-                               time_period = max(tt_contact_matrix,tt_hosp_beds,tt_ICU_beds,1))
-
-    # and add the parameters that changed between each simulation, i.e. posterior draws
-    r$replicate_parameters <- pmcmc_samples$sampled_PMCMC_Results
-
-    # as well as adding the pmcmc chains so it's easy to draw from the chains again in the future
-    r$pmcmc_results <- pmcmc
+  # as well as adding the pmcmc chains so it's easy to draw from the chains again in the future
+  r$pmcmc_results <- pmcmc
 
 
-    # then let's create the output that we are going to use
-    names(pmcmc_samples)[names(pmcmc_samples) == "trajectories"] <- "output"
-    dimnames(pmcmc_samples$output) <- list(dimnames(pmcmc_samples$output)[[1]], dimnames(r$output)[[2]], NULL)
-    r$output <- pmcmc_samples$output
+  # then let's create the output that we are going to use
+  names(pmcmc_samples)[names(pmcmc_samples) == "trajectories"] <- "output"
+  dimnames(pmcmc_samples$output) <- list(dimnames(pmcmc_samples$output)[[1]], dimnames(r$output)[[2]], NULL)
+  r$output <- pmcmc_samples$output
 
-    # and adjust the time as before
-    full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
-    saved_full <- r$output[,"time",full_row]
-    for(i in seq_len(replicates)) {
-      na_pos <- which(is.na(r$output[,"time",i]))
-      full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
-      if(length(na_pos) > 0) {
-        full_to_place[na_pos] <- NA
-      }
-      r$output[,"time",i] <- full_to_place
+  # and adjust the time as before
+  full_row <- match(0, apply(r$output[,"time",],2,function(x) { sum(is.na(x)) }))
+  saved_full <- r$output[,"time",full_row]
+  for(i in seq_len(replicates)) {
+    na_pos <- which(is.na(r$output[,"time",i]))
+    full_to_place <- saved_full - which(rownames(r$output) == as.Date(max(data$date))) + 1L
+    if(length(na_pos) > 0) {
+      full_to_place[na_pos] <- NA
     }
-
-  } else if (inherits(squire_model, "deterministic")) {
-
-
-    r <- list("output" = pmcmc_samples$trajectories)
-    # same as above, add in pmcmc items
-    r$inputs <- pmcmc_samples$inputs
-    r$replicate_parameters <- pmcmc_samples$sampled_PMCMC_Results
-    r$pmcmc_results <- pmcmc
-    r <- structure(r, class = "squire_simulation")
+    r$output[,"time",i] <- full_to_place
   }
 
   # second let's recreate the output

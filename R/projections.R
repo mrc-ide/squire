@@ -83,16 +83,6 @@ projections <- function(r,
     stop("Model must have been produced either with Squire Default, Scan Grid (calibrate), or pMCMC (pmcmcm) Approach")
   }
 
-  if (!is.null(r$pmcmc_results)) {
-    if (inherits(r$pmcmc_results$inputs$squire_model, "deterministic")) {
-      stop("projections unlikely to work with deterministic squire model currently")
-    }
-  } else if (!is.null(r$scan_results)) {
-    if (inherits(r$scan_results$inputs$squire_model, "deterministic")) {
-      stop("projections unlikely to work with deterministic squire model currently")
-    }
-  }
-
   assert_pos_int(tt_R0)
   if(!0 %in% tt_R0) {
     stop("tt_R0 must start with 0")
@@ -197,13 +187,23 @@ projections <- function(r,
 
   # what state time point do we want
   state_pos <- vapply(seq_len(ds[3]), function(x) {
-    which(r$output[,"time",x] == 0)
+    pos <- which(r$output[,"time",x] == 0)
+    if(length(pos) == 0) {
+      stop("projections needs time value to be equal to 0 to know how to project forwards")
+    }
+    return(pos)
   }, FUN.VALUE = numeric(1))
 
   # what are the remaining time points
   t_steps <- lapply(state_pos, function(x) {
     r$output[which(r$output[,1,1] > r$output[x,1,1]),1 ,1]
   })
+
+  # if there are no remaining steps
+  if(any(!unlist(lapply(t_steps, length))) && is.null(time_period)) {
+    stop("projections needs either time_period set or the calibrate/pmcmc object ",
+         "to have been run with forecast > 0")
+  }
 
   # do we need to do more than just the remaining time from calibrate
   if (!is.null(time_period)) {
@@ -212,9 +212,15 @@ projections <- function(r,
     t_start <- r$output[which((r$output[,"time",1]==0)),1,1]+t_diff
     t_initial <- unique(stats::na.omit(r$output[1,1,]))
 
+    if (r$model$.__enclos_env__$private$discrete) {
     t_steps <- lapply(t_steps, function(x) {
       seq(t_start, t_start - t_diff + time_period/r$parameters$dt, t_diff)
     })
+    } else {
+      t_steps <- lapply(t_steps, function(x) {
+        seq(t_start, t_start - t_diff + time_period, t_diff)
+      })
+    }
     steps <- seq(t_initial, max(t_steps[[1]]), t_diff)
 
     arr_new <- array(NA, dim = c(which(r$output[,"time",1]==0) + length(t_steps[[1]]),
@@ -233,10 +239,17 @@ projections <- function(r,
   # final values of R0, contacts, and beds
   finals <- t0_variables(r)
 
+  # what type of object isout squire_simulation
+  if ("scan_results" %in% names(r)) {
+    wh <- "scan_results"
+  } else if ("pmcmc_results" %in% names(r)) {
+    wh <- "pmcmc_results"
+  }
+
   # ----------------------------------------------------------------------------
   # conduct simulations
   # ----------------------------------------------------------------------------
-  out <- lapply(seq_len(ds[3]), function(x) {
+  conduct_replicate <- function(x) {
 
     # ----------------------------------------------------------------------------
     # adapt our time changing variables as needed
@@ -313,18 +326,10 @@ projections <- function(r,
                               R0 = R0)
 
     # Is the model still valid
-    if (!is.null(r$scan_results)) { # check if scan grid approach
-      if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {
-        r$model <- r$scan_results$inputs$squire_model$odin_model(
-          user = r$scan_results$inputs$model_params,
-          unused_user_action = "ignore")
-      }
-    } else if (!is.null(r$pmcmc_results)) { # check if pmcmc approach
-      if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {
-        r$model <- r$pmcmc_results$inputs$squire_model$odin_model(
-          user = r$pmcmc_results$inputs$model_params,
-          unused_user_action = "ignore")
-      }
+    if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {
+      r$model <- r[[wh]]$inputs$squire_model$odin_model(
+        user = r[[wh]]$inputs$model_params,
+        unused_user_action = "ignore")
     }
 
 
@@ -339,29 +344,55 @@ projections <- function(r,
     r$model$set_user(ICU_beds = ICU_bed_capacity)
 
     # run the model
-    if(diff(tail(r$output[,1,1],2)) != 1) {
-      step <- c(0,round(seq_len(length(t_steps[[x]]))/r$parameters$dt))
+    # step handling for stochastic
+    if(r$model$.__enclos_env__$private$discrete) {
+      if(diff(tail(r$output[,1,1],2)) != 1) {
+        step <- c(0,round(seq_len(length(t_steps[[x]]))/r$parameters$dt))
+      } else {
+        step <- seq_len(length(t_steps[[x]]))
+      }
     } else {
-      step <- seq_len(length(t_steps[[x]]))
+      if(diff(tail(r$output[,1,1],2)) != 1) {
+        step <- c(0,round(seq_len(length(t_steps[[x]]))*r$parameters$dt))
+      } else {
+        step <- c(0, seq_len(length(t_steps[[x]])))
+      }
     }
 
-    r$model$run(step = step,
-                y = as.numeric(r$output[state_pos[x], initials, x, drop=TRUE]),
-                use_names = TRUE,
-                replicate = 1)
+    get <- r$model$run(step,
+                       y = as.numeric(r$output[state_pos[x], initials, x, drop=TRUE]),
+                       use_names = TRUE,
+                       replicate = 1)
 
-  })
+    # coerce to array if deterministic
+    if(length(dim(get)) == 2) {
+      # coerce to array
+      get <- array(get, dim = c(dim(get),1), dimnames = dimnames(get))
+    }
+
+    return(get)
+
+  }
+
+  out <- lapply(seq_len(ds[3]), conduct_replicate)
 
   ## get output columns that match
   cn <- colnames(r$output[which(r$output[,1,1] %in% t_steps[[1]]), , 1])
   out <- lapply(out, function(x) { x[, which(colnames(x) %in% cn), , drop=FALSE] })
 
   ## collect results
-  for(i in seq_len(ds[3])) {
-    if(diff(tail(r$output[,"step",1],2)) != 1) {
+  # step handling for stochastic
+  if(r$model$.__enclos_env__$private$discrete) {
+    for(i in seq_len(ds[3])) {
+      if(diff(tail(r$output[,1,1],2)) != 1) {
+        r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][-1, -1, 1]
+      } else {
+        r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][, -1, 1]
+      }
+    }
+  } else {
+    for(i in seq_len(ds[3])) {
       r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][-1, -1, 1]
-    } else {
-      r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][, -1, 1]
     }
   }
 
@@ -501,17 +532,17 @@ t0_variables <- function(r) {
           R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change, 1)
         } else if (is.null(r$replicate_parameters$Meff_pl)) {
           R0 <- r[[wh]]$inputs$Rt_func(R0 = r$replicate_parameters$R0[x],
-                                              R0_change = tail(r$interventions$R0_change, 1),
-                                              Meff = r$replicate_parameters$Meff[x])
+                                       R0_change = tail(r$interventions$R0_change, 1),
+                                       Meff = r$replicate_parameters$Meff[x])
         } else {
           R0 <- tail(evaluate_Rt(R0_change = r$interventions$R0_change,
-                            R0 = r$replicate_parameters$R0[x],
-                            Meff = r$replicate_parameters$Meff[x],
-                            Meff_pl = r$replicate_parameters$Meff_pl[x],
-                            date_R0_change = r$interventions$date_R0_change,
-                            date_Meff_change = r$interventions$date_Meff_change,
-                            Rt_func = r[[wh]]$inputs$Rt_func
-                            ),1)
+                                 R0 = r$replicate_parameters$R0[x],
+                                 Meff = r$replicate_parameters$Meff[x],
+                                 Meff_pl = r$replicate_parameters$Meff_pl[x],
+                                 date_R0_change = r$interventions$date_R0_change,
+                                 date_Meff_change = r$interventions$date_Meff_change,
+                                 Rt_func = r[[wh]]$inputs$Rt_func
+          ),1)
         }
       } else {
         R0 <- r$replicate_parameters$R0[x]

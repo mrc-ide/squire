@@ -605,7 +605,7 @@ test_that("pmcmc deterministic", {
 
 
   expect_true(inherits(out$pmcmc_results$inputs$squire_model, "deterministic"))
-  expect_error(get <- projections(out), "unlikely to work with deterministic")
+  expect_error(get <- projections(out), "projections needs either time_period")
 
 })
 
