@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.18</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.19</span>
       </span>
     </div>
 
@@ -124,40 +124,206 @@
     </div>
 
     <pre class="usage"><span class='fu'>run_deterministic_SEIR_model</span>(
-  <span class='no'>population</span>,
-  <span class='no'>contact_matrix</span>,
-  <span class='no'>tt_R0</span>,
-  <span class='no'>R0_set</span>,
-  <span class='no'>time_period</span>,
-  <span class='no'>hosp_bed_capacity</span>,
-  <span class='no'>ICU_bed_capacity</span>,
-  <span class='kw'>mod_gen</span> <span class='kw'>=</span> <span class='no'>explicit_SEIR_deterministic</span>,
-  <span class='no'>...</span>
+  <span class='kw'>country</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tt_contact_matrix</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>tt_R0</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>beta_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>time_period</span> <span class='kw'>=</span> <span class='fl'>365</span>,
+  <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='kw'>day_return</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>init</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>1e+08</span>),
+  <span class='kw'>prob_hosp</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_hosp</span>,
+  <span class='kw'>prob_severe</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_severe</span>,
+  <span class='kw'>prob_non_severe_death_treatment</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_non_severe_death_treatment</span>,
+  <span class='kw'>prob_non_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_non_severe_death_no_treatment</span>,
+  <span class='kw'>prob_severe_death_treatment</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_severe_death_treatment</span>,
+  <span class='kw'>prob_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_severe_death_no_treatment</span>,
+  <span class='kw'>p_dist</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>p_dist</span>,
+  <span class='kw'>dur_E</span> <span class='kw'>=</span> <span class='fl'>4.6</span>,
+  <span class='kw'>dur_IMild</span> <span class='kw'>=</span> <span class='fl'>2.1</span>,
+  <span class='kw'>dur_ICase</span> <span class='kw'>=</span> <span class='fl'>4.5</span>,
+  <span class='kw'>dur_get_ox_survive</span> <span class='kw'>=</span> <span class='fl'>9.5</span>,
+  <span class='kw'>dur_get_ox_die</span> <span class='kw'>=</span> <span class='fl'>7.6</span>,
+  <span class='kw'>dur_not_get_ox_survive</span> <span class='kw'>=</span> <span class='fl'>9.5</span> * <span class='fl'>0.5</span>,
+  <span class='kw'>dur_not_get_ox_die</span> <span class='kw'>=</span> <span class='fl'>7.6</span> * <span class='fl'>0.5</span>,
+  <span class='kw'>dur_get_mv_survive</span> <span class='kw'>=</span> <span class='fl'>11.3</span>,
+  <span class='kw'>dur_get_mv_die</span> <span class='kw'>=</span> <span class='fl'>10.1</span>,
+  <span class='kw'>dur_not_get_mv_survive</span> <span class='kw'>=</span> <span class='fl'>11.3</span> * <span class='fl'>0.5</span>,
+  <span class='kw'>dur_not_get_mv_die</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>dur_rec</span> <span class='kw'>=</span> <span class='fl'>3.4</span>,
+  <span class='kw'>hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tt_hosp_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>tt_ICU_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>seeding_cases</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>mod_gen</span> <span class='kw'>=</span> <span class='no'>explicit_SEIR_deterministic</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>country</th>
+      <td><p>Character for country beign simulated. WIll be used to
+generate <code>population</code> and <code>contact_matrix_set</code> if
+unprovided. Either <code>country</code> or <code>population</code> and
+<code>contact_matrix_set</code> must be provided.</p></td>
+    </tr>
+    <tr>
       <th>population</th>
       <td><p>Population vector (for each age group). Default = NULL,
 which will cause population to be sourced from <code>country</code></p></td>
     </tr>
     <tr>
-      <th>contact_matrix</th>
-      <td><p>Contact matrix to use in the simulation.</p></td>
+      <th>tt_contact_matrix</th>
+      <td><p>Time change points for matrix change. Default = 0</p></td>
+    </tr>
+    <tr>
+      <th>contact_matrix_set</th>
+      <td><p>Contact matrices used in simulation. Default =
+NULL, which will generate this based on the <code>country</code>.</p></td>
+    </tr>
+    <tr>
+      <th>R0</th>
+      <td><p>Basic Reproduction Number. Default = 3</p></td>
     </tr>
     <tr>
       <th>tt_R0</th>
-      <td><p>Time change points for R0</p></td>
+      <td><p>Change time points for R0. Default = 0</p></td>
     </tr>
     <tr>
-      <th>R0_set</th>
-      <td><p>The values of R0 to use for the simulation</p></td>
+      <th>beta_set</th>
+      <td><p>Alternative parameterisation via beta rather than R0.
+Default = NULL, which causes beta to be estimated from R0</p></td>
     </tr>
     <tr>
       <th>time_period</th>
       <td><p>Length of simulation. Default = 365</p></td>
+    </tr>
+    <tr>
+      <th>dt</th>
+      <td><p>Time Step. Default = 0.1</p></td>
+    </tr>
+    <tr>
+      <th>day_return</th>
+      <td><p>Logical, do we want to return outut after each day rather
+than each dt. Default = FALSE</p></td>
+    </tr>
+    <tr>
+      <th>replicates</th>
+      <td><p>Number of replicates. Default = 10</p></td>
+    </tr>
+    <tr>
+      <th>init</th>
+      <td><p>Data.frame of initial conditions. Default = NULL</p></td>
+    </tr>
+    <tr>
+      <th>seed</th>
+      <td><p>Random seed used for simulations. Deafult = runif(1, 0, 10000)</p></td>
+    </tr>
+    <tr>
+      <th>prob_hosp</th>
+      <td><p>probability of hospitalisation by age.
+Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
+0.008100662, 0.015590734, 0.024597885, 0.035377529,
+0.04385549, 0.058495518, 0.08747709, 0.109730508,
+0.153943118, 0.177242143, 0.221362219, 0.267628264)</p></td>
+    </tr>
+    <tr>
+      <th>prob_severe</th>
+      <td><p>Probability of developing severe symptoms by age.
+Default = c(3.73755e-05, 3.18497e-05, 5.88166e-05, 0.000120264,
+0.000268514, 0.000516788, 0.00081535, 0.001242525,
+0.001729275, 0.002880196, 0.00598205, 0.010821894,
+0.022736324, 0.035911156, 0.056362032, 0.081467057)</p></td>
+    </tr>
+    <tr>
+      <th>prob_non_severe_death_treatment</th>
+      <td><p>Probability of death from non severe
+treated infection.
+Default = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
+0.0125702, 0.0125702, 0.0125702, 0.013361147,
+0.015104687, 0.019164124, 0.027477519, 0.041762108,
+0.068531658, 0.105302319, 0.149305732, 0.20349534)</p></td>
+    </tr>
+    <tr>
+      <th>prob_non_severe_death_no_treatment</th>
+      <td><p>Probability of death in non severe
+hospital inections that aren't treated</p></td>
+    </tr>
+    <tr>
+      <th>prob_severe_death_treatment</th>
+      <td><p>Probability of death from severe infection
+that is treated. Default = rep(0.5, 16)</p></td>
+    </tr>
+    <tr>
+      <th>prob_severe_death_no_treatment</th>
+      <td><p>Probability of death from severe infection
+that is not treated. Default = rep(0.95, 16)</p></td>
+    </tr>
+    <tr>
+      <th>p_dist</th>
+      <td><p>Preferentiality of age group receiving treatment relative to
+other age groups when demand exceeds healthcare capacity.</p></td>
+    </tr>
+    <tr>
+      <th>dur_E</th>
+      <td><p>Mean duration of incubation period (days). Default = 4.6</p></td>
+    </tr>
+    <tr>
+      <th>dur_IMild</th>
+      <td><p>Mean duration of mild infection (days). Default = 2.1</p></td>
+    </tr>
+    <tr>
+      <th>dur_ICase</th>
+      <td><p>Mean duration from symptom onset to hospitil admission (days).
+Default = 4.5</p></td>
+    </tr>
+    <tr>
+      <th>dur_get_ox_survive</th>
+      <td><p>Mean duration of oxygen given survive. Default = 5</p></td>
+    </tr>
+    <tr>
+      <th>dur_get_ox_die</th>
+      <td><p>Mean duration of oxygen given death. Default = 5</p></td>
+    </tr>
+    <tr>
+      <th>dur_not_get_ox_survive</th>
+      <td><p>Mean duration without oxygen given survive.
+Default = 5</p></td>
+    </tr>
+    <tr>
+      <th>dur_not_get_ox_die</th>
+      <td><p>Mean duration without  oxygen given death.
+Default = 5</p></td>
+    </tr>
+    <tr>
+      <th>dur_get_mv_survive</th>
+      <td><p>Mean duration of ventilation given survive.
+Default = 7.3</p></td>
+    </tr>
+    <tr>
+      <th>dur_get_mv_die</th>
+      <td><p>Mean duration of ventilation given death. Default = 6</p></td>
+    </tr>
+    <tr>
+      <th>dur_not_get_mv_survive</th>
+      <td><p>Mean duration without ventilation given
+survive. Default = 7.3</p></td>
+    </tr>
+    <tr>
+      <th>dur_not_get_mv_die</th>
+      <td><p>Mean duration without ventilation given
+death. Default = 1</p></td>
+    </tr>
+    <tr>
+      <th>dur_rec</th>
+      <td><p>Duration of recovery after coming off ventilation. Default = 2</p></td>
     </tr>
     <tr>
       <th>hosp_bed_capacity</th>
@@ -168,13 +334,21 @@ which will cause population to be sourced from <code>country</code></p></td>
       <td><p>ICU bed capacity. Can be single number of vector if capacity time-varies.</p></td>
     </tr>
     <tr>
+      <th>tt_hosp_beds</th>
+      <td><p>Times at which hospital bed capacity changes (Default = 0 = doesn't change)</p></td>
+    </tr>
+    <tr>
+      <th>tt_ICU_beds</th>
+      <td><p>Times at which ICU bed capacity changes (Default = 0 = doesn't change)</p></td>
+    </tr>
+    <tr>
+      <th>seeding_cases</th>
+      <td><p>Initial number of cases seeding the epidemic</p></td>
+    </tr>
+    <tr>
       <th>mod_gen</th>
       <td><p>An odin model generation function. Default:
 `explicit_SEIR_deterministic`</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Other arguments to pass to <code><a href='parameters_explicit_SEEIR.html'>parameters_explicit_SEEIR</a></code></p></td>
     </tr>
     </table>
 

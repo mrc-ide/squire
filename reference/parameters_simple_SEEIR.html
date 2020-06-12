@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.18</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.19</span>
       </span>
     </div>
 
@@ -130,6 +130,7 @@
   <span class='kw'>init</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>dur_E</span> <span class='kw'>=</span> <span class='fl'>4.58</span>,
   <span class='kw'>dur_I</span> <span class='kw'>=</span> <span class='fl'>2.09</span>,
+  <span class='kw'>day_return</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='no'>population</span>,
   <span class='no'>contact_matrix_set</span>,
   <span class='kw'>tt_contact_matrix</span> <span class='kw'>=</span> <span class='fl'>0</span>,
@@ -162,6 +163,11 @@
     <tr>
       <th>dur_I</th>
       <td><p>Mean duration of infectious period (days) in simple model</p></td>
+    </tr>
+    <tr>
+      <th>day_return</th>
+      <td><p>Logical, do we want to return outut after each day rather
+than each dt. Default = FALSE</p></td>
     </tr>
     <tr>
       <th>population</th>
