@@ -474,7 +474,6 @@ parameters_vaccine <- function(
 
   # parameters
   # probabilities
-  # probabilities
   prob_hosp = probs$prob_hosp,
   prob_severe = probs$prob_severe,
   prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
@@ -484,28 +483,29 @@ parameters_vaccine <- function(
   p_dist = probs$p_dist,
 
   # durations
-  dur_E  = 4.6,
-  dur_IMild = 2.1,
-  dur_ICase = 4.5,
+  dur_E,
+  dur_IMild,
+  dur_ICase,
 
-  dur_get_ox_survive = 9.5,
-  dur_get_ox_die = 7.6,
-  dur_not_get_ox_survive = 9.5*0.5,
-  dur_not_get_ox_die = 7.6*0.5,
+  dur_get_ox_survive,
+  dur_get_ox_die,
+  dur_not_get_ox_survive,
+  dur_not_get_ox_die,
 
-  dur_get_mv_survive = 11.3,
-  dur_get_mv_die = 10.1,
-  dur_not_get_mv_survive = 11.3*0.5,
-  dur_not_get_mv_die = 1,
+  dur_get_mv_survive,
+  dur_get_mv_die,
+  dur_not_get_mv_survive,
+  dur_not_get_mv_die,
 
-  dur_rec = 3.4,
-  dur_R = 0,
+  dur_rec,
+  dur_R,
+  vaccination_rate,
 
   # health system capacity
-  hosp_bed_capacity = NULL,
-  ICU_bed_capacity = NULL,
-  tt_hosp_beds = 0,
-  tt_ICU_beds = 0
+  hosp_bed_capacity,
+  ICU_bed_capacity,
+  tt_hosp_beds,
+  tt_ICU_beds
 
 ) {
 
@@ -685,6 +685,7 @@ parameters_vaccine <- function(
                R1_0 = mod_init$R1,
                R2_0 = mod_init$R2,
                D_0 = mod_init$D,
+               V_0 = mod_init$V,
                gamma_E = gamma_E,
                gamma_IMild = gamma_IMild,
                gamma_ICase = gamma_ICase,
@@ -715,7 +716,8 @@ parameters_vaccine <- function(
                beta_set = beta_set,
                dt = dt,
                population = population,
-               contact_matrix_set = contact_matrix_set)
+               contact_matrix_set = contact_matrix_set,
+               vaccination_rate = vaccination_rate)
 
   class(pars) <- c("explicit_SEEIR_parameters", "squire_parameters")
 

@@ -470,6 +470,16 @@ run_deterministic_SEIR_model <- function(
 }
 
 
+#' Return the default vaccine parameters for modelling
+#' @return list of default vaccine parameters
+default_vaccine_pars <- function() {
+  list(dur_R = 365,
+       vaccination_rate = rep(50, 17))
+}
+
+vaccine_pars <- default_vaccine_pars()
+
+
 #' Run the deterministic explicit SEIR model with vaccination
 #'
 #' @inheritParams run_explicit_SEEIR_model
@@ -537,7 +547,10 @@ run_deterministic_SEIR_vaccine_model <- function(
   dur_not_get_mv_die = 1,
 
   dur_rec = 3.4,
-  dur_R = 365,
+
+  # vaccine
+  dur_R = vaccine_pars$dur_R,
+  vaccination_rate = vaccine_pars$vaccination_rate,
 
   # health system capacity
   hosp_bed_capacity = NULL,
@@ -591,7 +604,8 @@ run_deterministic_SEIR_vaccine_model <- function(
                                     hosp_bed_capacity=hosp_bed_capacity,
                                     ICU_bed_capacity=ICU_bed_capacity,
                                     tt_hosp_beds=tt_hosp_beds,
-                                    tt_ICU_beds=tt_ICU_beds)
+                                    tt_ICU_beds=tt_ICU_beds,
+                             vaccination_rate = vaccination_rate)
 
   # handling time variables for js
   pars$tt_beta <- I(pars$tt_beta)
