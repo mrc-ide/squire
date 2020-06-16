@@ -22,6 +22,7 @@ test_that("projection works", {
   squire_model = explicit_model()
   pars_obs = NULL
   n_particles = 10
+  set.seed(123)
 
   t1 <- calibrate(
     data = data,
@@ -42,7 +43,6 @@ test_that("projection works", {
     forecast = 40
   )
 
-  set.seed(123)
   index <- odin_index(t1$model)
   p1 <- projections(r = t1, R0 = 1.8, tt_R0 = 0)
   expect_lt(sum(rowSums(t1$output[,index$D,1])), sum(rowSums(p1$output[,index$D,1])))
@@ -50,7 +50,7 @@ test_that("projection works", {
   expect_gt(sum(rowSums(p1$output[,index$D,1])), sum(rowSums(p2$output[,index$D,1])))
 
   out <- format_output(p2, "infections")
-  expect_gt(mean(out$y[out$t==19]), mean(out$y[out$t==40]))
+  expect_gt(mean(out$y[out$t==5]), mean(out$y[out$t==40]))
 
   # arg checks
   p3 <- projections(t1)
@@ -181,6 +181,7 @@ test_that("projection plotting", {
 test_that("projection with normal run", {
 
   r <- run_explicit_SEEIR_model("Angola",replicates = 1, time_period = 100)
+  expect_error(p <- projections(r, R0 = 10), "0 to know how")
   r$output[,"time",1] <- r$output[,"time",1] - 50
   p <- projections(r, R0 = 10)
   index <- odin_index(p$model)
@@ -188,6 +189,20 @@ test_that("projection with normal run", {
             sum(r$output[nrow(r$output),index$D,1]))
 
 })
+
+#------------------------------------------------
+test_that("projection with deterministic normal run", {
+
+  r <- run_deterministic_SEIR_model("Angola",replicates = 1, time_period = 100)
+  expect_error(p <- projections(r, R0 = 10), "0 to know how")
+  r$output[,"time",1] <- r$output[,"time",1] - 50
+  p <- projections(r, R0 = 10)
+  index <- odin_index(p$model)
+  expect_gt(sum(p$output[nrow(p$output),index$D,1]),
+            sum(r$output[nrow(r$output),index$D,1]))
+
+})
+
 
 
 #------------------------------------------------

@@ -731,7 +731,7 @@ sample_grid_scan <- function(scan_results,
 
   trajectories <- array(NA,
                         dim = c(max_rows, ncol(traces[[1]]), length(traces)),
-                        dimnames = list(max_date_names, NULL, NULL))
+                        dimnames = list(max_date_names, colnames(traces[[1]]), NULL))
 
   # fill the tail of the array slice
   # This is so that the end of the trajectories array is populated,
@@ -885,7 +885,7 @@ sample_3d_grid_scan <- function(scan_results,
 
   trajectories <- array(NA,
                         dim = c(max_rows, ncol(traces[[1]]), length(traces)),
-                        dimnames = list(max_date_names, NULL, NULL))
+                        dimnames = list(max_date_names, colnames(traces[[1]]), NULL))
 
   # fill the tail of the array slice
   # This is so that the end of the trajectories array is populated,

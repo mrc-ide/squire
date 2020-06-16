@@ -89,7 +89,7 @@ squire_simulation_plot_prep <- function(x,
 #' @param ... additional arguments affecting the plot produced.
 #'
 #' @export
-plot.squire_simulation <- function(x, var_select = NULL,
+  plot.squire_simulation <- function(x, var_select = NULL,
                                    replicates = FALSE,
                                    summarise = TRUE,
                                    ci = TRUE,

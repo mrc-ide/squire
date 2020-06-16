@@ -1,3 +1,11 @@
+# squire 0.4.20
+
+* `evaluate_Rt` allows for `date_Meff_change` to be later/earlier than `date_R0_change` ends
+
+# squire 0.4.19
+
+* Large overhaul to make `projections` and plotting work with deterministic models
+
 # squire 0.4.18
 
 * `calc_loglikelihood` fix for reduced date vectors

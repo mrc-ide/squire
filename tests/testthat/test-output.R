@@ -2,7 +2,14 @@ test_that("deterministic output format works", {
   pop <- get_population("Afghanistan")
   m <- get_mixing_matrix("Afghanistan")
   model_output <- run_deterministic_SEIR_model(
-    pop$n, m, c(0, 50), c(3, 3/2), 2, 100000, 1000000)
+      population = pop$n, contact_matrix_set = m,
+      tt_R0 = c(0), R0 = c(3), time_period = 2,
+      day_return = TRUE,
+      hosp_bed_capacity = 100000,
+      ICU_bed_capacity = 1000000)
+
+  # put in to keep this going
+  model_output$output <- model_output$output[,,1,drop=TRUE]
 
   # reset output
   model_output$output[,2:dim(model_output$output)[[2]]] <- 0
@@ -27,7 +34,7 @@ test_that("deterministic output format works", {
   actual <- format_deterministic_output(model_output)
   vars <- c('deaths','infections','hospital_demand','ICU_demand')
   expected <- data.frame(
-    t = rep(c(0, 1), length(vars)),
+    t = rep(c(1, 2), length(vars)),
     compartment = rep(vars, each = 2),
     value = c(2, 5, 4, 10, 2, 6, 1, 4),
     stringsAsFactors = FALSE

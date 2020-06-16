@@ -11,6 +11,7 @@ parameters_simple_SEEIR(
   init = NULL,
   dur_E = 4.58,
   dur_I = 2.09,
+  day_return = FALSE,
   population,
   contact_matrix_set,
   tt_contact_matrix = 0,
@@ -29,6 +30,9 @@ parameters_simple_SEEIR(
 \item{dur_E}{Mean duration of incubation period (days)}
 
 \item{dur_I}{Mean duration of infectious period (days) in simple model}
+
+\item{day_return}{Logical, do we want to return outut after each day rather
+than each dt. Default = FALSE}
 
 \item{population}{Population vector (for each age group)}
 

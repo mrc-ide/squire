@@ -39,6 +39,8 @@ probs <- default_probs()
 #' @param contact_matrix_set Contact matrices used in simulation
 #' @param tt_contact_matrix Time change points for matrix change
 #' @param time_period Length of simulation
+#' @param day_return Logical, do we want to return outut after each day rather
+#'   than each dt. Default = FALSE
 #' @param replicates Number of replicates
 #'
 #' @return Simulation output
@@ -57,6 +59,7 @@ run_simple_SEEIR_model <- function(R0 = 3,
                             init = NULL,
                             dur_E  = 4.58,
                             dur_I = 2.09,
+                            day_return = FALSE,
                             population,
                             contact_matrix_set,
                             tt_contact_matrix = 0,
@@ -73,11 +76,17 @@ run_simple_SEEIR_model <- function(R0 = 3,
                                   population=population,
                                   contact_matrix_set=contact_matrix_set,
                                   tt_contact_matrix=tt_contact_matrix,
+                                  day_return = day_return,
                                   time_period=time_period)
 
   # Running the Model
   mod <- simple_SEIR(user = pars, unused_user_action = "ignore")
   t <- seq(from = 1, to = time_period/dt)
+
+  if (day_return) {
+    t <- round(seq(1/dt, length(t)+(1/dt), by=1/dt))
+  }
+
   results <- mod$run(t, replicate = replicates)
 
   # Summarise inputs
@@ -88,6 +97,7 @@ run_simple_SEEIR_model <- function(R0 = 3,
                 population = population,
                 contact_matrix_set = contact_matrix_set,
                 tt_contact_matrix = tt_contact_matrix,
+                day_return = day_return,
                 time_period = time_period, replicates = replicates)
 
   out <- list(output = results, parameters = parameters, model = mod)
@@ -312,17 +322,9 @@ run_explicit_SEEIR_model <- function(
 
 #' Run the deterministic explicit SEIR model
 #'
-#' @param population Population vector (for each age group). Default = NULL,
-#'   which will cause population to be sourced from \code{country}
-#' @param contact_matrix Contact matrix to use in the simulation.
-#' @param tt_R0 Time change points for R0
-#' @param R0_set The values of R0 to use for the simulation
-#' @param time_period Length of simulation. Default = 365
-#' @param hosp_bed_capacity General bed capacity. Can be single number of vector if capacity time-varies.
-#' @param ICU_bed_capacity ICU bed capacity. Can be single number of vector if capacity time-varies.
+#' @inheritParams run_explicit_SEEIR_model
 #' @param mod_gen An odin model generation function. Default:
 #' `explicit_SEIR_deterministic`
-#' @param ... Other arguments to pass to \code{\link{parameters_explicit_SEEIR}}
 #'
 #' @return Simulation output
 #' @export
@@ -335,93 +337,141 @@ run_explicit_SEEIR_model <- function(
 #' 1000000)
 #' }
 run_deterministic_SEIR_model <- function(
-  population,
-  contact_matrix,
-  tt_R0,
-  R0_set,
-  time_period,
-  hosp_bed_capacity,
-  ICU_bed_capacity,
-  mod_gen = explicit_SEIR_deterministic,
-  ...
+
+  # demography
+  country = NULL,
+  population = NULL,
+  tt_contact_matrix = 0,
+  contact_matrix_set = NULL,
+
+  # transmission
+  R0 = 3,
+  tt_R0 = 0,
+  beta_set = NULL,
+
+  # initial state, duration, reps
+  time_period = 365,
+  dt = 0.1,
+  day_return = FALSE,
+  replicates = 10,
+  init = NULL,
+  seed = stats::runif(1, 0, 100000000),
+
+  # parameters
+  # probabilities
+  prob_hosp = probs$prob_hosp,
+  prob_severe = probs$prob_severe,
+  prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
+  prob_non_severe_death_no_treatment = probs$prob_non_severe_death_no_treatment,
+  prob_severe_death_treatment = probs$prob_severe_death_treatment,
+  prob_severe_death_no_treatment = probs$prob_severe_death_no_treatment,
+  p_dist = probs$p_dist,
+
+  # durations
+  dur_E  = 4.6,
+  dur_IMild = 2.1,
+  dur_ICase = 4.5,
+
+  dur_get_ox_survive = 9.5,
+  dur_get_ox_die = 7.6,
+  dur_not_get_ox_survive = 9.5*0.5,
+  dur_not_get_ox_die = 7.6*0.5,
+
+  dur_get_mv_survive = 11.3,
+  dur_get_mv_die = 10.1,
+  dur_not_get_mv_survive = 11.3*0.5,
+  dur_not_get_mv_die = 1,
+
+  dur_rec = 3.4,
+
+  # health system capacity
+  hosp_bed_capacity = NULL,
+  ICU_bed_capacity = NULL,
+  tt_hosp_beds = 0,
+  tt_ICU_beds = 0,
+
+  seeding_cases = NULL,
+  mod_gen = explicit_SEIR_deterministic
   ) {
 
-  default_params <- parameters_explicit_SEEIR(
-    population = population,
-    tt_contact_matrix = 0,
-    contact_matrix_set = contact_matrix,
-    R0 = R0_set,
-    tt_R0 = tt_R0,
-    dt = 1,
-    init = NULL,
-    seeding_cases = NULL,
-    hosp_bed_capacity = hosp_bed_capacity,
-    ICU_bed_capacity = ICU_bed_capacity,
-    tt_hosp_beds = 0,
-    tt_ICU_beds = 0,
-    ...
-  )
+  # replicates has to be 1
+  replicates <- 1
 
-  seed <- c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0)
+  # Grab function arguments
+  args <- as.list(environment())
+  set.seed(seed)
 
-  pars <- list(
-    N_age = length(population),
-    S_0 = population - seed,
-    E1_0 = seed,
-    E2_0 = rep(0, length(population)),
-    IMild_0 = rep(0, length(population)),
-    ICase1_0 = rep(0, length(population)),
-    ICase2_0 = rep(0, length(population)),
-    IOxGetLive1_0 = rep(0, length(population)),
-    IOxGetLive2_0 = rep(0, length(population)),
-    IOxGetDie1_0 = rep(0, length(population)),
-    IOxGetDie2_0 = rep(0, length(population)),
-    IOxNotGetLive1_0 = rep(0, length(population)),
-    IOxNotGetLive2_0 = rep(0, length(population)),
-    IOxNotGetDie1_0 = rep(0, length(population)),
-    IOxNotGetDie2_0 = rep(0, length(population)),
-    IMVGetLive1_0 = rep(0, length(population)),
-    IMVGetLive2_0 = rep(0, length(population)),
-    IMVGetDie1_0 = rep(0, length(population)),
-    IMVGetDie2_0 = rep(0, length(population)),
-    IMVNotGetLive1_0 = rep(0, length(population)),
-    IMVNotGetLive2_0 = rep(0, length(population)),
-    IMVNotGetDie1_0 = rep(0, length(population)),
-    IMVNotGetDie2_0 = rep(0, length(population)),
-    IRec1_0 = rep(0, length(population)),
-    IRec2_0 = rep(0, length(population)),
-    R_0 = rep(0, length(population)),
-    D_0 = rep(0, length(population)),
-    gamma_E = default_params$gamma_E,
-    gamma_R = default_params$gamma_IMild,
-    gamma_hosp = default_params$gamma_ICase,
-    gamma_get_ox_survive = default_params$gamma_get_ox_survive,
-    gamma_get_ox_die = default_params$gamma_get_ox_die,
-    gamma_not_get_ox_survive = default_params$gamma_not_get_ox_survive,
-    gamma_not_get_ox_die = default_params$gamma_not_get_ox_die,
-    gamma_get_mv_survive = default_params$gamma_get_mv_survive,
-    gamma_get_mv_die = default_params$gamma_get_mv_die,
-    gamma_not_get_mv_survive = default_params$gamma_not_get_mv_survive,
-    gamma_not_get_mv_die = default_params$gamma_not_get_mv_die,
-    gamma_rec = default_params$gamma_rec,
-    prob_hosp = default_params$prob_hosp,
-    prob_severe = default_params$prob_severe,
-    prob_non_severe_death_treatment = default_params$prob_non_severe_death_treatment,
-    prob_non_severe_death_no_treatment = default_params$prob_non_severe_death_no_treatment,
-    prob_severe_death_treatment = default_params$prob_severe_death_treatment,
-    prob_severe_death_no_treatment = default_params$prob_severe_death_no_treatment,
-    p_dist = default_params$p_dist,
-    hosp_bed_capacity = hosp_bed_capacity,
-    ICU_bed_capacity = ICU_bed_capacity,
-    tt_matrix = I(default_params$tt_matrix),
-    mix_mat_set = default_params$mix_mat_set,
-    tt_beta = I(default_params$tt_beta),
-    beta_set = I(default_params$beta_set)
-  )
+  # create parameter list
+  pars <- parameters_explicit_SEEIR(country=country,
+                                    population=population,
+                                    tt_contact_matrix=tt_contact_matrix,
+                                    contact_matrix_set=contact_matrix_set,
+                                    R0=R0,
+                                    tt_R0=tt_R0,
+                                    beta_set=beta_set,
+                                    time_period=time_period,
+                                    dt=dt,
+                                    init=init,
+                                    seeding_cases=seeding_cases,
+                                    prob_hosp=prob_hosp,
+                                    prob_severe=prob_severe,
+                                    prob_non_severe_death_treatment=prob_non_severe_death_treatment,
+                                    prob_non_severe_death_no_treatment=prob_non_severe_death_no_treatment,
+                                    prob_severe_death_treatment=prob_severe_death_treatment,
+                                    prob_severe_death_no_treatment=prob_severe_death_no_treatment,
+                                    p_dist=p_dist,
+                                    dur_E=dur_E,
+                                    dur_IMild=dur_IMild,
+                                    dur_ICase=dur_ICase,
+                                    dur_get_ox_survive=dur_get_ox_survive,
+                                    dur_get_ox_die=dur_get_ox_die,
+                                    dur_not_get_ox_survive=dur_not_get_ox_survive,
+                                    dur_not_get_ox_die=dur_not_get_ox_die,
+                                    dur_get_mv_survive=dur_get_mv_survive,
+                                    dur_get_mv_die=dur_get_mv_die,
+                                    dur_not_get_mv_survive=dur_not_get_mv_survive,
+                                    dur_not_get_mv_die=dur_not_get_mv_die,
+                                    dur_rec=dur_rec,
+                                    hosp_bed_capacity=hosp_bed_capacity,
+                                    ICU_bed_capacity=ICU_bed_capacity,
+                                    tt_hosp_beds=tt_hosp_beds,
+                                    tt_ICU_beds=tt_ICU_beds)
 
-  mod <- mod_gen(user = pars)
-  t <- seq(from = 0, to = time_period - 1)
-  results <- mod$run(t)
-  out <- list(output = results, parameters = pars, model = mod)
-  structure(out, class = "squire_simulation")
+  # handling time variables for js
+  pars$tt_beta <- I(pars$tt_beta)
+  pars$beta_set <- I(pars$beta_set)
+  pars$tt_hosp_beds <- I(pars$tt_hosp_beds)
+  pars$hosp_beds <- I(pars$hosp_beds)
+  pars$tt_ICU_beds <- I(pars$tt_ICU_beds)
+  pars$ICU_beds <- I(pars$ICU_beds)
+  pars$tt_matrix <- I(pars$tt_matrix)
+
+  # Running the Model
+  mod <- mod_gen(user = pars, unused_user_action = "ignore")
+  t <- seq(from = 1, to = time_period, by = dt)
+
+  # if we ar doing day return then proceed in steps of day length
+  # We also will do an extra day so we know the numebr of infections/deaths
+  # that would happen in the last day
+  if (day_return) {
+    t <- round(seq(from = 1, to = time_period))
+  }
+  results <- mod$run(t, replicate = replicates)
+
+  # coerce to array
+  results <- array(results, dim = c(dim(results),1), dimnames = dimnames(results))
+
+  # Summarise inputs
+  parameters <- args
+  parameters$population <- pars$population
+  parameters$hosp_bed_capacity <- pars$hosp_beds
+  parameters$ICU_bed_capacity <- pars$ICU_beds
+  parameters$beta_set <- pars$beta_set
+  parameters$seeding_cases <- pars$E1_0
+  parameters$contact_matrix_set <- pars$contact_matrix_set
+
+  out <- list(output = results, parameters = parameters, model = mod)
+  out <- structure(out, class = "squire_simulation")
+  return(out)
+
 }

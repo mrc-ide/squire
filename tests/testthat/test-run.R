@@ -253,17 +253,14 @@ test_that("run deterministic parameterises model correctly", {
   pop <- get_population("Afghanistan")
   m <- get_mixing_matrix("Afghanistan")
   output <- run_deterministic_SEIR_model(
-    pop$n,
-    m,
-    c(0, 50),
-    c(3, 3/2),
-    365,
-    100000,
-    1000000
+    population = pop$n,contact_matrix_set = m,
+    hosp_bed_capacity = 100000,
+    ICU_bed_capacity = 1000000,
+    day_return = TRUE
   )
-  expect_equal(length(output$output[,1]), 365)
-  expect_equal(output$parameters$hosp_bed_capacity, 100000)
-  expect_equal(output$parameters$ICU_bed_capacity, 1000000)
+  expect_equal(length(output$output[,1,1]), 365)
+  expect_equal(as.numeric(output$parameters$hosp_bed_capacity), 100000)
+  expect_equal(as.numeric(output$parameters$ICU_bed_capacity), 1000000)
 })
 
 
