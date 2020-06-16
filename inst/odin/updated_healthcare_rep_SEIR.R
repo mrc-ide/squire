@@ -6,6 +6,7 @@
 ##------------------------------------------------------------------------------
 dt <- user() # Specified timestep
 time <- step * dt # Tracking actual time
+output(time) <- TRUE
 N_age <- user() # Number of age groups
 
 ## RATES
@@ -157,7 +158,7 @@ number_GetHosp[] <- rmhyper(total_GetHosp, number_req_Hosp)
 number_NotHosp[] <- number_req_Hosp[i] - number_GetHosp[i]
 
 # Working Out How Much Oxygen There Is Available and How Many Individuals Requiring Hospital/ICU Bed Receive It
-oxygen_availability <- oxygen_supply + previous_reserves - oxygen_demand
+oxygen_availability <- oxygen_supply + leftover - oxygen_demand
 prop_ox_hosp_beds <- total_GetHosp/(total_GetHosp + total_GetICU * severe_critical_case_oxygen_consumption_multiplier)
 available_oxygen_for_hosp_beds <- floor(prop_ox_hosp_beds * oxygen_availability)
 available_oxygen_for_ICU_beds <- floor((oxygen_availability - available_oxygen_for_hosp_beds)/severe_critical_case_oxygen_consumption_multiplier)
@@ -193,10 +194,10 @@ overall_number_get_ICU_not_Ox[] <- number_GetICU[i] - number_GetICU_GetOx[i]
 number_GetICU_NoOx_NoMV[] <- rbinom(overall_number_get_ICU_not_Ox[i], prob_critical[i])
 number_GetICU_NoOx[] <- overall_number_get_ICU_not_Ox[i] - number_GetICU_NoOx_NoMV[i]
 
-ICU_leftover <- available_oxygen_for_ICU_Ox + available_oxygen_for_ICU_MV -
-                sum(number_GetICU_GetOx_NeedMV) - sum(number_GetICU_GetOx)
-previous_reserves <- oxygen_availability - min(available_oxygen_for_hosp_beds, sum(number_GetHosp_Ox)) +
-                     ICU_leftover * severe_critical_case_oxygen_consumption_multiplier # check this doesn't go below 0
+# not 100% sure if this is correct, but will hopefully solve the cyclic dependency
+leftover <- oxygen_supply - oxygen_demand -
+            (sum(number_GetICU_GetOx_NeedMV) + sum(number_GetICU_GetOx)) * severe_critical_case_oxygen_consumption_multiplier -
+            sum(number_GetHosp_Ox)
 
 # Numbers changing between hospital bed related compartments
 n_IMod_GetHosp_GetOx_Die1[] <- rbinom(number_GetHosp_Ox[i], prob_moderate_death_get_hosp_get_ox[i])
@@ -438,13 +439,13 @@ oxygen_supply <- interpolate(tt_oxygen_supply, input_oxygen_supply, "constant") 
 tt_oxygen_supply[] <- user()
 input_oxygen_supply[] <- user()
 dim(tt_oxygen_supply) <- user()
-dim(oxygen_supply) <- user()
+dim(input_oxygen_supply) <- user()
 
 oxygen_demand <- interpolate(tt_oxygen_demand, input_oxygen_demand, "constant") # rate of demand of oxygen
 tt_oxygen_demand[] <- user()
 input_oxygen_demand[] <- user()
 dim(tt_oxygen_demand) <- user()
-dim(oxygen_demand) <- user()
+dim(input_oxygen_demand) <- user()
 
 severe_critical_case_oxygen_consumption_multiplier <- user() # consumption of oxygen for severe/critical covid-19 cases compared to moderate cases
 
