@@ -324,3 +324,108 @@ expect_true(d2>d3)
 expect_true(d3<10)
 
 })
+
+
+#------------------------------------------------
+test_that("projection calibrate environmental works", {
+
+
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  replicates = 2
+  R0_min = 2.6
+  R0_max = 2.6
+  R0_step = 0.1
+  first_start_date = "2020-02-01"
+  last_start_date = "2020-02-02"
+  day_step = 1
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  pars_obs = NULL
+  n_particles = 10
+  set.seed(123)
+
+  t1 <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = explicit_env_model(),
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    replicates = replicates,
+    country = country,
+    forecast = 40
+  )
+
+  index <- odin_index(t1$model)
+  p1 <- projections(r = t1, R0 = 1.8, tt_R0 = 0)
+  expect_lt(sum(rowSums(t1$output[,index$D,1])), sum(rowSums(p1$output[,index$D,1])))
+  p2 <- projections(r = t1, R0_change = c(0.1, 0.05), tt_R0 = c(0, 20))
+  expect_gt(sum(rowSums(p1$output[,index$D,1])), sum(rowSums(p2$output[,index$D,1])))
+
+
+  t2 <- calibrate(
+    data = data,
+    R0_min = R0_min,
+    R0_max = R0_max,
+    R0_step = R0_step,
+    first_start_date = first_start_date,
+    last_start_date = last_start_date,
+    day_step = day_step,
+    squire_model = explicit_env_model(),
+    pars_obs = pars_obs,
+    n_particles = n_particles,
+    reporting_fraction = reporting_fraction,
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    replicates = replicates,
+    country = country,
+    env_dat = runif(nrow(data), 1.2,1.4),
+    env_slp = runif(1),
+    env_dat_date = as.Date(data$date),
+    forecast = 40
+  )
+
+  # greater as have set env_dat to be higher than 1
+  expect_gt(sum(rowSums(t2$output[,index$D,1])) ,  sum(rowSums(t1$output[,index$D,1]))  )
+
+  # to do projections with model calibrate we would re set env_dat
+  t2$scan_results$inputs$model_params$env_dat <- c(1.5, 2)
+  p1 <- projections(r = t2, R0_change = c(1,1), tt_R0 = c(0, 50), time_period = 90)
+  t2$scan_results$inputs$model_params$env_dat <- c(0.5, 0.25)
+  p1a <- projections(r = t2, R0_change = c(1,1), tt_R0 = c(0, 50), time_period = 90)
+
+  # we can control the seasonal effect as above to see the differneces here
+  expect_gt(sum(rowSums(p1$output[,index$D,1])), sum(rowSums(p1a$output[,index$D,1])))
+
+  # we can even run a plane seasonal model using run functions
+  r <- run_explicit_env_SEEIR_model("Angola",replicates = 3, day_return = TRUE, time_period = 90,
+                                    R0 = c(3,3), tt_R0 = c(0, 45), env_dat = c(1,2), env_slp = 1)
+
+  r2 <- run_explicit_env_SEEIR_model("Angola",replicates = 3, day_return = TRUE, time_period = 90,
+                                    R0 = c(3,3), tt_R0 = c(0, 45), env_dat = c(1,0.5), env_slp = 1)
+
+  expect_gt(sum(r$output[,index$D,]), sum(r2$output[,index$D,]))
+
+  # which can also be passed to projections with env params controlled liek this
+  r$output[,"time",] <- r$output[,"time",] - 50 # projections requires a 0 to be in time columns from which to project forwards from
+  r$parameters$env_dat <- c(1,0.5)
+  p1 <- projections(r = r, R0_change = c(1,1), tt_R0 = c(0, 50), time_period = 90)
+  r$parameters$env_dat <- c(1,2)
+  p2 <- projections(r = r, R0_change = c(1,1), tt_R0 = c(0, 50), time_period = 90)
+
+  expect_gt(sum(p2$output[,index$D,]), sum(p1$output[,index$D,]))
+
+})

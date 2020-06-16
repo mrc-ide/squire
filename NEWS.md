@@ -1,3 +1,7 @@
+# squire 0.4.21
+
+* seasonal models in, controlled with `env_dat`, `env_slp` and `env_dat`. See test for example
+
 # squire 0.4.20
 
 * `evaluate_Rt` allows for `date_Meff_change` to be later/earlier than `date_R0_change` ends

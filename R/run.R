@@ -243,14 +243,7 @@ run_explicit_SEEIR_model <- function(
   tt_hosp_beds = 0,
   tt_ICU_beds = 0,
 
-  seeding_cases = NULL,
-
-  # These do nothing here. Generate beta values via beta_est_env_explicit and
-  # pass those in as `beta_set` if you want to do a run that incorporates
-  # environmental effects.
-  env_dat = NULL,
-  env_slp = NULL,
-  env_dat_date = NULL
+  seeding_cases = NULL
 
   ) {
 
@@ -293,6 +286,152 @@ run_explicit_SEEIR_model <- function(
                                     ICU_bed_capacity=ICU_bed_capacity,
                                     tt_hosp_beds=tt_hosp_beds,
                                     tt_ICU_beds=tt_ICU_beds)
+
+  # Running the Model
+  mod <- explicit_SEIR(user = pars, unused_user_action = "ignore")
+  t <- seq(from = 1, to = time_period/dt)
+
+  # if we ar doing day return then proceed in steps of day length
+  # We also will do an extra day so we know the numebr of infections/deaths
+  # that would happen in the last day
+  if (day_return) {
+    t <- round(seq(1/dt, length(t)+(1/dt), by=1/dt))
+  }
+  results <- mod$run(t, replicate = replicates)
+
+  # Summarise inputs
+  parameters <- args
+  parameters$population <- pars$population
+  parameters$hosp_bed_capacity <- pars$hosp_beds
+  parameters$ICU_bed_capacity <- pars$ICU_beds
+  parameters$beta_set <- pars$beta_set
+  parameters$seeding_cases <- pars$E1_0
+  parameters$contact_matrix_set <- pars$contact_matrix_set
+
+  out <- list(output = results, parameters = parameters, model = mod)
+  out <- structure(out, class = "squire_simulation")
+  return(out)
+}
+
+# -----------------------------------------------------------------------------
+#' Run the explicit enivoronmental SEEIR model
+#'
+#' @return Simulation output
+#' @inheritParams run_explicit_SEEIR_model
+#' @inheritParams parameters_explicit_env_SEEIR
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' pop <- get_population("Afghanistan")
+#' m1 <- run_explicit_env_SEEIR_model(R0 = 2,
+#' population = pop$n, dt = 1,
+#' contact_matrix_set=contact_matrices[[1]])
+#' }
+run_explicit_env_SEEIR_model <- function(
+
+  # demography
+  country = NULL,
+  population = NULL,
+  tt_contact_matrix = 0,
+  contact_matrix_set = NULL,
+
+  # transmission
+  R0 = 3,
+  tt_R0 = 0,
+  beta_set = NULL,
+
+  # initial state, duration, reps
+  time_period = 365,
+  dt = 0.1,
+  day_return = FALSE,
+  replicates = 10,
+  init = NULL,
+  seed = stats::runif(1, 0, 100000000),
+
+  # parameters
+  # probabilities
+  prob_hosp = probs$prob_hosp,
+  prob_severe = probs$prob_severe,
+  prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
+  prob_non_severe_death_no_treatment = probs$prob_non_severe_death_no_treatment,
+  prob_severe_death_treatment = probs$prob_severe_death_treatment,
+  prob_severe_death_no_treatment = probs$prob_severe_death_no_treatment,
+  p_dist = probs$p_dist,
+
+  # durations
+  dur_E  = 4.6,
+  dur_IMild = 2.1,
+  dur_ICase = 4.5,
+
+  dur_get_ox_survive = 9.5,
+  dur_get_ox_die = 7.6,
+  dur_not_get_ox_survive = 9.5*0.5,
+  dur_not_get_ox_die = 7.6*0.5,
+
+  dur_get_mv_survive = 11.3,
+  dur_get_mv_die = 10.1,
+  dur_not_get_mv_survive = 11.3*0.5,
+  dur_not_get_mv_die = 1,
+
+  dur_rec = 3.4,
+
+  # health system capacity
+  hosp_bed_capacity = NULL,
+  ICU_bed_capacity = NULL,
+  tt_hosp_beds = 0,
+  tt_ICU_beds = 0,
+
+  seeding_cases = NULL,
+
+  env_dat = 0,
+  env_slp = 0,
+  env_dat_date = NULL
+
+) {
+
+  # Grab function arguments
+  args <- as.list(environment())
+  set.seed(seed)
+
+  # create parameter list
+  pars <- parameters_explicit_env_SEEIR(country=country,
+                                    population=population,
+                                    tt_contact_matrix=tt_contact_matrix,
+                                    contact_matrix_set=contact_matrix_set,
+                                    R0=R0,
+                                    tt_R0=tt_R0,
+                                    beta_set=beta_set,
+                                    time_period=time_period,
+                                    dt=dt,
+                                    init=init,
+                                    seeding_cases=seeding_cases,
+                                    prob_hosp=prob_hosp,
+                                    prob_severe=prob_severe,
+                                    prob_non_severe_death_treatment=prob_non_severe_death_treatment,
+                                    prob_non_severe_death_no_treatment=prob_non_severe_death_no_treatment,
+                                    prob_severe_death_treatment=prob_severe_death_treatment,
+                                    prob_severe_death_no_treatment=prob_severe_death_no_treatment,
+                                    p_dist=p_dist,
+                                    dur_E=dur_E,
+                                    dur_IMild=dur_IMild,
+                                    dur_ICase=dur_ICase,
+                                    dur_get_ox_survive=dur_get_ox_survive,
+                                    dur_get_ox_die=dur_get_ox_die,
+                                    dur_not_get_ox_survive=dur_not_get_ox_survive,
+                                    dur_not_get_ox_die=dur_not_get_ox_die,
+                                    dur_get_mv_survive=dur_get_mv_survive,
+                                    dur_get_mv_die=dur_get_mv_die,
+                                    dur_not_get_mv_survive=dur_not_get_mv_survive,
+                                    dur_not_get_mv_die=dur_not_get_mv_die,
+                                    dur_rec=dur_rec,
+                                    hosp_bed_capacity=hosp_bed_capacity,
+                                    ICU_bed_capacity=ICU_bed_capacity,
+                                    tt_hosp_beds=tt_hosp_beds,
+                                    tt_ICU_beds=tt_ICU_beds,
+                                    env_dat = env_dat,
+                                    env_slp = env_slp,
+                                    env_dat_date = env_dat_date)
 
   # Running the Model
   mod <- explicit_SEIR(user = pars, unused_user_action = "ignore")

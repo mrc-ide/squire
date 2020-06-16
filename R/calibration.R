@@ -299,6 +299,13 @@ calibrate <- function(data,
   }
 
   # recreate model output for each type of model
+  # hack to fix the env_dat
+  tt <- seq_along(model_params$env_dat)
+  R0 <- rep(3,length(model_params$env_dat))
+  if(length(tt) == 0) {
+    tt <- 0
+    R0 <- 3
+  }
 
     # create a fake run object and fill in the required elements
     r <- squire_model$run_func(country = country,
@@ -312,6 +319,8 @@ calibrate <- function(data,
                                population = population,
                                replicates = 1,
                                time_period = nrow(res$trajectories),
+                               tt_R0 = tt,
+                               R0 = R0,
                                ...)
 
     # first let's create the output
@@ -337,9 +346,10 @@ calibrate <- function(data,
   temp_parms <- res$inputs$model_params
 
   # remove the environmental ones
-  temp_parms["env_dat"] <- NULL
-  temp_parms["env_slp"] <- NULL
-  temp_parms["env_dat_date"] <- NULL
+  temp_parms[["env_dat"]] <- NULL
+  temp_parms[["env_slp"]] <- NULL
+  temp_parms[["env_dat_date"]] <- NULL
+  temp_parms[["beta_set"]] <- temp_parms[["beta_set"]][1]
 
   # create model
   r$model <- res$inputs$squire_model$odin_model(

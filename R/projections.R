@@ -239,11 +239,13 @@ projections <- function(r,
   # final values of R0, contacts, and beds
   finals <- t0_variables(r)
 
-  # what type of object isout squire_simulation
+  # what type of object is our squire_simulation
   if ("scan_results" %in% names(r)) {
     wh <- "scan_results"
   } else if ("pmcmc_results" %in% names(r)) {
     wh <- "pmcmc_results"
+  } else {
+    wh <- "run_object"
   }
 
   # ----------------------------------------------------------------------------
@@ -317,13 +319,31 @@ projections <- function(r,
     matrices_set <- matrix_set_explicit(contact_matrix_set, r$parameters$population)
 
     # create new betas going forwards
-    beta <- beta_est_explicit(dur_IMild = r$parameters$dur_IMild,
-                              dur_ICase = r$parameters$dur_ICase,
-                              prob_hosp = r$parameters$prob_hosp,
-                              mixing_matrix = process_contact_matrix_scaled_age(
-                                baseline_contact_matrix_set[[1]],
-                                r$parameters$population),
-                              R0 = R0)
+    if (wh != "run_object") {
+      beta <- beta_est(squire_model = r[[wh]]$inputs$squire_model,
+                       model_params = r[[wh]]$inputs$model_params,
+                       R0 = R0)
+    } else {
+      if("env_dat" %in% names(r$parameters)) {
+        beta <- beta_est_env_explicit(dur_IMild = r$parameters$dur_IMild,
+                                  dur_ICase = r$parameters$dur_ICase,
+                                  prob_hosp = r$parameters$prob_hosp,
+                                  mixing_matrix = process_contact_matrix_scaled_age(
+                                    baseline_contact_matrix_set[[1]],
+                                    r$parameters$population),
+                                  R0 = R0,
+                                  env_dat = r$parameters$env_dat,
+                                  env_slp = r$parameters$env_slp)
+      } else {
+        beta <- beta_est_explicit(dur_IMild = r$parameters$dur_IMild,
+                                  dur_ICase = r$parameters$dur_ICase,
+                                  prob_hosp = r$parameters$prob_hosp,
+                                  mixing_matrix = process_contact_matrix_scaled_age(
+                                    baseline_contact_matrix_set[[1]],
+                                    r$parameters$population),
+                                  R0 = R0)
+      }
+    }
 
     # Is the model still valid
     if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {

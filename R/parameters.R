@@ -700,8 +700,8 @@ parameters_explicit_env_SEEIR <- function(
   assert_greq(prob_severe_death_no_treatment, 0)
   assert_greq(p_dist, 0)
 
-  assert_numeric(env_slp, 1)
-  assert_numeric(env_dat, time_period)
+  assert_numeric(env_slp)
+  assert_numeric(env_dat)
 
 
   # Convert and Generate Parameters As Required

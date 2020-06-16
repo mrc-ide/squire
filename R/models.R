@@ -13,14 +13,10 @@ explicit_env_model <- function() {
     compare_output(model, pars_obs, data, type=model_class)
   }
 
-  run_func <- function(...) {
-    run_explicit_SEEIR_model(...)
-  }
-
   explicit_model <- list(odin_model = explicit_SEIR,
                          generate_beta_func = beta_est_env_explicit,
                          parameter_func = parameters_explicit_env_SEEIR,
-                         run_func = run_explicit_SEEIR_model,
+                         run_func = run_explicit_env_SEEIR_model,
                          compare_model = compare_model)
   class(explicit_model) <- c(model_class, "stochastic", "squire_model")
   explicit_model

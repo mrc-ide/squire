@@ -469,7 +469,7 @@ R0_date_particle_filter <- function(R0,
 
   # fill the correct date_R0_change in
   if (!is.null(date_R0_change)) {
-    date_change_df$R0_change[match(date_R0_change, date_change_df$dates)] <- R0_change
+    date_change_df$R0_change[match(as.character(date_R0_change), date_change_df$dates)] <- R0_change
   }
 
   # fill the correct model_params$env_dat_date in
@@ -492,6 +492,8 @@ R0_date_particle_filter <- function(R0,
     date_change_df <- tidyr::fill(date_change_df,c("env_dat"), .direction = "down")
   }
 
+  } else {
+    date_change_df <- data.frame()
   }
 
   # first set up our new timings for the new start date
