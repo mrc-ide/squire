@@ -54,17 +54,17 @@ probs <- default_probs()
 #' contact_matrix_set=contact_matrices[[1]])
 #' }
 run_simple_SEEIR_model <- function(R0 = 3,
-                            tt_R0 = 0,
-                            dt = 0.1,
-                            init = NULL,
-                            dur_E  = 4.58,
-                            dur_I = 2.09,
-                            day_return = FALSE,
-                            population,
-                            contact_matrix_set,
-                            tt_contact_matrix = 0,
-                            time_period = 365,
-                            replicates = 10) {
+                                   tt_R0 = 0,
+                                   dt = 0.1,
+                                   init = NULL,
+                                   dur_E  = 4.58,
+                                   dur_I = 2.09,
+                                   day_return = FALSE,
+                                   population,
+                                   contact_matrix_set,
+                                   tt_contact_matrix = 0,
+                                   time_period = 365,
+                                   replicates = 10) {
 
   # Initialise initial conditions
   pars <- parameters_simple_SEEIR(R0=R0,
@@ -91,14 +91,14 @@ run_simple_SEEIR_model <- function(R0 = 3,
 
   # Summarise inputs
   parameters = list(R0 = R0, tt_R0 = tt_R0,
-                dt = dt,
-                init = init,
-                dur_E  = dur_E, dur_I = dur_I,
-                population = population,
-                contact_matrix_set = contact_matrix_set,
-                tt_contact_matrix = tt_contact_matrix,
-                day_return = day_return,
-                time_period = time_period, replicates = replicates)
+                    dt = dt,
+                    init = init,
+                    dur_E  = dur_E, dur_I = dur_I,
+                    population = population,
+                    contact_matrix_set = contact_matrix_set,
+                    tt_contact_matrix = tt_contact_matrix,
+                    day_return = day_return,
+                    time_period = time_period, replicates = replicates)
 
   out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
@@ -245,7 +245,7 @@ run_explicit_SEEIR_model <- function(
 
   seeding_cases = NULL
 
-  ) {
+) {
 
   # Grab function arguments
   args <- as.list(environment())
@@ -385,7 +385,7 @@ run_deterministic_SEIR_model <- function(
 
   seeding_cases = NULL,
   mod_gen = explicit_SEIR_deterministic
-  ) {
+) {
 
   # replicates has to be 1
   replicates <- 1
@@ -474,7 +474,8 @@ run_deterministic_SEIR_model <- function(
 #' @return list of default vaccine parameters
 default_vaccine_pars <- function() {
   list(dur_R = 365,
-       vaccination_rate = rep(50, 17))
+       vaccination_rate = rep(50, 17),
+       dur_V = 365)
 }
 
 vaccine_pars <- default_vaccine_pars()
@@ -551,6 +552,7 @@ run_deterministic_SEIR_vaccine_model <- function(
   # vaccine
   dur_R = vaccine_pars$dur_R,
   vaccination_rate = vaccine_pars$vaccination_rate,
+  dur_V = vaccine_pars$dur_V,
 
   # health system capacity
   hosp_bed_capacity = NULL,
@@ -571,41 +573,42 @@ run_deterministic_SEIR_vaccine_model <- function(
 
   # create parameter list
   pars <- parameters_vaccine(country=country,
-                                    population=population,
-                                    tt_contact_matrix=tt_contact_matrix,
-                                    contact_matrix_set=contact_matrix_set,
-                                    R0=R0,
-                                    tt_R0=tt_R0,
-                                    beta_set=beta_set,
-                                    time_period=time_period,
-                                    dt=dt,
-                                    init=init,
-                                    seeding_cases=seeding_cases,
-                                    prob_hosp=prob_hosp,
-                                    prob_severe=prob_severe,
-                                    prob_non_severe_death_treatment=prob_non_severe_death_treatment,
-                                    prob_non_severe_death_no_treatment=prob_non_severe_death_no_treatment,
-                                    prob_severe_death_treatment=prob_severe_death_treatment,
-                                    prob_severe_death_no_treatment=prob_severe_death_no_treatment,
-                                    p_dist=p_dist,
-                                    dur_E=dur_E,
-                                    dur_IMild=dur_IMild,
-                                    dur_ICase=dur_ICase,
-                                    dur_get_ox_survive=dur_get_ox_survive,
-                                    dur_get_ox_die=dur_get_ox_die,
-                                    dur_not_get_ox_survive=dur_not_get_ox_survive,
-                                    dur_not_get_ox_die=dur_not_get_ox_die,
-                                    dur_get_mv_survive=dur_get_mv_survive,
-                                    dur_get_mv_die=dur_get_mv_die,
-                                    dur_not_get_mv_survive=dur_not_get_mv_survive,
-                                    dur_not_get_mv_die=dur_not_get_mv_die,
-                                    dur_rec=dur_rec,
-                                    dur_R = dur_R,
-                                    hosp_bed_capacity=hosp_bed_capacity,
-                                    ICU_bed_capacity=ICU_bed_capacity,
-                                    tt_hosp_beds=tt_hosp_beds,
-                                    tt_ICU_beds=tt_ICU_beds,
-                             vaccination_rate = vaccination_rate)
+                             population=population,
+                             tt_contact_matrix=tt_contact_matrix,
+                             contact_matrix_set=contact_matrix_set,
+                             R0=R0,
+                             tt_R0=tt_R0,
+                             beta_set=beta_set,
+                             time_period=time_period,
+                             dt=dt,
+                             init=init,
+                             seeding_cases=seeding_cases,
+                             prob_hosp=prob_hosp,
+                             prob_severe=prob_severe,
+                             prob_non_severe_death_treatment=prob_non_severe_death_treatment,
+                             prob_non_severe_death_no_treatment=prob_non_severe_death_no_treatment,
+                             prob_severe_death_treatment=prob_severe_death_treatment,
+                             prob_severe_death_no_treatment=prob_severe_death_no_treatment,
+                             p_dist=p_dist,
+                             dur_E=dur_E,
+                             dur_IMild=dur_IMild,
+                             dur_ICase=dur_ICase,
+                             dur_get_ox_survive=dur_get_ox_survive,
+                             dur_get_ox_die=dur_get_ox_die,
+                             dur_not_get_ox_survive=dur_not_get_ox_survive,
+                             dur_not_get_ox_die=dur_not_get_ox_die,
+                             dur_get_mv_survive=dur_get_mv_survive,
+                             dur_get_mv_die=dur_get_mv_die,
+                             dur_not_get_mv_survive=dur_not_get_mv_survive,
+                             dur_not_get_mv_die=dur_not_get_mv_die,
+                             dur_rec=dur_rec,
+                             dur_R = dur_R,
+                             hosp_bed_capacity=hosp_bed_capacity,
+                             ICU_bed_capacity=ICU_bed_capacity,
+                             tt_hosp_beds=tt_hosp_beds,
+                             tt_ICU_beds=tt_ICU_beds,
+                             vaccination_rate = vaccination_rate,
+                             dur_V = dur_V)
 
   # handling time variables for js
   pars$tt_beta <- I(pars$tt_beta)

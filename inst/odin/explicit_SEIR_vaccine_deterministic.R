@@ -59,6 +59,7 @@ gamma_not_get_mv_survive <- user() # rate of progression through requiring mecha
 gamma_not_get_mv_die <- user() # rate of progression through requiring mechanical ventilation compartment conditional on not getting ventilation and dying
 gamma_rec <- user() # rate of progression through post-ICU recovery compartment
 gamma_R <- user() # rate of progression through recovered compartment (loss of naturally acquired immunity)
+gamma_V <- user()
 
 # Probabilities
 prob_hosp[] <- user() # probability of requiring hospitalisation by age
@@ -72,11 +73,12 @@ p_dist[] <- user() # distributing infections in given age class to available hos
 # Vaccination
 vaccination_rate[] <- user() # Rate of vaccination by age
 
+
 ## Derivatives for Flows Between Compartments
 ##------------------------------------------------------------------------------
 
 # Susceptibles, Latent and Infections Prior to Hospitalisation
-deriv(S[]) <- -S[i] * lambda[i] + (gamma_R * R2[i]) - (vaccination_rate[i] * S[i])
+deriv(S[]) <- -S[i] * lambda[i] + (gamma_R * R2[i]) - (vaccination_rate[i] * S[i]) + (gamma_V * V2[i])
 deriv(E1[]) <- lambda[i] * S[i] - gamma_E * E1[i]
 deriv(E2[]) <- gamma_E * E1[i] - gamma_E * E2[i]
 deriv(IMild[]) <- gamma_E * E2[i] * (1 - prob_hosp[i]) - gamma_IMild * IMild[i]
@@ -128,7 +130,8 @@ deriv(R2[]) <- (gamma_R * R1[i]) - (gamma_R * R2[i]) - (vaccination_rate[i] * R2
 deriv(D[]) <- (gamma_get_ox_die * IOxGetDie2[i]) + (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_get_mv_die * IMVGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
 
 # Vaccinated
-deriv(V[]) <- (vaccination_rate[i] * S[i]) + (vaccination_rate[i] * R2[i]) + (vaccination_rate[i] * R1[i])
+deriv(V1[]) <- (vaccination_rate[i] * S[i]) + (vaccination_rate[i] * R2[i]) + (vaccination_rate[i] * R1[i]) - (gamma_V * V1[i])
+deriv(V2[]) <- (gamma_V * V1[i]) - (gamma_V * V2[i])
 
 ## Initial states:
 initial(S[]) <- S_0[i]
@@ -158,7 +161,8 @@ initial(IRec2[]) <- IRec2_0[i]
 initial(R1[]) <- R1_0[i]
 initial(R2[]) <- R2_0[i]
 initial(D[]) <- D_0[i]
-initial(V[]) <- V_0[i]
+initial(V1[]) <- V1_0[i]
+initial(V2[]) <- V2_0[i]
 
 ##Initial vectors
 S_0[] <- user()
@@ -188,7 +192,8 @@ IRec2_0[] <- user()
 R1_0[] <- user()
 R2_0[] <- user()
 D_0[] <- user()
-V_0[] <- user()
+V1_0[] <- user()
+V2_0[] <- user()
 ##Dimensions of the different "vectors" used
 # For the State Variables
 dim(S) <- N_age
@@ -218,7 +223,8 @@ dim(IRec2) <- N_age
 dim(R1) <- N_age
 dim(R2) <- N_age
 dim(D) <- N_age
-dim(V) <- N_age
+dim(V1) <- N_age
+dim(V2) <- N_age
 
 # For the Initial Values
 dim(S_0) <- N_age
@@ -248,7 +254,8 @@ dim(IRec2_0) <- N_age
 dim(R1_0) <- N_age
 dim(R2_0) <- N_age
 dim(D_0) <- N_age
-dim(V_0) <- N_age
+dim(V1_0) <- N_age
+dim(V2_0) <- N_age
 
 # Severity Parameters
 dim(prob_hosp) <- N_age

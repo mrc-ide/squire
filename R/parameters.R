@@ -500,6 +500,7 @@ parameters_vaccine <- function(
   dur_rec,
   dur_R,
   vaccination_rate,
+  dur_V,
 
   # health system capacity
   hosp_bed_capacity,
@@ -589,6 +590,7 @@ parameters_vaccine <- function(
   assert_pos(dur_not_get_mv_survive)
   assert_pos(dur_not_get_mv_die)
   assert_pos(dur_R)
+  assert_pos(dur_V)
   assert_pos(time_period)
   assert_pos(hosp_bed_capacity)
   assert_pos(ICU_bed_capacity)
@@ -643,6 +645,7 @@ parameters_vaccine <- function(
   gamma_not_get_mv_die = 2 * 1/dur_not_get_mv_die
   gamma_rec = 2 * 1/dur_rec
   gamma_R <- 2 * 1/dur_R
+  gamma_V <- 2 * 1/dur_V
 
   if (is.null(beta_set)) {
     baseline_matrix <- process_contact_matrix_scaled_age(contact_matrix_set[[1]], population)
@@ -685,7 +688,8 @@ parameters_vaccine <- function(
                R1_0 = mod_init$R1,
                R2_0 = mod_init$R2,
                D_0 = mod_init$D,
-               V_0 = mod_init$V,
+               V1_0 = mod_init$V1,
+               V2_0 = mod_init$V2,
                gamma_E = gamma_E,
                gamma_IMild = gamma_IMild,
                gamma_ICase = gamma_ICase,
@@ -699,6 +703,7 @@ parameters_vaccine <- function(
                gamma_not_get_mv_die = gamma_not_get_mv_die,
                gamma_rec = gamma_rec,
                gamma_R = gamma_R,
+               gamma_V = gamma_V,
                prob_hosp = prob_hosp,
                prob_severe = prob_severe,
                prob_non_severe_death_treatment = prob_non_severe_death_treatment,
