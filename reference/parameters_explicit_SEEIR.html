@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.19</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.20</span>
       </span>
     </div>
 
@@ -123,41 +123,41 @@
     <p>Parmaters for explicit SEEIR model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>parameters_explicit_SEEIR</span>(
-  <span class='kw'>country</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_contact_matrix</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>tt_R0</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>beta_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>time_period</span> <span class='kw'>=</span> <span class='fl'>365</span>,
-  <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
-  <span class='kw'>init</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>seeding_cases</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>prob_hosp</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_hosp</span>,
-  <span class='kw'>prob_severe</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_severe</span>,
-  <span class='kw'>prob_non_severe_death_treatment</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_non_severe_death_treatment</span>,
-  <span class='kw'>prob_non_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_non_severe_death_no_treatment</span>,
-  <span class='kw'>prob_severe_death_treatment</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_severe_death_treatment</span>,
-  <span class='kw'>prob_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>prob_severe_death_no_treatment</span>,
-  <span class='kw'>p_dist</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>p_dist</span>,
-  <span class='kw'>dur_E</span> <span class='kw'>=</span> <span class='fl'>4.6</span>,
-  <span class='kw'>dur_IMild</span> <span class='kw'>=</span> <span class='fl'>2.1</span>,
-  <span class='kw'>dur_ICase</span> <span class='kw'>=</span> <span class='fl'>4.5</span>,
-  <span class='kw'>dur_get_ox_survive</span> <span class='kw'>=</span> <span class='fl'>9.5</span>,
-  <span class='kw'>dur_get_ox_die</span> <span class='kw'>=</span> <span class='fl'>7.6</span>,
-  <span class='kw'>dur_not_get_ox_survive</span> <span class='kw'>=</span> <span class='fl'>9.5</span> * <span class='fl'>0.5</span>,
-  <span class='kw'>dur_not_get_ox_die</span> <span class='kw'>=</span> <span class='fl'>7.6</span> * <span class='fl'>0.5</span>,
-  <span class='kw'>dur_get_mv_survive</span> <span class='kw'>=</span> <span class='fl'>11.3</span>,
-  <span class='kw'>dur_get_mv_die</span> <span class='kw'>=</span> <span class='fl'>10.1</span>,
-  <span class='kw'>dur_not_get_mv_survive</span> <span class='kw'>=</span> <span class='fl'>11.3</span> * <span class='fl'>0.5</span>,
-  <span class='kw'>dur_not_get_mv_die</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>dur_rec</span> <span class='kw'>=</span> <span class='fl'>3.4</span>,
-  <span class='kw'>hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_hosp_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>tt_ICU_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/squire/man/parameters_explicit_SEEIR.html'>parameters_explicit_SEEIR</a></span>(
+  country = <span class='kw'>NULL</span>,
+  population = <span class='kw'>NULL</span>,
+  tt_contact_matrix = <span class='fl'>0</span>,
+  contact_matrix_set = <span class='kw'>NULL</span>,
+  R0 = <span class='fl'>3</span>,
+  tt_R0 = <span class='fl'>0</span>,
+  beta_set = <span class='kw'>NULL</span>,
+  time_period = <span class='fl'>365</span>,
+  dt = <span class='fl'>0.1</span>,
+  init = <span class='kw'>NULL</span>,
+  seeding_cases = <span class='kw'>NULL</span>,
+  prob_hosp = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_hosp</span>,
+  prob_severe = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_severe</span>,
+  prob_non_severe_death_treatment = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_non_severe_death_treatment</span>,
+  prob_non_severe_death_no_treatment = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_non_severe_death_no_treatment</span>,
+  prob_severe_death_treatment = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_severe_death_treatment</span>,
+  prob_severe_death_no_treatment = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_severe_death_no_treatment</span>,
+  p_dist = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>p_dist</span>,
+  dur_E = <span class='fl'>4.6</span>,
+  dur_IMild = <span class='fl'>2.1</span>,
+  dur_ICase = <span class='fl'>4.5</span>,
+  dur_get_ox_survive = <span class='fl'>9.5</span>,
+  dur_get_ox_die = <span class='fl'>7.6</span>,
+  dur_not_get_ox_survive = <span class='fl'>9.5</span> <span class='op'>*</span> <span class='fl'>0.5</span>,
+  dur_not_get_ox_die = <span class='fl'>7.6</span> <span class='op'>*</span> <span class='fl'>0.5</span>,
+  dur_get_mv_survive = <span class='fl'>11.3</span>,
+  dur_get_mv_die = <span class='fl'>10.1</span>,
+  dur_not_get_mv_survive = <span class='fl'>11.3</span> <span class='op'>*</span> <span class='fl'>0.5</span>,
+  dur_not_get_mv_die = <span class='fl'>1</span>,
+  dur_rec = <span class='fl'>3.4</span>,
+  hosp_bed_capacity = <span class='kw'>NULL</span>,
+  ICU_bed_capacity = <span class='kw'>NULL</span>,
+  tt_hosp_beds = <span class='fl'>0</span>,
+  tt_ICU_beds = <span class='fl'>0</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>

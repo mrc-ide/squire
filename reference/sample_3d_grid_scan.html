@@ -75,7 +75,7 @@ filter with num_particles and sample 1 trajectory" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.19</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.20</span>
       </span>
     </div>
 
@@ -123,18 +123,18 @@ filter with num_particles and sample 1 trajectory" />
     </div>
 
     <div class="ref-description">
-    <p>Take a grid search produced by <code><a href='scan_R0_date_Meff.html'>scan_R0_date_Meff</a></code> and
+    <p>Take a grid search produced by <code><a href='https://rdrr.io/pkg/squire/man/scan_R0_date_Meff.html'>scan_R0_date_Meff</a></code> and
 sample <code>n_sample_pairs</code> from the parameter grid uses based
 on their probability. For each parameter pair chosen, run particle
 filter with <code>num_particles</code> and sample 1 trajectory</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sample_3d_grid_scan</span>(
-  <span class='no'>scan_results</span>,
-  <span class='kw'>n_sample_pairs</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>n_particles</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>forecast_days</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>full_output</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/squire/man/sample_3d_grid_scan.html'>sample_3d_grid_scan</a></span>(
+  <span class='kw'>scan_results</span>,
+  n_sample_pairs = <span class='fl'>10</span>,
+  n_particles = <span class='fl'>100</span>,
+  forecast_days = <span class='fl'>0</span>,
+  full_output = <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -142,7 +142,7 @@ filter with <code>num_particles</code> and sample 1 trajectory</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>scan_results</th>
-      <td><p>Output of <code><a href='scan_R0_date_Meff.html'>scan_R0_date_Meff</a></code>.</p></td>
+      <td><p>Output of <code><a href='https://rdrr.io/pkg/squire/man/scan_R0_date_Meff.html'>scan_R0_date_Meff</a></code>.</p></td>
     </tr>
     <tr>
       <th>n_sample_pairs</th>

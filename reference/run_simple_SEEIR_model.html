@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.19</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.20</span>
       </span>
     </div>
 
@@ -123,19 +123,19 @@
     <p>Run the SEEIR model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>run_simple_SEEIR_model</span>(
-  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>tt_R0</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
-  <span class='kw'>init</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>dur_E</span> <span class='kw'>=</span> <span class='fl'>4.58</span>,
-  <span class='kw'>dur_I</span> <span class='kw'>=</span> <span class='fl'>2.09</span>,
-  <span class='kw'>day_return</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>population</span>,
-  <span class='no'>contact_matrix_set</span>,
-  <span class='kw'>tt_contact_matrix</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>time_period</span> <span class='kw'>=</span> <span class='fl'>365</span>,
-  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/squire/man/run_simple_SEEIR_model.html'>run_simple_SEEIR_model</a></span>(
+  R0 = <span class='fl'>3</span>,
+  tt_R0 = <span class='fl'>0</span>,
+  dt = <span class='fl'>0.1</span>,
+  init = <span class='kw'>NULL</span>,
+  dur_E = <span class='fl'>4.58</span>,
+  dur_I = <span class='fl'>2.09</span>,
+  day_return = <span class='fl'>FALSE</span>,
+  <span class='kw'>population</span>,
+  <span class='kw'>contact_matrix_set</span>,
+  tt_contact_matrix = <span class='fl'>0</span>,
+  time_period = <span class='fl'>365</span>,
+  replicates = <span class='fl'>10</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -197,11 +197,11 @@ than each dt. Default = FALSE</p></td>
     <p>Simulation output</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='no'>pop</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_population.html'>get_population</a></span>(<span class='st'>"Afghanistan"</span>, <span class='kw'>simple_SEIR</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'>run_simple_SEEIR_model</span>(<span class='kw'>population</span> <span class='kw'>=</span> <span class='no'>pop</span>$<span class='no'>n</span>, <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-<span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-<span class='kw'>contact_matrix_set</span><span class='kw'>=</span><span class='no'>contact_matrices</span><span class='kw'>[[</span><span class='fl'>1</span>]])
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>pop</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/squire/man/get_population.html'>get_population</a></span>(<span class='st'>"Afghanistan"</span>, simple_SEIR = <span class='fl'>TRUE</span>)
+<span class='kw'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/squire/man/run_simple_SEEIR_model.html'>run_simple_SEEIR_model</a></span>(population = <span class='kw'>pop</span><span class='op'>$</span><span class='kw'>n</span>, dt = <span class='fl'>1</span>,
+R0 = <span class='fl'>2</span>,
+contact_matrix_set=<span class='kw'>contact_matrices</span>[[<span class='fl'>1</span>]])
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

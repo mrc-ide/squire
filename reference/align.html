@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.19</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.20</span>
       </span>
     </div>
 
@@ -123,19 +123,19 @@
     <p>Quick method to align a set of simulations to a cumulative deaths total</p>
     </div>
 
-    <pre class="usage"><span class='fu'>align</span>(
-  <span class='no'>deaths</span>,
-  <span class='kw'>reporting_fraction</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>country</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>seeding_age_groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"35-40"</span>, <span class='st'>"40-45"</span>, <span class='st'>"45-50"</span>, <span class='st'>"50-55"</span>),
-  <span class='kw'>min_seeding_cases</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>max_seeding_cases</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>R0_scan</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='no'>...</span>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/squire/man/align.html'>align</a></span>(
+  <span class='kw'>deaths</span>,
+  reporting_fraction = <span class='fl'>1</span>,
+  country = <span class='kw'>NULL</span>,
+  population = <span class='kw'>NULL</span>,
+  contact_matrix_set = <span class='kw'>NULL</span>,
+  seeding_age_groups = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"35-40"</span>, <span class='st'>"40-45"</span>, <span class='st'>"45-50"</span>, <span class='st'>"50-55"</span>),
+  min_seeding_cases = <span class='fl'>5</span>,
+  max_seeding_cases = <span class='fl'>50</span>,
+  R0 = <span class='fl'>3</span>,
+  R0_scan = <span class='kw'>NULL</span>,
+  replicates = <span class='fl'>100</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -182,7 +182,7 @@ NULL, which will generate this based on the <code>country</code>.</p></td>
     </tr>
     <tr>
       <th>R0</th>
-      <td><p>R0 to be passed to <code><a href='run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model</a></code>.
+      <td><p>R0 to be passed to <code><a href='https://rdrr.io/pkg/squire/man/run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model</a></code>.
 Default = 3</p></td>
     </tr>
     <tr>
@@ -194,11 +194,11 @@ value in <code>R0</code> will be drawn from <code>R0_scan</code></p></td>
     <tr>
       <th>replicates</th>
       <td><p>Replicates to be passed to
-<code><a href='run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model</a></code>. Default = 100</p></td>
+<code><a href='https://rdrr.io/pkg/squire/man/run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model</a></code>. Default = 100</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Further aguments for <code><a href='run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model()</a></code></p></td>
+      <td><p>Further aguments for <code><a href='https://rdrr.io/pkg/squire/man/run_explicit_SEEIR_model.html'>run_explicit_SEEIR_model()</a></code></p></td>
     </tr>
     </table>
 

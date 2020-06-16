@@ -102,7 +102,7 @@ the squire_model framework." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.19</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.20</span>
       </span>
     </div>
 
@@ -183,48 +183,49 @@ posterior probability. The parameters from those iterations are then used to gen
 the <code>squire_model</code> framework.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>pmcmc</span>(
-  <span class='no'>data</span>,
-  <span class='no'>n_mcmc</span>,
-  <span class='kw'>log_likelihood</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>log_prior</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>n_particles</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>steps_per_day</span> <span class='kw'>=</span> <span class='fl'>4</span>,
-  <span class='kw'>output_proposals</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>n_chains</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>squire_model</span> <span class='kw'>=</span> <span class='fu'><a href='explicit_model.html'>explicit_model</a></span>(),
-  <span class='kw'>Rt_func</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>R0_change</span>, <span class='no'>R0</span>, <span class='no'>Meff</span>) {     <span class='no'>R0</span> * (<span class='fl'>2</span> * <span class='fu'><a href='https://rdrr.io/r/stats/Logistic.html'>plogis</a></span>(-(<span class='no'>R0_change</span> - <span class='fl'>1</span>) *
-    -<span class='no'>Meff</span>)) },
-  <span class='kw'>pars_obs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>phi_cases</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>k_cases</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>phi_death</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>k_death</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>exp_noise</span> <span class='kw'>=</span>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/squire/man/pmcmc.html'>pmcmc</a></span>(
+  <span class='kw'>data</span>,
+  <span class='kw'>n_mcmc</span>,
+  log_likelihood = <span class='kw'>NULL</span>,
+  log_prior = <span class='kw'>NULL</span>,
+  n_particles = <span class='fl'>100</span>,
+  steps_per_day = <span class='fl'>4</span>,
+  output_proposals = <span class='fl'>FALSE</span>,
+  n_chains = <span class='fl'>1</span>,
+  squire_model = <span class='fu'><a href='https://rdrr.io/pkg/squire/man/explicit_model.html'>explicit_model</a></span>(),
+  Rt_func = <span class='fu'>function</span>(<span class='kw'>R0_change</span>, <span class='kw'>R0</span>, <span class='kw'>Meff</span>) {     <span class='kw'>R0</span> <span class='op'>*</span> (<span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/stats/Logistic.html'>plogis</a></span>(<span class='op'>-</span>(<span class='kw'>R0_change</span> <span class='op'>-</span> <span class='fl'>1</span>) <span class='op'>*</span>
+    <span class='op'>-</span><span class='kw'>Meff</span>)) },
+  pars_obs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(phi_cases = <span class='fl'>1</span>, k_cases = <span class='fl'>2</span>, phi_death = <span class='fl'>1</span>, k_death = <span class='fl'>2</span>, exp_noise =
     <span class='fl'>1e+06</span>),
-  <span class='kw'>pars_init</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start_date</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-07"</span>), <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>2.5</span>, <span class='kw'>Meff</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>Meff_pl</span> <span class='kw'>=</span> <span class='fl'>3</span>),
-  <span class='kw'>pars_min</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start_date</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-01"</span>), <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>Meff</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>Meff_pl</span> <span class='kw'>=</span> <span class='fl'>2</span>),
-  <span class='kw'>pars_max</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start_date</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-20"</span>), <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>Meff</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>Meff_pl</span> <span class='kw'>=</span> <span class='fl'>4</span>),
-  <span class='kw'>pars_discrete</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>start_date</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>Meff</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>Meff_pl</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>),
-  <span class='kw'>proposal_kernel</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>reporting_fraction</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>country</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>baseline_contact_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>date_contact_matrix_set_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>date_R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>date_Meff_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>baseline_hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>date_hosp_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>baseline_ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>date_ICU_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>burnin</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>forecast</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>required_acceptance_ratio</span> <span class='kw'>=</span> <span class='fl'>0.23</span>,
-  <span class='kw'>start_covariance_adaptation</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span>(<span class='no'>n_mcmc</span>/<span class='fl'>2</span>),
-  <span class='kw'>start_scaling_factor_adaptation</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>initial_scaling_factor</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='no'>...</span>
+  pars_init = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-07"</span>), R0 = <span class='fl'>2.5</span>, Meff = <span class='fl'>2</span>, Meff_pl = <span class='fl'>3</span>),
+  pars_min = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-01"</span>), R0 = <span class='fl'>0</span>, Meff = <span class='fl'>1</span>, Meff_pl = <span class='fl'>2</span>),
+  pars_max = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-20"</span>), R0 = <span class='fl'>5</span>, Meff = <span class='fl'>3</span>, Meff_pl = <span class='fl'>4</span>),
+  pars_discrete = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fl'>TRUE</span>, R0 = <span class='fl'>FALSE</span>, Meff = <span class='fl'>FALSE</span>, Meff_pl = <span class='fl'>FALSE</span>),
+  proposal_kernel = <span class='kw'>NULL</span>,
+  reporting_fraction = <span class='fl'>1</span>,
+  country = <span class='kw'>NULL</span>,
+  population = <span class='kw'>NULL</span>,
+  contact_matrix_set = <span class='kw'>NULL</span>,
+  baseline_contact_matrix = <span class='kw'>NULL</span>,
+  date_contact_matrix_set_change = <span class='kw'>NULL</span>,
+  date_R0_change = <span class='kw'>NULL</span>,
+  R0_change = <span class='kw'>NULL</span>,
+  date_Meff_change = <span class='kw'>NULL</span>,
+  hosp_bed_capacity = <span class='kw'>NULL</span>,
+  baseline_hosp_bed_capacity = <span class='kw'>NULL</span>,
+  date_hosp_bed_capacity_change = <span class='kw'>NULL</span>,
+  ICU_bed_capacity = <span class='kw'>NULL</span>,
+  baseline_ICU_bed_capacity = <span class='kw'>NULL</span>,
+  date_ICU_bed_capacity_change = <span class='kw'>NULL</span>,
+  roll = <span class='fl'>0</span>,
+  burnin = <span class='fl'>0</span>,
+  replicates = <span class='fl'>100</span>,
+  forecast = <span class='fl'>0</span>,
+  required_acceptance_ratio = <span class='fl'>0.23</span>,
+  start_covariance_adaptation = <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span>(<span class='kw'>n_mcmc</span><span class='op'>/</span><span class='fl'>2</span>),
+  start_scaling_factor_adaptation = <span class='fl'>1</span>,
+  initial_scaling_factor = <span class='fl'>1</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -398,6 +399,10 @@ capacity changes set in <code>model_params</code> change.
 Defaut = NULL, i.e. no change</p></td>
     </tr>
     <tr>
+      <th>roll</th>
+      <td><p>Number of days over which Meff and Meff_pl switch. Default = 0</p></td>
+    </tr>
+    <tr>
       <th>burnin</th>
       <td><p>number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories</p></td>
     </tr>
@@ -429,7 +434,7 @@ to select parameter set. For each parmater set sampled, run particle filter with
     <tr>
       <th>...</th>
       <td><p>Further aguments for the model parameter function. If using the
-<code><a href='explicit_model.html'>explicit_model</a></code> (default) this will be
+<code><a href='https://rdrr.io/pkg/squire/man/explicit_model.html'>explicit_model</a></code> (default) this will be
 <code>parameters_explicit_SEEIR</code>.</p></td>
     </tr>
     </table>
