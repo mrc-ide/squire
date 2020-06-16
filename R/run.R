@@ -468,3 +468,166 @@ run_deterministic_SEIR_model <- function(
   return(out)
 
 }
+
+
+#' Run the deterministic explicit SEIR model with vaccination
+#'
+#' @inheritParams run_explicit_SEEIR_model
+#' @param mod_gen An odin model generation function. Default:
+#' `explicit_SEIR_vaccine_deterministic`
+#'
+#' @return Simulation output
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' pop <- get_population("Afghanistan")
+#' m <- get_mixing_matrix("Afghanistan")
+#' output <- run_deterministic_SEIR_vaccine_model(
+#'   population = pop$n,contact_matrix_set = m,
+#'   hosp_bed_capacity = 100000,
+#'   ICU_bed_capacity = 1000000,
+#'   day_return = TRUE
+#' )
+#' }
+run_deterministic_SEIR_vaccine_model <- function(
+
+  # demography
+  country = NULL,
+  population = NULL,
+  tt_contact_matrix = 0,
+  contact_matrix_set = NULL,
+
+  # transmission
+  R0 = 3,
+  tt_R0 = 0,
+  beta_set = NULL,
+
+  # initial state, duration, reps
+  time_period = 365,
+  dt = 0.1,
+  day_return = FALSE,
+  replicates = 10,
+  init = NULL,
+  seed = stats::runif(1, 0, 100000000),
+
+  # parameters
+  # probabilities
+  prob_hosp = probs$prob_hosp,
+  prob_severe = probs$prob_severe,
+  prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
+  prob_non_severe_death_no_treatment = probs$prob_non_severe_death_no_treatment,
+  prob_severe_death_treatment = probs$prob_severe_death_treatment,
+  prob_severe_death_no_treatment = probs$prob_severe_death_no_treatment,
+  p_dist = probs$p_dist,
+
+  # durations
+  dur_E  = 4.6,
+  dur_IMild = 2.1,
+  dur_ICase = 4.5,
+
+  dur_get_ox_survive = 9.5,
+  dur_get_ox_die = 7.6,
+  dur_not_get_ox_survive = 9.5*0.5,
+  dur_not_get_ox_die = 7.6*0.5,
+
+  dur_get_mv_survive = 11.3,
+  dur_get_mv_die = 10.1,
+  dur_not_get_mv_survive = 11.3*0.5,
+  dur_not_get_mv_die = 1,
+
+  dur_rec = 3.4,
+  dur_R = 365,
+
+  # health system capacity
+  hosp_bed_capacity = NULL,
+  ICU_bed_capacity = NULL,
+  tt_hosp_beds = 0,
+  tt_ICU_beds = 0,
+
+  seeding_cases = NULL,
+  mod_gen = explicit_SEIR_vaccine_deterministic
+) {
+
+  # replicates has to be 1
+  replicates <- 1
+
+  # Grab function arguments
+  args <- as.list(environment())
+  set.seed(seed)
+
+  # create parameter list
+  pars <- parameters_vaccine(country=country,
+                                    population=population,
+                                    tt_contact_matrix=tt_contact_matrix,
+                                    contact_matrix_set=contact_matrix_set,
+                                    R0=R0,
+                                    tt_R0=tt_R0,
+                                    beta_set=beta_set,
+                                    time_period=time_period,
+                                    dt=dt,
+                                    init=init,
+                                    seeding_cases=seeding_cases,
+                                    prob_hosp=prob_hosp,
+                                    prob_severe=prob_severe,
+                                    prob_non_severe_death_treatment=prob_non_severe_death_treatment,
+                                    prob_non_severe_death_no_treatment=prob_non_severe_death_no_treatment,
+                                    prob_severe_death_treatment=prob_severe_death_treatment,
+                                    prob_severe_death_no_treatment=prob_severe_death_no_treatment,
+                                    p_dist=p_dist,
+                                    dur_E=dur_E,
+                                    dur_IMild=dur_IMild,
+                                    dur_ICase=dur_ICase,
+                                    dur_get_ox_survive=dur_get_ox_survive,
+                                    dur_get_ox_die=dur_get_ox_die,
+                                    dur_not_get_ox_survive=dur_not_get_ox_survive,
+                                    dur_not_get_ox_die=dur_not_get_ox_die,
+                                    dur_get_mv_survive=dur_get_mv_survive,
+                                    dur_get_mv_die=dur_get_mv_die,
+                                    dur_not_get_mv_survive=dur_not_get_mv_survive,
+                                    dur_not_get_mv_die=dur_not_get_mv_die,
+                                    dur_rec=dur_rec,
+                                    dur_R = dur_R,
+                                    hosp_bed_capacity=hosp_bed_capacity,
+                                    ICU_bed_capacity=ICU_bed_capacity,
+                                    tt_hosp_beds=tt_hosp_beds,
+                                    tt_ICU_beds=tt_ICU_beds)
+
+  # handling time variables for js
+  pars$tt_beta <- I(pars$tt_beta)
+  pars$beta_set <- I(pars$beta_set)
+  pars$tt_hosp_beds <- I(pars$tt_hosp_beds)
+  pars$hosp_beds <- I(pars$hosp_beds)
+  pars$tt_ICU_beds <- I(pars$tt_ICU_beds)
+  pars$ICU_beds <- I(pars$ICU_beds)
+  pars$tt_matrix <- I(pars$tt_matrix)
+
+  # Running the Model
+  mod <- mod_gen(user = pars, unused_user_action = "ignore")
+  t <- seq(from = 1, to = time_period, by = dt)
+
+  # if we ar doing day return then proceed in steps of day length
+  # We also will do an extra day so we know the numebr of infections/deaths
+  # that would happen in the last day
+  if (day_return) {
+    t <- round(seq(from = 1, to = time_period))
+  }
+  results <- mod$run(t, replicate = replicates)
+
+  # coerce to array
+  results <- array(results, dim = c(dim(results),1), dimnames = dimnames(results))
+
+  # Summarise inputs
+  parameters <- args
+  parameters$population <- pars$population
+  parameters$hosp_bed_capacity <- pars$hosp_beds
+  parameters$ICU_bed_capacity <- pars$ICU_beds
+  parameters$beta_set <- pars$beta_set
+  parameters$seeding_cases <- pars$E1_0
+  parameters$contact_matrix_set <- pars$contact_matrix_set
+
+  out <- list(output = results, parameters = parameters, model = mod)
+  out <- structure(out, class = "squire_simulation")
+  return(out)
+
+}

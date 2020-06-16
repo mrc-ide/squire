@@ -447,3 +447,277 @@ parameters_explicit_SEEIR <- function(
   return(pars)
 
 }
+
+#' Vaccine parameters
+#'
+#' @details All durations are in days.
+#'
+#'@param dur_R Mean duration of naturally acquired immunity (days). Default = 365
+parameters_vaccine <- function(
+
+  # demography
+  country = NULL,
+  population = NULL,
+  tt_contact_matrix = 0,
+  contact_matrix_set = NULL,
+
+  # transmission
+  R0 = 3,
+  tt_R0 = 0,
+  beta_set = NULL,
+
+  # initial state, duration, reps
+  time_period = 365,
+  dt = 0.1,
+  init = NULL,
+  seeding_cases = NULL,
+
+  # parameters
+  # probabilities
+  # probabilities
+  prob_hosp = probs$prob_hosp,
+  prob_severe = probs$prob_severe,
+  prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
+  prob_non_severe_death_no_treatment = probs$prob_non_severe_death_no_treatment,
+  prob_severe_death_treatment = probs$prob_severe_death_treatment,
+  prob_severe_death_no_treatment = probs$prob_severe_death_no_treatment,
+  p_dist = probs$p_dist,
+
+  # durations
+  dur_E  = 4.6,
+  dur_IMild = 2.1,
+  dur_ICase = 4.5,
+
+  dur_get_ox_survive = 9.5,
+  dur_get_ox_die = 7.6,
+  dur_not_get_ox_survive = 9.5*0.5,
+  dur_not_get_ox_die = 7.6*0.5,
+
+  dur_get_mv_survive = 11.3,
+  dur_get_mv_die = 10.1,
+  dur_not_get_mv_survive = 11.3*0.5,
+  dur_not_get_mv_die = 1,
+
+  dur_rec = 3.4,
+  dur_R = 0,
+
+  # health system capacity
+  hosp_bed_capacity = NULL,
+  ICU_bed_capacity = NULL,
+  tt_hosp_beds = 0,
+  tt_ICU_beds = 0
+
+) {
+
+  # Handle country population args
+  cpm <- parse_country_population_mixing_matrix(country = country,
+                                                population = population,
+                                                contact_matrix_set = contact_matrix_set)
+  country <- cpm$country
+  population <- cpm$population
+  contact_matrix_set <- cpm$contact_matrix_set
+
+  # Standardise contact matrix set
+  if(is.matrix(contact_matrix_set)){
+    contact_matrix_set <- list(contact_matrix_set)
+  }
+
+  # populate contact matrix set if not provided
+  if (length(contact_matrix_set) == 1) {
+    baseline <- contact_matrix_set[[1]]
+    contact_matrix_set <- vector("list", length(tt_contact_matrix))
+    for(i in seq_along(tt_contact_matrix)) {
+      contact_matrix_set[[i]] <- baseline
+    }
+  }
+
+
+  # populate hospital and ICU bed capacity if not provided
+  if (is.null(hosp_bed_capacity)) {
+    if (!is.null(country)) {
+      beds <- get_healthcare_capacity(country)
+      hosp_beds <- beds$hosp_beds
+      hosp_bed_capacity <- rep(round(hosp_beds * sum(population)/1000), length(tt_hosp_beds))
+    } else {
+      hosp_bed_capacity <- round(5 * sum(population)/1000)
+    }
+  }
+  if (is.null(ICU_bed_capacity)) {
+    if (!is.null(country)) {
+      beds <- get_healthcare_capacity(country)
+      ICU_beds <- beds$ICU_beds
+      ICU_bed_capacity <- rep(round(ICU_beds * sum(population)/1000), length(tt_ICU_beds))
+    } else {
+      ICU_bed_capacity <- round(3 * hosp_bed_capacity/100)
+    }
+  }
+
+  # Initial state and matrix formatting
+  # ----------------------------------------------------------------------------
+
+  # Initialise initial conditions
+  if (!is.null(seeding_cases)) {
+    assert_int(seeding_cases)
+    mod_init <- init_check_vaccine(init, population, seeding_cases)
+  } else {
+    mod_init <- init_check_vaccine(init, population)
+  }
+
+  # Convert contact matrices to input matrices
+  matrices_set <- matrix_set_explicit(contact_matrix_set, population)
+
+  # Input checks
+  # ----------------------------------------------------------------------------
+  mc <- matrix_check(population[-1], contact_matrix_set)
+  stopifnot(length(R0) == length(tt_R0))
+  stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
+  stopifnot(length(hosp_bed_capacity) == length(tt_hosp_beds))
+  stopifnot(length(ICU_bed_capacity) == length(tt_ICU_beds))
+  tc <- lapply(list(tt_R0/dt, tt_contact_matrix/dt), check_time_change, time_period/dt)
+  tc2 <- lapply(list(tt_hosp_beds/dt, tt_ICU_beds/dt), check_time_change, time_period/dt)
+
+  assert_pos(dt)
+  assert_pos(dur_E)
+  assert_pos(dur_IMild)
+  assert_pos(dur_ICase)
+  assert_pos(dur_get_ox_survive)
+  assert_pos(dur_get_ox_die)
+  assert_pos(dur_not_get_ox_survive)
+  assert_pos(dur_not_get_ox_die)
+  assert_pos(dur_get_mv_survive)
+  assert_pos(dur_get_mv_die)
+  assert_pos(dur_not_get_mv_survive)
+  assert_pos(dur_not_get_mv_die)
+  assert_pos(dur_R)
+  assert_pos(time_period)
+  assert_pos(hosp_bed_capacity)
+  assert_pos(ICU_bed_capacity)
+
+  assert_length(prob_hosp, length(population))
+  assert_length(prob_severe, length(population))
+  assert_length(prob_non_severe_death_treatment, length(population))
+  assert_length(prob_non_severe_death_no_treatment, length(population))
+  assert_length(prob_severe_death_treatment, length(population))
+  assert_length(prob_severe_death_no_treatment, length(population))
+  assert_length(p_dist, length(population))
+
+  assert_numeric(prob_hosp, length(population))
+  assert_numeric(prob_severe, length(population))
+  assert_numeric(prob_non_severe_death_treatment, length(population))
+  assert_numeric(prob_non_severe_death_no_treatment, length(population))
+  assert_numeric(prob_severe_death_treatment, length(population))
+  assert_numeric(prob_severe_death_no_treatment, length(population))
+  assert_numeric(p_dist, length(population))
+
+  assert_leq(prob_hosp, 1)
+  assert_leq(prob_severe, 1)
+  assert_leq(prob_non_severe_death_treatment, 1)
+  assert_leq(prob_non_severe_death_no_treatment, 1)
+  assert_leq(prob_severe_death_treatment, 1)
+  assert_leq(prob_severe_death_no_treatment, 1)
+  assert_leq(p_dist, 1)
+
+  assert_greq(prob_hosp, 0)
+  assert_greq(prob_severe, 0)
+  assert_greq(prob_non_severe_death_treatment, 0)
+  assert_greq(prob_non_severe_death_no_treatment, 0)
+  assert_greq(prob_severe_death_treatment, 0)
+  assert_greq(prob_severe_death_no_treatment, 0)
+  assert_greq(p_dist, 0)
+
+
+  # Convert and Generate Parameters As Required
+  # ----------------------------------------------------------------------------
+
+  # durations
+  gamma_E = 2 * 1/dur_E
+  gamma_IMild = 1/dur_IMild
+  gamma_ICase = 2 * 1/dur_ICase
+  gamma_get_ox_survive = 2 * 1/dur_get_ox_survive
+  gamma_get_ox_die = 2 * 1/dur_get_ox_die
+  gamma_not_get_ox_survive = 2 * 1/dur_not_get_ox_survive
+  gamma_not_get_ox_die = 2 * 1/dur_not_get_ox_die
+  gamma_get_mv_survive = 2 * 1/dur_get_mv_survive
+  gamma_get_mv_die = 2 * 1/dur_get_mv_die
+  gamma_not_get_mv_survive = 2 * 1/dur_not_get_mv_survive
+  gamma_not_get_mv_die = 2 * 1/dur_not_get_mv_die
+  gamma_rec = 2 * 1/dur_rec
+  gamma_R <- 2 * 1/dur_R
+
+  if (is.null(beta_set)) {
+    baseline_matrix <- process_contact_matrix_scaled_age(contact_matrix_set[[1]], population)
+    beta_set <- beta_est_explicit(dur_IMild = dur_IMild,
+                                  dur_ICase = dur_ICase,
+                                  prob_hosp = prob_hosp,
+                                  mixing_matrix = baseline_matrix,
+                                  R0 = R0)
+  }
+
+  # normalise to sum to 1
+  p_dist <- p_dist/mean(p_dist)
+
+  # Collate Parameters Into List
+  pars <- list(N_age = length(population),
+               S_0 = mod_init$S,
+               E1_0 = mod_init$E1,
+               E2_0 = mod_init$E2,
+               IMild_0 = mod_init$IMild,
+               ICase1_0 = mod_init$ICase1,
+               ICase2_0 = mod_init$ICase2,
+               IOxGetLive1_0 = mod_init$IOxGetLive1,
+               IOxGetLive2_0 = mod_init$IOxGetLive2,
+               IOxGetDie1_0 = mod_init$IOxGetDie1,
+               IOxGetDie2_0 = mod_init$IOxGetDie2,
+               IOxNotGetLive1_0 = mod_init$IOxNotGetLive1,
+               IOxNotGetLive2_0 = mod_init$IOxNotGetLive2,
+               IOxNotGetDie1_0 = mod_init$IOxNotGetDie1,
+               IOxNotGetDie2_0 = mod_init$IOxNotGetDie2,
+               IMVGetLive1_0 = mod_init$IMVGetLive1,
+               IMVGetLive2_0 = mod_init$IMVGetLive2,
+               IMVGetDie1_0 = mod_init$IMVGetDie1,
+               IMVGetDie2_0 = mod_init$IMVGetDie2,
+               IMVNotGetLive1_0 = mod_init$IMVNotGetLive1,
+               IMVNotGetLive2_0 = mod_init$IMVNotGetLive2,
+               IMVNotGetDie1_0 = mod_init$IMVNotGetDie1,
+               IMVNotGetDie2_0 = mod_init$IMVNotGetDie2,
+               IRec1_0 = mod_init$IRec1,
+               IRec2_0 = mod_init$IRec2,
+               R1_0 = mod_init$R1,
+               R2_0 = mod_init$R2,
+               D_0 = mod_init$D,
+               gamma_E = gamma_E,
+               gamma_IMild = gamma_IMild,
+               gamma_ICase = gamma_ICase,
+               gamma_get_ox_survive = gamma_get_ox_survive,
+               gamma_get_ox_die = gamma_get_ox_die,
+               gamma_not_get_ox_survive = gamma_not_get_ox_survive,
+               gamma_not_get_ox_die = gamma_not_get_ox_die,
+               gamma_get_mv_survive = gamma_get_mv_survive,
+               gamma_get_mv_die = gamma_get_mv_die,
+               gamma_not_get_mv_survive = gamma_not_get_mv_survive,
+               gamma_not_get_mv_die = gamma_not_get_mv_die,
+               gamma_rec = gamma_rec,
+               gamma_R = gamma_R,
+               prob_hosp = prob_hosp,
+               prob_severe = prob_severe,
+               prob_non_severe_death_treatment = prob_non_severe_death_treatment,
+               prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
+               prob_severe_death_treatment = prob_severe_death_treatment,
+               prob_severe_death_no_treatment = prob_severe_death_no_treatment,
+               p_dist = p_dist,
+               hosp_beds = hosp_bed_capacity,
+               ICU_beds = ICU_bed_capacity,
+               tt_hosp_beds = round(tt_hosp_beds/dt),
+               tt_ICU_beds = round(tt_ICU_beds/dt),
+               tt_matrix = round(tt_contact_matrix/dt),
+               mix_mat_set = matrices_set,
+               tt_beta = round(tt_R0/dt),
+               beta_set = beta_set,
+               dt = dt,
+               population = population,
+               contact_matrix_set = contact_matrix_set)
+
+  class(pars) <- c("explicit_SEEIR_parameters", "squire_parameters")
+
+  return(pars)
+}

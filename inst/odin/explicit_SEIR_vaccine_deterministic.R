@@ -100,7 +100,6 @@ deriv(IMVNotGetLive2[]) <- gamma_not_get_mv_survive * IMVNotGetLive1[i] -  gamma
 deriv(IMVNotGetDie1[]) <- (number_requiring_IMV[i] - number_get_IMV[i]) * prob_severe_death_no_treatment[i] - gamma_not_get_mv_die * IMVNotGetDie1[i]
 deriv(IMVNotGetDie2[]) <- gamma_not_get_mv_die * IMVNotGetDie1[i] -  gamma_not_get_mv_die * IMVNotGetDie2[i]
 
-deriv(IRec1[]) <- gamma_get_mv_survive * IMVGetLive2[i] - gamma_rec * IRec1[i]
 deriv(IRec2[]) <- gamma_rec * IRec1[i] - gamma_rec * IRec2[i]
 
 # Infections Requiring Oxygen (a general Hosptial Bed)
