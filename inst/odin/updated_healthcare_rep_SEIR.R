@@ -194,7 +194,7 @@ overall_number_get_ICU_not_Ox[] <- number_GetICU[i] - number_GetICU_GetOx[i]
 number_GetICU_NoOx_NoMV[] <- rbinom(overall_number_get_ICU_not_Ox[i], prob_critical[i])
 number_GetICU_NoOx[] <- overall_number_get_ICU_not_Ox[i] - number_GetICU_NoOx_NoMV[i]
 
-# not 100% sure if this is correct, but will hopefully solve the cyclic dependency
+# cyclic dependency
 leftover <- oxygen_supply - oxygen_demand -
             (sum(number_GetICU_GetOx_NeedMV) + sum(number_GetICU_GetOx)) * severe_critical_case_oxygen_consumption_multiplier -
             sum(number_GetHosp_Ox)
