@@ -333,7 +333,7 @@ plot.squire_pmcmc_list <- function(x, burn_in = 1, thin = 1, ...) {
 
       } else if (i < j) {  # plot correlations on lower triangle
         if (thin == 1) {
-          smp <- seq_along(length(master_chain[[i]]))
+          smp <- seq_len(length(master_chain[[i]]))
         } else {
         smp <- sample(length(master_chain[[i]]),size = round(length(master_chain[[i]])*thin), replace = FALSE)
         }
