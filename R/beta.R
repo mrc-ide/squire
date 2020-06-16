@@ -135,7 +135,7 @@ beta_est <- function(squire_model, model_params, R0) {
 
   } else if (class(squire_model)[1] == "explicit_env_SEEIR_model") {
 
-    mat <- process_contact_matrix(model_params$contact_matrix_set[[1]],
+    mat <- process_contact_matrix_scaled_age(model_params$contact_matrix_set[[1]],
                                   model_params$population)
 
     assert_custom_class(model_params, "explicit_env_SEEIR_parameters")
@@ -145,7 +145,7 @@ beta_est <- function(squire_model, model_params, R0) {
                                                 mixing_matrix = mat,
                                                 R0 = R0,
                                                 env_dat = model_params$env_dat,
-                                                end_slp = model_params$env_slp)
+                                                env_slp = model_params$env_slp)
 
   }
 

@@ -516,6 +516,7 @@ parameters_explicit_SEEIR <- function(
 #'
 #' @param env_slp Effect of environment on R0. Default = 0 (no impact)
 #' @param env_dat Daily environmental estimates. Default = 0 (--> no estimated impact)
+#' @param env_dat_date ISO Dates at which env_dat impacts beta estimation. Default = NULL (no impact)
 #' @return Paramater List
 #' @export
 #'
@@ -574,7 +575,8 @@ parameters_explicit_env_SEEIR <- function(
 
   # Environmental effects
   env_slp = 0,
-  env_dat = 0
+  env_dat = 0,
+  env_dat_date = NULL
 
 ) {
 
@@ -788,7 +790,8 @@ parameters_explicit_env_SEEIR <- function(
                population = population,
                contact_matrix_set = contact_matrix_set,
                env_slp = env_slp,
-               env_dat = env_dat)
+               env_dat = env_dat,
+               env_dat_date = env_dat_date)
 
   class(pars) <- c("explicit_env_SEEIR_parameters", "squire_parameters")
 

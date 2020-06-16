@@ -454,17 +454,64 @@ R0_date_particle_filter <- function(R0,
                                     full_output = FALSE,
                                     return = "full") {
 
+  # This whol section is to create a shared set of dates between env_dat_date and date_R0_change
+  # as both thes impact the values going to the beta creation
+
+  # we need to create a vector of all the dates that either env_dat_change occurs or date_R0_change
+  r_env_dates <- c(as.character(date_R0_change), as.character(model_params$env_dat_date))
+  r_env_dates <- as.character(sort(unique(as.Date(r_env_dates))))
+
+  if (length(r_env_dates) > 0) {
+
+  # then lets create a data frame that will reflect the values of R0_change on those days
+  date_change_df <- data.frame("dates" = r_env_dates, "R0_change" = NA, "env_dat" = NA,
+                               stringsAsFactors = FALSE)
+
+  # fill the correct date_R0_change in
+  if (!is.null(date_R0_change)) {
+    date_change_df$R0_change[match(date_R0_change, date_change_df$dates)] <- R0_change
+  }
+
+  # fill the correct model_params$env_dat_date in
+  if (!is.null(model_params$env_dat_date)) {
+    date_change_df$env_dat[match(as.character(model_params$env_dat_date),
+                               as.character(date_change_df$dates))] <- model_params$env_dat
+  }
+
+  # now let's fill in the blanks
+  date_change_df <- tidyr::fill(date_change_df,c("R0_change","env_dat"), .direction = "down")
+
+  # we choose 1 for R0 so that it won't impact Rt estimated
+  if(is.na(date_change_df$R0_change[1])) {
+    date_change_df$R0_change[1] <- 1
+    date_change_df <- tidyr::fill(date_change_df,c("R0_change"), .direction = "down")
+  }
+  # we choose 0 here as this will cause no impact of environment
+  if(is.na(date_change_df$env_dat[1])) {
+    date_change_df$env_dat[1] <- 0
+    date_change_df <- tidyr::fill(date_change_df,c("env_dat"), .direction = "down")
+  }
+
+  }
+
   # first set up our new timings for the new start date
-  if (is.null(date_R0_change)) {
+  if (nrow(date_change_df) == 0) {
     tt_beta <- 0
   } else {
-    tt_list <- intervention_dates_for_odin(dates = date_R0_change,
-                                           change = R0_change,
+    tt_list <- intervention_dates_for_odin(dates = date_change_df$dates,
+                                           change = date_change_df$R0_change,
                                            start_date = start_date,
                                            steps_per_day = round(1/model_params$dt))
     model_params$tt_beta <- unique(c(0, tt_list$tt))
     R0_change <- tt_list$change
 
+    tt_list_env <- intervention_dates_for_odin(dates = date_change_df$dates,
+                                           change = date_change_df$env_dat,
+                                           start_date = start_date,
+                                           steps_per_day = round(1/model_params$dt))
+
+    # this will ensure that our env_dat is the same length as the R0 being passed to the beta
+    model_params$env_dat <- c(0, tt_list_env$change)
   }
 
   if (is.null(date_contact_matrix_set_change)) {

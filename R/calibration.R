@@ -337,8 +337,18 @@ calibrate <- function(data,
   }
 
   # second let's recreate the output
+
+  # create parms to be passed to the model
+  temp_parms <- res$inputs$model_params
+
+  # remove the environmental ones
+  temp_parms["env_dat"] <- NULL
+  temp_parms["env_slp"] <- NULL
+  temp_parms["env_dat_date"] <- NULL
+
+  # create model
   r$model <- res$inputs$squire_model$odin_model(
-    user = res$inputs$model_params, unused_user_action = "ignore"
+    user = temp_parms, unused_user_action = "ignore"
   )
 
   # we will add the interventions here so that we now what times are needed for projection
