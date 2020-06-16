@@ -501,6 +501,8 @@ parameters_vaccine <- function(
   dur_R,
   vaccination_rate,
   dur_V,
+  vaccine_efficacy_infection,
+  vaccine_efficacy_disease,
 
   # health system capacity
   hosp_bed_capacity,
@@ -659,6 +661,8 @@ parameters_vaccine <- function(
   # normalise to sum to 1
   p_dist <- p_dist/mean(p_dist)
 
+  vaccine_efficacy_infection = 1 - vaccine_efficacy_infection
+  prob_hosp_vaccine = (1 - vaccine_efficacy_disease) * prob_hosp
   # Collate Parameters Into List
   pars <- list(N_age = length(population),
                S_0 = mod_init$S,
@@ -690,6 +694,8 @@ parameters_vaccine <- function(
                D_0 = mod_init$D,
                V1_0 = mod_init$V1,
                V2_0 = mod_init$V2,
+               E1_vac_0 = mod_init$E1_vac,
+               E2_vac_0 = mod_init$E2_vac,
                gamma_E = gamma_E,
                gamma_IMild = gamma_IMild,
                gamma_ICase = gamma_ICase,
@@ -722,7 +728,9 @@ parameters_vaccine <- function(
                dt = dt,
                population = population,
                contact_matrix_set = contact_matrix_set,
-               vaccination_rate = vaccination_rate)
+               vaccination_rate = vaccination_rate,
+               vaccine_efficacy_infection = vaccine_efficacy_infection,
+               prob_hosp_vaccine = prob_hosp_vaccine)
 
   class(pars) <- c("explicit_SEEIR_parameters", "squire_parameters")
 

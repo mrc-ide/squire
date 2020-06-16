@@ -72,8 +72,8 @@ p_dist[] <- user() # distributing infections in given age class to available hos
 
 # Vaccination
 vaccination_rate[] <- user() # Rate of vaccination by age
-
-
+vaccine_efficacy_infection[] <- user() # Reduction in lambda for vaccinated individuals by age
+prob_hosp_vaccine[] <- user()
 ## Derivatives for Flows Between Compartments
 ##------------------------------------------------------------------------------
 
@@ -81,8 +81,12 @@ vaccination_rate[] <- user() # Rate of vaccination by age
 deriv(S[]) <- -S[i] * lambda[i] + (gamma_R * R2[i]) - (vaccination_rate[i] * S[i]) + (gamma_V * V2[i])
 deriv(E1[]) <- lambda[i] * S[i] - gamma_E * E1[i]
 deriv(E2[]) <- gamma_E * E1[i] - gamma_E * E2[i]
-deriv(IMild[]) <- gamma_E * E2[i] * (1 - prob_hosp[i]) - gamma_IMild * IMild[i]
-deriv(ICase1[]) <- gamma_E * E2[i] * prob_hosp[i] - gamma_ICase * ICase1[i]
+
+deriv(E1_vac[]) <- (lambda[i] * V1[i] * vaccine_efficacy_infection[i]) + (lambda[i] * V2[i] * vaccine_efficacy_infection[i]) - (gamma_E * E1_vac[i])
+deriv(E2_vac[]) <- (gamma_E * E1_vac[i]) - (gamma_E * E2_vac[i])
+
+deriv(IMild[]) <- (gamma_E * E2[i] * (1 - prob_hosp[i])) + (gamma_E * E2_vac[i] * (1 - prob_hosp_vaccine[i])) - gamma_IMild * IMild[i]
+deriv(ICase1[]) <- (gamma_E * E2[i] * prob_hosp[i]) +  (gamma_E * E2_vac[i] * prob_hosp_vaccine[i]) - gamma_ICase * ICase1[i]
 deriv(ICase2[]) <- gamma_ICase * ICase1[i] - gamma_ICase * ICase2[i]
 
 # Infections Requiring Mechanical Ventilation (an ICU Bed)
@@ -137,6 +141,8 @@ deriv(V2[]) <- (gamma_V * V1[i]) - (gamma_V * V2[i])
 initial(S[]) <- S_0[i]
 initial(E1[]) <- E1_0[i]
 initial(E2[]) <- E2_0[i]
+initial(E1_vac[]) <- E1_vac_0[i]
+initial(E2_vac[]) <- E2_vac_0[i]
 initial(IMild[]) <- IMild_0[i]
 initial(ICase1[]) <- ICase1_0[i]
 initial(ICase2[]) <- ICase2_0[i]
@@ -168,6 +174,8 @@ initial(V2[]) <- V2_0[i]
 S_0[] <- user()
 E1_0[] <- user()
 E2_0[] <- user()
+E1_vac_0[] <- user()
+E2_vac_0[] <- user()
 IMild_0[] <- user()
 ICase1_0[] <- user()
 ICase2_0[] <- user()
@@ -199,6 +207,8 @@ V2_0[] <- user()
 dim(S) <- N_age
 dim(E1) <- N_age
 dim(E2) <- N_age
+dim(E1_vac) <- N_age
+dim(E2_vac) <- N_age
 dim(IMild) <- N_age
 dim(ICase1) <- N_age
 dim(ICase2) <- N_age
@@ -230,6 +240,8 @@ dim(V2) <- N_age
 dim(S_0) <- N_age
 dim(E1_0) <- N_age
 dim(E2_0) <- N_age
+dim(E1_vac_0) <- N_age
+dim(E2_vac_0) <- N_age
 dim(IMild_0) <- N_age
 dim(ICase1_0) <- N_age
 dim(ICase2_0) <- N_age
@@ -275,3 +287,5 @@ dim(Ox_dist_weighting) <- N_age
 
 # Vaccination parameters
 dim(vaccination_rate) <- N_age
+dim(vaccine_efficacy_infection) <- N_age
+dim(prob_hosp_vaccine) <- N_age
