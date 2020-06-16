@@ -38,6 +38,7 @@ pmcmc(
   ICU_bed_capacity = NULL,
   baseline_ICU_bed_capacity = NULL,
   date_ICU_bed_capacity_change = NULL,
+  roll = 0,
   burnin = 0,
   replicates = 100,
   forecast = 0,
@@ -153,6 +154,8 @@ hospital beds}
 \item{date_ICU_bed_capacity_change}{Calendar dates at which ICU bed
 capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
+
+\item{roll}{Number of days over which Meff and Meff_pl switch. Default = 0}
 
 \item{burnin}{number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories}
 

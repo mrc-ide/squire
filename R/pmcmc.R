@@ -33,6 +33,7 @@
 #' @param n_chains number of MCMC chains to run
 #' @inheritParams calibrate
 #' @param date_Meff_change Date when mobility changed corresponding to expected changes in R0 during and after lockdown
+#' @param roll Number of days over which Meff and Meff_pl switch. Default = 0
 #' @param burnin number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories
 #' @param replicates number of trajectories (replicates) to be returned that are being sampled from the posterior probability results produced by \code{run_mcmc_chain}
 #' to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory
@@ -157,6 +158,7 @@ pmcmc <- function(data,
                   ICU_bed_capacity = NULL,
                   baseline_ICU_bed_capacity = NULL,
                   date_ICU_bed_capacity_change = NULL,
+                  roll = 0,
                   burnin = 0,
                   replicates = 100,
                   forecast = 0,
@@ -303,12 +305,6 @@ pmcmc <- function(data,
 
   if (!is.null(date_Meff_change)) {
     assert_date(date_Meff_change)
-    if(as.Date(date_Meff_change) >= as.Date(tail(date_R0_change, 1))) {
-      stop("Meff change date is at or after last date_R0_change")
-    }
-    if (as.Date(date_Meff_change) <= as.Date(head(date_R0_change, 1))) {
-      stop("Meff change date is at or before first date_R0_change")
-    }
   }
 
   if(!is.null(contact_matrix_set)) {
@@ -443,6 +439,7 @@ pmcmc <- function(data,
     interventions = interventions,
     pars_obs = pars_obs,
     Rt_func = Rt_func,
+    roll = roll,
     squire_model = squire_model,
     pars = list(pars_obs = pars_obs,
                 pars_init = pars_init,
@@ -481,6 +478,7 @@ pmcmc <- function(data,
                         n_particles = n_particles,
                         Rt_func = Rt_func,
                         forecast_days = 0,
+                        roll = roll,
                         return = "ll"
     )
     X
@@ -680,11 +678,9 @@ run_mcmc_chain <- function(inputs,
                            pars_max) {
 
 
-  #----------------..
+  #----------------
   # Set initial state
-  #----------------..
-
-
+  #----------------
 
   # run particle filter on initial parameters
   p_filter_est <- calc_ll(pars = curr_pars)
@@ -906,7 +902,7 @@ run_mcmc_chain <- function(inputs,
 #
 calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                pars_obs, n_particles, Rt_func,
-                               forecast_days = 0, return = "ll",
+                               forecast_days = 0, return = "ll", roll = 0,
                                interventions) {
   #----------------..
   # specify particle setup
@@ -1011,7 +1007,8 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   # and now get new R0s for the R0
   R0 <- evaluate_Rt(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
                     date_R0_change = date_R0_change[date_R0_change>start_date],
-                    date_Meff_change = date_Meff_change, Rt_func = Rt_func)
+                    date_Meff_change = date_Meff_change, Rt_func = Rt_func,
+                    roll = roll)
 
   # which allow us to work out our beta
   beta_set <- beta_est(squire_model = squire_model,
@@ -1059,7 +1056,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
 # R0 with Meff
 #' @noRd
 evaluate_Rt <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
-                        date_Meff_change, Rt_func) {
+                        date_Meff_change, Rt_func, roll = 0) {
 
   # and now get new R0s for the R0
   if (!is.null(R0_change)) {
@@ -1075,15 +1072,58 @@ evaluate_Rt <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
       date_R0_change <- as.Date(date_R0_change)
 
       # when does mobility change take place
-      swtchdates <- which(date_R0_change >= date_Meff_change)
-      R0 <- c(R0,
-              vapply(R0_change[1:(min(swtchdates)-1)], function(x){
-                Rt_func(R0_change = x, R0 = R0, Meff = Meff)
-              }, FUN.VALUE = numeric(1)),
-              vapply(R0_change[min(swtchdates):(length(R0_change))], function(x){
-                Rt_func(R0_change = x, R0 = R0, Meff = Meff_pl)
-              }, FUN.VALUE = numeric(1))
-      )
+      if(date_Meff_change <= date_R0_change[1]) {
+
+        R0 <- c(R0,
+                vapply(R0_change, function(x){
+                  Rt_func(R0_change = x, R0 = R0, Meff = Meff_pl)
+                }, FUN.VALUE = numeric(1)))
+
+      } else if (date_Meff_change > tail(date_R0_change, 1)) {
+
+        R0 <- c(R0,
+                vapply(R0_change, function(x){
+                  Rt_func(R0_change = x, R0 = R0, Meff = Meff)
+                }, FUN.VALUE = numeric(1)))
+
+      } else {
+
+        # how many days does the roll take to shift between meff and meff_pl
+        if (roll == 0) {
+
+          swtchdates <- which(date_R0_change >= date_Meff_change)
+
+          R0 <- c(R0,
+                  vapply(R0_change[1:(min(swtchdates)-1)], function(x){
+                    Rt_func(R0_change = x, R0 = R0, Meff = Meff)
+                  }, FUN.VALUE = numeric(1)),
+                  vapply(R0_change[min(swtchdates):(length(R0_change))], function(x){
+                    Rt_func(R0_change = x, R0 = R0, Meff = Meff_pl)
+                  }, FUN.VALUE = numeric(1))
+          )
+
+        } else {
+
+          swtchdates <- date_R0_change - date_Meff_change
+
+
+          Meff_vec <- rep(Meff, length(date_R0_change))
+          Meff_vec[date_R0_change>=date_Meff_change] <- Meff_pl
+
+          Meff_steps <- seq(Meff, Meff_pl, length.out = roll+1)
+          Meff_matches <- seq(-1*roll, 0, 1)
+
+          matched_steps <- match(Meff_matches, swtchdates)
+          to_match <- Meff_steps[which(!is.na(matched_steps))]
+
+          Meff_vec[which(!is.na(match(swtchdates, Meff_matches)))] <- Meff_steps[to_match]
+
+          R0 <- c(R0,
+                  vapply(seq_along(R0_change), function(x){
+                    Rt_func(R0_change = R0_change[x], R0 = R0, Meff = Meff_vec[x])
+                  }, FUN.VALUE = numeric(1)))
+        }
+      }
     }
   }
 
