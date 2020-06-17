@@ -397,10 +397,10 @@ run_deterministic_SEIR_model <- function(
   # create parameter list
   pars <- parameters_explicit_SEEIR(country=country,
                                     population=population,
-                                    tt_contact_matrix=tt_contact_matrix,
+                                    tt_contact_matrix=tt_contact_matrix*dt,
                                     contact_matrix_set=contact_matrix_set,
                                     R0=R0,
-                                    tt_R0=tt_R0,
+                                    tt_R0=tt_R0*dt,
                                     beta_set=beta_set,
                                     time_period=time_period,
                                     dt=dt,
@@ -427,8 +427,8 @@ run_deterministic_SEIR_model <- function(
                                     dur_rec=dur_rec,
                                     hosp_bed_capacity=hosp_bed_capacity,
                                     ICU_bed_capacity=ICU_bed_capacity,
-                                    tt_hosp_beds=tt_hosp_beds,
-                                    tt_ICU_beds=tt_ICU_beds)
+                                    tt_hosp_beds=tt_hosp_beds*dt,
+                                    tt_ICU_beds=tt_ICU_beds*dt)
 
   # handling time variables for js
   pars$tt_beta <- I(pars$tt_beta)
