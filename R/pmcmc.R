@@ -790,10 +790,12 @@ run_mcmc_chain <- function(inputs,
   #----------------
   # main pmcmc loop
   #----------------
+  scaling_factor_RM_update <-  diag(c(1, rep(sqrt(initial_scaling_factor), 3)), nrow = 4, ncol = 4)
   for(iter in seq_len(n_mcmc) + 1L) {
 
+    for_proposal <- scaling_factor_RM_update %*% proposal_kernel %*% t(scaling_factor_RM_update)
     prop_pars <- propose_parameters(curr_pars,
-                                    proposal_kernel * scaling_factor,
+                                    for_proposal,
                                     unlist(pars_discrete),
                                     unlist(pars_min),
                                     unlist(pars_max))
@@ -853,6 +855,9 @@ run_mcmc_chain <- function(inputs,
       timing_sf <- iter - start_scaling_factor_adaptation + 1 # iteration relative to when scaling factor adaptation started
       scaling_factor <- update_scaling_factor(scaling_factor, acceptances[iter], required_acceptance_ratio, timing_sf, number_of_parameters)
       scaling_factor_storage[timing_sf] <- scaling_factor
+      scaling_factor_RM_update <- diag(c(1, rep(sqrt(scaling_factor), 3)), nrow = 4, ncol = 4)
+    } else {
+      scaling_factor_RM_update <- diag(1, nrow = 4, ncol = 4)
     }
 
     if(output_proposals) {
@@ -864,7 +869,12 @@ run_mcmc_chain <- function(inputs,
     }
 
     if (iter %% 100 == 0) {
-      print(c(round(scaling_factor, 3), round(sum(acceptances, na.rm = TRUE)/iter, 3), round(iter, 1)))
+      print(c(round(scaling_factor, 3), round(sum(acceptances, na.rm = TRUE)/iter, 3), round(iter, 1), proposal_kernel[1, 1]))
+    }
+    if (iter %% 1100 == 0) {
+      print(scaling_factor)
+      print(scaling_factor_RM_update)
+      print(scaling_factor_RM_update %*% proposal_kernel %*% t(scaling_factor_RM_update))
     }
 
   }

@@ -226,8 +226,8 @@ update_scaling_factor <- function(scaling_factor, acceptance, probability, i, nu
   alpha <- -qnorm(probability / 2)
   c <- ((1 - 1 / number_of_parameters) * sqrt(2 * pi) * exp(alpha ^ 2 / 2) / (2 * alpha) + 1 / (number_of_parameters * probability * (1 - probability)))
   theta <- log(sqrt(scaling_factor))
-  # theta <- theta + c * (acceptance - probability) / max(200, i / number_of_parameters)
-  theta <- theta + c * (acceptance - probability) / max(50, (i / number_of_parameters))
+  theta <- theta + c * (acceptance - probability) / max(200, i / number_of_parameters)
+  #theta <- theta + c * (acceptance - probability) / max(50, (i / number_of_parameters))
   return(exp(theta)^2)
 }
 
