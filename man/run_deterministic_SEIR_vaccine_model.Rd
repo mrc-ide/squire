@@ -147,6 +147,24 @@ death. Default = 1}
 
 \item{dur_rec}{Duration of recovery after coming off ventilation. Default = 2}
 
+\item{dur_R}{Mean duration of natural immunity (days)}
+
+\item{vaccination_target}{Index of age group targets for vaccination. Must be 0
+(not vaccinated) or 1 (vaccinated) for each age group.}
+
+\item{dur_V}{Mean duration of vaccine-derived immunity (days)}
+
+\item{vaccine_efficacy_infection}{Efficacy of vaccine against infection (by age).
+An efficacy of 1 will reduce FOI by 100 percent, an efficacy of 0.2 will reduce FOI by 20 percent etc.}
+
+\item{vaccine_efficacy_disease}{Efficacy of vaccine against severe (requiring hospitilisatin) disease (by age).
+An efficacy of 1 will reduce the probability of hospitalisation by 100 percent,
+an efficacy of 0.2 will reduce the probability of hospitalisation by 20 percent etc.}
+
+\item{max_vaccine}{The maximum number of individuals who can be vaccinated per day.}
+
+\item{tt_vaccine}{Time change points for vaccine capacity (\code{max_vaccine}).}
+
 \item{hosp_bed_capacity}{General bed capacity. Can be single number of vector if capacity time-varies.}
 
 \item{ICU_bed_capacity}{ICU bed capacity. Can be single number of vector if capacity time-varies.}

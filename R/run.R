@@ -490,6 +490,17 @@ vaccine_pars <- default_vaccine_pars()
 #' @inheritParams run_explicit_SEEIR_model
 #' @param mod_gen An odin model generation function. Default:
 #' `explicit_SEIR_vaccine_deterministic`
+#' @param dur_R Mean duration of natural immunity (days)
+#' @param vaccination_target Index of age group targets for vaccination. Must be 0
+#' (not vaccinated) or 1 (vaccinated) for each age group.
+#' @param dur_V Mean duration of vaccine-derived immunity (days)
+#' @param vaccine_efficacy_infection Efficacy of vaccine against infection (by age).
+#' An efficacy of 1 will reduce FOI by 100 percent, an efficacy of 0.2 will reduce FOI by 20 percent etc.
+#' @param vaccine_efficacy_disease Efficacy of vaccine against severe (requiring hospitilisatin) disease (by age).
+#' An efficacy of 1 will reduce the probability of hospitalisation by 100 percent,
+#' an efficacy of 0.2 will reduce the probability of hospitalisation by 20 percent etc.
+#' @param max_vaccine The maximum number of individuals who can be vaccinated per day.
+#' @param tt_vaccine Time change points for vaccine capacity (\code{max_vaccine}).
 #'
 #' @return Simulation output
 #' @export

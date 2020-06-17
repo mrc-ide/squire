@@ -452,7 +452,7 @@ parameters_explicit_SEEIR <- function(
 #'
 #' @details All durations are in days.
 #'
-#'@param dur_R Mean duration of naturally acquired immunity (days). Default = 365
+#' @inheritParams run_deterministic_SEIR_vaccine_model
 parameters_vaccine <- function(
 
   # demography
@@ -581,6 +581,7 @@ parameters_vaccine <- function(
   stopifnot(length(max_vaccine) == length(tt_vaccine))
   tc <- lapply(list(tt_R0/dt, tt_contact_matrix/dt), check_time_change, time_period/dt)
   tc2 <- lapply(list(tt_hosp_beds/dt, tt_ICU_beds/dt), check_time_change, time_period/dt)
+  stopifnot(all(vaccination_target %in% 0:1))
 
   assert_pos(dt)
   assert_pos(dur_E)
