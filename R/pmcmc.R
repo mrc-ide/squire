@@ -39,8 +39,7 @@
 #' to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory
 #' @param forecast Number of days to forecast forward. Default = 0
 #' @param required_acceptance_ratio Desired MCMC acceptance ratio
-#' @param start_covariance_adaptation Iteration number to begin covariance matrix adaptation at
-#' @param start_scaling_factor_adaptation Iteration number to begin RM optimisation of scaling factor at
+#' @param start_adaptation Iteration number to begin RM optimisation of scaling factor at
 #' @param initial_scaling_factor Initial scaling factor for RM opitmisation if implemented
 #' @param ... Further aguments for the model parameter function. If using the
 #'   \code{\link{explicit_model}} (default) this will be
@@ -163,9 +162,7 @@ pmcmc <- function(data,
                   replicates = 100,
                   forecast = 0,
                   required_acceptance_ratio = 0.23,
-                  start_covariance_adaptation = round(n_mcmc/2),
-                  start_scaling_factor_adaptation = 1,
-                  initial_scaling_factor = 1,
+                  start_adaptation = round(n_mcmc/2),
                   ...
 ) {
 
@@ -511,13 +508,11 @@ pmcmc <- function(data,
       first_data_date = data$date[1],
       output_proposals = output_proposals,
       required_acceptance_ratio = required_acceptance_ratio,
-      start_covariance_adaptation = start_covariance_adaptation,
-      start_scaling_factor_adaptation = start_scaling_factor_adaptation,
+      start_adaptation = start_adaptation,
       proposal_kernel = proposal_kernel,
       pars_discrete = pars_discrete,
       pars_min = pars_min,
-      pars_max = pars_max,
-      initial_scaling_factor = initial_scaling_factor)
+      pars_max = pars_max)
 
   } else {
 
@@ -531,13 +526,11 @@ pmcmc <- function(data,
       first_data_date = data$date[1],
       output_proposals = output_proposals,
       required_acceptance_ratio = required_acceptance_ratio,
-      start_covariance_adaptation = start_covariance_adaptation,
-      start_scaling_factor_adaptation = start_scaling_factor_adaptation,
+      start_adaptation = start_adaptation,
       proposal_kernel = proposal_kernel,
       pars_discrete = pars_discrete,
       pars_min = pars_min,
       pars_max = pars_max,
-      initial_scaling_factor = initial_scaling_factor,
       .progress = TRUE)
 
   }
@@ -669,9 +662,7 @@ run_mcmc_chain <- function(inputs,
                            first_data_date,
                            output_proposals,
                            required_acceptance_ratio,
-                           start_covariance_adaptation,
-                           start_scaling_factor_adaptation,
-                           initial_scaling_factor,
+                           start_adaptation,
                            proposal_kernel,
                            pars_discrete,
                            pars_min,
@@ -699,11 +690,9 @@ run_mcmc_chain <- function(inputs,
   if(length(curr_lprior) > 1) {
     stop('log_prior must return a single numeric representing the log prior')
   }
-
   if(is.infinite(curr_lprior)) {
     stop('initial parameters are not compatible with supplied prior')
   }
-
   if(length(p_filter_est) != 2) {
     stop('log_likelihood function must return a list containing elements log_likelihood and sample_state')
   }
@@ -715,11 +704,6 @@ run_mcmc_chain <- function(inputs,
   }
   assert_neg(x = p_filter_est$log_likelihood,
              message1 = 'log_likelihood must be negative or zero')
-
-  if ((start_scaling_factor_adaptation + 100) > start_covariance_adaptation) {
-    warning('recommend starting to adapt scaling factor at least 100 iterations before beginning covariance
-            matrix adaptation')
-  }
 
   #----------------..
   # Create objects to store outputs
@@ -738,9 +722,7 @@ run_mcmc_chain <- function(inputs,
   res <- matrix(data = NA,
                 nrow = n_mcmc + 1L,
                 ncol = length(res_init),
-                dimnames = list(NULL,
-                                names(res_init)))
-
+                dimnames = list(NULL, names(res_init)))
   states <- matrix(data = NA,
                    nrow = n_mcmc + 1L,
                    ncol = length(curr_ss))
@@ -766,17 +748,11 @@ run_mcmc_chain <- function(inputs,
     scaling_factor_storage <- vector(mode = "numeric", length = (n_mcmc - start_scaling_factor_adaptation + 1))
   }
 
-  # New parameters related to Robbins Munro optimisation stuff
-  scaling_factor <- initial_scaling_factor
-  number_of_parameters <- length(curr_pars)
-
   if(output_proposals) {
     proposals <- matrix(data = NA,
                         nrow = n_mcmc + 1L,
                         ncol = length(res_init) + 1L,
-                        dimnames = list(NULL,
-                                        c(names(res_init),
-                                          'accept_prob')))
+                        dimnames = list(NULL, c(names(res_init), 'accept_prob')))
   }
 
   ## record initial results
@@ -790,6 +766,7 @@ run_mcmc_chain <- function(inputs,
   #----------------
   # main pmcmc loop
   #----------------
+  scaling_factor <- 1
   for(iter in seq_len(n_mcmc) + 1L) {
 
     prop_pars <- propose_parameters(curr_pars,
@@ -824,8 +801,6 @@ run_mcmc_chain <- function(inputs,
       acceptances[iter] <- 1
     }
 
-    # print(curr_pars)
-
     # record results
     res[iter, ] <- c(curr_pars,
                      curr_lprior,
@@ -834,25 +809,30 @@ run_mcmc_chain <- function(inputs,
     states[iter, ] <- curr_ss
 
     # adapt and update covariance matrix
-    if (iter >= start_covariance_adaptation) {
-      timing_cov <- iter - start_covariance_adaptation + 1 # iteration relative to when covariance adaptation started
-      if (iter == start_covariance_adaptation) {
-        proposal_kernel <- cov(res[1:start_covariance_adaptation, 1:number_of_parameters])
-        mean_vector <- apply(res[, 1:number_of_parameters], 2, mean, na.rm = TRUE)
-        covariance_matrix_storage[[timing_cov]] <- proposal_kernel
-      } else {
-        tmp <- update_covariance_matrix(proposal_kernel, timing_cov, mean_vector, curr_pars, number_of_parameters)
-        proposal_kernel <- tmp$new_covariance_matrix
-        mean_vector <- tmp$new_mean_vector
-        covariance_matrix_storage[[timing_cov]] <- proposal_kernel
-      }
-    }
+    if (iter >= start_adaptation) {
+      timing_cov <- iter - start_adaptation + 1 # iteration relative to when covariance adaptation started
+      if (iter == start_adaptation) {
+        previous_mu <- matrix(colMeans(res[1:iter, 1:4]), nrow = 1)
+        current_parameters <- matrix(curr_pars, nrow = 1)
+        temp <- jc_prop_update(acceptances[iter], timing_cov, scaling_factor, previous_mu,
+                               curr_pars, proposal_kernel, required_acceptance_ratio)
+        scaling_factor <- temp$scaling_factor
+        proposal_kernel <- temp$covariance_matrix
+        previous_mu <- temp$mu
 
-    # adapt and updat scaling factor
-    if (iter > start_scaling_factor_adaptation) {
-      timing_sf <- iter - start_scaling_factor_adaptation + 1 # iteration relative to when scaling factor adaptation started
-      scaling_factor <- update_scaling_factor(scaling_factor, acceptances[iter], required_acceptance_ratio, timing_sf, number_of_parameters)
-      scaling_factor_storage[timing_sf] <- scaling_factor
+        covariance_matrix_storage[[timing_cov]] <- proposal_kernel
+        scaling_factor_storage[[timing_cov]] <- scaling_factor
+
+      } else {
+        temp <- jc_prop_update(acceptances[iter], timing_cov, scaling_factor, previous_mu,
+                               curr_pars, proposal_kernel, required_acceptance_ratio)
+        scaling_factor <- temp$scaling_factor
+        proposal_kernel <- temp$covariance_matrix
+        previous_mu <- temp$mu
+
+        covariance_matrix_storage[[timing_cov]] <- proposal_kernel
+        scaling_factor_storage[[timing_cov]] <- scaling_factor
+      }
     }
 
     if(output_proposals) {
@@ -866,7 +846,6 @@ run_mcmc_chain <- function(inputs,
     if (iter %% 100 == 0) {
       print(c(round(scaling_factor, 3), round(sum(acceptances, na.rm = TRUE)/iter, 3), round(iter, 1)))
     }
-
   }
 
   res <- as.data.frame(res)
