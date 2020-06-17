@@ -485,7 +485,8 @@ format_deterministic_vaccine_output <- function(x) {
     "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2")
 
   diff_variable_compartments <- list(
-    deaths = "D"
+    deaths = "D",
+    N_vaccines = "VRec"
   )
 
   summary_variable_compartments <- list(

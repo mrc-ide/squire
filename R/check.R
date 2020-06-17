@@ -127,7 +127,7 @@ init_check_explicit <- function(init, population, seeding_cases = 20){
 
 #' Check and set up initial values for vaccine model
 #'
-#' @inheritParams run_explicit_SEEIR_vaccine_model
+#' @inheritParams run_explicit_SEEIR_model
 #'
 #' @return Checked initial values data.frame
 init_check_vaccine <- function(init, population, seeding_cases = 20){
