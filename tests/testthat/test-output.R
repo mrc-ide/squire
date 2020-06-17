@@ -8,28 +8,25 @@ test_that("deterministic output format works", {
       hosp_bed_capacity = 100000,
       ICU_bed_capacity = 1000000)
 
-  # put in to keep this going
-  model_output$output <- model_output$output[,,1,drop=TRUE]
-
   # reset output
-  model_output$output[,2:dim(model_output$output)[[2]]] <- 0
+  model_output$output[,2:dim(model_output$output)[[2]],1] <- 0
 
   # mock deaths
-  model_output$output[1, c('D[2]')] <- 2
-  model_output$output[2, c('D[10]')] <- 2
-  model_output$output[2, c('D[16]')] <- 5
+  model_output$output[1, c('D[2]'), 1] <- 2
+  model_output$output[2, c('D[10]'), 1] <- 2
+  model_output$output[2, c('D[16]'), 1] <- 5
 
   # mock infections
-  model_output$output[1, c('IMild[17]')] <- 4
-  model_output$output[2, c('IMild[2]', 'ICase1[5]')] <- 5
+  model_output$output[1, c('IMild[17]'), 1] <- 4
+  model_output$output[2, c('IMild[2]', 'ICase1[5]'), 1] <- 5
 
   # mock beds
-  model_output$output[1, c('IOxGetLive1[10]')] <- 2
-  model_output$output[2, c('IOxGetLive2[7]', 'IOxNotGetLive2[3]')] <- 3
+  model_output$output[1, c('IOxGetLive1[10]'), 1] <- 2
+  model_output$output[2, c('IOxGetLive2[7]', 'IOxNotGetLive2[3]'), 1] <- 3
 
   # mock icu
-  model_output$output[1, c('IMVGetLive1[10]')] <- 1
-  model_output$output[2, c('IMVGetLive2[7]', 'IMVNotGetLive2[3]')] <- 2
+  model_output$output[1, c('IMVGetLive1[10]'), 1] <- 1
+  model_output$output[2, c('IMVGetLive2[7]', 'IMVNotGetLive2[3]'), 1] <- 2
 
   actual <- format_deterministic_output(model_output)
   vars <- c('deaths','infections','hospital_demand','ICU_demand')

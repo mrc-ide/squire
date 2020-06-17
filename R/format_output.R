@@ -5,6 +5,7 @@
 #' @return Formatted long data.frame
 #' @export
 format_deterministic_output <- function(x) {
+  x$output <- x$output[,,1,drop=TRUE]
   index <- odin_index(x$model)
 
   hospital_demand = c(
