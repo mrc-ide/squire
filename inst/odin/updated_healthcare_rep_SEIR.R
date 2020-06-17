@@ -158,7 +158,7 @@ number_GetHosp[] <- rmhyper(total_GetHosp, number_req_Hosp)
 number_NotHosp[] <- number_req_Hosp[i] - number_GetHosp[i]
 
 # Working Out How Much Oxygen There Is Available and How Many Individuals Requiring Hospital/ICU Bed Receive It
-oxygen_availability <- oxygen_supply + leftover - oxygen_demand
+update(oxygen_availability) <- oxygen_supply + leftover - oxygen_demand
 prop_ox_hosp_beds <- total_GetHosp/(total_GetHosp + total_GetICU * severe_critical_case_oxygen_consumption_multiplier)
 available_oxygen_for_hosp_beds <- floor(prop_ox_hosp_beds * oxygen_availability)
 available_oxygen_for_ICU_beds <- floor((oxygen_availability - available_oxygen_for_hosp_beds)/severe_critical_case_oxygen_consumption_multiplier)
@@ -194,7 +194,7 @@ overall_number_get_ICU_not_Ox[] <- number_GetICU[i] - number_GetICU_GetOx[i]
 number_GetICU_NoOx_NoMV[] <- rbinom(overall_number_get_ICU_not_Ox[i], prob_critical[i])
 number_GetICU_NoOx[] <- overall_number_get_ICU_not_Ox[i] - number_GetICU_NoOx_NoMV[i]
 
-# cyclic dependency
+# cyclic dependency - CHANGE OXYGEN TO A STATE VARIABLE WHERE WE TRACK ITS AMOUNT AND SO HAVE AN UPDATE CALL
 leftover <- oxygen_supply - oxygen_demand -
             (sum(number_GetICU_GetOx_NeedMV) + sum(number_GetICU_GetOx)) * severe_critical_case_oxygen_consumption_multiplier -
             sum(number_GetHosp_Ox)
@@ -454,6 +454,7 @@ MV_capacity <- user() # number of mechanical ventilators available
 
 ## DEFINING INITIAL STATES
 ##------------------------------------------------------------------------------
+initial(oxygen_availability) <- oxygen_availability_0
 initial(S[]) <- S_0[i]
 initial(E1[]) <- E1_0[i]
 initial(E2[]) <- E2_0[i]
@@ -510,6 +511,7 @@ initial(ICrit_NoICU_NoOx_NoMV_Die1[]) <- ICrit_NoICU_NoOx_NoMV_Die1_0[i]
 initial(ICrit_NoICU_NoOx_NoMV_Die2[]) <- ICrit_NoICU_NoOx_NoMV_Die2_0[i]
 
 ##Initial vectors
+oxygen_availability_0 <- user()
 S_0[] <- user()
 E1_0[] <- user()
 E2_0[] <- user()
