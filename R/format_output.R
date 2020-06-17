@@ -493,10 +493,13 @@ format_deterministic_vaccine_output <- function(x) {
     infections = c("IMild", "ICase1", "ICase2"),
     hospital_demand = hospital_demand,
     ICU_demand = ICU_demand,
+    S = "S",
     R = c("R1", "R2"),
     V = c("V1", "V2"),
     E = c("E1", "E2"),
-    Evac = c("E1_vac", "E2_vac")
+    Evac = c("E1_vac", "E2_vac"),
+    ICase = c("ICase1", "ICase2"),
+    IMild = "IMild"
   )
 
   diff_data <- vapply(
