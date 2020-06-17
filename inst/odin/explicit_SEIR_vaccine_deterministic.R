@@ -71,14 +71,22 @@ prob_severe_death_no_treatment[] <- user() # probability of dying from severe di
 p_dist[] <- user() # distributing infections in given age class to available hosp/ICU beds (make all equal to make it random and not related to age)
 
 # Vaccination
-vaccination_rate[] <- user() # Rate of vaccination by age
+vaccination_target[] <- user() # 0/1 index of targeted age groups
 vaccine_efficacy_infection[] <- user() # Reduction in lambda for vaccinated individuals by age
 prob_hosp_vaccine[] <- user()
+  # Interpolation of vaccination rate over time
+vaccination_rate <- interpolate(tt_vaccine, vaccine_rate, "constant")
+tt_vaccine[] <- user()
+vaccine_rate[] <- user()
+dim(tt_vaccine) <- user()
+dim(vaccine_rate) <- length(tt_vaccine)
+
+
 ## Derivatives for Flows Between Compartments
 ##------------------------------------------------------------------------------
 
 # Susceptibles, Latent and Infections Prior to Hospitalisation
-deriv(S[]) <- -S[i] * lambda[i] + (gamma_R * R2[i]) - (vaccination_rate[i] * S[i]) + (gamma_V * V2[i])
+deriv(S[]) <- -S[i] * lambda[i] + (gamma_R * R2[i]) - (vaccination_rate * vaccination_target[i] * S[i]) + (gamma_V * V2[i])
 deriv(E1[]) <- lambda[i] * S[i] - gamma_E * E1[i]
 deriv(E2[]) <- gamma_E * E1[i] - gamma_E * E2[i]
 
@@ -129,13 +137,14 @@ deriv(IOxNotGetDie1[]) <- (number_requiring_Ox[i] - number_get_Ox[i]) * prob_non
 deriv(IOxNotGetDie2[]) <- gamma_not_get_ox_die * IOxNotGetDie1[i] -  gamma_not_get_ox_die * IOxNotGetDie2[i]
 
 # Recoveries and Deaths
-deriv(R1[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox_survive * IOxGetLive2[i]) + (gamma_not_get_ox_survive * IOxNotGetLive2[i]) + (gamma_not_get_mv_survive * IMVNotGetLive2[i]) - (gamma_R * R1[i]) - (vaccination_rate[i] * R1[i])
-deriv(R2[]) <- (gamma_R * R1[i]) - (gamma_R * R2[i]) - (vaccination_rate[i] * R2[i])
+deriv(R1[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox_survive * IOxGetLive2[i]) + (gamma_not_get_ox_survive * IOxNotGetLive2[i]) + (gamma_not_get_mv_survive * IMVNotGetLive2[i]) - (gamma_R * R1[i]) - (vaccination_rate * vaccination_target[i] * R1[i])
+deriv(R2[]) <- (gamma_R * R1[i]) - (gamma_R * R2[i]) - (vaccination_rate * vaccination_target[i] * R2[i])
 deriv(D[]) <- (gamma_get_ox_die * IOxGetDie2[i]) + (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_get_mv_die * IMVGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
 
 # Vaccinated
-deriv(V1[]) <- (vaccination_rate[i] * S[i]) + (vaccination_rate[i] * R2[i]) + (vaccination_rate[i] * R1[i]) - (gamma_V * V1[i])
+deriv(V1[]) <- (vaccination_rate * vaccination_target[i] * S[i]) + (vaccination_rate * vaccination_target[i] * R2[i]) + (vaccination_rate * vaccination_target[i] * R1[i]) - (gamma_V * V1[i])
 deriv(V2[]) <- (gamma_V * V1[i]) - (gamma_V * V2[i])
+deriv(VRec[]) <- (vaccination_rate * vaccination_target[i] * S[i]) + (vaccination_rate * vaccination_target[i] * R2[i]) + (vaccination_rate * vaccination_target[i] * R1[i])
 
 ## Initial states:
 initial(S[]) <- S_0[i]
@@ -169,6 +178,7 @@ initial(R2[]) <- R2_0[i]
 initial(D[]) <- D_0[i]
 initial(V1[]) <- V1_0[i]
 initial(V2[]) <- V2_0[i]
+initial(VRec[]) <- 0
 
 ##Initial vectors
 S_0[] <- user()
@@ -235,6 +245,7 @@ dim(R2) <- N_age
 dim(D) <- N_age
 dim(V1) <- N_age
 dim(V2) <- N_age
+dim(VRec) <- N_age
 
 # For the Initial Values
 dim(S_0) <- N_age
@@ -286,6 +297,6 @@ dim(IMV_dist_weighting) <- N_age
 dim(Ox_dist_weighting) <- N_age
 
 # Vaccination parameters
-dim(vaccination_rate) <- N_age
+dim(vaccination_target) <- N_age
 dim(vaccine_efficacy_infection) <- N_age
 dim(prob_hosp_vaccine) <- N_age

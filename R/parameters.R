@@ -499,10 +499,12 @@ parameters_vaccine <- function(
 
   dur_rec,
   dur_R,
-  vaccination_rate,
+  vaccination_target,
   dur_V,
   vaccine_efficacy_infection,
   vaccine_efficacy_disease,
+  max_vaccine,
+  tt_vaccine,
 
   # health system capacity
   hosp_bed_capacity,
@@ -576,6 +578,7 @@ parameters_vaccine <- function(
   stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
   stopifnot(length(hosp_bed_capacity) == length(tt_hosp_beds))
   stopifnot(length(ICU_bed_capacity) == length(tt_ICU_beds))
+  stopifnot(length(max_vaccine) == length(tt_vaccine))
   tc <- lapply(list(tt_R0/dt, tt_contact_matrix/dt), check_time_change, time_period/dt)
   tc2 <- lapply(list(tt_hosp_beds/dt, tt_ICU_beds/dt), check_time_change, time_period/dt)
 
@@ -596,6 +599,7 @@ parameters_vaccine <- function(
   assert_pos(time_period)
   assert_pos(hosp_bed_capacity)
   assert_pos(ICU_bed_capacity)
+  assert_pos(max_vaccine)
 
   assert_length(prob_hosp, length(population))
   assert_length(prob_severe, length(population))
@@ -661,8 +665,11 @@ parameters_vaccine <- function(
   # normalise to sum to 1
   p_dist <- p_dist/mean(p_dist)
 
+  # Format vaccine-specific parameters
   vaccine_efficacy_infection = 1 - vaccine_efficacy_infection
   prob_hosp_vaccine = (1 - vaccine_efficacy_disease) * prob_hosp
+  vaccine_rate = max_vaccine / sum(population * vaccination_target)
+
   # Collate Parameters Into List
   pars <- list(N_age = length(population),
                S_0 = mod_init$S,
@@ -728,9 +735,11 @@ parameters_vaccine <- function(
                dt = dt,
                population = population,
                contact_matrix_set = contact_matrix_set,
-               vaccination_rate = vaccination_rate,
+               vaccination_target = vaccination_target,
+               vaccine_rate = vaccine_rate,
                vaccine_efficacy_infection = vaccine_efficacy_infection,
-               prob_hosp_vaccine = prob_hosp_vaccine)
+               prob_hosp_vaccine = prob_hosp_vaccine,
+               tt_vaccine = tt_vaccine)
 
   class(pars) <- c("explicit_SEEIR_parameters", "squire_parameters")
 

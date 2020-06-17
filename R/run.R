@@ -474,10 +474,12 @@ run_deterministic_SEIR_model <- function(
 #' @return list of default vaccine parameters
 default_vaccine_pars <- function() {
   list(dur_R = 365,
-       vaccination_rate = rep(50, 17),
+       vaccination_target = rep(1, 17),
        dur_V = 365,
        vaccine_efficacy_infection = rep(0.95, 17),
-       vaccine_efficacy_disease = rep(0.95, 17))
+       vaccine_efficacy_disease = rep(0.95, 17),
+       max_vaccine = 1000,
+       tt_vaccine = 0)
 }
 
 vaccine_pars <- default_vaccine_pars()
@@ -553,10 +555,12 @@ run_deterministic_SEIR_vaccine_model <- function(
 
   # vaccine
   dur_R = vaccine_pars$dur_R,
-  vaccination_rate = vaccine_pars$vaccination_rate,
+  vaccination_target = vaccine_pars$vaccination_target,
   dur_V = vaccine_pars$dur_V,
   vaccine_efficacy_infection = vaccine_pars$vaccine_efficacy_infection,
   vaccine_efficacy_disease = vaccine_pars$vaccine_efficacy_disease,
+  max_vaccine = vaccine_pars$max_vaccine,
+  tt_vaccine = vaccine_pars$tt_vaccine,
 
   # health system capacity
   hosp_bed_capacity = NULL,
@@ -611,10 +615,12 @@ run_deterministic_SEIR_vaccine_model <- function(
                              ICU_bed_capacity=ICU_bed_capacity,
                              tt_hosp_beds=tt_hosp_beds,
                              tt_ICU_beds=tt_ICU_beds,
-                             vaccination_rate = vaccination_rate,
+                             vaccination_target = vaccination_target,
                              dur_V = dur_V,
                              vaccine_efficacy_infection = vaccine_efficacy_infection,
-                             vaccine_efficacy_disease = vaccine_efficacy_disease)
+                             vaccine_efficacy_disease = vaccine_efficacy_disease,
+                             max_vaccine = max_vaccine,
+                             tt_vaccine = tt_vaccine)
 
   # handling time variables for js
   pars$tt_beta <- I(pars$tt_beta)
