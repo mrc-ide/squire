@@ -142,8 +142,9 @@ deriv(R2[]) <- (gamma_R * R1[i]) - (gamma_R * R2[i]) - (vaccination_rate * vacci
 deriv(D[]) <- (gamma_get_ox_die * IOxGetDie2[i]) + (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_get_mv_die * IMVGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
 
 # Vaccinated
-deriv(V1[]) <- (vaccination_rate * vaccination_target[i] * S[i]) + (vaccination_rate * vaccination_target[i] * R2[i]) + (vaccination_rate * vaccination_target[i] * R1[i]) - (gamma_V * V1[i])
-deriv(V2[]) <- (gamma_V * V1[i]) - (gamma_V * V2[i])
+deriv(V1[]) <- (vaccination_rate * vaccination_target[i] * S[i]) + (vaccination_rate * vaccination_target[i] * R2[i]) + (vaccination_rate * vaccination_target[i] * R1[i]) - (gamma_V * V1[i]) - (lambda[i] * V1[i] * vaccine_efficacy_infection[i])
+deriv(V2[]) <- (gamma_V * V1[i]) - (gamma_V * V2[i]) - (lambda[i] * V2[i] * vaccine_efficacy_infection[i])
+# Record total vaccines delivered
 deriv(VRec[]) <- (vaccination_rate * vaccination_target[i] * S[i]) + (vaccination_rate * vaccination_target[i] * R2[i]) + (vaccination_rate * vaccination_target[i] * R1[i])
 
 ## Initial states:

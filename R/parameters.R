@@ -739,7 +739,7 @@ parameters_vaccine <- function(
                vaccine_rate = vaccine_rate,
                vaccine_efficacy_infection = vaccine_efficacy_infection,
                prob_hosp_vaccine = prob_hosp_vaccine,
-               tt_vaccine = tt_vaccine)
+               tt_vaccine = round(tt_vaccine/dt))
 
   class(pars) <- c("explicit_SEEIR_parameters", "squire_parameters")
 

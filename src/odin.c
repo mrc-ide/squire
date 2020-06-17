@@ -6473,9 +6473,6 @@ void explicit_SEIR_vaccine_deterministic_rhs(explicit_SEIR_vaccine_deterministic
   for (int i = 1; i <= internal->dim_IRec2; ++i) {
     dstatedt[internal->offset_variable_IRec2 + i - 1] = internal->gamma_rec * IRec1[i - 1] - internal->gamma_rec * IRec2[i - 1];
   }
-  for (int i = 1; i <= internal->dim_V2; ++i) {
-    dstatedt[internal->offset_variable_V2 + i - 1] = (internal->gamma_V * V1[i - 1]) - (internal->gamma_V * V2[i - 1]);
-  }
   for (int i = 1; i <= internal->dim_ICase1; ++i) {
     dstatedt[internal->offset_variable_ICase1 + i - 1] = (internal->gamma_E * E2[i - 1] * internal->prob_hosp[i - 1]) + (internal->gamma_E * E2_vac[i - 1] * internal->prob_hosp_vaccine[i - 1]) - internal->gamma_ICase * ICase1[i - 1];
   }
@@ -6514,9 +6511,6 @@ void explicit_SEIR_vaccine_deterministic_rhs(explicit_SEIR_vaccine_deterministic
   }
   for (int i = 1; i <= internal->dim_R2; ++i) {
     dstatedt[internal->offset_variable_R2 + i - 1] = (internal->gamma_R * R1[i - 1]) - (internal->gamma_R * R2[i - 1]) - (vaccination_rate * internal->vaccination_target[i - 1] * R2[i - 1]);
-  }
-  for (int i = 1; i <= internal->dim_V1; ++i) {
-    dstatedt[internal->offset_variable_V1 + i - 1] = (vaccination_rate * internal->vaccination_target[i - 1] * S[i - 1]) + (vaccination_rate * internal->vaccination_target[i - 1] * R2[i - 1]) + (vaccination_rate * internal->vaccination_target[i - 1] * R1[i - 1]) - (internal->gamma_V * V1[i - 1]);
   }
   for (int i = 1; i <= internal->dim_VRec; ++i) {
     dstatedt[internal->offset_variable_VRec + i - 1] = (vaccination_rate * internal->vaccination_target[i - 1] * S[i - 1]) + (vaccination_rate * internal->vaccination_target[i - 1] * R2[i - 1]) + (vaccination_rate * internal->vaccination_target[i - 1] * R1[i - 1]);
@@ -6570,6 +6564,12 @@ void explicit_SEIR_vaccine_deterministic_rhs(explicit_SEIR_vaccine_deterministic
   }
   for (int i = 1; i <= internal->dim_S; ++i) {
     dstatedt[0 + i - 1] = -(S[i - 1]) * internal->lambda[i - 1] + (internal->gamma_R * R2[i - 1]) - (vaccination_rate * internal->vaccination_target[i - 1] * S[i - 1]) + (internal->gamma_V * V2[i - 1]);
+  }
+  for (int i = 1; i <= internal->dim_V1; ++i) {
+    dstatedt[internal->offset_variable_V1 + i - 1] = (vaccination_rate * internal->vaccination_target[i - 1] * S[i - 1]) + (vaccination_rate * internal->vaccination_target[i - 1] * R2[i - 1]) + (vaccination_rate * internal->vaccination_target[i - 1] * R1[i - 1]) - (internal->gamma_V * V1[i - 1]) - (internal->lambda[i - 1] * V1[i - 1] * internal->vaccine_efficacy_infection[i - 1]);
+  }
+  for (int i = 1; i <= internal->dim_V2; ++i) {
+    dstatedt[internal->offset_variable_V2 + i - 1] = (internal->gamma_V * V1[i - 1]) - (internal->gamma_V * V2[i - 1]) - (internal->lambda[i - 1] * V2[i - 1] * internal->vaccine_efficacy_infection[i - 1]);
   }
   if (output) {
     double time = t;

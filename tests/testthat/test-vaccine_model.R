@@ -22,7 +22,7 @@ test_that("deterministic vaccine model", {
     ICU_bed_capacity = 1000000,
     day_return = TRUE,
     dur_R = Inf,
-    vaccination_rate = rep(0, 17),
+    max_vaccine = 0,
     seed = 1
   )
   o1 <- format_deterministic_vaccine_output(m1)
@@ -37,6 +37,9 @@ test_that("deterministic vaccine model", {
   # Check total pop is constant and equal to expected
   i1 <- unlist(odin_index(m1$model)[2:32])
   expect_equal(rowSums(m1$output[,i1,1]), rep(sum(pop$n), 365))
+  # Check no vaccines have been distributed
+  vr1 <- sum(m1$output[,odin_index(m1$model)[["VRec"]],1])
+  expect_equal(vr1, 0)
 
   # Vaccine model, loss of natural immunity, no vaccination
   m2 <-run_deterministic_SEIR_vaccine_model(
@@ -45,7 +48,7 @@ test_that("deterministic vaccine model", {
     ICU_bed_capacity = 1000000,
     day_return = TRUE,
     dur_R = 20,
-    vaccination_rate = rep(0, 17),
+    max_vaccine = 0,
     seed = 1
   )
   o2 <- format_deterministic_vaccine_output(m2)
@@ -64,12 +67,50 @@ test_that("deterministic vaccine model", {
     ICU_bed_capacity = 1000000,
     day_return = TRUE,
     dur_R = Inf,
-    vaccination_rate = rep(0.01, 17),
+    max_vaccine = 10,
     seed = 1
   )
   o3 <- format_deterministic_vaccine_output(m3)
   v3 <- o3[o3$compartment == "V", "value"]
   # Check people are entering vaccinated compartment
   expect_gt(sum(v3), 0)
+  i3 <- unlist(odin_index(m3$model)[2:32])
+  expect_equal(rowSums(m3$output[,i3,1]), rep(sum(pop$n), 365))
+  # Check vaccine distribution >0 and  <= max
+  vr3 <- diff(rowSums(m3$output[,odin_index(m3$model)[["VRec"]],1]))
+  expect_gt(max(vr3), 0)
+  expect_lte(max(vr3), 10)
+
+  # Vaccine model, no loss of natural immunity, vaccination time-varying
+  m4 <- run_deterministic_SEIR_vaccine_model(
+    population = pop$n,contact_matrix_set = mm,
+    hosp_bed_capacity = 100000,
+    ICU_bed_capacity = 1000000,
+    day_return = TRUE,
+    dur_R = Inf,
+    max_vaccine = c(0, 10),
+    tt_vaccine = c(0, 100),
+    seed = 1
+  )
+  # Check vaccine distribution >0 and  <= max
+  vr4 <- diff(rowSums(m4$output[,odin_index(m4$model)[["VRec"]],1]))
+  expect_equal(max(vr4[1:98]), 0)
+  expect_lte(max(vr4), 10)
+  expect_gt(max(vr4), 0)
+
+  # Vaccine model, no loss of natural immunity, vaccination age-targeted
+  m5 <- run_deterministic_SEIR_vaccine_model(
+    population = pop$n,contact_matrix_set = mm,
+    hosp_bed_capacity = 100000,
+    ICU_bed_capacity = 1000000,
+    day_return = TRUE,
+    dur_R = Inf,
+    max_vaccine = 10,
+    vaccination_target = c(1, rep(0, 16)),
+    seed = 1
+  )
+  vr5 <- colSums(m5$output[,odin_index(m5$model)[["VRec"]],1])
+  expect_gt(vr5[1], 0)
+  expect_equal(max(vr5[-1]), 0)
 
 })
