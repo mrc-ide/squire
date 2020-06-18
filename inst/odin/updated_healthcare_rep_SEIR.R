@@ -162,11 +162,13 @@ update(oxygen_availability) <- oxygen_supply + leftover - oxygen_demand
 prop_ox_hosp_beds <- total_GetHosp/(total_GetHosp + total_GetICU * severe_critical_case_oxygen_consumption_multiplier)
 available_oxygen_for_hosp_beds <- floor(prop_ox_hosp_beds * oxygen_availability)
 available_oxygen_for_ICU_beds <- floor((oxygen_availability - available_oxygen_for_hosp_beds)/severe_critical_case_oxygen_consumption_multiplier)
-number_GetHosp_Ox[] <- rmhyper(available_oxygen_for_hosp_beds, number_GetHosp)
+total_GetHosp_GetOx <- if(available_oxygen_for_hosp_beds <= 0) 0 else(if(available_oxygen_for_hosp_beds - total_GetHosp >= 0) total_GetHosp else(available_oxygen_for_hosp_beds)) # Working out the number of new ICU requiring infections that get a bed
+number_GetHosp_Ox[] <- rmhyper(total_GetHosp_GetOx, number_GetHosp)
 number_GetHosp_NoOx[] <- number_GetHosp[i] - number_GetHosp_Ox[i]
 
 # Working Out Number of Mechanical Ventilators Available and How Many Individuals Requiring ICU Bed and MV Receive Them
-number_GetICU_GetOx_overall[] <- rmhyper(available_oxygen_for_ICU_beds, number_GetICU)
+total_GetICU_GetOx <- if(available_oxygen_for_ICU_beds <= 0) 0 else(if(available_oxygen_for_ICU_beds - total_GetICU >= 0) total_GetICU else(available_oxygen_for_ICU_beds)) # Working out the number of new ICU requiring infections that get a bed
+number_GetICU_GetOx_overall[] <- rmhyper(total_GetICU_GetOx, number_GetICU)
 number_req_ICU_MV[] <- rbinom(number_GetICU_GetOx_overall[i], prob_critical[i]) # Number of new ICU admissions that are going to require oxygen and mechanical ventilation
 number_req_ICU_Ox[] <- number_GetICU_GetOx_overall[i] - number_req_ICU_MV[i] # Number of new ICU admissions that going to require oxygen only
 total_req_ICU_MV <- sum(number_req_ICU_MV)
@@ -184,10 +186,13 @@ available_oxygen_for_ICU_MV <- round(available_oxygen_for_ICU_beds * total_req_I
 available_oxygen_for_ICU_Ox <- available_oxygen_for_ICU_beds - available_oxygen_for_ICU_MV
 
 # Number of People Getting Oxygen and Mechanical Ventilator Etc
-number_GetICU_GetOx_NeedMV[] <- rmhyper(available_oxygen_for_ICU_MV, number_req_ICU_MV)
-number_GetICU_GetOx_GetMV[] <- rmhyper(current_free_MV, number_GetICU_GetOx_NeedMV)
+total_GetICU_GetOx_Need_MV <- if(available_oxygen_for_ICU_MV <= 0) 0 else(if(available_oxygen_for_ICU_MV - total_req_ICU_MV >= 0) total_req_ICU_MV else(available_oxygen_for_ICU_MV))
+number_GetICU_GetOx_NeedMV[] <- rmhyper(total_GetICU_GetOx_Need_MV, number_req_ICU_MV)
+total_GetICU_GetOx_GetMV[] <- if(current_free_MV <= 0) 0 else(if(current_free_MV - total_GetICU_GetOx_Need_MV >= 0) total_GetICU_GetOx_Need_MV else(current_free_MV))
+number_GetICU_GetOx_GetMV[] <- rmhyper(total_GetICU_GetOx_GetMV, number_GetICU_GetOx_NeedMV)
 number_GetICU_GetOx_NoMV[] <- number_GetICU_GetOx_NeedMV[i] - number_GetICU_GetOx_GetMV[i]
-number_GetICU_GetOx[] <- rmhyper(available_oxygen_for_ICU_Ox, number_req_ICU_Ox)
+total_GetICU_GetOx_Only <- if(available_oxygen_for_ICU_Ox <= 0) 0 else(if(available_oxygen_for_ICU_Ox - total_req_ICU_Ox >= 0) total_req_ICU_Ox else(available_oxygen_for_ICU_Ox))
+number_GetICU_GetOx[] <- rmhyper(total_GetICU_GetOx_Only, number_req_ICU_Ox)
 
 # Number of People Not Oxygen and Who Require an ICU Bed
 overall_number_get_ICU_not_Ox[] <- number_GetICU[i] - number_GetICU_GetOx[i]
@@ -439,13 +444,13 @@ oxygen_supply <- interpolate(tt_oxygen_supply, input_oxygen_supply, "constant") 
 tt_oxygen_supply[] <- user()
 input_oxygen_supply[] <- user()
 dim(tt_oxygen_supply) <- user()
-dim(input_oxygen_supply) <- user()
+dim(input_oxygen_supply) <- length(tt_oxygen_supply)
 
 oxygen_demand <- interpolate(tt_oxygen_demand, input_oxygen_demand, "constant") # rate of demand of oxygen
 tt_oxygen_demand[] <- user()
 input_oxygen_demand[] <- user()
 dim(tt_oxygen_demand) <- user()
-dim(input_oxygen_demand) <- user()
+dim(input_oxygen_demand) <- length(tt_oxygen_demand)
 
 severe_critical_case_oxygen_consumption_multiplier <- user() # consumption of oxygen for severe/critical covid-19 cases compared to moderate cases
 
@@ -829,6 +834,7 @@ dim(number_GetICU_GetOx_overall) <- N_age
 dim(number_GetICU_GetOx_GetMV) <- N_age
 dim(number_GetICU_GetOx_NeedMV) <- N_age
 dim(number_GetICU_GetOx) <- N_age
+dim(total_GetICU_GetOx_GetMV) <- N_age
 
 # Related to Calculating Age-Structured Force of Infection
 dim(p_S_E1) <- N_age
