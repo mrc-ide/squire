@@ -40,7 +40,6 @@
 #' @param forecast Number of days to forecast forward. Default = 0
 #' @param required_acceptance_ratio Desired MCMC acceptance ratio
 #' @param start_adaptation Iteration number to begin RM optimisation of scaling factor at
-#' @param initial_scaling_factor Initial scaling factor for RM opitmisation if implemented
 #' @param ... Further aguments for the model parameter function. If using the
 #'   \code{\link{explicit_model}} (default) this will be
 #'   \code{parameters_explicit_SEEIR}.

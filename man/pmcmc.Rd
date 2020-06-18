@@ -169,8 +169,6 @@ to select parameter set. For each parmater set sampled, run particle filter with
 \item{...}{Further aguments for the model parameter function. If using the
 \code{\link{explicit_model}} (default) this will be
 \code{parameters_explicit_SEEIR}.}
-
-\item{initial_scaling_factor}{Initial scaling factor for RM opitmisation if implemented}
 }
 \value{
 squire_simulation \describe{
