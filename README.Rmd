@@ -144,7 +144,8 @@ This plot will plot each of the compartments of the model output. We can also pl
 ```{r subset variables plot}
 plot(r, var_select = c("E", "IMild"))
 ```
-Or, you can specify one of `deaths`, `infections`, `hospital_occupancy`, `ICU_occupancy`, `hospital_demand` or `ICU_demand`, and plot these summary metrics that represent the combintion of a number of different compartment e.g:
+
+Or, you can specify one of `deaths`, `infections`, `hospital_occupancy`, `ICU_occupancy`, `hospital_demand` or `ICU_demand`, and plot these summary metrics that represent the combination of a number of different compartment e.g:
 ```{r subset variables plot2}
 plot(r, var_select = "deaths")
 ```
