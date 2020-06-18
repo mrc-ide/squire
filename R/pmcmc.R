@@ -733,19 +733,19 @@ run_mcmc_chain <- function(inputs,
   acceptances <- vector(mode = "numeric", length = n_mcmc) # tracks acceptances over time
 
   # storage for covariance matrices over time - only properly initalised if we're actually adapting
-  # i.e. in instances where start_covariance_adaptation < n_mcmc
-  if (n_mcmc - start_covariance_adaptation <= 0) {
+  # i.e. in instances where start_adaptation < n_mcmc
+  if (n_mcmc - start_adaptation <= 0) {
     covariance_matrix_storage <- vector(mode = "list", length = 1)
   } else {
-    covariance_matrix_storage <- vector(mode = "list", length = (n_mcmc - start_covariance_adaptation + 1))
+    covariance_matrix_storage <- vector(mode = "list", length = (n_mcmc - start_adaptation + 1))
   }
 
   # storage for scaling factor over time - only properly initalised if we're actually adapting
-  # i.e. in instances where start_scaling_factor_adaptation < n_mcmc
-  if (n_mcmc - start_scaling_factor_adaptation <= 0) {
+  # i.e. in instances where start_adaptation < n_mcmc
+  if (n_mcmc - start_adaptation <= 0) {
     scaling_factor_storage <- vector(mode = "numeric", length = 1)
   } else {
-    scaling_factor_storage <- vector(mode = "numeric", length = (n_mcmc - start_scaling_factor_adaptation + 1))
+    scaling_factor_storage <- vector(mode = "numeric", length = (n_mcmc - start_adaptation + 1))
   }
 
   if(output_proposals) {
