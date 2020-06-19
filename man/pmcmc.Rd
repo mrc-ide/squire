@@ -43,9 +43,7 @@ pmcmc(
   replicates = 100,
   forecast = 0,
   required_acceptance_ratio = 0.23,
-  start_covariance_adaptation = round(n_mcmc/2),
-  start_scaling_factor_adaptation = 1,
-  initial_scaling_factor = 1,
+  start_adaptation = round(n_mcmc/2),
   ...
 )
 }
@@ -166,11 +164,7 @@ to select parameter set. For each parmater set sampled, run particle filter with
 
 \item{required_acceptance_ratio}{Desired MCMC acceptance ratio}
 
-\item{start_covariance_adaptation}{Iteration number to begin covariance matrix adaptation at}
-
-\item{start_scaling_factor_adaptation}{Iteration number to begin RM optimisation of scaling factor at}
-
-\item{initial_scaling_factor}{Initial scaling factor for RM opitmisation if implemented}
+\item{start_adaptation}{Iteration number to begin RM optimisation of scaling factor at}
 
 \item{...}{Further aguments for the model parameter function. If using the
 \code{\link{explicit_model}} (default) this will be
