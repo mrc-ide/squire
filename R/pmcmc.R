@@ -1094,7 +1094,7 @@ evaluate_Rt <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
           matched_steps <- match(Meff_matches, swtchdates)
           to_match <- Meff_steps[which(!is.na(matched_steps))]
 
-          Meff_vec[which(!is.na(match(swtchdates, Meff_matches)))] <- Meff_steps[to_match]
+          Meff_vec[which(!is.na(match(swtchdates, Meff_matches)))] <- to_match
 
           R0 <- c(R0,
                   vapply(seq_along(R0_change), function(x){
