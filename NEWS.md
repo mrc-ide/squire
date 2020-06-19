@@ -1,3 +1,7 @@
+# squire 0.4.22
+
+* Johnstone Change approach implemented for pmcmc RM
+
 # squire 0.4.21
 
 * `evaluate_Rt` patch for `roll` of Meff
