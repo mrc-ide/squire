@@ -1061,9 +1061,11 @@ evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
 
         # when is the swithc in our data
           swtchdates <- which(date_R0_change >= date_Meff_change)
+          min_d <- as.Date(date_R0_change[min(swtchdates)])
+          dates_to_median <- seq(min_d - floor(roll/2),min_d + floor(roll/2),1)
 
           # Work out the mobility during this period
-          mob_pld <- median(R0_change[seq(min(swtchdates)-floor((roll/2)),min(swtchdates)+floor((roll/2)))])
+          mob_pld <- median(R0_change[which(date_R0_change %in% dates_to_median)])
 
           mob_up <- c(rep(0, swtchdates[1]-1),
                       R0_change[min(swtchdates):(length(R0_change))] - mob_pld)
