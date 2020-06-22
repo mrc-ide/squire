@@ -87,15 +87,23 @@ dim(vaccine_rate) <- length(tt_vaccine)
 
 # Susceptibles, Latent and Infections Prior to Hospitalisation
 deriv(S[]) <- -S[i] * lambda[i] + (gamma_R * R2[i]) - (vaccination_rate * vaccination_target[i] * S[i]) + (gamma_V * V2[i])
+
+# Latent
 deriv(E1[]) <- lambda[i] * S[i] - gamma_E * E1[i]
 deriv(E2[]) <- gamma_E * E1[i] - gamma_E * E2[i]
+output(E[]) <- E1[i] + E2[i]
 
+# Latent vaccinated
 deriv(E1_vac[]) <- (lambda[i] * V1[i] * vaccine_efficacy_infection[i]) + (lambda[i] * V2[i] * vaccine_efficacy_infection[i]) - (gamma_E * E1_vac[i])
 deriv(E2_vac[]) <- (gamma_E * E1_vac[i]) - (gamma_E * E2_vac[i])
+output(E_vac[]) <- E1_vac[i] + E2_vac[i]
 
+# Cases
 deriv(IMild[]) <- (gamma_E * E2[i] * (1 - prob_hosp[i])) + (gamma_E * E2_vac[i] * (1 - prob_hosp_vaccine[i])) - gamma_IMild * IMild[i]
 deriv(ICase1[]) <- (gamma_E * E2[i] * prob_hosp[i]) +  (gamma_E * E2_vac[i] * prob_hosp_vaccine[i]) - gamma_ICase * ICase1[i]
 deriv(ICase2[]) <- gamma_ICase * ICase1[i] - gamma_ICase * ICase2[i]
+output(ICase[]) <- ICase1[i] + ICase2[i]
+
 
 # Infections Requiring Mechanical Ventilation (an ICU Bed)
 ICU_occ <- sum(IMVGetLive1) + sum(IMVGetLive2) + sum(IMVGetDie1) + sum(IMVGetDie2) # Summing number of infections in compartments that use ICU beds
@@ -114,9 +122,11 @@ deriv(IMVNotGetLive1[]) <- (number_requiring_IMV[i] - number_get_IMV[i]) * (1 - 
 deriv(IMVNotGetLive2[]) <- gamma_not_get_mv_survive * IMVNotGetLive1[i] -  gamma_not_get_mv_survive * IMVNotGetLive2[i]
 deriv(IMVNotGetDie1[]) <- (number_requiring_IMV[i] - number_get_IMV[i]) * prob_severe_death_no_treatment[i] - gamma_not_get_mv_die * IMVNotGetDie1[i]
 deriv(IMVNotGetDie2[]) <- gamma_not_get_mv_die * IMVNotGetDie1[i] -  gamma_not_get_mv_die * IMVNotGetDie2[i]
+output(IICU[]) <- IMVGetLive1[i] + IMVGetLive2[i] + IMVGetDie1[i] + IMVGetDie2[i] + IMVNotGetLive1[i] + IMVNotGetLive2[i] + IMVNotGetDie1[i] + IMVNotGetDie2[i]
 
 deriv(IRec1[]) <- gamma_get_mv_survive * IMVGetLive2[i] - gamma_rec * IRec1[i]
 deriv(IRec2[]) <- gamma_rec * IRec1[i] - gamma_rec * IRec2[i]
+output(IRec[]) <- IRec1[i] + IRec2[i]
 
 # Infections Requiring Oxygen (a general Hosptial Bed)
 hosp_occ <- sum(IOxGetLive1) + sum(IOxGetLive2) + sum(IOxGetDie1) + sum(IOxGetDie2) + sum(IRec1) + sum(IRec2) # Summing number of infections in compartments that use general hospital beds
@@ -135,17 +145,35 @@ deriv(IOxNotGetLive1[]) <- (number_requiring_Ox[i] - number_get_Ox[i]) * (1 - pr
 deriv(IOxNotGetLive2[]) <- gamma_not_get_ox_survive * IOxNotGetLive1[i] -  gamma_not_get_ox_survive * IOxNotGetLive2[i]
 deriv(IOxNotGetDie1[]) <- (number_requiring_Ox[i] - number_get_Ox[i]) * prob_non_severe_death_no_treatment[i] - gamma_not_get_ox_die * IOxNotGetDie1[i]
 deriv(IOxNotGetDie2[]) <- gamma_not_get_ox_die * IOxNotGetDie1[i] -  gamma_not_get_ox_die * IOxNotGetDie2[i]
+output(IHospital[]) <- IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] + IOxNotGetLive1[i] + IOxNotGetLive2[i] + IOxNotGetDie1[i] + IOxNotGetDie2[i]
 
-# Recoveries and Deaths
+# Hospital occupancy and demand
+output(hospital_occupancy[]) <- IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] +  IRec1[i] + IRec2[i]
+output(ICU_occupancy[]) <- IMVGetLive1[i] +  IMVGetLive2[i] + IMVGetDie1[i] + IMVGetDie2[i]
+output(hospital_demand[]) <- IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] +  IRec1[i] + IRec2[i] + IOxNotGetLive1[i] + IOxNotGetLive2[i] + IOxNotGetDie1[i] + IOxNotGetDie2[i]
+output(ICU_demand[]) <- IMVGetLive1[i] +  IMVGetLive2[i] + IMVGetDie1[i] + IMVGetDie2[i] + IMVNotGetLive1[i] +  IMVNotGetLive2[i] + IMVNotGetDie1[i] + IMVNotGetDie2[i]
+
+# Recoveries
 deriv(R1[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox_survive * IOxGetLive2[i]) + (gamma_not_get_ox_survive * IOxNotGetLive2[i]) + (gamma_not_get_mv_survive * IMVNotGetLive2[i]) - (gamma_R * R1[i]) - (vaccination_rate * vaccination_target[i] * R1[i])
 deriv(R2[]) <- (gamma_R * R1[i]) - (gamma_R * R2[i]) - (vaccination_rate * vaccination_target[i] * R2[i])
+output(R[]) <- R1[i] + R2[i]
+
+# Deaths
 deriv(D[]) <- (gamma_get_ox_die * IOxGetDie2[i]) + (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_get_mv_die * IMVGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
 
 # Vaccinated
 deriv(V1[]) <- (vaccination_rate * vaccination_target[i] * S[i]) + (vaccination_rate * vaccination_target[i] * R2[i]) + (vaccination_rate * vaccination_target[i] * R1[i]) - (gamma_V * V1[i]) - (lambda[i] * V1[i] * vaccine_efficacy_infection[i])
 deriv(V2[]) <- (gamma_V * V1[i]) - (gamma_V * V2[i]) - (lambda[i] * V2[i] * vaccine_efficacy_infection[i])
-# Record total vaccines delivered
-deriv(VRec[]) <- (vaccination_rate * vaccination_target[i] * S[i]) + (vaccination_rate * vaccination_target[i] * R2[i]) + (vaccination_rate * vaccination_target[i] * R1[i])
+output(V[]) <- V1[i] + V2[i]
+deriv(vaccinated[]) <- (vaccination_rate * vaccination_target[i] * S[i]) + (vaccination_rate * vaccination_target[i] * R2[i]) + (vaccination_rate * vaccination_target[i] * R1[i])
+
+output(N[]) <- S[i] + E1[i] + E2[i] + E1_vac[i] + E2_vac[i] + IMild[i] + ICase1[i] + ICase2[i] +
+  IMVGetLive1[i] + IMVGetLive2[i] +
+  IMVGetDie1[i] + IMVGetDie2[i] + IMVNotGetLive1[i] + IMVNotGetLive2[i] + IMVNotGetDie1[i] + IMVNotGetDie2[i] +
+  IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] + IOxNotGetLive1[i] + IOxNotGetLive2[i] +
+  IOxNotGetDie1[i] + IOxNotGetDie2[i] +
+  IRec1[i] + IRec2[i] +
+  R1[i] + R2[i] + D[i] + V1[i] + V2[i]
 
 ## Initial states:
 initial(S[]) <- S_0[i]
@@ -179,7 +207,7 @@ initial(R2[]) <- R2_0[i]
 initial(D[]) <- D_0[i]
 initial(V1[]) <- V1_0[i]
 initial(V2[]) <- V2_0[i]
-initial(VRec[]) <- 0
+initial(vaccinated[]) <- 0
 
 ##Initial vectors
 S_0[] <- user()
@@ -213,16 +241,20 @@ R2_0[] <- user()
 D_0[] <- user()
 V1_0[] <- user()
 V2_0[] <- user()
+
 ##Dimensions of the different "vectors" used
 # For the State Variables
 dim(S) <- N_age
 dim(E1) <- N_age
 dim(E2) <- N_age
+dim(E) <- N_age
 dim(E1_vac) <- N_age
 dim(E2_vac) <- N_age
+dim(E_vac) <- N_age
 dim(IMild) <- N_age
 dim(ICase1) <- N_age
 dim(ICase2) <- N_age
+dim(ICase) <- N_age
 dim(IOxGetLive1) <- N_age
 dim(IOxGetLive2) <- N_age
 dim(IOxGetDie1) <- N_age
@@ -241,13 +273,22 @@ dim(IMVNotGetDie1) <- N_age
 dim(IMVNotGetDie2) <- N_age
 dim(IRec1) <- N_age
 dim(IRec2) <- N_age
+dim(IRec) <- N_age
 dim(R1) <- N_age
 dim(R2) <- N_age
+dim(R) <- N_age
 dim(D) <- N_age
 dim(V1) <- N_age
 dim(V2) <- N_age
-dim(VRec) <- N_age
-
+dim(V) <- N_age
+dim(IICU) <- N_age
+dim(IHospital) <- N_age
+dim(hospital_occupancy) <- N_age
+dim(hospital_demand) <- N_age
+dim(ICU_occupancy) <- N_age
+dim(ICU_demand) <- N_age
+dim(N) <- N_age
+dim(vaccinated) <- N_age
 # For the Initial Values
 dim(S_0) <- N_age
 dim(E1_0) <- N_age
@@ -280,6 +321,7 @@ dim(R2_0) <- N_age
 dim(D_0) <- N_age
 dim(V1_0) <- N_age
 dim(V2_0) <- N_age
+
 
 # Severity Parameters
 dim(prob_hosp) <- N_age
