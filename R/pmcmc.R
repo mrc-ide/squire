@@ -104,7 +104,7 @@
 #'
 #' @export
 #' @import coda
-#' @importFrom stats rnorm plogis qnorm cov
+#' @importFrom stats rnorm plogis qnorm cov median
 #' @importFrom mvtnorm rmvnorm
 
 pmcmc <- function(data,
