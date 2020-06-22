@@ -535,14 +535,14 @@ t0_variables <- function(r) {
                                        R0_change = tail(r$interventions$R0_change, 1),
                                        Meff = r$replicate_parameters$Meff[x])
         } else {
-          R0 <- tail(evaluate_Rt(R0_change = r$interventions$R0_change,
+          R0 <- tail(evaluate_Rt_pmcmc(R0_change = r$interventions$R0_change,
                                  R0 = r$replicate_parameters$R0[x],
                                  Meff = r$replicate_parameters$Meff[x],
                                  Meff_pl = r$replicate_parameters$Meff_pl[x],
                                  date_R0_change = r$interventions$date_R0_change,
                                  date_Meff_change = r$interventions$date_Meff_change,
-                                 Rt_func = r[[wh]]$inputs$Rt_func
-          ),1)
+                                 start_date = r$replicate_parameters$start_date[x],
+                                 roll = r[[wh]]$inputs$roll), 1)
         }
       } else {
         R0 <- r$replicate_parameters$R0[x]

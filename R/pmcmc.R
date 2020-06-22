@@ -33,7 +33,7 @@
 #' @param n_chains number of MCMC chains to run
 #' @inheritParams calibrate
 #' @param date_Meff_change Date when mobility changed corresponding to expected changes in R0 during and after lockdown
-#' @param roll Number of days over which Meff and Meff_pl switch. Default = 0
+#' @param roll Number of days over which mean mobility at plateau is calculated. Default = 7
 #' @param burnin number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories
 #' @param replicates number of trajectories (replicates) to be returned that are being sampled from the posterior probability results produced by \code{run_mcmc_chain}
 #' to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory
@@ -116,9 +116,6 @@ pmcmc <- function(data,
                   output_proposals = FALSE,
                   n_chains = 1,
                   squire_model = explicit_model(),
-                  Rt_func = function (R0_change, R0, Meff) {
-                    R0 * (2 * plogis(-(R0_change - 1) * -Meff))
-                  },
                   pars_obs = list(phi_cases = 1,
                                   k_cases = 2,
                                   phi_death = 1,
@@ -156,7 +153,7 @@ pmcmc <- function(data,
                   ICU_bed_capacity = NULL,
                   baseline_ICU_bed_capacity = NULL,
                   date_ICU_bed_capacity_change = NULL,
-                  roll = 0,
+                  roll = 7,
                   burnin = 0,
                   replicates = 100,
                   forecast = 0,
@@ -222,9 +219,9 @@ pmcmc <- function(data,
   assert_pos(pars_init[[1]]$Meff)
   assert_bounded(pars_init[[1]]$Meff, left = pars_min$Meff, right = pars_max$Meff)
 
-  assert_pos(pars_min$Meff_pl)
-  assert_pos(pars_max$Meff_pl)
-  assert_pos(pars_init[[1]]$Meff_pl)
+  assert_single_numeric(pars_min$Meff_pl)
+  assert_single_numeric(pars_max$Meff_pl)
+  assert_single_numeric(pars_init[[1]]$Meff_pl)
   assert_bounded(pars_init[[1]]$Meff_pl, left = pars_min$Meff_pl, right = pars_max$Meff_pl)
 
   assert_logical(unlist(pars_discrete))
@@ -434,7 +431,6 @@ pmcmc <- function(data,
     model_params = model_params,
     interventions = interventions,
     pars_obs = pars_obs,
-    Rt_func = Rt_func,
     roll = roll,
     squire_model = squire_model,
     pars = list(pars_obs = pars_obs,
@@ -472,7 +468,6 @@ pmcmc <- function(data,
                         interventions = interventions,
                         pars_obs = pars_obs,
                         n_particles = n_particles,
-                        Rt_func = Rt_func,
                         forecast_days = 0,
                         roll = roll,
                         return = "ll"
@@ -879,8 +874,8 @@ run_mcmc_chain <- function(inputs,
 # return: Set to 'll' to return the log-likelihood (for MCMC) or to
 #
 calc_loglikelihood <- function(pars, data, squire_model, model_params,
-                               pars_obs, n_particles, Rt_func,
-                               forecast_days = 0, return = "ll", roll = 0,
+                               pars_obs, n_particles,
+                               forecast_days = 0, return = "ll", roll = 7,
                                interventions) {
   #----------------..
   # specify particle setup
@@ -921,7 +916,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   assert_pos(R0)
   assert_date(start_date)
   assert_pos(Meff)
-  assert_pos(Meff_pl)
+  assert_numeric(Meff_pl)
 
   #----------------..
   # setup model based on inputs and interventions
@@ -983,9 +978,10 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   # update new R0s based on R0_change and R0_date_change, and Meff_date_change
   #--------------------..
   # and now get new R0s for the R0
-  R0 <- evaluate_Rt(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
-                    date_R0_change = date_R0_change[date_R0_change>start_date],
-                    date_Meff_change = date_Meff_change, Rt_func = Rt_func,
+  R0 <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
+                    date_R0_change = date_R0_change[date_R0_change>=start_date],
+                    start_date = start_date,
+                    date_Meff_change = date_Meff_change,
                     roll = roll)
 
   # which allow us to work out our beta
@@ -1033,16 +1029,16 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
 
 # R0 with Meff
 #' @noRd
-evaluate_Rt <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
-                        date_Meff_change, Rt_func, roll = 0) {
+evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
+                        date_Meff_change, roll = 7, start_date = NULL) {
 
-  # and now get new R0s for the R0
+  # and now get new Rts for the R0
   if (!is.null(R0_change)) {
 
+    # if no change then all from R0_change
     if (is.null(date_Meff_change)) {
-      R0 <- c(R0, vapply(R0_change, function(x){
-        Rt_func(R0_change = x, R0 = R0, Meff = Meff)
-      }, FUN.VALUE = numeric(1)))
+
+      Rt <- R0 * (2 * plogis(-(R0_change - 1) * -Meff))
 
     } else if (!is.null(date_Meff_change)) {
 
@@ -1052,60 +1048,55 @@ evaluate_Rt <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
       # when does mobility change take place
       if(date_Meff_change <= date_R0_change[1]) {
 
-        R0 <- c(R0,
-                vapply(R0_change, function(x){
-                  Rt_func(R0_change = x, R0 = R0, Meff = Meff_pl)
-                }, FUN.VALUE = numeric(1)))
+        Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(R0_change-R0_change[1]) ))
 
       } else if (date_Meff_change > tail(date_R0_change, 1)) {
 
-        R0 <- c(R0,
-                vapply(R0_change, function(x){
-                  Rt_func(R0_change = x, R0 = R0, Meff = Meff)
-                }, FUN.VALUE = numeric(1)))
+        Rt <- R0 * (2 * plogis(-(R0_change - 1) * -Meff))
 
       } else {
 
-        # how many days does the roll take to shift between meff and meff_pl
-        if (roll == 0) {
-
+        # when is the swithc in our data
           swtchdates <- which(date_R0_change >= date_Meff_change)
 
-          R0 <- c(R0,
-                  vapply(R0_change[1:(min(swtchdates)-1)], function(x){
-                    Rt_func(R0_change = x, R0 = R0, Meff = Meff)
-                  }, FUN.VALUE = numeric(1)),
-                  vapply(R0_change[min(swtchdates):(length(R0_change))], function(x){
-                    Rt_func(R0_change = x, R0 = R0, Meff = Meff_pl)
-                  }, FUN.VALUE = numeric(1))
-          )
+          # Work out the mobility during this period
+          mob_pld <- mean(tail(R0_change[1:(min(swtchdates)-1)], roll))
 
-        } else {
+          mob_up <- c(rep(0, swtchdates[1]-1),
+                      R0_change[min(swtchdates):(length(R0_change))] - mob_pld)
 
-          swtchdates <- date_R0_change - date_Meff_change
+          # now work out Rt forwards based on mobility increasing from this plateau
 
+          Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) ))
 
-          Meff_vec <- rep(Meff, length(date_R0_change))
-          Meff_vec[date_R0_change>=date_Meff_change] <- Meff_pl
-
-          Meff_steps <- seq(Meff, Meff_pl, length.out = roll+1)
-          Meff_matches <- seq(-1*roll, 0, 1)
-
-          matched_steps <- match(Meff_matches, swtchdates)
-          to_match <- Meff_steps[which(!is.na(matched_steps))]
-
-          Meff_vec[which(!is.na(match(swtchdates, Meff_matches)))] <- to_match
-
-          R0 <- c(R0,
-                  vapply(seq_along(R0_change), function(x){
-                    Rt_func(R0_change = R0_change[x], R0 = R0, Meff = Meff_vec[x])
-                  }, FUN.VALUE = numeric(1)))
-        }
       }
+    }
+  } else {
+    Rt <- rep(R0, length(date_R0_change))
+  }
+
+  # add start date
+  if(is.null(start_date)) {
+    Rt <- c(R0, Rt)
+  } else {
+
+    start_date <- as.Date(start_date)
+    if(start_date %in% date_R0_change) {
+
+      if(start_date <= date_Meff_change) {
+        Rt <- c(R0 * (2 * plogis(-(R0_change[which(date_R0_change == start_date)] - 1) * -Meff)),
+                Rt)
+      } else {
+        Rt <- c(R0 * 2*(plogis( -Meff * -(R0_change[which(date_R0_change == start_date)]-1) -
+                                  Meff_pl*(mob_up[R0_change[which(date_R0_change == start_date)]]) )),
+                Rt)
+      }
+    } else {
+      Rt <- c(R0, Rt)
     }
   }
 
-  return(R0)
+  return(Rt)
 
 }
 

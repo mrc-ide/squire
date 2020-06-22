@@ -1023,7 +1023,6 @@ test_that("Rt_func pmcmc", {
                               n_chains = 1,
                               replicates = 2,
                               burnin = 0,
-                              Rt_func = Rt_func,
                               date_Meff_change = "2020-03-20",
                               squire_model = squire_model,
                               pars_init = pars_init,
@@ -1064,37 +1063,24 @@ test_that("evaluate_Rt", {
   date_R0_change <- c("2020-03-12","2020-03-18","2020-03-22",
                       "2020-03-25","2020-03-27","2020-03-29")
   date_Meff_change <- c("2020-03-26")
-  Rt_func <- function (R0_change, R0, Meff) {
-    R0 * (2 * plogis(-(R0_change - 1) * -Meff))
-  }
+
   Meff <- 2
   Meff_pl <- 6
 
-  Rt_base <- evaluate_Rt(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
-                         date_R0_change = date_R0_change,
-                         date_Meff_change = date_Meff_change, Rt_func = Rt_func)
+  Rt_base <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
+                         date_R0_change = date_R0_change,roll=1,
+                         date_Meff_change = date_Meff_change)
 
   expect_lt(Rt_base[7], Rt_base[4])
 
-  Rt <- evaluate_Rt(R0_change = NULL, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
-                    date_R0_change = date_R0_change,
-                    date_Meff_change = date_Meff_change, Rt_func = Rt_func)
-  expect_equal(R0, Rt)
+  Rt <- evaluate_Rt_pmcmc(R0_change = NULL, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
+                    date_R0_change = date_R0_change,roll=1,
+                    date_Meff_change = date_Meff_change)
+  expect_equal(R0, Rt[1])
 
-  Rt <- evaluate_Rt(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
-                    date_R0_change = date_R0_change,
-                    date_Meff_change = "2030-01-01", Rt_func = Rt_func)
+  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
+                    date_R0_change = date_R0_change,roll=1,
+                    date_Meff_change = "2010-01-01")
   expect_lt(mean(Rt_base), mean(Rt))
 
-
-  Rt <- evaluate_Rt(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
-                    date_R0_change = date_R0_change,
-                    date_Meff_change = "2010-01-01", Rt_func = Rt_func)
-  expect_gt(mean(Rt_base), mean(Rt))
-
-  Rt <- evaluate_Rt(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
-                    date_R0_change = date_R0_change,
-                    date_Meff_change = date_Meff_change, Rt_func = Rt_func,
-                    roll = 7)
-  expect_gt(mean(Rt_base), mean(Rt))
 })

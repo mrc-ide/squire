@@ -1,3 +1,7 @@
+# squire 0.4.23
+
+* `pmcmc` no longer takes Rt_func as hard coded given Meff_pl complexity
+
 # squire 0.4.22
 
 * Johnstone Change approach implemented for pmcmc RM
