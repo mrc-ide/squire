@@ -1045,6 +1045,9 @@ evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
       date_Meff_change <- as.Date(date_Meff_change)
       date_R0_change <- as.Date(date_R0_change)
 
+      # scale Meff accordingly
+      Meff_pl <- Meff_pl*Meff
+
       # when does mobility change take place
       if(date_Meff_change <= date_R0_change[1]) {
 
@@ -1060,7 +1063,7 @@ evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
           swtchdates <- which(date_R0_change >= date_Meff_change)
 
           # Work out the mobility during this period
-          mob_pld <- mean(tail(R0_change[1:(min(swtchdates)-1)], roll))
+          mob_pld <- median(R0_change[seq(min(swtchdates)-floor((roll/2)),min(swtchdates)+floor((roll/2)))])
 
           mob_up <- c(rep(0, swtchdates[1]-1),
                       R0_change[min(swtchdates):(length(R0_change))] - mob_pld)
