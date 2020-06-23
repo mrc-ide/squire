@@ -75,7 +75,7 @@ sample_pmcmc <- function(pmcmc_results,
   params_smpl <- res[params_smpl, !grepl("log", colnames(res))]
 
   # catch
-  assert_in(colnames(params_smpl), c("start_date", "R0", "Meff", "Meff_pl"),
+  assert_in(c("start_date", "R0", "Meff", "Meff_pl"), colnames(params_smpl),
             message = paste0(
             "Currently only allow for the start date, R0, and Meff during and ",
             "after the lockdown to be inferred. All four must be included,",

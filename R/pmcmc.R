@@ -124,19 +124,23 @@ pmcmc <- function(data,
                   pars_init = list('start_date'     = as.Date("2020-02-07"),
                                    'R0'             = 2.5,
                                    'Meff'           = 2,
-                                   'Meff_pl'        = 3),
+                                   'Meff_pl'        = 3,
+                                   "R0_pl_shift"    = 0),
                   pars_min = list('start_date'      = as.Date("2020-02-01"),
                                   'R0'              = 0,
                                   'Meff'            = 1,
-                                  'Meff_pl'         = 2),
+                                  'Meff_pl'         = 2,
+                                  "R0_pl_shift"     = -2),
                   pars_max = list('start_date'      = as.Date("2020-02-20"),
                                   'R0'              = 5,
                                   'Meff'            = 3,
-                                  'Meff_pl'         = 4),
+                                  'Meff_pl'         = 4,
+                                  "R0_pl_shift"     = 5),
                   pars_discrete = list('start_date' = TRUE,
                                        'R0'         = FALSE,
                                        'Meff'       = FALSE,
-                                       'Meff_pl'    = FALSE),
+                                       'Meff_pl'    = FALSE,
+                                       "R0_pl_shift" = FALSE),
                   proposal_kernel = NULL,
                   reporting_fraction = 1,
                   country = NULL,
@@ -199,7 +203,7 @@ pmcmc <- function(data,
   assert_eq(names(pars_init[[1]]), names(pars_min))
   assert_eq(names(pars_min), names(pars_max))
   assert_eq(names(pars_max), names(pars_discrete))
-  assert_in(names(pars_init[[1]]), c("R0", "start_date", "Meff", "Meff_pl"),
+  assert_in(c("R0", "start_date", "Meff", "Meff_pl"),names(pars_init[[1]]),
             message = "Params to infer must include R0, start_date, and Effective Mobility during and after lockdown")
   assert_date(pars_init[[1]]$start_date)
   assert_date(pars_min$start_date)
@@ -223,6 +227,13 @@ pmcmc <- function(data,
   assert_single_numeric(pars_max$Meff_pl)
   assert_single_numeric(pars_init[[1]]$Meff_pl)
   assert_bounded(pars_init[[1]]$Meff_pl, left = pars_min$Meff_pl, right = pars_max$Meff_pl)
+
+  if("R0_pl_shift" %in% names(pars_min)) {
+  assert_single_numeric(pars_min$R0_pl_shift)
+  assert_single_numeric(pars_max$R0_pl_shift)
+  assert_single_numeric(pars_init[[1]]$R0_pl_shift)
+  assert_bounded(pars_init[[1]]$R0_pl_shift, left = pars_min$R0_pl_shift, right = pars_max$R0_pl_shift)
+  }
 
   assert_logical(unlist(pars_discrete))
 
@@ -806,7 +817,7 @@ run_mcmc_chain <- function(inputs,
     if (iter >= start_adaptation) {
       timing_cov <- iter - start_adaptation + 1 # iteration relative to when covariance adaptation started
       if (iter == start_adaptation) {
-        previous_mu <- matrix(colMeans(res[1:iter, 1:4]), nrow = 1)
+        previous_mu <- matrix(colMeans(res[1:iter, seq_along(curr_pars)]), nrow = 1)
         current_parameters <- matrix(curr_pars, nrow = 1)
         temp <- jc_prop_update(acceptances[iter], timing_cov, scaling_factor, previous_mu,
                                curr_pars, proposal_kernel, required_acceptance_ratio)
@@ -909,6 +920,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   start_date <- pars[["start_date"]]
   Meff <- pars[["Meff"]]
   Meff_pl <- pars[["Meff_pl"]]
+  R0_pl_shift <- pars[["R0_pl_shift"]]
 
   #----------------..
   # more assertions
@@ -982,7 +994,8 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                     date_R0_change = date_R0_change[date_R0_change>=start_date],
                     start_date = start_date,
                     date_Meff_change = date_Meff_change,
-                    roll = roll)
+                    roll = roll,
+                    R0_pl_shift = R0_pl_shift)
 
   # which allow us to work out our beta
   beta_set <- beta_est(squire_model = squire_model,
@@ -1030,7 +1043,8 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
 # R0 with Meff
 #' @noRd
 evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
-                        date_Meff_change, roll = 7, start_date = NULL) {
+                        date_Meff_change, roll = 7, start_date = NULL,
+                        R0_pl_shift=NULL) {
 
   # and now get new Rts for the R0
   if (!is.null(R0_change)) {
@@ -1045,13 +1059,17 @@ evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
       date_Meff_change <- as.Date(date_Meff_change)
       date_R0_change <- as.Date(date_R0_change)
 
+      if(is.null(R0_pl_shift)) {
+        R0_pl_shift <- 0
+      }
+
       # scale Meff accordingly
       Meff_pl <- Meff_pl*Meff
 
       # when does mobility change take place
       if(date_Meff_change <= date_R0_change[1]) {
 
-        Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(R0_change-R0_change[1]) ))
+        Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(R0_change-R0_change[1]) - R0_pl_shift ))
 
       } else if (date_Meff_change > tail(date_R0_change, 1)) {
 
@@ -1070,9 +1088,15 @@ evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
           mob_up <- c(rep(0, swtchdates[1]-1),
                       R0_change[min(swtchdates):(length(R0_change))] - mob_pld)
 
+          # and our R0_pl_shift
+          R0_pl_change <- c(rep(0,min(swtchdates)-1),
+                        seq(0, R0_pl_shift, length.out = roll),
+                        rep(R0_pl_shift, max(0,length(mob_up)-roll)))
+          R0_pl_change <- head(R0_pl_change, length(mob_up))
+
           # now work out Rt forwards based on mobility increasing from this plateau
 
-          Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) ))
+          Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) - R0_pl_change ))
 
       }
     }
@@ -1093,7 +1117,8 @@ evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
                 Rt)
       } else {
         Rt <- c(R0 * 2*(plogis( -Meff * -(R0_change[which(date_R0_change == start_date)]-1) -
-                                  Meff_pl*(mob_up[R0_change[which(date_R0_change == start_date)]]) )),
+                                  Meff_pl*(mob_up[R0_change[which(date_R0_change == start_date)]]) -
+                                  R0_pl_change[which(date_R0_change == start_date)])),
                 Rt)
       }
     } else {
