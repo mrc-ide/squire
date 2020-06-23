@@ -188,8 +188,10 @@ available_oxygen_for_ICU_Ox <- available_oxygen_for_ICU_beds - available_oxygen_
 # Number of People Getting Oxygen and Mechanical Ventilator Etc
 total_GetICU_GetOx_Need_MV <- if(available_oxygen_for_ICU_MV <= 0) 0 else(if(available_oxygen_for_ICU_MV - total_req_ICU_MV >= 0) total_req_ICU_MV else(available_oxygen_for_ICU_MV))
 number_GetICU_GetOx_NeedMV[] <- rmhyper(total_GetICU_GetOx_Need_MV, number_req_ICU_MV)
-total_GetICU_GetOx_GetMV[] <- if(current_free_MV <= 0) 0 else(if(current_free_MV - total_GetICU_GetOx_Need_MV >= 0) total_GetICU_GetOx_Need_MV else(current_free_MV))
+
+total_GetICU_GetOx_GetMV <- if(current_free_MV <= 0) 0 else(if(current_free_MV - total_GetICU_GetOx_Need_MV >= 0) total_GetICU_GetOx_Need_MV else(current_free_MV))
 number_GetICU_GetOx_GetMV[] <- rmhyper(total_GetICU_GetOx_GetMV, number_GetICU_GetOx_NeedMV)
+
 number_GetICU_GetOx_NoMV[] <- number_GetICU_GetOx_NeedMV[i] - number_GetICU_GetOx_GetMV[i]
 total_GetICU_GetOx_Only <- if(available_oxygen_for_ICU_Ox <= 0) 0 else(if(available_oxygen_for_ICU_Ox - total_req_ICU_Ox >= 0) total_req_ICU_Ox else(available_oxygen_for_ICU_Ox))
 number_GetICU_GetOx[] <- rmhyper(total_GetICU_GetOx_Only, number_req_ICU_Ox)
@@ -834,7 +836,6 @@ dim(number_GetICU_GetOx_overall) <- N_age
 dim(number_GetICU_GetOx_GetMV) <- N_age
 dim(number_GetICU_GetOx_NeedMV) <- N_age
 dim(number_GetICU_GetOx) <- N_age
-dim(total_GetICU_GetOx_GetMV) <- N_age
 
 # Related to Calculating Age-Structured Force of Infection
 dim(p_S_E1) <- N_age
