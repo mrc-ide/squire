@@ -1,3 +1,7 @@
+# squire 0.4.24
+
+* `Meff_pl` can be scaled or not in relation to Meff
+
 # squire 0.4.23
 
 * `pmcmc` no longer takes Rt_func as hard coded given Meff_pl complexity
