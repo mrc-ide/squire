@@ -37,6 +37,7 @@ pmcmc(
   baseline_ICU_bed_capacity = NULL,
   date_ICU_bed_capacity_change = NULL,
   roll = 7,
+  scale_meff_pl = FALSE,
   burnin = 0,
   replicates = 100,
   forecast = 0,
@@ -148,6 +149,8 @@ capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
 
 \item{roll}{Number of days over which mean mobility at plateau is calculated. Default = 7}
+
+\item{scale_meff_pl}{Boolean for whether Meff_pl is scaling relative to Meff. Default = FALSE.}
 
 \item{burnin}{number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories}
 

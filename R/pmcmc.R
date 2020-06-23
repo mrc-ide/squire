@@ -34,6 +34,7 @@
 #' @inheritParams calibrate
 #' @param date_Meff_change Date when mobility changed corresponding to expected changes in R0 during and after lockdown
 #' @param roll Number of days over which mean mobility at plateau is calculated. Default = 7
+#' @param scale_meff_pl Boolean for whether Meff_pl is scaling relative to Meff. Default = FALSE.
 #' @param burnin number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories
 #' @param replicates number of trajectories (replicates) to be returned that are being sampled from the posterior probability results produced by \code{run_mcmc_chain}
 #' to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory
@@ -154,6 +155,7 @@ pmcmc <- function(data,
                   baseline_ICU_bed_capacity = NULL,
                   date_ICU_bed_capacity_change = NULL,
                   roll = 7,
+                  scale_meff_pl = FALSE,
                   burnin = 0,
                   replicates = 100,
                   forecast = 0,
@@ -432,6 +434,7 @@ pmcmc <- function(data,
     interventions = interventions,
     pars_obs = pars_obs,
     roll = roll,
+    scale_meff_pl = scale_meff_pl,
     squire_model = squire_model,
     pars = list(pars_obs = pars_obs,
                 pars_init = pars_init,
@@ -470,6 +473,7 @@ pmcmc <- function(data,
                         n_particles = n_particles,
                         forecast_days = 0,
                         roll = roll,
+                        scale_meff_pl = scale_meff_pl,
                         return = "ll"
     )
     X
@@ -875,7 +879,8 @@ run_mcmc_chain <- function(inputs,
 #
 calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                pars_obs, n_particles,
-                               forecast_days = 0, return = "ll", roll = 7,
+                               forecast_days = 0, return = "ll",
+                               roll = 7, scale_meff_pl = FALSE,
                                interventions) {
   #----------------..
   # specify particle setup
@@ -982,6 +987,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                     date_R0_change = date_R0_change[date_R0_change>=start_date],
                     start_date = start_date,
                     date_Meff_change = date_Meff_change,
+                    scale_meff_pl = scale_meff_pl,
                     roll = roll)
 
   # which allow us to work out our beta
@@ -1030,7 +1036,9 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
 # R0 with Meff
 #' @noRd
 evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
-                        date_Meff_change, roll = 7, start_date = NULL) {
+                        date_Meff_change, roll = 7,
+                        scale_meff_pl = FALSE,
+                        start_date = NULL) {
 
   # and now get new Rts for the R0
   if (!is.null(R0_change)) {
@@ -1046,7 +1054,9 @@ evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
       date_R0_change <- as.Date(date_R0_change)
 
       # scale Meff accordingly
+      if (scale_meff_pl) {
       Meff_pl <- Meff_pl*Meff
+      }
 
       # when does mobility change take place
       if(date_Meff_change <= date_R0_change[1]) {

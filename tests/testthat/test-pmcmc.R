@@ -1083,4 +1083,16 @@ test_that("evaluate_Rt", {
                     date_Meff_change = "2010-01-01")
   expect_lt(mean(Rt_base), mean(Rt))
 
+  # with scale
+  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff,
+                          date_R0_change = date_R0_change,roll=1,scale_meff_pl = FALSE,
+                          date_Meff_change = "2010-01-01")
+  expect_equal(Rt[4], Rt[5])
+
+  # with scale
+  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = 1,
+                          date_R0_change = date_R0_change,roll=1,scale_meff_pl = TRUE,
+                          date_Meff_change = "2010-01-01")
+  expect_equal(Rt[4], Rt[5])
+
 })
