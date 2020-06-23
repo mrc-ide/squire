@@ -59,7 +59,7 @@ gamma_not_get_mv_survive <- user() # rate of progression through requiring mecha
 gamma_not_get_mv_die <- user() # rate of progression through requiring mechanical ventilation compartment conditional on not getting ventilation and dying
 gamma_rec <- user() # rate of progression through post-ICU recovery compartment
 gamma_R <- user() # rate of progression through recovered compartment (loss of naturally acquired immunity)
-gamma_V <- user()
+gamma_V <- user() # Rate of progression through vaccine compartment (loss of vaccine acquired immunity)
 
 # Probabilities
 prob_hosp[] <- user() # probability of requiring hospitalisation by age

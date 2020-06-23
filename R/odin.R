@@ -139,6 +139,57 @@ explicit_SEIR_vaccine_deterministic <- structure(function (beta_set, D_0, E1_0, 
 }, ir = "odin/explicit_SEIR_vaccine_deterministic.json", class = "odin_generator")
 class(explicit_SEIR_vaccine_deterministic) <- "odin_generator"
 attr(explicit_SEIR_vaccine_deterministic, "ir") <- .explicit_SEIR_vaccine_deterministic$public_fields$ir
+.explicit_SEIR_vaccine_stochastic <- odin:::odin_c_class("explicit_SEIR_vaccine_stochastic", list(get_internal = "explicit_SEIR_vaccine_stochastic_get_internal", finalise = "explicit_SEIR_vaccine_stochastic_finalise", create = "explicit_SEIR_vaccine_stochastic_create", initmod_desolve = "explicit_SEIR_vaccine_stochastic_initmod_desolve", contents = "explicit_SEIR_vaccine_stochastic_contents", set_user = "explicit_SEIR_vaccine_stochastic_set_user", metadata = "explicit_SEIR_vaccine_stochastic_metadata", initial_conditions = "explicit_SEIR_vaccine_stochastic_initial_conditions", rhs = "explicit_SEIR_vaccine_stochastic_rhs", rhs_dde = "explicit_SEIR_vaccine_stochastic_rhs_dde", rhs_r = "explicit_SEIR_vaccine_stochastic_rhs_r"), c("beta_set", "D_0", "dt", "E1_0", "E1_vac_0", "E2_0", "E2_vac_0", "gamma_E", "gamma_get_mv_die", "gamma_get_mv_survive", "gamma_get_ox_die", "gamma_get_ox_survive", "gamma_ICase", "gamma_IMild", "gamma_not_get_mv_die", "gamma_not_get_mv_survive", "gamma_not_get_ox_die", "gamma_not_get_ox_survive", "gamma_R", "gamma_rec", "gamma_V", "hosp_beds", "ICase1_0", "ICase2_0", "ICU_beds", "IMild_0", "IMVGetDie1_0", "IMVGetDie2_0", "IMVGetLive1_0", "IMVGetLive2_0", "IMVNotGetDie1_0", "IMVNotGetDie2_0", "IMVNotGetLive1_0", "IMVNotGetLive2_0", "IOxGetDie1_0", "IOxGetDie2_0", "IOxGetLive1_0", "IOxGetLive2_0", "IOxNotGetDie1_0", "IOxNotGetDie2_0", "IOxNotGetLive1_0", "IOxNotGetLive2_0", "IRec1_0", "IRec2_0", "mix_mat_set", "N_age", "prob_hosp", "prob_hosp_vaccine", "prob_non_severe_death_no_treatment", "prob_non_severe_death_treatment", "prob_severe", "prob_severe_death_no_treatment", "prob_severe_death_treatment", "R1_0", "R2_0", "S_0", "tt_beta", "tt_hosp_beds", "tt_ICU_beds", "tt_matrix", "tt_vaccine", "V1_0", "V2_0", "vaccination_target", "vaccine_efficacy_infection", "vaccine_rate"), list(discrete = TRUE, has_array = TRUE, has_output = TRUE, has_user = TRUE, has_delay = FALSE, has_interpolate = TRUE, has_stochastic = TRUE, has_include = FALSE, initial_time_dependent = FALSE), "squire", "odin/explicit_SEIR_vaccine_stochastic.json", TRUE)
+explicit_SEIR_vaccine_stochastic <- structure(function (beta_set, D_0, dt, E1_0, E1_vac_0, E2_0,
+    E2_vac_0, gamma_E, gamma_get_mv_die, gamma_get_mv_survive,
+    gamma_get_ox_die, gamma_get_ox_survive, gamma_ICase, gamma_IMild,
+    gamma_not_get_mv_die, gamma_not_get_mv_survive, gamma_not_get_ox_die,
+    gamma_not_get_ox_survive, gamma_R, gamma_rec, gamma_V, hosp_beds,
+    ICase1_0, ICase2_0, ICU_beds, IMild_0, IMVGetDie1_0, IMVGetDie2_0,
+    IMVGetLive1_0, IMVGetLive2_0, IMVNotGetDie1_0, IMVNotGetDie2_0,
+    IMVNotGetLive1_0, IMVNotGetLive2_0, IOxGetDie1_0, IOxGetDie2_0,
+    IOxGetLive1_0, IOxGetLive2_0, IOxNotGetDie1_0, IOxNotGetDie2_0,
+    IOxNotGetLive1_0, IOxNotGetLive2_0, IRec1_0, IRec2_0, mix_mat_set,
+    N_age, prob_hosp, prob_hosp_vaccine, prob_non_severe_death_no_treatment,
+    prob_non_severe_death_treatment, prob_severe, prob_severe_death_no_treatment,
+    prob_severe_death_treatment, R1_0, R2_0, S_0, tt_beta, tt_hosp_beds,
+    tt_ICU_beds, tt_matrix, tt_vaccine, V1_0, V2_0, vaccination_target,
+    vaccine_efficacy_infection, vaccine_rate, user = list(beta_set = beta_set,
+        D_0 = D_0, dt = dt, E1_0 = E1_0, E1_vac_0 = E1_vac_0,
+        E2_0 = E2_0, E2_vac_0 = E2_vac_0, gamma_E = gamma_E,
+        gamma_get_mv_die = gamma_get_mv_die, gamma_get_mv_survive = gamma_get_mv_survive,
+        gamma_get_ox_die = gamma_get_ox_die, gamma_get_ox_survive = gamma_get_ox_survive,
+        gamma_ICase = gamma_ICase, gamma_IMild = gamma_IMild,
+        gamma_not_get_mv_die = gamma_not_get_mv_die, gamma_not_get_mv_survive = gamma_not_get_mv_survive,
+        gamma_not_get_ox_die = gamma_not_get_ox_die, gamma_not_get_ox_survive = gamma_not_get_ox_survive,
+        gamma_R = gamma_R, gamma_rec = gamma_rec, gamma_V = gamma_V,
+        hosp_beds = hosp_beds, ICase1_0 = ICase1_0, ICase2_0 = ICase2_0,
+        ICU_beds = ICU_beds, IMild_0 = IMild_0, IMVGetDie1_0 = IMVGetDie1_0,
+        IMVGetDie2_0 = IMVGetDie2_0, IMVGetLive1_0 = IMVGetLive1_0,
+        IMVGetLive2_0 = IMVGetLive2_0, IMVNotGetDie1_0 = IMVNotGetDie1_0,
+        IMVNotGetDie2_0 = IMVNotGetDie2_0, IMVNotGetLive1_0 = IMVNotGetLive1_0,
+        IMVNotGetLive2_0 = IMVNotGetLive2_0, IOxGetDie1_0 = IOxGetDie1_0,
+        IOxGetDie2_0 = IOxGetDie2_0, IOxGetLive1_0 = IOxGetLive1_0,
+        IOxGetLive2_0 = IOxGetLive2_0, IOxNotGetDie1_0 = IOxNotGetDie1_0,
+        IOxNotGetDie2_0 = IOxNotGetDie2_0, IOxNotGetLive1_0 = IOxNotGetLive1_0,
+        IOxNotGetLive2_0 = IOxNotGetLive2_0, IRec1_0 = IRec1_0,
+        IRec2_0 = IRec2_0, mix_mat_set = mix_mat_set, N_age = N_age,
+        prob_hosp = prob_hosp, prob_hosp_vaccine = prob_hosp_vaccine,
+        prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
+        prob_non_severe_death_treatment = prob_non_severe_death_treatment,
+        prob_severe = prob_severe, prob_severe_death_no_treatment = prob_severe_death_no_treatment,
+        prob_severe_death_treatment = prob_severe_death_treatment,
+        R1_0 = R1_0, R2_0 = R2_0, S_0 = S_0, tt_beta = tt_beta,
+        tt_hosp_beds = tt_hosp_beds, tt_ICU_beds = tt_ICU_beds,
+        tt_matrix = tt_matrix, tt_vaccine = tt_vaccine, V1_0 = V1_0,
+        V2_0 = V2_0, vaccination_target = vaccination_target,
+        vaccine_efficacy_infection = vaccine_efficacy_infection,
+        vaccine_rate = vaccine_rate), unused_user_action = NULL)
+{
+    .explicit_SEIR_vaccine_stochastic$new(user, unused_user_action)
+}, ir = "odin/explicit_SEIR_vaccine_stochastic.json", class = "odin_generator")
+class(explicit_SEIR_vaccine_stochastic) <- "odin_generator"
+attr(explicit_SEIR_vaccine_stochastic, "ir") <- .explicit_SEIR_vaccine_stochastic$public_fields$ir
 .less_basic_model_for_js <- odin:::odin_c_class("less_basic_model_for_js", list(get_internal = "less_basic_model_for_js_get_internal", finalise = "less_basic_model_for_js_finalise", create = "less_basic_model_for_js_create", initmod_desolve = "less_basic_model_for_js_initmod_desolve", contents = "less_basic_model_for_js_contents", set_user = "less_basic_model_for_js_set_user", metadata = "less_basic_model_for_js_metadata", initial_conditions = "less_basic_model_for_js_initial_conditions", rhs = "less_basic_model_for_js_rhs", rhs_dde = "less_basic_model_for_js_rhs_dde", rhs_desolve = "less_basic_model_for_js_rhs_desolve", rhs_r = "less_basic_model_for_js_rhs_r"), c("beta_1", "beta_2", "D0", "E0", "gamma", "I_hosp0", "I_ICU0", "I_mild0", "m", "mu", "p_hosp", "p_ICU", "p_mild", "R0", "S0", "sigma"), list(discrete = FALSE, has_array = TRUE, has_output = FALSE, has_user = TRUE, has_delay = FALSE, has_interpolate = FALSE, has_stochastic = FALSE, has_include = FALSE, initial_time_dependent = FALSE), "squire", "odin/less_basic_model_for_js.json", TRUE)
 less_basic_model_for_js <- structure(function (beta_1, beta_2, D0, E0, gamma, I_hosp0, I_ICU0,
     I_mild0, m, mu, p_hosp, p_ICU, p_mild, R0, S0, sigma, user = list(beta_1 = beta_1,
