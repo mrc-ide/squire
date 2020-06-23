@@ -7,9 +7,9 @@
 format_vaccine(
   x,
   compartments = c("S", "E", "V", "E_vac", "IMild", "ICase", "IICU", "IHospital",
-    "IRec", "R", "D"),
-  summaries = c("infections", "deaths", "vaccines", "ICU_occupancy", "ICU_demand",
-    "hospital_occupancy", "hospital_demand"),
+    "IRec", "R", "D", "N"),
+  summaries = c("deaths", "infections", "hospital_occupancy", "ICU_occupancy",
+    "hospital_demand", "ICU_demand", "vaccinated"),
   reduce_age = TRUE,
   date_0 = NULL
 )
@@ -21,13 +21,13 @@ format_vaccine(
 
 \item{summaries}{Vecto of summary names, which may be:
 \itemize{
-      \item{"deaths"}{ Daily Deaths }
-      \item{"infections"}{ Daily Infections }
+      \item{"deaths"}{ Daily Deaths (stochatic model) }
+      \item{"infections"}{ Daily Infections (stochastic model)}
       \item{"hospital_occupancy"}{ Occupied Hospital Beds }
       \item{"ICU_occupancy"}{ Occupied ICU Beds }
       \item{"hospital_demand}{ Required Hospital Beds }
       \item{"ICU_demand}{ Required ICU Beds }
-      \item{"vaccines}{ Daily vaccines administered}
+      \item{"vaccinated"}{ Daily vaccines administered (Stochastic model)}
       }}
 
 \item{reduce_age}{Collapse age-dimension, calculating the total in the

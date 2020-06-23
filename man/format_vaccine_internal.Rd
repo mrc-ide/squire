@@ -5,6 +5,7 @@
 \title{Internals of Format vaccine model output as data.frame}
 \usage{
 format_vaccine_internal(
+  x,
   compartments,
   summaries,
   reduce_age,
@@ -14,21 +15,29 @@ format_vaccine_internal(
 )
 }
 \arguments{
+\item{x}{squire_simulation object}
+
 \item{compartments}{Vector of compartment names, e.g. \code{c("S", "R")}.}
 
 \item{summaries}{Vecto of summary names, which may be:
 \itemize{
-      \item{"deaths"}{ Daily Deaths }
-      \item{"infections"}{ Daily Infections }
+      \item{"deaths"}{ Daily Deaths (stochatic model) }
+      \item{"infections"}{ Daily Infections (stochastic model)}
       \item{"hospital_occupancy"}{ Occupied Hospital Beds }
       \item{"ICU_occupancy"}{ Occupied ICU Beds }
       \item{"hospital_demand}{ Required Hospital Beds }
       \item{"ICU_demand}{ Required ICU Beds }
-      \item{"vaccines}{ Daily vaccines administered}
+      \item{"vaccinated"}{ Daily vaccines administered (Stochastic model)}
       }}
 
 \item{reduce_age}{Collapse age-dimension, calculating the total in the
 compartment.}
+
+\item{index}{odin ouput index}
+
+\item{time}{time vector}
+
+\item{replicate}{outpu replicate number}
 }
 \description{
 Internals of Format vaccine model output as data.frame

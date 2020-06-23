@@ -61,6 +61,9 @@ format_vaccine <- function(x,
 
 #' Internals of Format vaccine model output as data.frame
 #' @inheritParams format_vaccine
+#' @param index odin ouput index
+#' @param time time vector
+#' @param replicate outpu replicate number
 format_vaccine_internal <- function(x, compartments, summaries, reduce_age, index, time,
                                     replicate){
 
