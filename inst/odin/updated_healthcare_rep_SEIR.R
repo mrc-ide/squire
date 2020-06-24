@@ -189,6 +189,7 @@ available_oxygen_for_ICU_Ox <- available_oxygen_for_ICU_beds - available_oxygen_
 total_GetICU_GetOx_Need_MV <- if(available_oxygen_for_ICU_MV <= 0) 0 else(if(available_oxygen_for_ICU_MV - total_req_ICU_MV >= 0) total_req_ICU_MV else(available_oxygen_for_ICU_MV))
 number_GetICU_GetOx_NeedMV[] <- rmhyper(total_GetICU_GetOx_Need_MV, number_req_ICU_MV)
 
+# think the else term is being thrown somehow and I don't really know how unless the ludicrously large oxygen upstream is triggering a massive total_GetICU_GetOx_Need_MV - that could be it
 total_GetICU_GetOx_GetMV <- if(current_free_MV <= 0) 0 else(if(current_free_MV - total_GetICU_GetOx_Need_MV >= 0) total_GetICU_GetOx_Need_MV else(current_free_MV))
 number_GetICU_GetOx_GetMV[] <- rmhyper(total_GetICU_GetOx_GetMV, number_GetICU_GetOx_NeedMV)
 
