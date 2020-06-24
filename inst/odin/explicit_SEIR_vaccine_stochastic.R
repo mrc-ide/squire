@@ -49,9 +49,17 @@ prob_severe_death_no_treatment[] <- user() # probability of dying from severe di
 update(S[]) <- S[i] + delta_S[i]  # Susceptibles (1 comp)
 update(E1[]) <- E1[i] + delta_E1[i]  # First of the latent infection compartments (2 comps)
 update(E2[]) <- E2[i] + delta_E2[i]  # Second of the latent infection compartments (2 comps)
+E[] <- E1[i] + E2[i]
+
+# Infected + vaccinated
+update(E1_vac[]) <- E1_vac[i] + delta_E1_vac[i]
+update(E2_vac[]) <- E2_vac[i] + delta_E2_vac[i]
+E_vac[] <- E1_vac[i] + E2_vac[i]
+
 update(IMild[]) <- IMild[i] + delta_IMild[i]  # Mild infections (1 comp)
 update(ICase1[]) <- ICase1[i] + delta_ICase1[i] # First of the compartments for infections that will require hospitalisation (2 comps)
 update(ICase2[]) <- ICase2[i] + delta_ICase2[i] # Second of the compartments for infections that will require hospitalisation (2 comps)
+ICase[] <- ICase1[i] + ICase2[i]
 
 # Passage Through Requiring Oxygen, Either Receiving It or Not, and Surviving or Not
 update(IOxGetLive1[]) <- IOxGetLive1[i] + delta_IOxGetLive1[i] # First of the compartments for infections that will require oxygen, get it, and who survive (2 comps)
@@ -62,6 +70,7 @@ update(IOxNotGetLive1[]) <- IOxNotGetLive1[i] + delta_IOxNotGetLive1[i] # First 
 update(IOxNotGetLive2[]) <- IOxNotGetLive2[i] + delta_IOxNotGetLive2[i] # Second of the compartments for infections that will require oxygen, do NOT get it, and live (2 comps)
 update(IOxNotGetDie1[]) <- IOxNotGetDie1[i] + delta_IOxNotGetDie1[i] # First of the compartments for infections that will require oxygen, do NOT get it, and die (2 comps)
 update(IOxNotGetDie2[]) <- IOxNotGetDie2[i] + delta_IOxNotGetDie2[i] # Second of the compartments for infections that will require oxygen, do NOT get it, and die (2 comps)
+IHospital[] <- IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] + IOxNotGetLive1[i] + IOxNotGetLive2[i] + IOxNotGetDie1[i] + IOxNotGetDie2[i]
 
 # Passage Through Requiring Mechanical Ventilation, Either Receiving It or Not, and Surviving or Not
 update(IMVGetLive1[]) <- IMVGetLive1[i] + delta_IMVGetLive1[i] # First of the compartments for infections that will require mechanical ventilation, get it, and who survive (2 comps)
@@ -72,20 +81,24 @@ update(IMVNotGetLive1[]) <- IMVNotGetLive1[i] + delta_IMVNotGetLive1[i] # First 
 update(IMVNotGetLive2[]) <- IMVNotGetLive2[i] + delta_IMVNotGetLive2[i] # Second of the compartments for infections that will require mechanical ventilation, do NOT get it, and survive (2 comps)
 update(IMVNotGetDie1[]) <- IMVNotGetDie1[i] + delta_IMVNotGetDie1[i] # First of the compartments for infections that will require mechanical ventilation, do NOT get it, and die (2 comps)
 update(IMVNotGetDie2[]) <- IMVNotGetDie2[i] + delta_IMVNotGetDie2[i] # Second of the compartments for infections that will require mechanical ventilation, do NOT get it, and die (2 comps)
+IICU[] <- IMVGetLive1[i] + IMVGetLive2[i] + IMVGetDie1[i] + IMVGetDie2[i] + IMVNotGetLive1[i] + IMVNotGetLive2[i] + IMVNotGetDie1[i] + IMVNotGetDie2[i]
 
 # Passage Through Recovery, from Mild Infection, Requiring Oxygen or From ICU Post-Requiring Mechanical Ventilation
 update(IRec1[]) <- IRec1[i] + delta_IRec1[i] # First of the compartments for those recovering from ICU (2 comps)
 update(IRec2[]) <- IRec2[i] + delta_IRec2[i] # Second of the compartments for those recovering from ICU (2 comps)
+IRec[] <- IRec1[i] + IRec2[i]
+
 update(D[]) <- D[i] + delta_D[i] # Deaths
 # Recovery
 update(R1[]) <- R1[i] + delta_R1[i] # Recovered 1
-update(R2[]) <- R1[i] + delta_R2[i] # Recovered 2
+update(R2[]) <- R2[i] + delta_R2[i] # Recovered 2
+R[] <- R1[i] + R2[i]
+
 # Vaccination
 update(V1[]) <- V1[i] + delta_V1[i]
 update(V2[]) <- V2[i] + delta_V2[i]
-# Infected + vaccinated
-update(E1_vac[]) <- E1_vac[i] + delta_E1_vac[i]
-update(E2_vac[]) <- E2_vac[i] + delta_E2_vac[i]
+V[] <- V1[i] + V2[i]
+vaccines[] <- n_R1_V[i] + n_R2_V[i] + n_S_V1[i]
 ###########################################################################
 ## Defining individual probabilities of transition between compartments: ##
 ###########################################################################
@@ -130,8 +143,8 @@ p_Rec2_R <- 1 - exp(-gamma_rec * dt) # Progression through recovery from ICU in 
 p_leave_R[] <- 1 - exp(-(gamma_R + vaccination_rate * vaccination_target[i]) * dt) # Probability leaving R
 p_R[] <- gamma_R / (gamma_R + vaccination_rate * vaccination_target[i]) # Probability of progression through R
 # Transition probabilities for those vaccinated
-p_leave_V[] <- 1 - exp(-(gamma_V + lambda[i] * V1[i] * vaccine_efficacy_infection[i]) * dt) # Probability leaving V
-p_V[] <- gamma_V / (gamma_V + lambda[i] * V1[i] * vaccine_efficacy_infection[i]) # Probability of progression through V
+p_leave_V[] <- 1 - exp(-(gamma_V + lambda[i] * vaccine_efficacy_infection[i]) * dt) # Probability leaving V
+p_V[] <- gamma_V / (gamma_V + lambda[i] * vaccine_efficacy_infection[i]) # Probability of progression through V
 
 
 p_leave_S[] <- 1 - exp(-(lambda[i] + vaccination_rate * vaccination_target[i]) * dt) # Infection - age dependent FOI based on mixing patterns
@@ -201,39 +214,81 @@ n_IRec2_R[] <- rbinom(IRec2[i], p_Rec2_R) # Number recovering completely
 
 # Recovery
 n_R1_R2_V[] <- rbinom(R1[i], p_leave_R[i]) # Number leaving R1
-n_R1_R2[] <- rbinom(n_R1_R2_V[i], p_R[i]) # Number moving R1->R2
+n_R1_R2[] <- if (n_R1_R2_V[i] > 0) rbinom(n_R1_R2_V[i], p_R[i]) else 0 # Number moving R1->R2
 n_R1_V[] <- n_R1_R2_V[i] - n_R1_R2[i] # Number moving R1->V
 
 n_R2_S_V[] <- rbinom(R2[i], p_leave_R[i]) # Number leaving R2
-n_R2_S[] <- rbinom(n_R2_S_V[i], p_R[i]) # Number moving R2->S
+n_R2_S[] <- if (n_R2_S_V[i] > 0) rbinom(n_R2_S_V[i], p_R[i]) else 0 # Number moving R2->S
 n_R2_V[] <- n_R2_S_V[i] - n_R2_S[i] # Number moving R2->V
 
 n_S_E1_V[] <- rbinom(S[i], p_leave_S[i]) # Number leaving S
-n_S_E1[] <- rbinom(n_S_E1_V[i], p_E[i]) # Number moving S->E1
+n_S_E1[] <- if(n_S_E1_V[i] > 0) rbinom(n_S_E1_V[i], p_E[i]) else 0 # Number moving S->E1
 n_S_V1[] <- n_S_E1_V[i] - n_S_E1[i] # Number moving S->V1
 
 # Vaccine
 n_V1_V2_Evac[] <- rbinom(V1[i], p_leave_V[i]) # Number leaving V1
-n_V1_V2[] <- rbinom(n_V1_V2_Evac[i], p_V[i]) # Number moving V1->V2
+n_V1_V2[] <- if (n_V1_V2_Evac[i] > 0) rbinom(n_V1_V2_Evac[i], p_V[i]) else 0 # Number moving V1->V2
 n_V1_Evac[] <- n_V1_V2_Evac[i] - n_V1_V2[i] # Number moving V1->Evac
 
 n_V2_S_Evac[] <- rbinom(V2[i], p_leave_V[i]) # Number leaving V2
-n_V2_S[] <- rbinom(n_V2_S_Evac[i], p_V[i]) # Number moving V2->S
+n_V2_S[] <- if (n_V2_S_Evac[i] > 0) rbinom(n_V2_S_Evac[i], p_V[i]) else 0 # Number moving V2->S
 n_V2_Evac[] <- n_V2_S_Evac[i] - n_V2_S[i] # Number moving V2->Evac
 
 n_E1_vac_E2_vac[] <- rbinom(E1_vac[i], p_E1_E2) # Number leaving E1_Vac
 n_E2_vac_I[] <- rbinom(E2_vac[i], p_E2_I) # Number leaving E2_Vac
-n_E2_vac_Icase[] <- n_E2_vac_I[i] * prob_hosp_vaccine[i] # Number moving E2_vac -> ICase
+n_E2_vac_Icase[] <- round(n_E2_vac_I[i] * prob_hosp_vaccine[i]) # Number moving E2_vac -> ICase
 n_E2_vac_Imild[] <- n_E2_vac_I[i] - n_E2_vac_Icase[i] # Number moving E2_vac -> IMild
 
+N[] <- S[i] + E1[i] + E2[i] + E1_vac[i] + E2_vac[i] + IMild[i] + ICase1[i] + ICase2[i] +
+  IMVGetLive1[i] + IMVGetLive2[i] +
+  IMVGetDie1[i] + IMVGetDie2[i] + IMVNotGetLive1[i] + IMVNotGetLive2[i] + IMVNotGetDie1[i] + IMVNotGetDie2[i] +
+  IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] + IOxNotGetLive1[i] + IOxNotGetLive2[i] +
+  IOxNotGetDie1[i] + IOxNotGetDie2[i] +
+  IRec1[i] + IRec2[i] +
+  R1[i] + R2[i] + D[i] + V1[i] + V2[i]
+
 ### Outputs
-output(n_E2_I[]) <- TRUE
-output(n_E2_ICase1[]) <- TRUE
-output(n_E2_IMild[]) <- TRUE
-output(number_requiring_IMV[]) <- TRUE
-output(delta_D[]) <- TRUE
+#output(n_E2_I[]) <- TRUE
+#output(n_E2_ICase1[]) <- TRUE
+#output(n_E2_IMild[]) <- TRUE
+#output(number_requiring_IMV[]) <- TRUE
+#output(delta_D[]) <- TRUE
+output(E[]) <- TRUE
+output(IICU[]) <- TRUE
+output(IHospital[]) <- TRUE
+output(ICase[]) <- TRUE
+output(R[]) <- TRUE
+output(V[]) <- TRUE
+output(E_vac[]) <- TRUE
+output(IRec[]) <- TRUE
+output(vaccines[]) <- TRUE
+output(N[]) <- TRUE
 output(time) <- TRUE
 
+#output(n_S_E1_V[]) <- TRUE
+#output(n_S_E1[]) <- TRUE
+output(delta_E1) <- TRUE
+output(delta_S) <- TRUE
+output(n_E1_E2) <- TRUE
+output(lambda[]) <- TRUE
+output(number_get_IMV[]) <- TRUE
+output(n_V1_Evac) <- TRUE
+output(n_V2_Evac) <- TRUE
+output(n_E1_vac_E2_vac) <- TRUE
+output(n_V1_V2_Evac) <- TRUE
+output(n_V1_V2) <- TRUE
+output(n_R1_V) <- TRUE
+output(n_R2_V) <- TRUE
+output(n_S_V1) <- TRUE
+output(n_S_E1_V) <- TRUE
+output(n_S_E1) <- TRUE
+output(p_leave_S) <- TRUE
+output(p_E) <- TRUE
+output(p_V) <- TRUE
+output(n_E2_IMild) <- TRUE
+output(n_IMild_R) <- TRUE
+output(n_E2_vac_Imild) <- TRUE
+output(delta_IMild) <- TRUE
 ###########################################################################
 ##  Totalling up the flows in and out of each compartment                ##
 ###########################################################################
@@ -267,7 +322,7 @@ delta_IRec2[] <- n_IRec1_IRec2[i] - n_IRec2_R[i]
 delta_D[] <- n_IOxGetDie2_D[i] + n_IOxNotGetDie2_D[i] + n_IMVGetDie2_D[i] + n_IMVNotGetDie2_D[i]
 
 delta_R1[] <- n_IOxGetLive2_R[i] + n_IOxNotGetLive2_R[i] + n_IRec2_R[i] + n_IMVNotGetLive2_R[i] + n_IMild_R[i] - n_R1_R2_V[i]
-delta_R2[] <- n_R1_R2_V[i] - n_R2_S_V[i]
+delta_R2[] <- n_R1_R2[i] - n_R2_S_V[i]
 
 delta_V1[] <- n_R1_V[i] + n_R2_V[i] + n_S_V1[i] - n_V1_V2_Evac[i]
 delta_V2[] <- n_V1_V2[i] - n_V2_S_Evac[i]
@@ -392,9 +447,11 @@ E2_vac_0[] <- user()
 dim(S) <- N_age
 dim(E1) <- N_age
 dim(E2) <- N_age
+dim(E) <- N_age
 dim(IMild) <- N_age
 dim(ICase1) <- N_age
 dim(ICase2) <- N_age
+dim(ICase) <- N_age
 dim(IOxGetLive1) <- N_age
 dim(IOxGetLive2) <- N_age
 dim(IOxGetDie1) <- N_age
@@ -411,15 +468,23 @@ dim(IMVNotGetLive1) <- N_age
 dim(IMVNotGetLive2) <- N_age
 dim(IMVNotGetDie1) <- N_age
 dim(IMVNotGetDie2) <- N_age
+dim(IICU) <- N_age
+dim(IHospital) <- N_age
 dim(IRec1) <- N_age
 dim(IRec2) <- N_age
 dim(D) <- N_age
 dim(R1) <- N_age
 dim(R2) <- N_age
+dim(R) <- N_age
 dim(V1) <- N_age
 dim(V2) <- N_age
+dim(V) <- N_age
 dim(E1_vac) <- N_age
 dim(E2_vac) <- N_age
+dim(E_vac) <- N_age
+dim(IRec) <- N_age
+dim(vaccines) <- N_age
+dim(N) <- N_age
 
 # For the Initial Values
 dim(S_0) <- N_age

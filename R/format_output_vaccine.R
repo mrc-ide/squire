@@ -32,6 +32,10 @@ format_vaccine <- function(x,
   assert_custom_class(x, "squire_simulation")
   assert_logical(reduce_age)
 
+  if(length(dim(x$output)) == 4){
+    x$output <- abind::adrop(x$output, drop = c(FALSE, FALSE, FALSE, TRUE))
+  }
+
   # Get columns indices of variables
   index <- odin_index(x$model)
   if(!all(compartments %in% names(index))){
@@ -39,7 +43,7 @@ format_vaccine <- function(x,
   }
 
   # Extract time
-  time <- x$output[,index$t,]
+  time <- x$output[,index$t,1]
   # N replicates
   replicates = dim(x$output)[3]
   # Format over each replicate

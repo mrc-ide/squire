@@ -516,7 +516,7 @@ vaccine_pars <- default_vaccine_pars()
 #'   day_return = TRUE
 #' )
 #' }
-run_deterministic_SEIR_vaccine_model <- function(
+run_vaccine <- function(
 
   # demography
   country = NULL,
@@ -580,15 +580,20 @@ run_deterministic_SEIR_vaccine_model <- function(
   tt_ICU_beds = 0,
 
   seeding_cases = NULL,
-  mod_gen = explicit_SEIR_vaccine_deterministic
+  framework = "deterministic"
 ) {
 
-  # replicates has to be 1
-  replicates <- 1
 
   # Grab function arguments
   args <- as.list(environment())
   set.seed(seed)
+
+  if(framework == "deterministic"){
+    replicates <- 1
+    mod_gen = explicit_SEIR_vaccine_deterministic
+  } else {
+    mod_gen = explicit_SEIR_vaccine_stochastic
+  }
 
   # create parameter list
   pars <- parameters_vaccine(country=country,
@@ -641,6 +646,8 @@ run_deterministic_SEIR_vaccine_model <- function(
   pars$tt_ICU_beds <- I(pars$tt_ICU_beds)
   pars$ICU_beds <- I(pars$ICU_beds)
   pars$tt_matrix <- I(pars$tt_matrix)
+  pars$tt_vaccine <- I(pars$tt_vaccine)
+
 
   # Running the Model
   mod <- mod_gen(user = pars, unused_user_action = "ignore")
