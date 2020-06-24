@@ -99,6 +99,17 @@ update(V1[]) <- V1[i] + delta_V1[i]
 update(V2[]) <- V2[i] + delta_V2[i]
 V[] <- V1[i] + V2[i]
 vaccines[] <- n_R1_V[i] + n_R2_V[i] + n_S_V1[i]
+
+# Hospital occupancy and demand
+hospital_occupancy[] <- IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] +  IRec1[i] + IRec2[i]
+ICU_occupancy[] <- IMVGetLive1[i] +  IMVGetLive2[i] + IMVGetDie1[i] + IMVGetDie2[i]
+hospital_demand[] <- IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] +  IRec1[i] + IRec2[i] + IOxNotGetLive1[i] + IOxNotGetLive2[i] + IOxNotGetDie1[i] + IOxNotGetDie2[i]
+ICU_demand[] <- IMVGetLive1[i] +  IMVGetLive2[i] + IMVGetDie1[i] + IMVGetDie2[i] + IMVNotGetLive1[i] +  IMVNotGetLive2[i] + IMVNotGetDie1[i] + IMVNotGetDie2[i]
+
+# Deaths and infections
+deaths[] <- n_IOxGetDie2_D[i] + n_IOxNotGetDie2_D[i] + n_IMVGetDie2_D[i] + n_IMVNotGetDie2_D[i]
+infections[] <- n_S_E1[i] + n_V1_Evac[i] + n_V2_Evac[i]
+
 ###########################################################################
 ## Defining individual probabilities of transition between compartments: ##
 ###########################################################################
@@ -248,46 +259,24 @@ N[] <- S[i] + E1[i] + E2[i] + E1_vac[i] + E2_vac[i] + IMild[i] + ICase1[i] + ICa
   R1[i] + R2[i] + D[i] + V1[i] + V2[i]
 
 ### Outputs
-#output(n_E2_I[]) <- TRUE
-#output(n_E2_ICase1[]) <- TRUE
-#output(n_E2_IMild[]) <- TRUE
-#output(number_requiring_IMV[]) <- TRUE
-#output(delta_D[]) <- TRUE
-output(E[]) <- TRUE
-output(IICU[]) <- TRUE
-output(IHospital[]) <- TRUE
-output(ICase[]) <- TRUE
-output(R[]) <- TRUE
-output(V[]) <- TRUE
-output(E_vac[]) <- TRUE
-output(IRec[]) <- TRUE
-output(vaccines[]) <- TRUE
-output(N[]) <- TRUE
+output(E) <- TRUE
+output(IICU) <- TRUE
+output(IHospital) <- TRUE
+output(ICase) <- TRUE
+output(R) <- TRUE
+output(V) <- TRUE
+output(E_vac) <- TRUE
+output(IRec) <- TRUE
+output(vaccines) <- TRUE
+output(N) <- TRUE
+output(hospital_occupancy) <- TRUE
+output(ICU_occupancy) <- TRUE
+output(hospital_demand) <- TRUE
+output(ICU_demand) <- TRUE
+output(deaths) <- TRUE
+output(infections) <- TRUE
 output(time) <- TRUE
 
-#output(n_S_E1_V[]) <- TRUE
-#output(n_S_E1[]) <- TRUE
-output(delta_E1) <- TRUE
-output(delta_S) <- TRUE
-output(n_E1_E2) <- TRUE
-output(lambda[]) <- TRUE
-output(number_get_IMV[]) <- TRUE
-output(n_V1_Evac) <- TRUE
-output(n_V2_Evac) <- TRUE
-output(n_E1_vac_E2_vac) <- TRUE
-output(n_V1_V2_Evac) <- TRUE
-output(n_V1_V2) <- TRUE
-output(n_R1_V) <- TRUE
-output(n_R2_V) <- TRUE
-output(n_S_V1) <- TRUE
-output(n_S_E1_V) <- TRUE
-output(n_S_E1) <- TRUE
-output(p_leave_S) <- TRUE
-output(p_E) <- TRUE
-output(p_V) <- TRUE
-output(n_E2_IMild) <- TRUE
-output(n_IMild_R) <- TRUE
-output(n_E2_vac_Imild) <- TRUE
 ###########################################################################
 ##  Totalling up the flows in and out of each compartment                ##
 ###########################################################################
@@ -484,6 +473,12 @@ dim(E_vac) <- N_age
 dim(IRec) <- N_age
 dim(vaccines) <- N_age
 dim(N) <- N_age
+dim(hospital_occupancy) <- N_age
+dim(ICU_occupancy) <- N_age
+dim(hospital_demand) <- N_age
+dim(ICU_demand) <- N_age
+dim(deaths) <- N_age
+dim(infections) <- N_age
 
 # For the Initial Values
 dim(S_0) <- N_age

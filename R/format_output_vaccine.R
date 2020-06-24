@@ -5,7 +5,7 @@
 #' @param summaries Vecto of summary names, which may be:
 #' \itemize{
 #'       \item{"deaths"}{ Daily Deaths (stochatic model) }
-#'       \item{"infections"}{ Daily Infections (stochastic model)}
+#'       \item{"infections"}{ Daily Infections. New infections (note this is currently a slightly different definitionto the main Squire mode)}
 #'       \item{"hospital_occupancy"}{ Occupied Hospital Beds }
 #'       \item{"ICU_occupancy"}{ Occupied ICU Beds }
 #'       \item{"hospital_demand}{ Required Hospital Beds }
@@ -24,7 +24,7 @@ format_vaccine <- function(x,
                                             "IRec", "R", "D", "N"),
                            summaries = c("deaths", "infections", "hospital_occupancy",
                                          "ICU_occupancy", "hospital_demand",
-                                         "ICU_demand", "vaccinated"),
+                                         "ICU_demand", "vaccines"),
                            reduce_age = TRUE,
                            date_0 = NULL){
 
@@ -32,6 +32,7 @@ format_vaccine <- function(x,
   assert_custom_class(x, "squire_simulation")
   assert_logical(reduce_age)
 
+  # Standardise output dimensions
   if(length(dim(x$output)) == 4){
     x$output <- abind::adrop(x$output, drop = c(FALSE, FALSE, FALSE, TRUE))
   }
