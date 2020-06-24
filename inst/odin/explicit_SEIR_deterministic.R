@@ -124,6 +124,10 @@ deriv(IOxNotGetDie2[]) <- gamma_not_get_ox_die * IOxNotGetDie1[i] -  gamma_not_g
 deriv(R[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox_survive * IOxGetLive2[i]) + (gamma_not_get_ox_survive * IOxNotGetLive2[i]) + (gamma_not_get_mv_survive * IMVNotGetLive2[i])
 deriv(D[]) <- (gamma_get_ox_die * IOxGetDie2[i]) + (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_get_mv_die * IMVGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
 
+# Outputting Hospitalisation and ICU Incidence
+output(number_requiring_Ox[]) <- TRUE
+output(number_requiring_IMV[]) <- TRUE
+
 ## Initial states:
 initial(S[]) <- S_0[i]
 initial(E1[]) <- E1_0[i]
