@@ -649,6 +649,7 @@ test_that("reporting fraction into pars_obs", {
     forecast = 0
   )
 
+  set.seed(93L)
   out2 <- calibrate(
     data = data,
     R0_min = R0_min,
@@ -667,9 +668,8 @@ test_that("reporting fraction into pars_obs", {
     country = country,
     forecast = 0
   )
-
-  index <- odin_index(out$model)
-  expect_true(sum(rowSums(out$output[,index$D,1]))  > sum(rowSums(out2$output[,index$D,1])))
+  
+  expect_true(all(out2$replicate_parameters$R0 == out$replicate_parameters$R0))
 
 })
 
