@@ -23,7 +23,9 @@ format_deterministic_output <- function(x) {
   summary_variable_compartments <- list(
     infections = c("IMild", "ICase1", "ICase2"),
     hospital_demand = hospital_demand,
-    ICU_demand = ICU_demand
+    ICU_demand = ICU_demand,
+    hospital_incidence = "number_requiring_Ox",
+    ICU_incidence = "number_requiring_IMV"
   )
 
   diff_data <- vapply(
@@ -171,7 +173,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
 
   # Summary Values and Relevant Compartments
   summary_variables <- c("deaths", "infections", "hospital_occupancy",
-                         "ICU_occupancy", "hospital_demand", "ICU_demand")
+                         "ICU_occupancy", "hospital_demand", "ICU_demand", "hospital_incidence", "ICU_incidence")
   summary_variable_compartments <- list(
     deaths = "delta_D",
     infections = "n_E2_I",
@@ -180,7 +182,9 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
     hospital_demand = c("IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2", "IRec1", "IRec2",
                         "IOxNotGetLive1","IOxNotGetLive2","IOxNotGetDie1","IOxNotGetDie2"),
     ICU_demand = c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2",
-                   "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2")
+                   "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2"),
+    hospital_incidence = "number_requiring_Ox",
+    ICU_incidence = "number_requiring_IMV"
   )
 
   # Check var_select contains only variables described above

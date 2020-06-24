@@ -259,3 +259,35 @@ test_that("calibrate_output_parsing vs format_output",{
 
 
 })
+
+test_that("output format works for hospitalisation and ICU incidence for stochastic and deterministic versions", {
+  set.seed(123)
+  pop <- get_population("Afghanistan", simple_SEIR = FALSE)
+  m1 <- run_explicit_SEEIR_model(R0 = 2,
+                                 population = pop$n,
+                                 dt = 1,
+                                 time_period = 10,
+                                 replicates = 10,
+                                 contact_matrix_set=contact_matrices[[1]])
+
+  ICU_incidence <- format_output(m1, var_select = "ICU_incidence")
+  hosp_incidence <- format_output(m1, var_select = "hospital_incidence")
+  expect_type(ICU_incidence, "list")
+  expect_type(hosp_incidence, "list")
+
+  m <- get_mixing_matrix("Afghanistan")
+  model_output <- run_deterministic_SEIR_model(
+    population = pop$n, contact_matrix_set = m,
+    tt_R0 = c(0), R0 = c(3), time_period = 2,
+    day_return = TRUE,
+    hosp_bed_capacity = 100000,
+    ICU_bed_capacity = 1000000)
+
+  actual <- format_deterministic_output(model_output)
+  compartment_names <- unique(actual$compartment)
+  expect_true("hospital_incidence" %in% compartment_names)
+  expect_true("ICU_incidence" %in% compartment_names)
+
+})
+
+
