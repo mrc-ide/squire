@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>create a master chain from a pmcmc_list object — create_master_chain • squire</title>
+<title>update_sigma — jc_prop_update • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="create a master chain from a pmcmc_list object — create_master_chain" />
-<meta property="og:description" content="create a master chain from a pmcmc_list object" />
+<meta property="og:title" content="update_sigma — jc_prop_update" />
+<meta property="og:description" content="Involved in the Johnstone-Change optimisation within the Metropolis-Hastings MCMC.
+Function to iteratively update the scaling factor and covariance matrix involved
+in the proposal distribution." />
 
 
 
@@ -114,27 +116,57 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>create a master chain from a pmcmc_list object</h1>
+    <h1>update_sigma</h1>
     
-    <div class="hidden name"><code>create_master_chain.Rd</code></div>
+    <div class="hidden name"><code>jc_prop_update.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>create a master chain from a pmcmc_list object</p>
+    <p>Involved in the Johnstone-Change optimisation within the Metropolis-Hastings MCMC.
+Function to iteratively update the scaling factor and covariance matrix involved
+in the proposal distribution.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/squire/man/create_master_chain.html'>create_master_chain</a></span>(<span class='kw'>x</span>, <span class='kw'>burn_in</span>)</pre>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/squire/man/jc_prop_update.html'>jc_prop_update</a></span>(
+  <span class='kw'>accepted</span>,
+  <span class='kw'>i</span>,
+  <span class='kw'>current_sf</span>,
+  <span class='kw'>previous_mu</span>,
+  <span class='kw'>current_parameters</span>,
+  <span class='kw'>current_covariance_matrix</span>,
+  <span class='kw'>required_acceptance_ratio</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>a pmcmc_list object</p></td>
+      <th>accepted</th>
+      <td><p>whether or not the most recent parameter proposal was accepted</p></td>
     </tr>
     <tr>
-      <th>burn_in</th>
-      <td><p>an integer denoting the number of samples to discard from each chain</p></td>
+      <th>i</th>
+      <td><p>the iteration number</p></td>
+    </tr>
+    <tr>
+      <th>current_sf</th>
+      <td><p>the current scaling factor</p></td>
+    </tr>
+    <tr>
+      <th>previous_mu</th>
+      <td><p>running average of the MCMC parameters</p></td>
+    </tr>
+    <tr>
+      <th>current_parameters</th>
+      <td><p>current parameters</p></td>
+    </tr>
+    <tr>
+      <th>current_covariance_matrix</th>
+      <td><p>current covariance matrix</p></td>
+    </tr>
+    <tr>
+      <th>required_acceptance_ratio</th>
+      <td><p>required acceptance ratio</p></td>
     </tr>
     </table>
 

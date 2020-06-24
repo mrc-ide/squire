@@ -102,7 +102,7 @@ the squire_model framework." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.21</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.25</span>
       </span>
     </div>
 
@@ -193,8 +193,6 @@ the <code>squire_model</code> framework.</p>
   output_proposals = <span class='fl'>FALSE</span>,
   n_chains = <span class='fl'>1</span>,
   squire_model = <span class='fu'><a href='https://rdrr.io/pkg/squire/man/explicit_model.html'>explicit_model</a></span>(),
-  Rt_func = <span class='fu'>function</span>(<span class='kw'>R0_change</span>, <span class='kw'>R0</span>, <span class='kw'>Meff</span>) {     <span class='kw'>R0</span> <span class='op'>*</span> (<span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/stats/Logistic.html'>plogis</a></span>(<span class='op'>-</span>(<span class='kw'>R0_change</span> <span class='op'>-</span> <span class='fl'>1</span>) <span class='op'>*</span>
-    <span class='op'>-</span><span class='kw'>Meff</span>)) },
   pars_obs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(phi_cases = <span class='fl'>1</span>, k_cases = <span class='fl'>2</span>, phi_death = <span class='fl'>1</span>, k_death = <span class='fl'>2</span>, exp_noise =
     <span class='fl'>1e+06</span>),
   pars_init = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-07"</span>), R0 = <span class='fl'>2.5</span>, Meff = <span class='fl'>2</span>, Meff_pl = <span class='fl'>3</span>),
@@ -217,14 +215,13 @@ the <code>squire_model</code> framework.</p>
   ICU_bed_capacity = <span class='kw'>NULL</span>,
   baseline_ICU_bed_capacity = <span class='kw'>NULL</span>,
   date_ICU_bed_capacity_change = <span class='kw'>NULL</span>,
-  roll = <span class='fl'>0</span>,
+  roll = <span class='fl'>7</span>,
+  scale_meff_pl = <span class='fl'>FALSE</span>,
   burnin = <span class='fl'>0</span>,
   replicates = <span class='fl'>100</span>,
   forecast = <span class='fl'>0</span>,
   required_acceptance_ratio = <span class='fl'>0.23</span>,
-  start_covariance_adaptation = <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span>(<span class='kw'>n_mcmc</span><span class='op'>/</span><span class='fl'>2</span>),
-  start_scaling_factor_adaptation = <span class='fl'>1</span>,
-  initial_scaling_factor = <span class='fl'>1</span>,
+  start_adaptation = <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span>(<span class='kw'>n_mcmc</span><span class='op'>/</span><span class='fl'>2</span>),
   <span class='kw'>...</span>
 )</pre>
 
@@ -274,12 +271,6 @@ If NULL, uses uninformative priors which do not affect the posterior</p></td>
     <tr>
       <th>squire_model</th>
       <td><p>A squire model to use</p></td>
-    </tr>
-    <tr>
-      <th>Rt_func</th>
-      <td><p>Function for converting R0, Meff and R0_change. Function must
-have names arguments of R0, Meff and R0_change. Default is linear relationship
-on the log scale given by <code><a href='https://rdrr.io/r/base/Log.html'>exp(log(R0) - Meff*(1-R0_change))</a></code>.</p></td>
     </tr>
     <tr>
       <th>pars_obs</th>
@@ -400,7 +391,11 @@ Defaut = NULL, i.e. no change</p></td>
     </tr>
     <tr>
       <th>roll</th>
-      <td><p>Number of days over which Meff and Meff_pl switch. Default = 0</p></td>
+      <td><p>Number of days over which mean mobility at plateau is calculated. Default = 7</p></td>
+    </tr>
+    <tr>
+      <th>scale_meff_pl</th>
+      <td><p>Boolean for whether Meff_pl is scaling relative to Meff. Default = FALSE.</p></td>
     </tr>
     <tr>
       <th>burnin</th>
@@ -420,16 +415,8 @@ to select parameter set. For each parmater set sampled, run particle filter with
       <td><p>Desired MCMC acceptance ratio</p></td>
     </tr>
     <tr>
-      <th>start_covariance_adaptation</th>
-      <td><p>Iteration number to begin covariance matrix adaptation at</p></td>
-    </tr>
-    <tr>
-      <th>start_scaling_factor_adaptation</th>
+      <th>start_adaptation</th>
       <td><p>Iteration number to begin RM optimisation of scaling factor at</p></td>
-    </tr>
-    <tr>
-      <th>initial_scaling_factor</th>
-      <td><p>Initial scaling factor for RM opitmisation if implemented</p></td>
     </tr>
     <tr>
       <th>...</th>
