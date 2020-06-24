@@ -668,9 +668,8 @@ test_that("reporting fraction into pars_obs", {
     country = country,
     forecast = 0
   )
-
-  index <- odin_index(out$model)
-  expect_true(sum(rowSums(out$output[,index$D,1]))  > sum(rowSums(out2$output[,index$D,1]), na.rm = TRUE))
+  
+  expect_true(all(out2$replicate_parameters$R0 == out$replicate_parameters$R0))
 
 })
 
