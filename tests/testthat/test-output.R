@@ -29,14 +29,14 @@ test_that("deterministic output format works", {
   model_output$output[2, c('IMVGetLive2[7]', 'IMVNotGetLive2[3]'), 1] <- 2
 
   actual <- format_deterministic_output(model_output)
-  vars <- c('deaths','infections','hospital_demand','ICU_demand')
+  vars <- c('deaths','infections','hospital_demand','ICU_demand', 'hospital_incidence', 'ICU_incidence')
   expected <- data.frame(
     t = rep(c(1, 2), length(vars)),
     compartment = rep(vars, each = 2),
-    value = c(2, 5, 4, 10, 2, 6, 1, 4),
+    value = c(2, 5, 4, 10, 2, 6, 1, 4, 0, 0, 0, 0),
     stringsAsFactors = FALSE
   )
-  rownames(actual) <- seq_len(8)
+  rownames(actual) <- seq_len(12)
   expect_mapequal(actual, expected)
 })
 
