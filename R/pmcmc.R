@@ -1061,7 +1061,8 @@ evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
       # when does mobility change take place
       if(date_Meff_change <= date_R0_change[1]) {
 
-        Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(R0_change-R0_change[1]) ))
+        mob_up <- R0_change-R0_change[1]
+        Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) ))
 
       } else if (date_Meff_change > tail(date_R0_change, 1)) {
 
@@ -1103,7 +1104,7 @@ evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
                 Rt)
       } else {
         Rt <- c(R0 * 2*(plogis( -Meff * -(R0_change[which(date_R0_change == start_date)]-1) -
-                                  Meff_pl*(mob_up[R0_change[which(date_R0_change == start_date)]]) )),
+                                  Meff_pl*(mob_up[which(date_R0_change == start_date)]) )),
                 Rt)
       }
     } else {
