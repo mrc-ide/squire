@@ -148,7 +148,7 @@ p_V[] <- gamma_V / (gamma_V + lambda[i] * vaccine_efficacy_infection[i]) # Proba
 
 
 p_leave_S[] <- 1 - exp(-(lambda[i] + vaccination_rate * vaccination_target[i]) * dt) # Infection - age dependent FOI based on mixing patterns
-p_E[] <- lambda[i] / (lambda[i] + vaccination_rate * vaccination_target[i]) # Probability infection
+p_E[] <- if(lambda[i] > 0) lambda[i] / (lambda[i] + vaccination_rate * vaccination_target[i]) else 0 # Probability infection
 
 ###########################################################################
 ## Draws for the number of individuals changing between compartments:    ##
@@ -236,7 +236,7 @@ n_V2_Evac[] <- n_V2_S_Evac[i] - n_V2_S[i] # Number moving V2->Evac
 
 n_E1_vac_E2_vac[] <- rbinom(E1_vac[i], p_E1_E2) # Number leaving E1_Vac
 n_E2_vac_I[] <- rbinom(E2_vac[i], p_E2_I) # Number leaving E2_Vac
-n_E2_vac_Icase[] <- round(n_E2_vac_I[i] * prob_hosp_vaccine[i]) # Number moving E2_vac -> ICase
+n_E2_vac_Icase[] <- if(n_E2_vac_I[i] > 0) rbinom(n_E2_vac_I[i], prob_hosp_vaccine[i]) else 0 # Number moving E2_vac -> ICase
 n_E2_vac_Imild[] <- n_E2_vac_I[i] - n_E2_vac_Icase[i] # Number moving E2_vac -> IMild
 
 N[] <- S[i] + E1[i] + E2[i] + E1_vac[i] + E2_vac[i] + IMild[i] + ICase1[i] + ICase2[i] +
@@ -288,7 +288,6 @@ output(p_V) <- TRUE
 output(n_E2_IMild) <- TRUE
 output(n_IMild_R) <- TRUE
 output(n_E2_vac_Imild) <- TRUE
-output(delta_IMild) <- TRUE
 ###########################################################################
 ##  Totalling up the flows in and out of each compartment                ##
 ###########################################################################
