@@ -161,6 +161,7 @@ pmcmc <- function(data,
                   forecast = 0,
                   required_acceptance_ratio = 0.23,
                   start_adaptation = round(n_mcmc/2),
+                  use_Meff,
                   ...
 ) {
 
@@ -269,8 +270,8 @@ pmcmc <- function(data,
 
   # catch that if date_R0_change isn't set, Meff isn't doing anything -- not to confuse user
   if (is.null(date_R0_change)) {
-    if (pars_min[["Meff"]] != 1 & pars_max[["Meff"]] != 1 & pars_init[[1]][["Meff"]] != 1 &
-        pars_min[["Meff_pl"]] != 1 & pars_max[["Meff_pl"]] != 1 & pars_init[[1]][["Meff_pl"]] != 1) {
+    if (pars_min[["Meff"]] != 0 & pars_max[["Meff"]] != 0 & pars_init[[1]][["Meff"]] != 0 &
+        pars_min[["Meff_pl"]] != 0 & pars_max[["Meff_pl"]] != 0 & pars_init[[1]][["Meff_pl"]] != 0) {
       stop("Without an R0 date change, Meff during and post lockdown is not being used. Set Meff during and after lockdow to 1 in all pars lists")
     } else {
       # this slight tweak, so it still works with reflect proposal but won't move since it's not being estimated
@@ -287,8 +288,8 @@ pmcmc <- function(data,
 
   # meff change
   if (is.null(date_Meff_change)) {
-    if (pars_min[["Meff_pl"]] != 1 & pars_max[["Meff_pl"]] != 1 & pars_init[[1]][["Meff_pl"]] != 1) {
-      stop("Without date of Meff change, Meff after lockdown is not being used. Set Meff after lockdow to 1 in all pars lists")
+    if (pars_min[["Meff_pl"]] != 0 & pars_max[["Meff_pl"]] != 0 & pars_init[[1]][["Meff_pl"]] != 0) {
+      stop("Without date of Meff change, Meff after lockdown is not being used. Set Meff after lockdow to 0 in all pars lists")
     } else {
       # this slight tweak, so it still works with reflect proposal but won't move since it's not being estimated
       pars_min[["Meff_pl"]] <- pars_min[["Meff_pl"]] - 1e-10
@@ -296,6 +297,12 @@ pmcmc <- function(data,
       pars_discrete[["Meff_pl"]] <- TRUE
 
     }
+  }
+
+  # if the value of Meff has been set to the same (so no variation), add/subtract a little as above to make reflection work
+  if(pars_min[["Meff"]] == pars_max[["Meff"]]) {
+    pars_min[["Meff"]] <- pars_min[["Meff"]] - 1e-10
+    pars_max[["Meff"]] <- pars_max[["Meff"]] + 1e-10
   }
 
   if (!is.null(date_Meff_change)) {
@@ -442,7 +449,8 @@ pmcmc <- function(data,
                 pars_max = pars_max,
                 proposal_kernel = proposal_kernel,
                 pars_discrete = pars_discrete),
-    n_particles = n_particles)
+    n_particles = n_particles,
+    use_Meff = use_Meff)
 
 
 
@@ -474,7 +482,8 @@ pmcmc <- function(data,
                         forecast_days = 0,
                         roll = roll,
                         scale_meff_pl = scale_meff_pl,
-                        return = "ll"
+                        return = "ll",
+                        use_Meff = use_Meff
     )
     X
   }
@@ -881,7 +890,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                pars_obs, n_particles,
                                forecast_days = 0, return = "ll",
                                roll = 7, scale_meff_pl = FALSE,
-                               interventions) {
+                               interventions, use_Meff) {
   #----------------..
   # specify particle setup
   #----------------..
@@ -983,12 +992,13 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   # update new R0s based on R0_change and R0_date_change, and Meff_date_change
   #--------------------..
   # and now get new R0s for the R0
-  R0 <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
-                    date_R0_change = date_R0_change[date_R0_change>=start_date],
-                    start_date = start_date,
-                    date_Meff_change = date_Meff_change,
-                    scale_meff_pl = scale_meff_pl,
-                    roll = roll)
+  R0 <- evaluate_Rt_pmcmc(use_Meff = use_Meff,
+                          R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
+                          date_R0_change = date_R0_change[date_R0_change>=start_date],
+                          start_date = start_date,
+                          date_Meff_change = date_Meff_change,
+                          scale_meff_pl = scale_meff_pl,
+                          roll = roll)
 
   # which allow us to work out our beta
   beta_set <- beta_est(squire_model = squire_model,
@@ -1035,42 +1045,44 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
 
 # R0 with Meff
 #' @noRd
-evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
-                        date_Meff_change, roll = 7,
-                        scale_meff_pl = FALSE,
-                        start_date = NULL) {
+evaluate_Rt_pmcmc <- function(use_Meff,
+                              R0_change, R0, Meff, Meff_pl, date_R0_change,
+                              date_Meff_change, roll = 7,
+                              scale_meff_pl = FALSE,
+                              start_date = NULL) {
 
-  # and now get new Rts for the R0
-  if (!is.null(R0_change)) {
+  if (use_Meff) {
+    # and now get new Rts for the R0
+    if (!is.null(R0_change)) {
 
-    # if no change then all from R0_change
-    if (is.null(date_Meff_change)) {
-
-      Rt <- R0 * (2 * plogis(-(R0_change - 1) * -Meff))
-
-    } else if (!is.null(date_Meff_change)) {
-
-      date_Meff_change <- as.Date(date_Meff_change)
-      date_R0_change <- as.Date(date_R0_change)
-
-      # scale Meff accordingly
-      if (scale_meff_pl) {
-      Meff_pl <- Meff_pl*Meff
-      }
-
-      # when does mobility change take place
-      if(date_Meff_change <= date_R0_change[1]) {
-
-        mob_up <- R0_change-R0_change[1]
-        Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) ))
-
-      } else if (date_Meff_change > tail(date_R0_change, 1)) {
+      # if no change then all from R0_change
+      if (is.null(date_Meff_change)) {
 
         Rt <- R0 * (2 * plogis(-(R0_change - 1) * -Meff))
 
-      } else {
+      } else if (!is.null(date_Meff_change)) {
 
-        # when is the swithc in our data
+        date_Meff_change <- as.Date(date_Meff_change)
+        date_R0_change <- as.Date(date_R0_change)
+
+        # scale Meff accordingly
+        if (scale_meff_pl) {
+          Meff_pl <- Meff_pl*Meff
+        }
+
+        # when does mobility change take place
+        if(date_Meff_change <= date_R0_change[1]) {
+
+          mob_up <- R0_change-R0_change[1]
+          Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) ))
+
+        } else if (date_Meff_change > tail(date_R0_change, 1)) {
+
+          Rt <- R0 * (2 * plogis(-(R0_change - 1) * -Meff))
+
+        } else {
+
+          # when is the swithc in our data
           swtchdates <- which(date_R0_change >= date_Meff_change)
           min_d <- as.Date(date_R0_change[min(swtchdates)])
           dates_to_median <- seq(min_d - floor(roll/2),min_d + floor(roll/2),1)
@@ -1085,31 +1097,34 @@ evaluate_Rt_pmcmc <- function(R0_change, R0, Meff, Meff_pl, date_R0_change,
 
           Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) ))
 
-      }
-    }
-  } else {
-    Rt <- rep(R0, length(date_R0_change))
-  }
-
-  # add start date
-  if(is.null(start_date)) {
-    Rt <- c(R0, Rt)
-  } else {
-
-    start_date <- as.Date(start_date)
-    if(start_date %in% date_R0_change) {
-
-      if(start_date <= date_Meff_change) {
-        Rt <- c(R0 * (2 * plogis(-(R0_change[which(date_R0_change == start_date)] - 1) * -Meff)),
-                Rt)
-      } else {
-        Rt <- c(R0 * 2*(plogis( -Meff * -(R0_change[which(date_R0_change == start_date)]-1) -
-                                  Meff_pl*(mob_up[which(date_R0_change == start_date)]) )),
-                Rt)
+        }
       }
     } else {
-      Rt <- c(R0, Rt)
+      Rt <- rep(R0, length(date_R0_change))
     }
+
+    # add start date
+    if(is.null(start_date)) {
+      Rt <- c(R0, Rt)
+    } else {
+
+      start_date <- as.Date(start_date)
+      if(start_date %in% date_R0_change) {
+
+        if(start_date <= date_Meff_change) {
+          Rt <- c(R0 * (2 * plogis(-(R0_change[which(date_R0_change == start_date)] - 1) * -Meff)),
+                  Rt)
+        } else {
+          Rt <- c(R0 * 2*(plogis( -Meff * -(R0_change[which(date_R0_change == start_date)]-1) -
+                                    Meff_pl*(mob_up[which(date_R0_change == start_date)]) )),
+                  Rt)
+        }
+      } else {
+        Rt <- c(R0, Rt)
+      }
+    }
+  } else {
+    Rt <- c(R0, R0 * R0_change) # think this poss needs to be expanded to account for if R0 is included in the date_R0_change etc as above
   }
 
   return(Rt)

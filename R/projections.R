@@ -542,7 +542,8 @@ t0_variables <- function(r) {
                                  date_R0_change = r$interventions$date_R0_change,
                                  date_Meff_change = r$interventions$date_Meff_change,
                                  start_date = r$replicate_parameters$start_date[x],
-                                 roll = r[[wh]]$inputs$roll), 1)
+                                 roll = r[[wh]]$inputs$roll,
+                                 use_Meff = r$pmcmc_results$inputs$use_Meff), 1)
         }
       } else {
         R0 <- r$replicate_parameters$R0[x]
