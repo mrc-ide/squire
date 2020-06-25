@@ -6,7 +6,6 @@
 ##------------------------------------------------------------------------------
 dt <- user() # Specified timestep
 time <- step * dt # Tracking actual time
-output(time) <- TRUE
 N_age <- user() # Number of age groups
 
 ## RATES
@@ -94,7 +93,7 @@ p_ICrit_NoICU_NoOx_NoMV_Surv <- 1 - exp(-gamma_ICrit_NoICU_NoOx_NoMV_Surv * dt) 
 p_ICrit_NoICU_NoOx_NoMV_Die <- 1 - exp(-gamma_ICrit_NoICU_NoOx_NoMV_Die * dt) # Progression through requiring ICU bed, oxygen and MV, receiving nothing -> Dying
 
 
-## DRAWS FOR NUMBER OF INDIVIDUALS MOVING BETWEEN COMPARTMENTS
+## DRAWS FOR NUMBER OF INDIVIDUALS MOVING BETWEEN NON-HOSPITAL RELATED COMPARTMENTS
 ##------------------------------------------------------------------------------
 # Numbers changing between non-hospital related compartments:
 n_S_E1[] <- rbinom(S[i], p_S_E1[i]) # Number of newly infected individuals
@@ -108,10 +107,22 @@ n_ICase2_Hosp[] <- rbinom(ICase2[i], p_ICase2_Hosp) # Number progressing to requ
 n_IRec1_IRec2[] <- rbinom(IRec1[i], p_Rec1_Rec2) # Number progressing through ICU recovery compartment
 n_IRec2_R[] <- rbinom(IRec2[i], p_Rec2_R) # Number recovering completely
 
-output(n_E2_I) <- TRUE
-output(n_E2_IMild) <- TRUE
-output(n_E2_ICase1) <- TRUE
-output(n_ICase2_Hosp) <- TRUE
+## DRAWS FOR NUMBER OF INDIVIDUALS MOVING BETWEEN NON-HOSPITAL RELATED COMPARTMENTS
+##
+##  This section is non-trivial and so a brief description of everything that occurs below
+##  is provided:
+##    1) The number of ICU beds available is calculated, compared to the number of individuals
+##       newly requiring ICU beds, and these individuals are assigned to receive/not get an ICU
+##       bed as appropriate.
+##    2) The number of hospital beds available is calculated, compared to the number of individuals
+##       newly requiring hospital beds, and these individuals are assigned to receive/not get a hospital
+##       bed as appropriate.
+##    3) The amount of oxygen available is calculated and split amongst hospital bed and ICU bed patients
+##       in a manner proportional to the numbers in each group. The amount of people in hospital beds/ICU
+##       beds receiving or not receiving oxygen is then calculated.
+##    4) For those in ICU beds receiving oxygen, the number of those who are severe (no MV required) and
+##       those who are critical (MV required) is calculated.
+##------------------------------------------------------------------------------
 
 # Working Out Number of ICU Beds Available and How Many Individuals Receive Them
 number_req_ICU[] <- rbinom(n_ICase2_Hosp[i], prob_severe[i]) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
@@ -157,97 +168,54 @@ current_free_hosp <- hosp_bed_capacity +
                      sum(n_ICrit_GetICU_GetOx_GetMV_Surv2_Rec) - sum(n_ICrit_GetICU_GetOx_NoMV_Surv2_Rec) - sum(n_ICrit_GetICU_NoOx_NoMV_Surv2_Rec) -
                      hosp_occ # Number of hospital beds that are currently free
 
-output(number_req_Hosp) <- TRUE
-output(total_req_Hosp) <- TRUE
-output(hosp_occ) <- TRUE
-output(current_free_hosp) <- TRUE
-
-
 # Individuals Getting and Not Get Hospital Beds
 total_GetHosp <- if (current_free_hosp <= 0) 0 else (if(current_free_hosp - total_req_Hosp >= 0) total_req_Hosp else(current_free_hosp)) # Working out the number of new hospital bed requiring infections that get a bed
 number_GetHosp[] <- rmhyper(total_GetHosp, number_req_Hosp)
 number_NotHosp[] <- number_req_Hosp[i] - number_GetHosp[i]
 
-output(total_GetHosp) <- TRUE
-output(number_GetHosp) <- TRUE
-output(number_NotHosp) <- TRUE
-
 # Working Out How Much Oxygen There Is Available and How Many Individuals Requiring Hospital/ICU Bed Receive It
 update(oxygen_availability) <- oxygen_supply + leftover - oxygen_demand
-prop_ox_hosp_beds <- total_GetHosp/(total_GetHosp + total_GetICU * severe_critical_case_oxygen_consumption_multiplier)
+prop_ox_hosp_beds <- if (total_GetHosp == 0 && total_GetICU == 0) 0 else (total_GetHosp/(total_GetHosp + total_GetICU * severe_critical_case_oxygen_consumption_multiplier))
 available_oxygen_for_hosp_beds <- floor(prop_ox_hosp_beds * oxygen_availability)
 available_oxygen_for_ICU_beds <- floor((oxygen_availability - available_oxygen_for_hosp_beds)/severe_critical_case_oxygen_consumption_multiplier)
 total_GetHosp_GetOx <- if(available_oxygen_for_hosp_beds <= 0) 0 else(if(available_oxygen_for_hosp_beds - total_GetHosp >= 0) total_GetHosp else(available_oxygen_for_hosp_beds)) # Working out the number of new ICU requiring infections that get a bed
 
-output(oxygen_supply) <- TRUE
-output(leftover) <- TRUE
-output(oxygen_demand) <- TRUE
-output(prop_ox_hosp_beds) <- TRUE
-output(available_oxygen_for_hosp_beds) <- TRUE
-output(available_oxygen_for_ICU_beds) <- TRUE
-output(total_GetHosp_GetOx) <- TRUE
-
 number_GetHosp_Ox[] <- rmhyper(total_GetHosp_GetOx, number_GetHosp)
 number_GetHosp_NoOx[] <- number_GetHosp[i] - number_GetHosp_Ox[i]
-output(number_GetHosp_Ox) <- TRUE
-output(number_GetHosp_NoOx) <- TRUE
 
 # Working Out Number of Mechanical Ventilators Available and How Many Individuals Requiring ICU Bed and MV Receive Them
 total_GetICU_GetOx <- if(available_oxygen_for_ICU_beds <= 0) 0 else(if(available_oxygen_for_ICU_beds - total_GetICU >= 0) total_GetICU else(available_oxygen_for_ICU_beds)) # Working out the number of new ICU requiring infections that get a bed
 number_GetICU_GetOx_overall[] <- rmhyper(total_GetICU_GetOx, number_GetICU)
-output(total_GetICU_GetOx) <- TRUE
-output(number_GetICU_GetOx_overall) <- TRUE
-
-number_req_ICU_MV[] <- rbinom(number_GetICU_GetOx_overall[i], prob_critical[i]) # Number of new ICU admissions that are going to require oxygen and mechanical ventilation
-number_req_ICU_Ox[] <- number_GetICU_GetOx_overall[i] - number_req_ICU_MV[i] # Number of new ICU admissions that going to require oxygen only
-output(number_req_ICU_MV) <- TRUE
-output(number_req_ICU_Ox) <- TRUE
-
+number_req_ICU_MV[] <- rbinom(number_GetICU[i], prob_critical[i]) # Number of new ICU admissions that are going to require oxygen and mechanical ventilation
+number_req_ICU_Ox[] <- number_GetICU[i] - number_req_ICU_MV[i] # Number of new ICU admissions that going to require oxygen only
 total_req_ICU_MV <- sum(number_req_ICU_MV)
 total_req_ICU_Ox <- sum(number_req_ICU_Ox)
-output(total_req_ICU_MV) <- TRUE
-output(total_req_ICU_Ox) <- TRUE
-
-# Current Mechanical Ventilator Usage
-MV_occ <- sum(ICrit_GetICU_GetOx_GetMV_Surv1) + sum(ICrit_GetICU_GetOx_GetMV_Surv2) +
-          sum(ICrit_GetICU_GetOx_GetMV_Die1) + sum(ICrit_GetICU_GetOx_GetMV_Die2) # Summing over compartments that use mechanical ventilators
-output(MV_occ) <- TRUE
-
-# Totting Up Mechanical Ventilator Usage After Taking Into Account Individuals Coming Off Of it
-current_free_MV <- MV_capacity + sum(n_ICrit_GetICU_GetOx_GetMV_Surv2_Rec) + sum(n_ICrit_GetICU_GetOx_GetMV_Die2_D_Hospital) - MV_occ # Number of mechanical ventilators that are currently free
-output(current_free_MV) <- TRUE
 
 # Splitting Oxygen Between MV and Non-MV Individuals According to the Number of Patients in Each Category
-available_oxygen_for_ICU_MV <- if(total_req_ICU_MV == 0 & total_req_ICU_Ox == 0) 0 else (round(available_oxygen_for_ICU_beds * total_req_ICU_MV/(total_req_ICU_MV + total_req_ICU_Ox))) # if these are 0s we get NAs maybe!!!
+available_oxygen_for_ICU_MV <- if(total_req_ICU_MV == 0 && total_req_ICU_Ox == 0) 0 else (round(available_oxygen_for_ICU_beds * total_req_ICU_MV/(total_req_ICU_MV + total_req_ICU_Ox))) # if these are 0s we get NAs maybe!!!
 available_oxygen_for_ICU_Ox <- available_oxygen_for_ICU_beds - available_oxygen_for_ICU_MV
-output(available_oxygen_for_ICU_MV) <- TRUE
-output(available_oxygen_for_ICU_Ox) <- TRUE
 
-# Number of People Getting Oxygen and Mechanical Ventilator Etc
-total_GetICU_GetOx_Need_MV <- if(available_oxygen_for_ICU_MV <= 0) 0 else(if(available_oxygen_for_ICU_MV - total_req_ICU_MV >= 0) total_req_ICU_MV else(available_oxygen_for_ICU_MV))
-number_GetICU_GetOx_NeedMV[] <- rmhyper(total_GetICU_GetOx_Need_MV, number_req_ICU_MV)
-output(number_GetICU_GetOx_NeedMV) <-TRUE
-
-# think the else term is being thrown somehow and I don't really know how unless the ludicrously large oxygen upstream is triggering a massive total_GetICU_GetOx_Need_MV - that could be it
-total_GetICU_GetOx_GetMV <- if(current_free_MV <= 0) 0 else(if(current_free_MV - total_GetICU_GetOx_Need_MV >= 0) total_GetICU_GetOx_Need_MV else(current_free_MV))
-number_GetICU_GetOx_GetMV[] <-  rmhyper(0, number_GetICU_GetOx_NeedMV) # rmhyper(total_GetICU_GetOx_GetMV, number_GetICU_GetOx_NeedMV)
-
-output(total_GetICU_GetOx_Need_MV) <- TRUE
-output(total_GetICU_GetOx_GetMV) <- TRUE
-
-number_GetICU_GetOx_NoMV[] <- number_GetICU_GetOx_NeedMV[i] - number_GetICU_GetOx_GetMV[i]
+# Calculating the Number of Severe Cases (no MV required) Who Get Oxygen
 total_GetICU_GetOx_Only <- if(available_oxygen_for_ICU_Ox <= 0) 0 else(if(available_oxygen_for_ICU_Ox - total_req_ICU_Ox >= 0) total_req_ICU_Ox else(available_oxygen_for_ICU_Ox))
 number_GetICU_GetOx[] <- rmhyper(total_GetICU_GetOx_Only, number_req_ICU_Ox)
+number_GetICU_NoOx[] <- number_req_ICU_Ox[i] - number_GetICU_GetOx[i]
 
-# Number of People Not Oxygen and Who Require an ICU Bed
-overall_number_get_ICU_not_Ox[] <- number_GetICU[i] - number_GetICU_GetOx[i]
-number_GetICU_NoOx_NoMV[] <- rbinom(overall_number_get_ICU_not_Ox[i], prob_critical[i])
-number_GetICU_NoOx[] <- overall_number_get_ICU_not_Ox[i] - number_GetICU_NoOx_NoMV[i]
+# Calculating the Number of Critical Cases (MV requied) Who Get Oxygen
+total_GetICU_GetOx_Need_MV <- if(available_oxygen_for_ICU_MV <= 0) 0 else(if(available_oxygen_for_ICU_MV - total_req_ICU_MV >= 0) total_req_ICU_MV else(available_oxygen_for_ICU_MV))
+number_GetICU_GetOx_NeedMV[] <- rmhyper(total_GetICU_GetOx_Need_MV, number_req_ICU_MV)
+number_GetICU_NoOx_NeedMV[] <- number_req_ICU_MV[i] - number_GetICU_GetOx_NeedMV[i]
 
-# cyclic dependency - CHANGE OXYGEN TO A STATE VARIABLE WHERE WE TRACK ITS AMOUNT AND SO HAVE AN UPDATE CALL
-leftover <- oxygen_supply - oxygen_demand -
-            (sum(number_GetICU_GetOx_NeedMV) + sum(number_GetICU_GetOx)) * severe_critical_case_oxygen_consumption_multiplier -
-            sum(number_GetHosp_Ox)
+# Calculating the Number of Critical Cases (MV requied) Who Receive Oxygen
+# Current Mechanical Ventilator Usage
+MV_occ <- sum(ICrit_GetICU_GetOx_GetMV_Surv1) + sum(ICrit_GetICU_GetOx_GetMV_Surv2) + sum(ICrit_GetICU_GetOx_GetMV_Die1) + sum(ICrit_GetICU_GetOx_GetMV_Die2)
+current_free_MV <- MV_capacity + sum(n_ICrit_GetICU_GetOx_GetMV_Surv2_Rec) + sum(n_ICrit_GetICU_GetOx_GetMV_Die2_D_Hospital) - MV_occ # Number of mechanical ventilators that are currently free
+total_GetICU_GetOx_GetMV <- if(current_free_MV <= 0) 0 else(if(current_free_MV - total_GetICU_GetOx_Need_MV >= 0) total_GetICU_GetOx_Need_MV else(current_free_MV))
+number_GetICU_GetOx_GetMV[] <-  rmhyper(total_GetICU_GetOx_GetMV, number_GetICU_GetOx_NeedMV) # rmhyper(total_GetICU_GetOx_GetMV, number_GetICU_GetOx_NeedMV) # CHANGE
+number_GetICU_GetOx_NoMV[] <- number_GetICU_GetOx_NeedMV[i] - number_GetICU_GetOx_GetMV[i]
+
+temp_leftover <- oxygen_supply - oxygen_demand -
+                 (sum(number_GetICU_GetOx_NeedMV) + sum(number_GetICU_GetOx)) * severe_critical_case_oxygen_consumption_multiplier - sum(number_GetHosp_Ox)
+leftover <- if(temp_leftover >= max_leftover) max_leftover else temp_leftover
 
 # Numbers changing between hospital bed related compartments
 n_IMod_GetHosp_GetOx_Die1[] <- rbinom(number_GetHosp_Ox[i], prob_moderate_death_get_hosp_get_ox[i])
@@ -308,10 +276,10 @@ n_ICrit_GetICU_GetOx_NoMV_Surv1[] <- number_GetICU_GetOx_NoMV[i] - n_ICrit_GetIC
 n_ICrit_GetICU_GetOx_NoMV_Surv1_ICrit_GetICU_GetOx_NoMV_Surv2[] <- rbinom(ICrit_GetICU_GetOx_NoMV_Surv1[i], p_ICrit_GetICU_GetOx_NoMV_Surv) # Number progressing through requiring ICU bed, oxygen and MV, and receiving ICU bed and oxygen only -> Recovery
 n_ICrit_GetICU_GetOx_NoMV_Surv2_Rec[] <- rbinom(ICrit_GetICU_GetOx_NoMV_Surv2[i], p_ICrit_GetICU_GetOx_NoMV_Surv) # Number progressing through requiring ICU bed, oxygen and MV, and receiving ICU bed and oxygen only -> Recovery
 
-n_ICrit_GetICU_NoOx_NoMV_Die1[] <- rbinom(number_GetICU_NoOx_NoMV[i], prob_critical_death_get_ICU_no_ox_no_MV[i])
+n_ICrit_GetICU_NoOx_NoMV_Die1[] <- rbinom(number_GetICU_NoOx_NeedMV[i], prob_critical_death_get_ICU_no_ox_no_MV[i])
 n_ICrit_GetICU_NoOx_NoMV_Die1_ICrit_GetICU_NoOx_NoMV_Die2[] <- rbinom(ICrit_GetICU_NoOx_NoMV_Die1[i], p_ICrit_GetICU_NoOx_NoMV_Die) # Number progressing through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Dying
 n_ICrit_GetICU_NoOx_NoMV_Die2_D_Hospital[] <- rbinom(ICrit_GetICU_NoOx_NoMV_Die2[i], p_ICrit_GetICU_NoOx_NoMV_Die) # Number progressing through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Dying
-n_ICrit_GetICU_NoOx_NoMV_Surv1[] <- number_GetICU_NoOx_NoMV[i] - n_ICrit_GetICU_NoOx_NoMV_Die1[i]
+n_ICrit_GetICU_NoOx_NoMV_Surv1[] <- number_GetICU_NoOx_NeedMV[i] - n_ICrit_GetICU_NoOx_NoMV_Die1[i]
 n_ICrit_GetICU_NoOx_NoMV_Surv1_ICrit_GetICU_NoOx_NoMV_Surv2[] <- rbinom(ICrit_GetICU_NoOx_NoMV_Surv1[i], p_ICrit_GetICU_NoOx_NoMV_Surv) # Number progressing through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Recovery
 n_ICrit_GetICU_NoOx_NoMV_Surv2_Rec[] <- rbinom(ICrit_GetICU_NoOx_NoMV_Surv2[i], p_ICrit_GetICU_NoOx_NoMV_Surv) # Number progressing through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Recovery
 
@@ -324,20 +292,21 @@ n_ICrit_NoICU_NoOx_NoMV_Surv2_R[] <- rbinom(ICrit_NoICU_NoOx_NoMV_Surv2[i], p_IC
 
 ## TOTALLING UP THE FLOWS IN AND OUT OF EACH COMPARTMENT
 ##------------------------------------------------------------------------------
-output(n_S_E1) <- TRUE
-output(n_E1_E2) <- TRUE
-
 delta_E1[] <- n_S_E1[i] - n_E1_E2[i]
 delta_E2[] <- n_E1_E2[i] - n_E2_I[i]
 delta_IMild[] <- n_E2_IMild[i] - n_IMild_R[i]
 delta_ICase1[] <- n_E2_ICase1[i] - n_ICase1_ICase2[i]
 delta_ICase2[] <- n_ICase1_ICase2[i] - n_ICase2_Hosp[i]
+
+
 delta_IRec1[] <- n_ISev_GetICU_GetOx_Surv2_Rec[i] + n_ISev_GetICU_NoOx_Surv2_Rec[i] +
                  n_ICrit_GetICU_GetOx_GetMV_Surv2_Rec[i]  + n_ICrit_GetICU_GetOx_NoMV_Surv2_Rec[i] + n_ICrit_GetICU_NoOx_NoMV_Surv2_Rec[i] -
                  n_IRec1_IRec2[i]
 delta_IRec2[] <- n_IRec1_IRec2[i] - n_IRec2_R[i]
-delta_R[] <- n_IMod_GetHosp_GetOx_Surv2_R[i] + n_IMod_GetHosp_NoOx_Surv2_R[i] +
-             n_IMod_NoHosp_NoOx_Surv2_R[i] + n_ISev_NoICU_NoOx_Surv2_R[i] + n_ICrit_NoICU_NoOx_NoMV_Surv2_R[i]
+delta_R[] <- n_IMild_R[i] + n_IRec2_R[i] +
+             n_IMod_GetHosp_GetOx_Surv2_R[i] + n_IMod_GetHosp_NoOx_Surv2_R[i] + n_IMod_NoHosp_NoOx_Surv2_R[i] +
+             n_ISev_NoICU_NoOx_Surv2_R[i] +
+             n_ICrit_NoICU_NoOx_NoMV_Surv2_R[i]
 delta_D_Community[] <- n_IMod_NoHosp_NoOx_Die2_D_Community[i] + n_ISev_NoICU_NoOx_Die2_D_Community[i] + n_ICrit_NoICU_NoOx_NoMV_Die2_D_Community[i]
 delta_D_Hospital[] <- n_IMod_GetHosp_GetOx_Die2_D_Hospital[i] + n_IMod_GetHosp_NoOx_Die2_D_Hospital[i] +
                       n_ISev_GetICU_GetOx_Die2_D_Hospital[i] + n_ISev_GetICU_NoOx_Die2_D_Hospital[i] +
@@ -501,7 +470,7 @@ dim(tt_oxygen_demand) <- user()
 dim(input_oxygen_demand) <- length(tt_oxygen_demand)
 
 severe_critical_case_oxygen_consumption_multiplier <- user() # consumption of oxygen for severe/critical covid-19 cases compared to moderate cases
-
+max_leftover <- user()
 MV_capacity <- user() # number of mechanical ventilators available
 
 
@@ -875,9 +844,8 @@ dim(number_req_ICU_MV) <- N_age
 dim(number_req_ICU_Ox) <- N_age
 dim(number_GetICU) <- N_age
 dim(number_GetICU_GetOx_NoMV) <- N_age
-dim(number_GetICU_NoOx_NoMV) <- N_age
+dim(number_GetICU_NoOx_NeedMV) <- N_age
 dim(number_GetICU_NoOx) <- N_age
-dim(overall_number_get_ICU_not_Ox) <- N_age
 dim(number_GetICU_GetOx_overall) <- N_age
 dim(number_GetICU_GetOx_GetMV) <- N_age
 dim(number_GetICU_GetOx_NeedMV) <- N_age
@@ -904,4 +872,55 @@ dim(prob_critical_death_get_ICU_get_ox_get_MV) <- N_age
 dim(prob_critical_death_get_ICU_get_ox_no_MV) <- N_age
 dim(prob_critical_death_get_ICU_no_ox_no_MV) <- N_age
 dim(prob_critical_death_no_ICU_no_ox_no_MV) <- N_age
+
+# Extra Non-State Variables Outputted by the Model
+output(time) <- TRUE
+output(n_S_E1) <- TRUE
+output(n_E1_E2) <- TRUE
+output(n_E2_I) <- TRUE
+output(n_E2_ICase1) <- TRUE
+output(n_E2_IMild) <- TRUE
+output(n_IMild_R) <- TRUE
+output(n_ICase1_ICase2) <- TRUE
+output(n_ICase2_Hosp) <- TRUE
+output(n_IRec1_IRec2) <- TRUE
+output(n_IRec2_R) <- TRUE
+output(number_req_ICU) <- TRUE
+output(total_req_ICU) <- TRUE
+output(ICU_occ) <- TRUE
+output(current_free_ICU) <- TRUE
+output(total_GetICU) <- TRUE
+output(number_GetICU) <- TRUE
+output(number_NotICU) <- TRUE
+output(number_NotICU_NotOx_NotMV) <- TRUE
+output(number_NotICU_NotOx) <- TRUE
+output(number_req_Hosp) <- TRUE
+output(total_req_Hosp) <- TRUE
+output(hosp_occ) <- TRUE
+output(current_free_hosp) <- TRUE
+output(total_GetHosp) <- TRUE
+output(number_GetHosp) <- TRUE
+output(number_NotHosp) <- TRUE
+output(oxygen_supply) <- TRUE
+output(leftover) <- TRUE
+output(oxygen_demand) <- TRUE
+output(prop_ox_hosp_beds) <- TRUE
+output(available_oxygen_for_hosp_beds) <- TRUE
+output(available_oxygen_for_ICU_beds) <- TRUE
+output(total_GetHosp_GetOx) <- TRUE
+output(number_GetHosp_Ox) <- TRUE
+output(number_GetHosp_NoOx) <- TRUE
+output(total_GetICU_GetOx) <- TRUE
+output(number_GetICU_GetOx_overall) <- TRUE
+output(number_req_ICU_MV) <- TRUE
+output(number_req_ICU_Ox) <- TRUE
+output(total_req_ICU_MV) <- TRUE
+output(total_req_ICU_Ox) <- TRUE
+output(MV_occ) <- TRUE
+output(current_free_MV) <- TRUE
+output(available_oxygen_for_ICU_MV) <- TRUE
+output(available_oxygen_for_ICU_Ox) <- TRUE
+output(number_GetICU_GetOx_NeedMV) <-TRUE
+output(total_GetICU_GetOx_Need_MV) <- TRUE
+output(total_GetICU_GetOx_GetMV) <- TRUE
 
