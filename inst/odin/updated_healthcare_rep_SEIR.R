@@ -178,14 +178,12 @@ update(oxygen_availability) <- oxygen_supply + leftover - oxygen_demand
 prop_ox_hosp_beds <- if (total_GetHosp == 0 && total_GetICU == 0) 0 else (total_GetHosp/(total_GetHosp + total_GetICU * severe_critical_case_oxygen_consumption_multiplier))
 available_oxygen_for_hosp_beds <- floor(prop_ox_hosp_beds * oxygen_availability)
 available_oxygen_for_ICU_beds <- floor((oxygen_availability - available_oxygen_for_hosp_beds)/severe_critical_case_oxygen_consumption_multiplier)
-total_GetHosp_GetOx <- if(available_oxygen_for_hosp_beds <= 0) 0 else(if(available_oxygen_for_hosp_beds - total_GetHosp >= 0) total_GetHosp else(available_oxygen_for_hosp_beds)) # Working out the number of new ICU requiring infections that get a bed
 
+total_GetHosp_GetOx <- if(available_oxygen_for_hosp_beds <= 0) 0 else(if(available_oxygen_for_hosp_beds - total_GetHosp >= 0) total_GetHosp else(available_oxygen_for_hosp_beds)) # Working out the number of new ICU requiring infections that get a bed
 number_GetHosp_Ox[] <- rmhyper(total_GetHosp_GetOx, number_GetHosp)
 number_GetHosp_NoOx[] <- number_GetHosp[i] - number_GetHosp_Ox[i]
 
-# Working Out Number of Mechanical Ventilators Available and How Many Individuals Requiring ICU Bed and MV Receive Them
-total_GetICU_GetOx <- if(available_oxygen_for_ICU_beds <= 0) 0 else(if(available_oxygen_for_ICU_beds - total_GetICU >= 0) total_GetICU else(available_oxygen_for_ICU_beds)) # Working out the number of new ICU requiring infections that get a bed
-number_GetICU_GetOx_overall[] <- rmhyper(total_GetICU_GetOx, number_GetICU)
+# Working Out the Number of Individuals Who Get an ICU Bed and Who Are Severe or Critical Respectively
 number_req_ICU_MV[] <- rbinom(number_GetICU[i], prob_critical[i]) # Number of new ICU admissions that are going to require oxygen and mechanical ventilation
 number_req_ICU_Ox[] <- number_GetICU[i] - number_req_ICU_MV[i] # Number of new ICU admissions that going to require oxygen only
 total_req_ICU_MV <- sum(number_req_ICU_MV)
@@ -212,10 +210,12 @@ current_free_MV <- MV_capacity + sum(n_ICrit_GetICU_GetOx_GetMV_Surv2_Rec) + sum
 total_GetICU_GetOx_GetMV <- if(current_free_MV <= 0) 0 else(if(current_free_MV - total_GetICU_GetOx_Need_MV >= 0) total_GetICU_GetOx_Need_MV else(current_free_MV))
 number_GetICU_GetOx_GetMV[] <-  rmhyper(total_GetICU_GetOx_GetMV, number_GetICU_GetOx_NeedMV) # rmhyper(total_GetICU_GetOx_GetMV, number_GetICU_GetOx_NeedMV) # CHANGE
 number_GetICU_GetOx_NoMV[] <- number_GetICU_GetOx_NeedMV[i] - number_GetICU_GetOx_GetMV[i]
-
-temp_leftover <- oxygen_supply - oxygen_demand -
-                 (sum(number_GetICU_GetOx_NeedMV) + sum(number_GetICU_GetOx)) * severe_critical_case_oxygen_consumption_multiplier - sum(number_GetHosp_Ox)
+temp_leftover <- oxygen_supply - oxygen_demand - (sum(number_GetICU_GetOx_NeedMV) + sum(number_GetICU_GetOx)) * severe_critical_case_oxygen_consumption_multiplier - sum(number_GetHosp_Ox)
 leftover <- if(temp_leftover >= max_leftover) max_leftover else temp_leftover
+oxygen_used <- (sum(number_GetICU_GetOx_NeedMV) + sum(number_GetICU_GetOx)) * severe_critical_case_oxygen_consumption_multiplier + sum(number_GetHosp_Ox)
+output(oxygen_used) <- TRUE
+output(leftover) <- TRUE
+output(number_GetICU_GetOx) <- TRUE
 
 # Numbers changing between hospital bed related compartments
 n_IMod_GetHosp_GetOx_Die1[] <- rbinom(number_GetHosp_Ox[i], prob_moderate_death_get_hosp_get_ox[i])
@@ -846,7 +846,6 @@ dim(number_GetICU) <- N_age
 dim(number_GetICU_GetOx_NoMV) <- N_age
 dim(number_GetICU_NoOx_NeedMV) <- N_age
 dim(number_GetICU_NoOx) <- N_age
-dim(number_GetICU_GetOx_overall) <- N_age
 dim(number_GetICU_GetOx_GetMV) <- N_age
 dim(number_GetICU_GetOx_NeedMV) <- N_age
 dim(number_GetICU_GetOx) <- N_age
@@ -910,8 +909,6 @@ output(available_oxygen_for_ICU_beds) <- TRUE
 output(total_GetHosp_GetOx) <- TRUE
 output(number_GetHosp_Ox) <- TRUE
 output(number_GetHosp_NoOx) <- TRUE
-output(total_GetICU_GetOx) <- TRUE
-output(number_GetICU_GetOx_overall) <- TRUE
 output(number_req_ICU_MV) <- TRUE
 output(number_req_ICU_Ox) <- TRUE
 output(total_req_ICU_MV) <- TRUE
