@@ -4,26 +4,48 @@
 
 
 ### S: susceptible #############################################################
-delta_S[] <- n_R2_S[i] - n_S_E1_V[i] + n_V2_S[i]
+delta_S[] <- n_R2_S[i] - n_S_E1_SVac1[i] + n_V2_S[i]
 
 update(S[]) <- S[i] + delta_S[i]  # Susceptibles (1 compartment)
 
 p_leave_S[] <- 1 - exp(-(lambda[i] + vr) * dt) # Infection - age dependent FOI based on mixing patterns
 p_E[] <- if(lambda[i] > 0) lambda[i] / (lambda[i] + vr) else 0 # Probability infection
 
-n_S_E1_V[] <- rbinom(S[i], p_leave_S[i]) # Leaving S
-n_S_E1[] <- if(n_S_E1_V[i] > 0) rbinom(n_S_E1_V[i], p_E[i]) else 0 # S->E1
-n_S_V1[] <- n_S_E1_V[i] - n_S_E1[i] # S->V1
+n_S_E1_SVac1[] <- rbinom(S[i], p_leave_S[i]) # Leaving S
+n_S_E1[] <- if(n_S_E1_SVac1[i] > 0) rbinom(n_S_E1_SVac1[i], p_E[i]) else 0 # S->E1
+n_S_SVac1[] <- n_S_E1_SVac1[i] - n_S_E1[i] # S->V1
+################################################################################
+
+### SVac (SVac1 & SVac2): Vaccinated but still susceptible #####################
+delta_SVac1[] <- n_S_SVac1[i] - n_SVac1_E1_SVac2[i]
+delta_SVac2[] <- n_SVac1_SVac2[i] - n_SVac2_E1_V1[i]
+
+update(SVac1[]) <- SVac1[i] + delta_SVac1[i]
+update(SVac2[]) <- SVac2[i] + delta_SVac2[i]
+SVac[] <- SVac1[i] + SVac2[i]
+
+gamma_SVac <- user() # Rate of progression through vaccinnated but susceptible compartment
+p_leave_SVac[] <- 1 - exp(-(lambda[i] + gamma_SVac) * dt)
+p_SVac1_SVac2[] <- gamma_SVac / (lambda[i] + gamma_SVac)
+p_SVac2_V1[] <- gamma_SVac / (lambda[i] + gamma_SVac)
+
+n_SVac1_E1_SVac2[] <- rbinom(SVac1[i], p_leave_SVac[i]) # Leaving SVac1
+n_SVac1_SVac2[] <- if(n_SVac1_E1_SVac2[i] > 0) rbinom(n_SVac1_E1_SVac2[i], p_SVac1_SVac2[i]) else 0 # SVac1->SVac2
+n_SVac1_E1[] <- n_SVac1_E1_SVac2[i] - n_SVac1_SVac2[i] # SVac1->E1
+
+n_SVac2_E1_V1[] <- rbinom(SVac2[i], p_leave_SVac[i]) # Leaving SVac2
+n_SVac2_V1[] <- if(n_SVac2_E1_V1[i] > 0) rbinom(n_SVac2_E1_V1[i], p_SVac2_V1[i]) else 0 # SVac2->V1
+n_SVac2_E1[] <- n_SVac2_E1_V1[i] - n_SVac2_V1[i] # SVac2->E1
 ################################################################################
 
 ### V (V1 & v2): Vaccinated ####################################################
-delta_V1[] <- n_R1_V[i] + n_R2_V[i] + n_S_V1[i] - n_V1_V2_Evac[i]
+delta_V1[] <- n_R1_V[i] + n_R2_V[i] + n_SVac2_V1[i] - n_V1_V2_Evac[i]
 delta_V2[] <- n_V1_V2[i] - n_V2_S_Evac[i]
 
 update(V1[]) <- V1[i] + delta_V1[i] # First of the vaccinated compartments (2 comps)
 update(V2[]) <- V2[i] + delta_V2[i] # Second of the vaccinated compartments (2 comps)
 V[] <- V1[i] + V2[i] # Summary V
-vaccines[] <- n_R1_V[i] + n_R2_V[i] + n_S_V1[i] # Summary number of people vaccinated
+vaccines[] <- n_R1_V[i] + n_R2_V[i] + n_S_SVac1[i] # Summary number of people vaccinated
 
 gamma_V <- user() # Rate of progression through vaccine compartment (loss of vaccine acquired immunity)
 
@@ -40,7 +62,7 @@ n_V2_Evac[] <- n_V2_S_Evac[i] - n_V2_S[i] # V2->Evac
 ################################################################################
 
 ### E (E1 & E2): Latent ########################################################
-delta_E1[] <- n_S_E1[i] - n_E1_E2[i]
+delta_E1[] <- n_S_E1[i] + n_SVac1_E1[i] + n_SVac2_E1[i] - n_E1_E2[i]
 delta_E2[] <- n_E1_E2[i] - n_E2_I[i]
 
 update(E1[]) <- E1[i] + delta_E1[i]  # First of the latent infection compartments (2 comps)
@@ -64,7 +86,7 @@ delta_EVac2[] <- n_EVac1_EVac2[i] - n_EVac2_I[i]
 
 update(EVac1[]) <- EVac1[i] + delta_EVac1[i]  # First of the latent vaccinated infection compartments (2 comps)
 update(EVac2[]) <- EVac2[i] + delta_EVac2[i]  # Second of the latent vaccinated infection compartments (2 comps)
-E_vac[] <- EVac1[i] + EVac2[i] # Summary of Evac
+EVac[] <- EVac1[i] + EVac2[i] # Summary of Evac
 
 p_EVac1_EVac2 <- 1 - exp(-gamma_E * dt) # Progression through latent infection
 p_EVac2_I <- 1 - exp(-gamma_E * dt) # Progression to onset of infectiousness. Number split between I_Mild and I_Case
@@ -299,6 +321,7 @@ infections[] <- n_S_E1[i] + n_V1_Evac[i] + n_V2_Evac[i]
 
 # Population size
 N[] <- S[i] + E1[i] + E2[i] + EVac1[i] + EVac2[i] + IMild[i] + ICase1[i] + ICase2[i] +
+  SVac1[i] + SVac2[i] +
   IMVGetLive1[i] + IMVGetLive2[i] +
   IMVGetDie1[i] + IMVGetDie2[i] + IMVNotGetLive1[i] + IMVNotGetLive2[i] + IMVNotGetDie1[i] + IMVNotGetDie2[i] +
   IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] + IOxNotGetLive1[i] + IOxNotGetLive2[i] +
@@ -407,9 +430,10 @@ output(IHospital) <- TRUE
 output(ICase) <- TRUE
 output(R) <- TRUE
 output(V) <- TRUE
-output(E_vac) <- TRUE
+output(EVac) <- TRUE
 output(IRec) <- TRUE
 output(vaccines) <- TRUE
+output(SVac) <- TRUE
 output(N) <- TRUE
 output(hospital_occupancy) <- TRUE
 output(ICU_occupancy) <- TRUE
@@ -418,6 +442,14 @@ output(ICU_demand) <- TRUE
 output(deaths) <- TRUE
 output(infections) <- TRUE
 output(time) <- TRUE
+
+output(n_SVac2_E1) <- TRUE
+output(n_SVac1_E1) <- TRUE
+output(n_S_E1) <- TRUE
+output(n_E1_E2) <- TRUE
+output(p_E1_E2) <- TRUE
+output(n_SVac2_E1_V1) <- TRUE
+output(n_SVac2_V1) <- TRUE
 ################################################################################
 ################################################################################
 
@@ -430,6 +462,8 @@ N_age <- user() # Number of age groups
 
 # Initial states:
 initial(S[]) <- S_0[i]
+initial(SVac1[]) <- SVac1_0[i]
+initial(SVac2[]) <- SVac2_0[i]
 initial(E1[]) <- E1_0[i]
 initial(E2[]) <- E2_0[i]
 initial(IMild[]) <- IMild_0[i]
@@ -463,6 +497,8 @@ initial(EVac2[]) <- EVac2_0[i]
 
 # Initial vectors
 S_0[] <- user()
+SVac1_0[] <- user()
+SVac2_0[] <- user()
 E1_0[] <- user()
 E2_0[] <- user()
 IMild_0[] <- user()
@@ -496,6 +532,8 @@ EVac2_0[] <- user()
 
 # State dimensions
 dim(S) <- N_age
+dim(SVac1) <- N_age
+dim(SVac2) <- N_age
 dim(E1) <- N_age
 dim(E2) <- N_age
 dim(E) <- N_age
@@ -532,7 +570,7 @@ dim(V2) <- N_age
 dim(V) <- N_age
 dim(EVac1) <- N_age
 dim(EVac2) <- N_age
-dim(E_vac) <- N_age
+dim(EVac) <- N_age
 dim(IRec) <- N_age
 dim(vaccines) <- N_age
 dim(N) <- N_age
@@ -542,9 +580,12 @@ dim(hospital_demand) <- N_age
 dim(ICU_demand) <- N_age
 dim(deaths) <- N_age
 dim(infections) <- N_age
+dim(SVac) <- N_age
 
 # Initial value dimensions
 dim(S_0) <- N_age
+dim(SVac1_0) <- N_age
+dim(SVac2_0) <- N_age
 dim(E1_0) <- N_age
 dim(E2_0) <- N_age
 dim(IMild_0) <- N_age
@@ -579,6 +620,8 @@ dim(EVac2_0) <- N_age
 # Delta dimensions
 dim(delta_E1) <- N_age
 dim(delta_E2) <- N_age
+dim(delta_SVac1) <- N_age
+dim(delta_SVac2) <- N_age
 dim(delta_IMild) <- N_age
 dim(delta_ICase1) <- N_age
 dim(delta_ICase2) <- N_age
@@ -655,9 +698,7 @@ dim(n_R1_V) <- N_age
 dim(n_R2_S_V) <- N_age
 dim(n_R2_S) <- N_age
 dim(n_R2_V) <- N_age
-dim(n_S_E1_V) <- N_age
 dim(n_S_E1) <- N_age
-dim(n_S_V1) <- N_age
 dim(n_V1_V2_Evac) <- N_age
 dim(n_V1_V2) <- N_age
 dim(n_V1_Evac) <- N_age
@@ -668,6 +709,14 @@ dim(n_EVac1_EVac2) <- N_age
 dim(n_EVac2_I) <- N_age
 dim(n_EVac2_ICase) <- N_age
 dim(n_EVac2_IMild) <- N_age
+dim(n_SVac1_E1_SVac2) <- N_age
+dim(n_SVac1_SVac2) <- N_age
+dim(n_SVac1_E1) <- N_age
+dim(n_SVac2_E1_V1) <- N_age
+dim(n_SVac2_V1) <- N_age
+dim(n_SVac2_E1) <- N_age
+dim(n_S_E1_SVac1) <- N_age
+dim(n_S_SVac1) <- N_age
 
 # Severity Parameters
 dim(prob_hosp) <- N_age
@@ -688,6 +737,9 @@ dim(p_leave_V) <- N_age
 dim(p_V) <- N_age
 dim(p_leave_S) <- N_age
 dim(p_E) <- N_age
+dim(p_leave_SVac) <- N_age
+dim(p_SVac1_SVac2) <- N_age
+dim(p_SVac2_V1) <- N_age
 
 # Related to Calculating Age-Structured Force of Infection
 dim(lambda) <- N_age

@@ -479,7 +479,8 @@ default_vaccine_pars <- function() {
        vaccine_efficacy_infection = rep(0.95, 17),
        vaccine_efficacy_disease = rep(0.95, 17),
        max_vaccine = 1000,
-       tt_vaccine = 0)
+       tt_vaccine = 0,
+       dur_vaccine_delay = 14)
 }
 
 vaccine_pars <- default_vaccine_pars()
@@ -572,6 +573,7 @@ run_vaccine <- function(
   vaccine_efficacy_disease = vaccine_pars$vaccine_efficacy_disease,
   max_vaccine = vaccine_pars$max_vaccine,
   tt_vaccine = vaccine_pars$tt_vaccine,
+  dur_vaccine_delay = vaccine_pars$dur_vaccine_delay,
 
   # health system capacity
   hosp_bed_capacity = NULL,
@@ -636,7 +638,8 @@ run_vaccine <- function(
                              vaccine_efficacy_infection = vaccine_efficacy_infection,
                              vaccine_efficacy_disease = vaccine_efficacy_disease,
                              max_vaccine = max_vaccine,
-                             tt_vaccine = tt_vaccine * dt)
+                             tt_vaccine = tt_vaccine * dt,
+                             dur_vaccine_delay = dur_vaccine_delay)
 
   # handling time variables for js
   pars$tt_beta <- I(pars$tt_beta)

@@ -505,6 +505,7 @@ parameters_vaccine <- function(
   vaccine_efficacy_disease,
   max_vaccine,
   tt_vaccine,
+  dur_vaccine_delay,
 
   # health system capacity
   hosp_bed_capacity,
@@ -601,6 +602,7 @@ parameters_vaccine <- function(
   assert_pos(hosp_bed_capacity)
   assert_pos(ICU_bed_capacity)
   assert_pos(max_vaccine)
+  assert_pos(dur_vaccine_delay)
 
   assert_length(prob_hosp, length(population))
   assert_length(prob_severe, length(population))
@@ -653,6 +655,7 @@ parameters_vaccine <- function(
   gamma_rec = 2 * 1/dur_rec
   gamma_R <- 2 * 1/dur_R
   gamma_V <- 2 * 1/dur_V
+  gamma_SVac <- 2 * 1 / dur_vaccine_delay
 
   if (is.null(beta_set)) {
     baseline_matrix <- process_contact_matrix_scaled_age(contact_matrix_set[[1]], population)
@@ -703,6 +706,8 @@ parameters_vaccine <- function(
                V2_0 = mod_init$V2,
                EVac1_0 = mod_init$EVac1,
                EVac2_0 = mod_init$EVac2,
+               SVac1_0 = mod_init$SVac1,
+               SVac2_0 = mod_init$SVac2,
                gamma_E = gamma_E,
                gamma_IMild = gamma_IMild,
                gamma_ICase = gamma_ICase,
@@ -739,7 +744,8 @@ parameters_vaccine <- function(
                max_vaccine = max_vaccine,
                vaccine_efficacy_infection = vaccine_efficacy_infection,
                prob_hosp_vaccine = prob_hosp_vaccine,
-               tt_vaccine = round(tt_vaccine/dt))
+               tt_vaccine = round(tt_vaccine/dt),
+               gamma_SVac = gamma_SVac)
 
   class(pars) <- c("explicit_SEEIR_parameters", "squire_parameters")
 
