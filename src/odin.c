@@ -10492,6 +10492,8 @@ SEXP explicit_SEIR_vaccine_stochastic_initial_conditions(SEXP internal_p, SEXP s
 }
 void explicit_SEIR_vaccine_stochastic_rhs(explicit_SEIR_vaccine_stochastic_internal* internal, size_t step, double * state, double * state_next, double * output) {
   double * S = state + 0;
+  double * V1 = state + internal->offset_variable_V1;
+  double * V2 = state + internal->offset_variable_V2;
   double * E1 = state + internal->dim_S;
   double * E2 = state + internal->offset_variable_E2;
   double * E1_vac = state + internal->offset_variable_E1_vac;
@@ -10520,8 +10522,6 @@ void explicit_SEIR_vaccine_stochastic_rhs(explicit_SEIR_vaccine_stochastic_inter
   double * D = state + internal->offset_variable_D;
   double * R1 = state + internal->offset_variable_R1;
   double * R2 = state + internal->offset_variable_R2;
-  double * V1 = state + internal->offset_variable_V1;
-  double * V2 = state + internal->offset_variable_V2;
   double hosp_occ = odin_sum1(IOxGetLive1, 0, internal->dim_IOxGetLive1) + odin_sum1(IOxGetLive2, 0, internal->dim_IOxGetLive2) + odin_sum1(IOxGetDie1, 0, internal->dim_IOxGetDie1) + odin_sum1(IOxGetDie2, 0, internal->dim_IOxGetDie2) + odin_sum1(IRec1, 0, internal->dim_IRec1) + odin_sum1(IRec2, 0, internal->dim_IRec2);
   double ICU_occ = odin_sum1(IMVGetLive1, 0, internal->dim_IMVGetLive1) + odin_sum1(IMVGetLive2, 0, internal->dim_IMVGetLive2) + odin_sum1(IMVGetDie1, 0, internal->dim_IMVGetDie1) + odin_sum1(IMVGetDie2, 0, internal->dim_IMVGetDie2);
   for (int i = 1; i <= internal->dim_n_E1_E2; ++i) {
