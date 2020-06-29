@@ -669,7 +669,6 @@ parameters_vaccine <- function(
   # Format vaccine-specific parameters
   vaccine_efficacy_infection = 1 - vaccine_efficacy_infection
   prob_hosp_vaccine = (1 - vaccine_efficacy_disease) * prob_hosp
-  vaccine_rate = max_vaccine# / sum(population * vaccination_target)
 
   # Collate Parameters Into List
   pars <- list(N_age = length(population),
@@ -702,8 +701,8 @@ parameters_vaccine <- function(
                D_0 = mod_init$D,
                V1_0 = mod_init$V1,
                V2_0 = mod_init$V2,
-               E1_vac_0 = mod_init$E1_vac,
-               E2_vac_0 = mod_init$E2_vac,
+               EVac1_0 = mod_init$EVac1,
+               EVac2_0 = mod_init$EVac2,
                gamma_E = gamma_E,
                gamma_IMild = gamma_IMild,
                gamma_ICase = gamma_ICase,
@@ -737,7 +736,7 @@ parameters_vaccine <- function(
                population = population,
                contact_matrix_set = contact_matrix_set,
                vaccination_target = vaccination_target,
-               vaccine_rate = vaccine_rate,
+               max_vaccine = max_vaccine,
                vaccine_efficacy_infection = vaccine_efficacy_infection,
                prob_hosp_vaccine = prob_hosp_vaccine,
                tt_vaccine = round(tt_vaccine/dt))

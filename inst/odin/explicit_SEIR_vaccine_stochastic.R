@@ -59,23 +59,25 @@ n_E2_IMild[] <- n_E2_I[i] - n_E2_ICase1[i] # E2->IMild
 ################################################################################
 
 ### Evac (E1vac & E2vac): Latent vaccinated ####################################
-delta_E1_vac[] <- n_V1_Evac[i] + n_V2_Evac[i] - n_E1_vac_E2_vac[i]
-delta_E2_vac[] <- n_E1_vac_E2_vac[i] - n_E2_vac_I[i]
+delta_EVac1[] <- n_V1_Evac[i] + n_V2_Evac[i] - n_EVac1_EVac2[i]
+delta_EVac2[] <- n_EVac1_EVac2[i] - n_EVac2_I[i]
 
-update(E1_vac[]) <- E1_vac[i] + delta_E1_vac[i]  # First of the latent vaccinated infection compartments (2 comps)
-update(E2_vac[]) <- E2_vac[i] + delta_E2_vac[i]  # Second of the latent vaccinated infection compartments (2 comps)
-E_vac[] <- E1_vac[i] + E2_vac[i] # Summary of Evac
+update(EVac1[]) <- EVac1[i] + delta_EVac1[i]  # First of the latent vaccinated infection compartments (2 comps)
+update(EVac2[]) <- EVac2[i] + delta_EVac2[i]  # Second of the latent vaccinated infection compartments (2 comps)
+E_vac[] <- EVac1[i] + EVac2[i] # Summary of Evac
 
+p_EVac1_EVac2 <- 1 - exp(-gamma_E * dt) # Progression through latent infection
+p_EVac2_I <- 1 - exp(-gamma_E * dt) # Progression to onset of infectiousness. Number split between I_Mild and I_Case
 prob_hosp_vaccine[] <- user() # probability of requiring hospitalisation by age, given vaccinated
 
-n_E1_vac_E2_vac[] <- rbinom(E1_vac[i], p_E1_E2) # E1vac->E2vac
-n_E2_vac_I[] <- rbinom(E2_vac[i], p_E2_I) # E2vac->I
-n_E2_vac_Icase[] <- if(n_E2_vac_I[i] > 0) rbinom(n_E2_vac_I[i], prob_hosp_vaccine[i]) else 0 # E2vac->ICase
-n_E2_vac_Imild[] <- n_E2_vac_I[i] - n_E2_vac_Icase[i] # E2->Imild
+n_EVac1_EVac2[] <- rbinom(EVac1[i], p_EVac1_EVac2) # E1vac->E2vac
+n_EVac2_I[] <- rbinom(EVac2[i], p_EVac2_I) # E2vac->I
+n_EVac2_ICase[] <- if(n_EVac2_I[i] > 0) rbinom(n_EVac2_I[i], prob_hosp_vaccine[i]) else 0 # E2vac->ICase
+n_EVac2_IMild[] <- n_EVac2_I[i] - n_EVac2_ICase[i] # E2->IMild
 ################################################################################
 
 ### IMild: Unhospitalised infection ############################################
-delta_IMild[] <- n_E2_IMild[i] - n_IMild_R[i] + n_E2_vac_Imild[i]
+delta_IMild[] <- n_E2_IMild[i] - n_IMild_R[i] + n_EVac2_IMild[i]
 
 update(IMild[]) <- IMild[i] + delta_IMild[i]  # Mild infections (1 comp)
 
@@ -86,7 +88,7 @@ n_IMild_R[] <- rbinom(IMild[i], p_IMild_R) # IMild->R
 ################################################################################
 
 ### ICase (ICase1 & ICase2): To-be hospitalised infection ######################
-delta_ICase1[] <- n_E2_ICase1[i] - n_ICase1_ICase2[i] + n_E2_vac_Icase[i]
+delta_ICase1[] <- n_E2_ICase1[i] - n_ICase1_ICase2[i] + n_EVac2_ICase[i]
 delta_ICase2[] <- n_ICase1_ICase2[i] - n_ICase2_Hosp[i]
 
 update(ICase1[]) <- ICase1[i] + delta_ICase1[i] # First of the compartments for infections that will require hospitalisation (2 comps)
@@ -296,7 +298,7 @@ deaths[] <- n_IOxGetDie2_D[i] + n_IOxNotGetDie2_D[i] + n_IMVGetDie2_D[i] + n_IMV
 infections[] <- n_S_E1[i] + n_V1_Evac[i] + n_V2_Evac[i]
 
 # Population size
-N[] <- S[i] + E1[i] + E2[i] + E1_vac[i] + E2_vac[i] + IMild[i] + ICase1[i] + ICase2[i] +
+N[] <- S[i] + E1[i] + E2[i] + EVac1[i] + EVac2[i] + IMild[i] + ICase1[i] + ICase2[i] +
   IMVGetLive1[i] + IMVGetLive2[i] +
   IMVGetDie1[i] + IMVGetDie2[i] + IMVNotGetLive1[i] + IMVNotGetLive2[i] + IMVNotGetDie1[i] + IMVNotGetDie2[i] +
   IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] + IOxNotGetLive1[i] + IOxNotGetLive2[i] +
@@ -358,15 +360,15 @@ vaccination_target[] <- user() # 0/1 index of targeted age groups
 vaccine_efficacy_infection[] <- user() # Reduction in lambda for vaccinated individuals by age
 
 # Interpolation of vaccination rate over time
-vaccination_rate <- interpolate(tt_vaccine, vaccine_rate, "constant")
+mv <- interpolate(tt_vaccine, max_vaccine, "constant")
 tt_vaccine[] <- user()
-vaccine_rate[] <- user()
+max_vaccine[] <- user()
 dim(tt_vaccine) <- user()
-dim(vaccine_rate) <- length(tt_vaccine)
+dim(max_vaccine) <- length(tt_vaccine)
 
 vr_temp[] <- S[i] * vaccination_target[i] + R[i] * vaccination_target[i]
 dim(vr_temp) <- N_age
-vr <- vaccination_rate / sum(vr_temp) # Vaccination rate to achieve capacity given number in S or R
+vr <- mv / sum(vr_temp) # Vaccination rate to achieve capacity given number in S or R
 ################################################################################
 ################################################################################
 
@@ -456,8 +458,8 @@ initial(R1[]) <- R1_0[i]
 initial(R2[]) <- R2_0[i]
 initial(V1[]) <- V1_0[i]
 initial(V2[]) <- V2_0[i]
-initial(E1_vac[]) <- E1_vac_0[i]
-initial(E2_vac[]) <- E2_vac_0[i]
+initial(EVac1[]) <- EVac1_0[i]
+initial(EVac2[]) <- EVac2_0[i]
 
 # Initial vectors
 S_0[] <- user()
@@ -489,8 +491,8 @@ R1_0[] <- user()
 R2_0[] <- user()
 V1_0[] <- user()
 V2_0[] <- user()
-E1_vac_0[] <- user()
-E2_vac_0[] <- user()
+EVac1_0[] <- user()
+EVac2_0[] <- user()
 
 # State dimensions
 dim(S) <- N_age
@@ -528,8 +530,8 @@ dim(R) <- N_age
 dim(V1) <- N_age
 dim(V2) <- N_age
 dim(V) <- N_age
-dim(E1_vac) <- N_age
-dim(E2_vac) <- N_age
+dim(EVac1) <- N_age
+dim(EVac2) <- N_age
 dim(E_vac) <- N_age
 dim(IRec) <- N_age
 dim(vaccines) <- N_age
@@ -571,8 +573,8 @@ dim(R1_0) <- N_age
 dim(R2_0) <- N_age
 dim(V1_0) <- N_age
 dim(V2_0) <- N_age
-dim(E1_vac_0) <- N_age
-dim(E2_vac_0) <- N_age
+dim(EVac1_0) <- N_age
+dim(EVac2_0) <- N_age
 
 # Delta dimensions
 dim(delta_E1) <- N_age
@@ -603,8 +605,8 @@ dim(delta_R1) <- N_age
 dim(delta_R2) <- N_age
 dim(delta_V1) <- N_age
 dim(delta_V2) <- N_age
-dim(delta_E1_vac) <- N_age
-dim(delta_E2_vac) <- N_age
+dim(delta_EVac1) <- N_age
+dim(delta_EVac2) <- N_age
 dim(delta_S) <- N_age
 
 # n dimensions
@@ -662,10 +664,10 @@ dim(n_V1_Evac) <- N_age
 dim(n_V2_S_Evac) <- N_age
 dim(n_V2_S) <- N_age
 dim(n_V2_Evac) <- N_age
-dim(n_E1_vac_E2_vac) <- N_age
-dim(n_E2_vac_I) <- N_age
-dim(n_E2_vac_Icase) <- N_age
-dim(n_E2_vac_Imild) <- N_age
+dim(n_EVac1_EVac2) <- N_age
+dim(n_EVac2_I) <- N_age
+dim(n_EVac2_ICase) <- N_age
+dim(n_EVac2_IMild) <- N_age
 
 # Severity Parameters
 dim(prob_hosp) <- N_age
