@@ -19,7 +19,7 @@
 #' @return Formatted long data.frame
 #' @export
 format_vaccine <- function(x,
-                           compartments = c("S", "E", "V", "EVac", "SVac",
+                           compartments = c("S", "E", "V", "EVac", "SVac", "RVac",
                                             "IMild", "ICase", "IICU", "IHospital",
                                             "IRec", "R", "D", "N"),
                            summaries = c("deaths", "infections", "hospital_occupancy",

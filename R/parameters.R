@@ -656,6 +656,7 @@ parameters_vaccine <- function(
   gamma_R <- 2 * 1/dur_R
   gamma_V <- 2 * 1/dur_V
   gamma_SVac <- 2 * 1 / dur_vaccine_delay
+  gamma_RVac <- 2 * 1 / dur_vaccine_delay
 
   if (is.null(beta_set)) {
     baseline_matrix <- process_contact_matrix_scaled_age(contact_matrix_set[[1]], population)
@@ -708,6 +709,8 @@ parameters_vaccine <- function(
                EVac2_0 = mod_init$EVac2,
                SVac1_0 = mod_init$SVac1,
                SVac2_0 = mod_init$SVac2,
+               RVac1_0 = mod_init$RVac1,
+               RVac2_0 = mod_init$RVac2,
                gamma_E = gamma_E,
                gamma_IMild = gamma_IMild,
                gamma_ICase = gamma_ICase,
@@ -745,7 +748,8 @@ parameters_vaccine <- function(
                vaccine_efficacy_infection = vaccine_efficacy_infection,
                prob_hosp_vaccine = prob_hosp_vaccine,
                tt_vaccine = round(tt_vaccine/dt),
-               gamma_SVac = gamma_SVac)
+               gamma_SVac = gamma_SVac,
+               gamma_RVac = gamma_RVac)
 
   class(pars) <- c("explicit_SEEIR_parameters", "squire_parameters")
 
