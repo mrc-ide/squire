@@ -150,16 +150,20 @@ p_IMVNotGetDie2_D <- 1 - exp(-gamma_not_get_mv_die * dt) # Progression through r
 p_Rec1_Rec2 <- 1 - exp(-gamma_rec * dt) # Progression through recovery from ICU in hospital bed to eventual discharge (R)
 p_Rec2_R <- 1 - exp(-gamma_rec * dt) # Progression through recovery from ICU in hospital bed to eventual discharge (R)
 
+vr_temp[] <- S[i] * vaccination_target[i] + R[i] * vaccination_target[i]
+dim(vr_temp) <- N_age
+vr <- vaccination_rate / sum(vr_temp)
+
 # Transition probabilities for those recovering
-p_leave_R[] <- 1 - exp(-(gamma_R + vaccination_rate * vaccination_target[i]) * dt) # Probability leaving R
-p_R[] <- gamma_R / (gamma_R + vaccination_rate * vaccination_target[i]) # Probability of progression through R
+p_leave_R[] <- 1 - exp(-(gamma_R + vr) * dt) # Probability leaving R
+p_R[] <- gamma_R / (gamma_R + vr) # Probability of progression through R
 # Transition probabilities for those vaccinated
 p_leave_V[] <- 1 - exp(-(gamma_V + lambda[i] * vaccine_efficacy_infection[i]) * dt) # Probability leaving V
 p_V[] <- gamma_V / (gamma_V + lambda[i] * vaccine_efficacy_infection[i]) # Probability of progression through V
 
 
-p_leave_S[] <- 1 - exp(-(lambda[i] + vaccination_rate * vaccination_target[i]) * dt) # Infection - age dependent FOI based on mixing patterns
-p_E[] <- if(lambda[i] > 0) lambda[i] / (lambda[i] + vaccination_rate * vaccination_target[i]) else 0 # Probability infection
+p_leave_S[] <- 1 - exp(-(lambda[i] + vr) * dt) # Infection - age dependent FOI based on mixing patterns
+p_E[] <- if(lambda[i] > 0) lambda[i] / (lambda[i] + vr) else 0 # Probability infection
 
 ###########################################################################
 ## Draws for the number of individuals changing between compartments:    ##

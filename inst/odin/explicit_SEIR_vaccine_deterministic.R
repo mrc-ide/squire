@@ -82,11 +82,12 @@ dim(tt_vaccine) <- user()
 dim(vaccine_rate) <- length(tt_vaccine)
 
 
+
 ## Derivatives for Flows Between Compartments
 ##------------------------------------------------------------------------------
 
 # Susceptibles, Latent and Infections Prior to Hospitalisation
-deriv(S[]) <- -S[i] * lambda[i] + (gamma_R * R2[i]) - (vaccination_rate * vaccination_target[i] * S[i]) + (gamma_V * V2[i])
+deriv(S[]) <- -S[i] * lambda[i] + (gamma_R * R2[i]) - (vr * vaccination_target[i] * S[i]) + (gamma_V * V2[i])
 
 # Latent
 deriv(E1[]) <- lambda[i] * S[i] - gamma_E * E1[i]
@@ -154,9 +155,14 @@ output(hospital_demand[]) <- IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + I
 output(ICU_demand[]) <- IMVGetLive1[i] +  IMVGetLive2[i] + IMVGetDie1[i] + IMVGetDie2[i] + IMVNotGetLive1[i] +  IMVNotGetLive2[i] + IMVNotGetDie1[i] + IMVNotGetDie2[i]
 
 # Recoveries
-deriv(R1[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox_survive * IOxGetLive2[i]) + (gamma_not_get_ox_survive * IOxNotGetLive2[i]) + (gamma_not_get_mv_survive * IMVNotGetLive2[i]) - (gamma_R * R1[i]) - (vaccination_rate * vaccination_target[i] * R1[i])
-deriv(R2[]) <- (gamma_R * R1[i]) - (gamma_R * R2[i]) - (vaccination_rate * vaccination_target[i] * R2[i])
+deriv(R1[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox_survive * IOxGetLive2[i]) + (gamma_not_get_ox_survive * IOxNotGetLive2[i]) + (gamma_not_get_mv_survive * IMVNotGetLive2[i]) - (gamma_R * R1[i]) - (vr * vaccination_target[i] * R1[i])
+deriv(R2[]) <- (gamma_R * R1[i]) - (gamma_R * R2[i]) - (vr * vaccination_target[i] * R2[i])
 output(R[]) <- R1[i] + R2[i]
+
+
+vr_temp[] <- S[i] * vaccination_target[i] + R1[i] * vaccination_target[i] + R2[i] * vaccination_target[i]
+dim(vr_temp) <- N_age
+vr <- vaccination_rate / sum(vr_temp)
 
 # Deaths
 deriv(D[]) <- (gamma_get_ox_die * IOxGetDie2[i]) + (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_get_mv_die * IMVGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
@@ -174,10 +180,10 @@ dim(Ilag) <- N_age
 dim(infections) <- N_age
 
 # Vaccinated
-deriv(V1[]) <- (vaccination_rate * vaccination_target[i] * S[i]) + (vaccination_rate * vaccination_target[i] * R2[i]) + (vaccination_rate * vaccination_target[i] * R1[i]) - (gamma_V * V1[i]) - (lambda[i] * V1[i] * vaccine_efficacy_infection[i])
+deriv(V1[]) <- (vr * vaccination_target[i] * S[i]) + (vr * vaccination_target[i] * R2[i]) + (vr * vaccination_target[i] * R1[i]) - (gamma_V * V1[i]) - (lambda[i] * V1[i] * vaccine_efficacy_infection[i])
 deriv(V2[]) <- (gamma_V * V1[i]) - (gamma_V * V2[i]) - (lambda[i] * V2[i] * vaccine_efficacy_infection[i])
 output(V[]) <- V1[i] + V2[i]
-deriv(vaccinated[]) <- (vaccination_rate * vaccination_target[i] * S[i]) + (vaccination_rate * vaccination_target[i] * R2[i]) + (vaccination_rate * vaccination_target[i] * R1[i])
+deriv(vaccinated[]) <- (vr * vaccination_target[i] * S[i]) + (vr * vaccination_target[i] * R2[i]) + (vr * vaccination_target[i] * R1[i])
 vaccinatedlag[] <- delay(vaccinated[i], 1)
 output(vaccines[]) <- vaccinated[i] - vaccinatedlag[i]
 dim(vaccinatedlag) <- N_age

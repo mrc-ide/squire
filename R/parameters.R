@@ -669,7 +669,7 @@ parameters_vaccine <- function(
   # Format vaccine-specific parameters
   vaccine_efficacy_infection = 1 - vaccine_efficacy_infection
   prob_hosp_vaccine = (1 - vaccine_efficacy_disease) * prob_hosp
-  vaccine_rate = max_vaccine / sum(population * vaccination_target)
+  vaccine_rate = max_vaccine# / sum(population * vaccination_target)
 
   # Collate Parameters Into List
   pars <- list(N_age = length(population),
