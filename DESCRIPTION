@@ -25,7 +25,7 @@ Suggests:
     rmarkdown
 RoxygenNote: 7.1.0
 Imports: 
-    odin (>= 1.0.3), 
+    odin (>= 1.0.3),
     dde (>= 1.0.2),
     dplyr,
     tidyr,
@@ -38,7 +38,8 @@ Imports:
     ggplot2,
     viridis,
     coda,
-    mvtnorm
+    mvtnorm,
+    abind
 Depends: R (>= 3.1.0)
 VignetteBuilder: knitr
 Remotes:

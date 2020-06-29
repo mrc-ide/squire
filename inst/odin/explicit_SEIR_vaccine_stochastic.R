@@ -8,8 +8,8 @@ delta_S[] <- n_R2_S[i] - n_S_E1_SVac1[i] + n_V2_S[i]
 
 update(S[]) <- S[i] + delta_S[i]  # Susceptibles (1 compartment)
 
-p_leave_S[] <- 1 - exp(-(lambda[i] + vr) * dt) # Infection - age dependent FOI based on mixing patterns
-p_E[] <- if(lambda[i] > 0) lambda[i] / (lambda[i] + vr) else 0 # Probability infection
+p_leave_S[] <- 1 - exp(-(lambda[i] + vr * vaccination_target[i]) * dt) # Infection - age dependent FOI based on mixing patterns
+p_E[] <- if(lambda[i] > 0) lambda[i] / (lambda[i] + vr * vaccination_target[i]) else 0 # Probability infection
 
 n_S_E1_SVac1[] <- rbinom(S[i], p_leave_S[i]) # Leaving S
 n_S_E1[] <- if(n_S_E1_SVac1[i] > 0) rbinom(n_S_E1_SVac1[i], p_E[i]) else 0 # S->E1
@@ -17,8 +17,8 @@ n_S_SVac1[] <- n_S_E1_SVac1[i] - n_S_E1[i] # S->V1
 ################################################################################
 
 ### SVac (SVac1 & SVac2): Vaccinated but still susceptible #####################
-delta_SVac1[] <- n_S_SVac1[i] - n_SVac1_E1_SVac2[i]
-delta_SVac2[] <- n_SVac1_SVac2[i] - n_SVac2_E1_V1[i]
+delta_SVac1[] <- n_S_SVac1[i] - n_SVac1_EVac1_SVac2[i]
+delta_SVac2[] <- n_SVac1_SVac2[i] - n_SVac2_EVac1_V1[i]
 
 update(SVac1[]) <- SVac1[i] + delta_SVac1[i]
 update(SVac2[]) <- SVac2[i] + delta_SVac2[i]
@@ -29,13 +29,13 @@ p_leave_SVac[] <- 1 - exp(-(lambda[i] + gamma_SVac) * dt)
 p_SVac1_SVac2[] <- gamma_SVac / (lambda[i] + gamma_SVac)
 p_SVac2_V1[] <- gamma_SVac / (lambda[i] + gamma_SVac)
 
-n_SVac1_E1_SVac2[] <- rbinom(SVac1[i], p_leave_SVac[i]) # Leaving SVac1
-n_SVac1_SVac2[] <- if(n_SVac1_E1_SVac2[i] > 0) rbinom(n_SVac1_E1_SVac2[i], p_SVac1_SVac2[i]) else 0 # SVac1->SVac2
-n_SVac1_E1[] <- n_SVac1_E1_SVac2[i] - n_SVac1_SVac2[i] # SVac1->E1
+n_SVac1_EVac1_SVac2[] <- rbinom(SVac1[i], p_leave_SVac[i]) # Leaving SVac1
+n_SVac1_SVac2[] <- if(n_SVac1_EVac1_SVac2[i] > 0) rbinom(n_SVac1_EVac1_SVac2[i], p_SVac1_SVac2[i]) else 0 # SVac1->SVac2
+n_SVac1_EVac1[] <- n_SVac1_EVac1_SVac2[i] - n_SVac1_SVac2[i] # SVac1->E1
 
-n_SVac2_E1_V1[] <- rbinom(SVac2[i], p_leave_SVac[i]) # Leaving SVac2
-n_SVac2_V1[] <- if(n_SVac2_E1_V1[i] > 0) rbinom(n_SVac2_E1_V1[i], p_SVac2_V1[i]) else 0 # SVac2->V1
-n_SVac2_E1[] <- n_SVac2_E1_V1[i] - n_SVac2_V1[i] # SVac2->E1
+n_SVac2_EVac1_V1[] <- rbinom(SVac2[i], p_leave_SVac[i]) # Leaving SVac2
+n_SVac2_V1[] <- if(n_SVac2_EVac1_V1[i] > 0) rbinom(n_SVac2_EVac1_V1[i], p_SVac2_V1[i]) else 0 # SVac2->V1
+n_SVac2_EVac1[] <- n_SVac2_EVac1_V1[i] - n_SVac2_V1[i] # SVac2->E1
 ################################################################################
 
 ### V (V1 & v2): Vaccinated ####################################################
@@ -62,7 +62,7 @@ n_V2_Evac[] <- n_V2_S_Evac[i] - n_V2_S[i] # V2->Evac
 ################################################################################
 
 ### E (E1 & E2): Latent ########################################################
-delta_E1[] <- n_S_E1[i] + n_SVac1_E1[i] + n_SVac2_E1[i] - n_E1_E2[i]
+delta_E1[] <- n_S_E1[i] - n_E1_E2[i]
 delta_E2[] <- n_E1_E2[i] - n_E2_I[i]
 
 update(E1[]) <- E1[i] + delta_E1[i]  # First of the latent infection compartments (2 comps)
@@ -81,7 +81,7 @@ n_E2_IMild[] <- n_E2_I[i] - n_E2_ICase1[i] # E2->IMild
 ################################################################################
 
 ### Evac (E1vac & E2vac): Latent vaccinated ####################################
-delta_EVac1[] <- n_V1_Evac[i] + n_V2_Evac[i] - n_EVac1_EVac2[i]
+delta_EVac1[] <- n_V1_Evac[i] + n_V2_Evac[i] + n_SVac1_EVac1[i] + n_SVac2_EVac1[i] - n_EVac1_EVac2[i]
 delta_EVac2[] <- n_EVac1_EVac2[i] - n_EVac2_I[i]
 
 update(EVac1[]) <- EVac1[i] + delta_EVac1[i]  # First of the latent vaccinated infection compartments (2 comps)
@@ -289,8 +289,8 @@ R[] <- R1[i] + R2[i] # Summary R
 
 gamma_R <- user() # rate of progression through recovered compartment (loss of naturally acquired immunity)
 
-p_leave_R[] <- 1 - exp(-(gamma_R + vr) * dt) # Probability leaving R
-p_R[] <- gamma_R / (gamma_R + vr) # Probability of progression through R
+p_leave_R[] <- 1 - exp(-(gamma_R + vr * vaccination_target[i]) * dt) # Probability leaving R
+p_R[] <- gamma_R / (gamma_R + vr * vaccination_target[i]) # Probability of progression through R
 
 n_R1_R2_RVac1[] <- rbinom(R1[i], p_leave_R[i]) # Number leaving R1
 n_R1_R2[] <- if (n_R1_R2_RVac1[i] > 0) rbinom(n_R1_R2_RVac1[i], p_R[i]) else 0 # R1->R2
@@ -336,7 +336,7 @@ infections[] <- n_S_E1[i] + n_V1_Evac[i] + n_V2_Evac[i]
 
 # Population size
 N[] <- S[i] + E1[i] + E2[i] + EVac1[i] + EVac2[i] + IMild[i] + ICase1[i] + ICase2[i] +
-  SVac1[i] + SVac2[i] +
+  SVac1[i] + SVac2[i] + RVac1[i] + RVac2[i] +
   IMVGetLive1[i] + IMVGetLive2[i] +
   IMVGetDie1[i] + IMVGetDie2[i] + IMVNotGetLive1[i] + IMVNotGetLive2[i] + IMVNotGetDie1[i] + IMVNotGetDie2[i] +
   IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] + IOxNotGetLive1[i] + IOxNotGetLive2[i] +
@@ -459,13 +459,6 @@ output(deaths) <- TRUE
 output(infections) <- TRUE
 output(time) <- TRUE
 
-output(n_SVac2_E1) <- TRUE
-output(n_SVac1_E1) <- TRUE
-output(n_S_E1) <- TRUE
-output(n_E1_E2) <- TRUE
-output(p_E1_E2) <- TRUE
-output(n_SVac2_E1_V1) <- TRUE
-output(n_SVac2_V1) <- TRUE
 ################################################################################
 ################################################################################
 
@@ -732,12 +725,8 @@ dim(n_EVac1_EVac2) <- N_age
 dim(n_EVac2_I) <- N_age
 dim(n_EVac2_ICase) <- N_age
 dim(n_EVac2_IMild) <- N_age
-dim(n_SVac1_E1_SVac2) <- N_age
 dim(n_SVac1_SVac2) <- N_age
-dim(n_SVac1_E1) <- N_age
-dim(n_SVac2_E1_V1) <- N_age
 dim(n_SVac2_V1) <- N_age
-dim(n_SVac2_E1) <- N_age
 dim(n_S_E1_SVac1) <- N_age
 dim(n_S_SVac1) <- N_age
 dim(n_RVac1_RVac2) <- N_age
@@ -746,7 +735,10 @@ dim(n_R1_R2_RVac1) <- N_age
 dim(n_R1_RVac1) <- N_age
 dim(n_R2_S_RVac1) <- N_age
 dim(n_R2_RVac1) <- N_age
-
+dim(n_SVac1_EVac1_SVac2) <- N_age
+dim(n_SVac2_EVac1_V1) <- N_age
+dim(n_SVac1_EVac1) <- N_age
+dim(n_SVac2_EVac1) <- N_age
 
 # Severity Parameters
 dim(prob_hosp) <- N_age

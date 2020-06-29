@@ -6,10 +6,10 @@
 \usage{
 format_vaccine(
   x,
-  compartments = c("S", "E", "V", "E_vac", "IMild", "ICase", "IICU", "IHospital",
-    "IRec", "R", "D", "N"),
+  compartments = c("S", "E", "V", "EVac", "SVac", "RVac", "IMild", "ICase", "IICU",
+    "IHospital", "IRec", "R", "D", "N"),
   summaries = c("deaths", "infections", "hospital_occupancy", "ICU_occupancy",
-    "hospital_demand", "ICU_demand", "vaccinated"),
+    "hospital_demand", "ICU_demand", "vaccines"),
   reduce_age = TRUE,
   date_0 = NULL
 )
@@ -22,7 +22,7 @@ format_vaccine(
 \item{summaries}{Vecto of summary names, which may be:
 \itemize{
       \item{"deaths"}{ Daily Deaths (stochatic model) }
-      \item{"infections"}{ Daily Infections (stochastic model)}
+      \item{"infections"}{ Daily Infections. New infections (note this is currently a slightly different definitionto the main Squire mode)}
       \item{"hospital_occupancy"}{ Occupied Hospital Beds }
       \item{"ICU_occupancy"}{ Occupied ICU Beds }
       \item{"hospital_demand}{ Required Hospital Beds }

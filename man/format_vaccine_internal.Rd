@@ -22,7 +22,7 @@ format_vaccine_internal(
 \item{summaries}{Vecto of summary names, which may be:
 \itemize{
       \item{"deaths"}{ Daily Deaths (stochatic model) }
-      \item{"infections"}{ Daily Infections (stochastic model)}
+      \item{"infections"}{ Daily Infections. New infections (note this is currently a slightly different definitionto the main Squire mode)}
       \item{"hospital_occupancy"}{ Occupied Hospital Beds }
       \item{"ICU_occupancy"}{ Occupied ICU Beds }
       \item{"hospital_demand}{ Required Hospital Beds }
