@@ -1,5 +1,5 @@
 ################################################################################
-### Vaccine model ##############################################################
+### Vaccine model: stochatsic ##################################################
 ################################################################################
 
 
@@ -204,7 +204,7 @@ n_IMVGetLive1_IMVGetLive2[] <- rbinom(IMVGetLive1[i], p_IMVGetLive1_IMVGetLive2)
 n_IMVGetLive2_Rec[] <- rbinom(IMVGetLive2[i], p_IMVGetLive2_Rec) # IMVGetLive2->Rec
 ################################################################################
 
-### IMVGetDie (IMVGetLive1 & IMVGetLive2): Get mechanical ventilation, go on to die ########
+### IMVGetDie (IMVGetDie1 & IMVGetDie2): Get mechanical ventilation, go on to die ########
 delta_IMVGetDie1[] <- n_IMVGetDie1[i] - n_IMVGetDie1_IMVGetDie2[i]
 delta_IMVGetDie2[] <- n_IMVGetDie1_IMVGetDie2[i] - n_IMVGetDie2_D[i]
 
