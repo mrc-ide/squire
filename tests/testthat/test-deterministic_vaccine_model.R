@@ -8,9 +8,8 @@ test_that("compare deterministic vaccine model to SEEIR model", {
     contact_matrix_set = mm,
     hosp_bed_capacity = 100000,
     ICU_bed_capacity = 1000000,
-    day_return = TRUE,
     seed = 1,
-    dt = 1,
+    dt = 0.01,
     replicates = 1,
     seeding_cases = 20
   )
@@ -22,12 +21,11 @@ test_that("compare deterministic vaccine model to SEEIR model", {
     contact_matrix_set = mm,
     hosp_bed_capacity = 100000,
     ICU_bed_capacity = 1000000,
-    day_return = TRUE,
     dur_R = Inf,
     max_vaccine = 0,
     seed = 1,
     framework = "deterministic",
-    dt = 1,
+    dt = 0.01,
     replicates = 1,
     seeding_cases = 20
   )
@@ -36,7 +34,7 @@ test_that("compare deterministic vaccine model to SEEIR model", {
   # Compare shared compartments
   compare_compartments <- names(oi1)[names(oi1) %in% names(oi2)]
   expect_equal(m1$output[,unlist(oi1[compare_compartments]),],
-               m2$output[1:365,unlist(oi2[compare_compartments]),], tol = 0.00001)
+               m2$output[1:(36500 - 99), unlist(oi2[compare_compartments]),], tol = 0.00001)
 
   # Check all vaccine-related compartments are 0
   expect_equal(sum(m2$output[,unlist(oi2[c("SVac1", "SVac2", "SVac",
@@ -47,7 +45,7 @@ test_that("compare deterministic vaccine model to SEEIR model", {
 
   # Check population size is constant at specified level
   expect_equal(format_vaccine(m2, "N", NULL)$value,
-               rep(sum(pop$n), 366))
+               rep(sum(pop$n), 36500))
 
 })
 
@@ -62,12 +60,11 @@ test_that("Vaccine on works", {
     contact_matrix_set = mm,
     hosp_bed_capacity = 100000,
     ICU_bed_capacity = 1000000,
-    day_return = TRUE,
     dur_R = Inf,
     max_vaccine = 10000,
     seed = 1,
     framework = "deterministic",
-    dt = 1,
+    dt = 0.01,
     replicates = 1,
     seeding_cases = 20
   )
@@ -77,7 +74,7 @@ test_that("Vaccine on works", {
 
   # Check population size is constant at specified level
   expect_equal(format_vaccine(m1, "N", NULL)$value,
-               rep(sum(pop$n), 366))
+               rep(sum(pop$n), 36500))
 })
 
 
@@ -91,13 +88,12 @@ test_that("Age targeting works", {
     contact_matrix_set = mm,
     hosp_bed_capacity = 100000,
     ICU_bed_capacity = 1000000,
-    day_return = TRUE,
     dur_R = Inf,
     max_vaccine = 10000,
     vaccination_target = c(1, rep(0, 16)),
     seed = 1,
     framework = "deterministic",
-    dt = 1,
+    dt = 0.01,
     replicates = 1,
     seeding_cases = 20
   )
@@ -112,19 +108,18 @@ test_that("Time-varying works", {
   pop <- get_population("Angola")
   mm <- get_mixing_matrix("Angola")
 
-  # Vaccine model time varying vaccine
+  # Vaccine model time varying
   m1 <- run_vaccine(
     population = pop$n,
     contact_matrix_set = mm,
     hosp_bed_capacity = 100000,
     ICU_bed_capacity = 1000000,
-    day_return = TRUE,
     dur_R = Inf,
     max_vaccine = c(0, 1000, 0),
     tt_vaccine = c(0, 100, 200),
     seed = 1,
-    framework = "deterministic",
-    dt = 1,
+    framework = "stochastic",
+    dt = 0.01,
     replicates = 1,
     seeding_cases = 20
   )

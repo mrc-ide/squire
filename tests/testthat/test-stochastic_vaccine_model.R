@@ -8,9 +8,8 @@ test_that("compare stochastic vaccine model to SEEIR model", {
     contact_matrix_set = mm,
     hosp_bed_capacity = 100000,
     ICU_bed_capacity = 1000000,
-    day_return = TRUE,
     seed = 1,
-    dt = 1,
+    dt = 0.01,
     replicates = 1,
     seeding_cases = 20
   )
@@ -22,12 +21,11 @@ test_that("compare stochastic vaccine model to SEEIR model", {
     contact_matrix_set = mm,
     hosp_bed_capacity = 100000,
     ICU_bed_capacity = 1000000,
-    day_return = TRUE,
     dur_R = Inf,
     max_vaccine = 0,
     seed = 1,
     framework = "stochastic",
-    dt = 1,
+    dt = 0.01,
     replicates = 1,
     seeding_cases = 20
   )
@@ -47,7 +45,7 @@ test_that("compare stochastic vaccine model to SEEIR model", {
 
   # Check population size is constant at specified level
   expect_equal(format_vaccine(m2, "N", NULL)$value,
-               rep(sum(pop$n), 366))
+               rep(sum(pop$n), 36500))
 
 })
 
@@ -62,12 +60,11 @@ test_that("Vaccine on works", {
     contact_matrix_set = mm,
     hosp_bed_capacity = 100000,
     ICU_bed_capacity = 1000000,
-    day_return = TRUE,
     dur_R = Inf,
     max_vaccine = 10000,
     seed = 1,
     framework = "stochastic",
-    dt = 1,
+    dt = 0.01,
     replicates = 1,
     seeding_cases = 20
   )
@@ -77,7 +74,7 @@ test_that("Vaccine on works", {
 
   # Check population size is constant at specified level
   expect_equal(format_vaccine(m1, "N", NULL)$value,
-               rep(sum(pop$n), 366))
+               rep(sum(pop$n), 36500))
 })
 
 
@@ -91,13 +88,12 @@ test_that("Age targeting works", {
     contact_matrix_set = mm,
     hosp_bed_capacity = 100000,
     ICU_bed_capacity = 1000000,
-    day_return = TRUE,
     dur_R = Inf,
     max_vaccine = 10000,
     vaccination_target = c(1, rep(0, 16)),
     seed = 1,
     framework = "stochastic",
-    dt = 1,
+    dt = 0.01,
     replicates = 1,
     seeding_cases = 20
   )
@@ -118,13 +114,12 @@ test_that("Time-varying works", {
     contact_matrix_set = mm,
     hosp_bed_capacity = 100000,
     ICU_bed_capacity = 1000000,
-    day_return = TRUE,
     dur_R = Inf,
     max_vaccine = c(0, 1000, 0),
     tt_vaccine = c(0, 100, 200),
     seed = 1,
     framework = "stochastic",
-    dt = 1,
+    dt = 0.01,
     replicates = 1,
     seeding_cases = 20
   )
@@ -132,6 +127,6 @@ test_that("Time-varying works", {
   # Check individuals in youngest age group reaching V
   t_v <- format_vaccine(m1, "vaccines", NULL)
   expect_equal(sum(dplyr::filter(t_v, t < 100)$value), 0)
-  expect_gt(sum(dplyr::filter(t_v, t >= 100, t <200)$value), 0)
-  expect_equal(sum(dplyr::filter(t_v, t >= 200)$value), 0)
+  expect_gt(sum(dplyr::filter(t_v, t >= 100, t <201)$value), 0)
+  expect_equal(sum(dplyr::filter(t_v, t >= 201)$value), 0)
 })

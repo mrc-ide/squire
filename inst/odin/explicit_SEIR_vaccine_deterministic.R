@@ -19,7 +19,7 @@ deriv(V1[]) <- (gamma_SVac * SVac2[i]) + (gamma_RVac * RVac2[i]) - (gamma_V * V1
 deriv(V2[]) <- (gamma_V * V1[i]) - (gamma_V * V2[i]) - (lambda[i] * V2[i] * vaccine_efficacy_infection[i])
 output(V[]) <- V1[i] + V2[i]
 deriv(vaccinated[]) <- (vr * vaccination_target[i] * S[i]) + (vr * vaccination_target[i] * R2[i]) + (vr * vaccination_target[i] * R1[i])
-vaccinatedlag[] <- delay(vaccinated[i], 1)
+vaccinatedlag[] <- delay(vaccinated[i], dt)
 output(vaccines[]) <- vaccinated[i] - vaccinatedlag[i]
 ################################################################################
 
@@ -233,10 +233,11 @@ output(IICU[]) <- IMVGetLive1[i] + IMVGetLive2[i] + IMVGetDie1[i] + IMVGetDie2[i
 output(IHospital[]) <- IOxGetLive1[i] + IOxGetLive2[i] + IOxGetDie1[i] + IOxGetDie2[i] + IOxNotGetLive1[i] + IOxNotGetLive2[i] + IOxNotGetDie1[i] + IOxNotGetDie2[i]
 
 # Deaths and infections
-Dlag[] <- delay(D[i], 1)
+dt <- user() # Specified timestep
+Dlag[] <- delay(D[i], dt)
 output(deaths[]) <- D[i] - Dlag[i]
 deriv(I[]) <- lambda[i] * S[i] + (lambda[i] * V1[i] * vaccine_efficacy_infection[i]) + (lambda[i] * V2[i] * vaccine_efficacy_infection[i])
-Ilag[] <- delay(I[i], 1)
+Ilag[] <- delay(I[i], dt)
 output(infections[]) <- I[i] - Ilag[i]
 
 # Population size

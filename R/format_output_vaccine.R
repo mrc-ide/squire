@@ -44,7 +44,11 @@ format_vaccine <- function(x,
   }
 
   # Extract time
-  time <- x$output[,index$t,1]
+  if(x$parameters$framework == "deterministic"){
+    time <- x$output[,index$t,1]
+  } else {
+    time <- x$output[,index$t,1] * x$parameters$dt
+  }
   # N replicates
   replicates = dim(x$output)[3]
   # Format over each replicate
