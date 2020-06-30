@@ -332,32 +332,38 @@ projections <- function(r,
         unused_user_action = "ignore")
     }
 
+    # get the dt for the simulation
+    dt_step <- r$parameters$dt
 
-    # change these user params
-    r$model$set_user(tt_beta = round(tt_R0/r$parameters$dt))
-    r$model$set_user(beta_set = beta)
-    r$model$set_user(tt_matrix = round(tt_contact_matrix/r$parameters$dt))
-    r$model$set_user(mix_mat_set = matrices_set)
-    r$model$set_user(tt_hosp_beds = round(tt_hosp_beds/r$parameters$dt))
-    r$model$set_user(hosp_beds = hosp_bed_capacity)
-    r$model$set_user(tt_ICU_beds = round(tt_ICU_beds/r$parameters$dt))
-    r$model$set_user(ICU_beds = ICU_bed_capacity)
-
-    # run the model
     # step handling for stochastic
     if(r$model$.__enclos_env__$private$discrete) {
       if(diff(tail(r$output[,1,1],2)) != 1) {
         step <- c(0,round(seq_len(length(t_steps[[x]]))/r$parameters$dt))
       } else {
         step <- seq_len(length(t_steps[[x]]))
+        dt_step <- 1
       }
     } else {
       if(diff(tail(r$output[,1,1],2)) != 1) {
         step <- c(0,round(seq_len(length(t_steps[[x]]))*r$parameters$dt))
       } else {
         step <- c(0, seq_len(length(t_steps[[x]])))
+        dt_step <- 1
       }
     }
+
+    # change these user params
+    r$model$set_user(tt_beta = round(tt_R0/dt_step))
+    r$model$set_user(beta_set = beta)
+    r$model$set_user(tt_matrix = round(tt_contact_matrix/dt_step))
+    r$model$set_user(mix_mat_set = matrices_set)
+    r$model$set_user(tt_hosp_beds = round(tt_hosp_beds/dt_step))
+    r$model$set_user(hosp_beds = hosp_bed_capacity)
+    r$model$set_user(tt_ICU_beds = round(tt_ICU_beds/dt_step))
+    r$model$set_user(ICU_beds = ICU_bed_capacity)
+
+    # run the model
+
 
     get <- r$model$run(step,
                        y = as.numeric(r$output[state_pos[x], initials, x, drop=TRUE]),
