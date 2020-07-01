@@ -379,7 +379,7 @@ plot.squire_pmcmc_list <- function(x, burn_in = 1, thin = 1, ...) {
     }
   },
   par_name = par_names,
-  leg = c(FALSE, FALSE, FALSE, FALSE))
+  leg = rep(FALSE, length(traces)))
 
 }
 

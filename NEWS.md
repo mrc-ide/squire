@@ -1,3 +1,12 @@
+# squire 0.4.25
+
+* `format_output` now returns `hospital_incidence` and `ICU_incidence`
+* `evaluate_Rt_pmcmc` patch for `Meff_switch_date` earlier than `date_R0_change[1]`
+
+# squire 0.4.24
+
+* `Meff_pl` can be scaled or not in relation to Meff
+
 # squire 0.4.23
 
 * `pmcmc` no longer takes Rt_func as hard coded given Meff_pl complexity

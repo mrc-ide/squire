@@ -189,6 +189,7 @@ output(n_E2_ICase1[]) <- TRUE
 output(n_E2_IMild[]) <- TRUE
 output(number_requiring_IMV[]) <- TRUE
 output(delta_D[]) <- TRUE
+output(number_requiring_Ox[]) <- TRUE
 output(time) <- TRUE
 # output(hosp_bed_capacity) <- TRUE
 # output(hosp_occ) <- TRUE

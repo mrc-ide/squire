@@ -332,32 +332,38 @@ projections <- function(r,
         unused_user_action = "ignore")
     }
 
+    # get the dt for the simulation
+    dt_step <- r$parameters$dt
 
-    # change these user params
-    r$model$set_user(tt_beta = round(tt_R0/r$parameters$dt))
-    r$model$set_user(beta_set = beta)
-    r$model$set_user(tt_matrix = round(tt_contact_matrix/r$parameters$dt))
-    r$model$set_user(mix_mat_set = matrices_set)
-    r$model$set_user(tt_hosp_beds = round(tt_hosp_beds/r$parameters$dt))
-    r$model$set_user(hosp_beds = hosp_bed_capacity)
-    r$model$set_user(tt_ICU_beds = round(tt_ICU_beds/r$parameters$dt))
-    r$model$set_user(ICU_beds = ICU_bed_capacity)
-
-    # run the model
     # step handling for stochastic
     if(r$model$.__enclos_env__$private$discrete) {
       if(diff(tail(r$output[,1,1],2)) != 1) {
         step <- c(0,round(seq_len(length(t_steps[[x]]))/r$parameters$dt))
       } else {
         step <- seq_len(length(t_steps[[x]]))
+        dt_step <- 1
       }
     } else {
       if(diff(tail(r$output[,1,1],2)) != 1) {
         step <- c(0,round(seq_len(length(t_steps[[x]]))*r$parameters$dt))
       } else {
         step <- c(0, seq_len(length(t_steps[[x]])))
+        dt_step <- 1
       }
     }
+
+    # change these user params
+    r$model$set_user(tt_beta = round(tt_R0/dt_step))
+    r$model$set_user(beta_set = beta)
+    r$model$set_user(tt_matrix = round(tt_contact_matrix/dt_step))
+    r$model$set_user(mix_mat_set = matrices_set)
+    r$model$set_user(tt_hosp_beds = round(tt_hosp_beds/dt_step))
+    r$model$set_user(hosp_beds = hosp_bed_capacity)
+    r$model$set_user(tt_ICU_beds = round(tt_ICU_beds/dt_step))
+    r$model$set_user(ICU_beds = ICU_bed_capacity)
+
+    # run the model
+
 
     get <- r$model$run(step,
                        y = as.numeric(r$output[state_pos[x], initials, x, drop=TRUE]),
@@ -535,14 +541,13 @@ t0_variables <- function(r) {
                                        R0_change = tail(r$interventions$R0_change, 1),
                                        Meff = r$replicate_parameters$Meff[x])
         } else {
+          pars <- as.list(r$replicate_parameters[x,-which(names(r$replicate_parameters) %in% c("start_date", "R0"))])
+          names(pars) <- names(r$replicate_parameters)[-which(names(r$replicate_parameters) %in% c("start_date", "R0"))]
           R0 <- tail(evaluate_Rt_pmcmc(R0_change = r$interventions$R0_change,
                                  R0 = r$replicate_parameters$R0[x],
-                                 Meff = r$replicate_parameters$Meff[x],
-                                 Meff_pl = r$replicate_parameters$Meff_pl[x],
                                  date_R0_change = r$interventions$date_R0_change,
-                                 date_Meff_change = r$interventions$date_Meff_change,
-                                 start_date = r$replicate_parameters$start_date[x],
-                                 roll = r[[wh]]$inputs$roll), 1)
+                                 pars = pars,
+                                 Rt_args = r[[wh]]$inputs$Rt_args), 1)
         }
       } else {
         R0 <- r$replicate_parameters$R0[x]

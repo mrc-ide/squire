@@ -649,6 +649,7 @@ test_that("reporting fraction into pars_obs", {
     forecast = 0
   )
 
+  set.seed(93L)
   out2 <- calibrate(
     data = data,
     R0_min = R0_min,
@@ -668,8 +669,7 @@ test_that("reporting fraction into pars_obs", {
     forecast = 0
   )
 
-  index <- odin_index(out$model)
-  expect_true(sum(rowSums(out$output[,index$D,1]))  > sum(rowSums(out2$output[,index$D,1])))
+  expect_true(all(out2$replicate_parameters$R0 == out$replicate_parameters$R0))
 
 })
 
@@ -853,7 +853,7 @@ test_that("Rt_func", {
   date_contact_matrix_set_change = NULL
   squire_model = explicit_model()
   pars_obs = NULL
-  n_particles = 2
+  n_particles = 10
 
   set.seed(93L)
   out <- calibrate(
@@ -891,7 +891,11 @@ test_that("Rt_func", {
     last_start_date = last_start_date,
     day_step = day_step,
     squire_model = squire_model,
-    pars_obs = pars_obs,
+    pars_obs =  list(phi_cases = 1,
+                                     k_cases = 2,
+                                     phi_death = 1,
+                                     k_death = 30,
+                                     exp_noise = 1e6),
     n_particles = n_particles,
     reporting_fraction = reporting_fraction,
     R0_change = R0_change,
@@ -906,15 +910,19 @@ test_that("Rt_func", {
     R0_min = R0_min,
     R0_max = R0_max,
     R0_step = R0_step,
-    Meff_min = Meff_min,
-    Meff_max = Meff_max,
+    Meff_min = 0.6,
+    Meff_max = 0.7,
     Meff_step = Meff_step,
     Rt_func = function(R0_change, R0, Meff){R0_change*Meff*R0},
     first_start_date = first_start_date,
     last_start_date = last_start_date,
     day_step = day_step,
     squire_model = squire_model,
-    pars_obs = pars_obs,
+    pars_obs =  list(phi_cases = 1,
+                     k_cases = 2,
+                     phi_death = 1,
+                     k_death = 30,
+                     exp_noise = 1e6),
     n_particles = n_particles,
     reporting_fraction = reporting_fraction,
     R0_change = R0_change,

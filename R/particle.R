@@ -463,11 +463,20 @@ intervention_dates_for_odin <- function(dates,
     stop("dates must be strictly increasing")
   }
 
-  # trim dates if needed
-  if (any(start_date >= dates)) {
+  # if start date is in out dates then just trip all earlier dates
+  if (start_date %in% dates) {
+
+    include <- which(dates >= start_date)
+    dates <- dates[include]
+    change <- change[include]
+
+  # if start date is in the middle of our dates but not incldued
+  # then remove all earlier dates and change the last date before the
+  # start date to the start date
+  } else if (any(start_date >= dates)) {
 
     # which are before the start date
-    to_change <- which(dates <= start_date)
+    to_change <- which(dates < start_date)
     to_drop <- head(to_change, -1)
 
     # remove all but the last one
@@ -476,18 +485,20 @@ intervention_dates_for_odin <- function(dates,
       change <- change[-to_drop]
     }
 
-    # change the first remaining date if that date + 1 does not already exist
-    if ((as.Date(start_date)+1) %in% dates) {
-     dates <- dates[-1]
-     change <- change[-1]
-    } else {
-    dates[1] <- as.Date(start_date)+1
-  }
+    dates[1] <- as.Date(start_date)
+
+  # if all the dates are after the start date then add the start date
+  # and we assume the first change value is 1 (i.e. the R0)
+  } else {
+
+    dates <- c(start_date, dates)
+    change <- c(1, change)
+
   }
 
 
   tt <- round((as.numeric(dates - start_date)) * steps_per_day)
-  return(list("tt" = tt, "change" = change))
+  return(list("tt" = tt, "change" = change, "dates" = dates))
 
 }
 

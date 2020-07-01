@@ -33,14 +33,13 @@ pmcmc(
   date_contact_matrix_set_change = NULL,
   date_R0_change = NULL,
   R0_change = NULL,
-  date_Meff_change = NULL,
   hosp_bed_capacity = NULL,
   baseline_hosp_bed_capacity = NULL,
   date_hosp_bed_capacity_change = NULL,
   ICU_bed_capacity = NULL,
   baseline_ICU_bed_capacity = NULL,
   date_ICU_bed_capacity_change = NULL,
-  roll = 7,
+  Rt_args = NULL,
   burnin = 0,
   replicates = 100,
   forecast = 0,
@@ -123,8 +122,6 @@ Defaut = NULL, i.e. no change in R0}
 \item{R0_change}{Numeric vector for relative changes in R0. Default = NULL,
 i.e. no change in R0}
 
-\item{date_Meff_change}{Date when mobility changed corresponding to expected changes in R0 during and after lockdown}
-
 \item{hosp_bed_capacity}{Number of hospital beds at each date specified in
 \code{date_hosp_bed_capacity_change}. Must be same length as
 \code{date_hosp_bed_capacity_change}.}
@@ -151,7 +148,8 @@ hospital beds}
 capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
 
-\item{roll}{Number of days over which mean mobility at plateau is calculated. Default = 7}
+\item{Rt_args}{List of arguments to be passed to \code{evaluate_Rt_pmcmc} for calculating Rt.
+Current arguments are available in \code{Rt_args_list}}
 
 \item{burnin}{number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories}
 
