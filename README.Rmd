@@ -124,7 +124,7 @@ specified in the [global report](https://www.imperial.ac.uk/mrc-global-infectiou
 To run the model by providing the `country` we use `run_explicit_SEEIR_model()`:
 
 ```{r basic model run country}
-r <- run_explicit_SEEIR_model(country = "Afghanistan")
+r <- run_explicit_SEEIR_model(country = "Afghanistan", replicates = 5)
 ```
 
 The returned object is a `squire_simulation` object, which is a list of two 
@@ -144,7 +144,9 @@ This plot will plot each of the compartments of the model output. We can also pl
 ```{r subset variables plot}
 plot(r, var_select = c("E", "IMild"))
 ```
+
 Or, you can specify one of `deaths`, `infections`, `hospital_occupancy`, `ICU_occupancy`, `hospital_demand` or `ICU_demand`, and plot these summary metrics that represent the combintion of a number of different compartment e.g:
+
 ```{r subset variables plot2}
 plot(r, var_select = "deaths")
 ```
@@ -216,9 +218,10 @@ r <- run_explicit_SEEIR_model(population = population,
                               replicates = 5)
 plot(r, var_select = "infections")
 ```
+
 where `n_E2_I` is the daily number of new infections.
 
-To show an 80% reduction after 50 days but only maintained for 30 days :
+To show an 80% reduction after 80 days but only maintained for 40 days :
 
 ```{r set contact matrix decrease and relax}
 
@@ -235,7 +238,7 @@ r <- run_explicit_SEEIR_model(population = population,
 plot(r, var_select = "infections")
 ```
 
-Alternatively, we could set a changing R0, which falls below 1 after 50 days:
+Alternatively, we could set a changing R0, which falls below 1 after 80 days:
 
 ```{r set R0 decrease}
 
@@ -346,6 +349,7 @@ out <- calibrate(
     )
 
 ```
+
 `calibrate` returns the same output as `run_explicit_SEEIR_model`, with the first
 three elements in `out` being the simulation outputs, the model and model parameters. Note that simulation replicates are aligned to the maximum date in the data provided, and as a result we can use the same plotting functions as before: 
 
@@ -507,7 +511,7 @@ ggproj + ggplot2::geom_hline(yintercept = out$parameters$ICU_bed_capacity)
 
 We can see above that the intervention introduced is nearly sufficient to prevent ICU demand (solid line red) from exceeding the supply, whereas in the unmitigated strategy this did occur.
 
-We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 75% in a week before relaxing it to 80% in 20 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with `add_parms_to_scenarios = FALSE`):
+We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 75% in a week before relaxing it to 80% in 30 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with `add_parms_to_scenarios = FALSE`):
 
 ```{r projection relative beds}
 # create our projections

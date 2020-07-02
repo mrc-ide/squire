@@ -454,7 +454,11 @@ R0_date_particle_filter <- function(R0,
                                     full_output = FALSE,
                                     return = "full") {
 
+  # make sure this is a date
+  start_date <- as.Date(start_date)
+
   # first set up our new timings for the new start date
+  # change betas
   if (is.null(date_R0_change)) {
     tt_beta <- 0
   } else {
@@ -462,59 +466,57 @@ R0_date_particle_filter <- function(R0,
                                            change = R0_change,
                                            start_date = start_date,
                                            steps_per_day = round(1/model_params$dt))
-    model_params$tt_beta <- unique(c(0, tt_list$tt))
+    model_params$tt_beta <- tt_list$tt
     R0_change <- tt_list$change
-
   }
 
+  # and contact matrixes
   if (is.null(date_contact_matrix_set_change)) {
     tt_contact_matrix <- 0
   } else {
-    tt_list <- intervention_dates_for_odin(dates = date_contact_matrix_set_change,
-                                           change = model_params$contact_matrix_set[-1],
+    date_contact_matrix_set_change <- as.Date(date_contact_matrix_set_change)
+    tt_list <- intervention_dates_for_odin(dates = sort(unique(c(start_date,date_contact_matrix_set_change))),
+                                           change = model_params$contact_matrix_set,
                                            start_date = start_date,
                                            steps_per_day = round(1/model_params$dt))
-
-    model_params$tt_contact_matrix <- unique(c(0, tt_list$tt))
-    model_params$contact_matrix_set <- append(model_params$contact_matrix_set[1], tt_list$change)
-
+    model_params$tt_contact_matrix <- tt_list$tt
+    model_params$contact_matrix_set <- tt_list$change
   }
 
+  # and icu beds
   if (is.null(date_ICU_bed_capacity_change)) {
     tt_ICU_beds <- 0
   } else {
-    tt_list <- intervention_dates_for_odin(dates = date_ICU_bed_capacity_change,
-                                           change = model_params$ICU_beds[-1],
+    date_ICU_bed_capacity_change <- as.Date(date_ICU_bed_capacity_change)
+    tt_list <- intervention_dates_for_odin(dates = sort(unique(c(start_date,date_ICU_bed_capacity_change))),
+                                           change = model_params$ICU_beds,
                                            start_date = start_date,
                                            steps_per_day = round(1/model_params$dt))
-
-    model_params$tt_ICU_beds <- unique(c(0, tt_list$tt))
-    model_params$ICU_beds <- c(model_params$ICU_beds[1], tt_list$change)
-
+    model_params$tt_ICU_beds <- tt_list$tt
+    model_params$ICU_beds <- tt_list$change
   }
 
+  # and hosp beds
   if (is.null(date_hosp_bed_capacity_change)) {
     tt_hosp_beds <- 0
   } else {
-    tt_list <- intervention_dates_for_odin(dates = date_hosp_bed_capacity_change,
-                                           change = model_params$hosp_beds[-1],
+    date_hosp_bed_capacity_change <- as.Date(date_hosp_bed_capacity_change)
+    tt_list <- intervention_dates_for_odin(dates = sort(unique(c(start_date,date_hosp_bed_capacity_change))),
+                                           change = model_params$hosp_beds,
                                            start_date = start_date,
                                            steps_per_day = round(1/model_params$dt))
-
-    model_params$tt_hosp_beds <- unique(c(0, tt_list$tt))
-    model_params$hosp_beds <- c(model_params$hosp_beds[1], tt_list$change)
-
+    model_params$tt_hosp_beds <- tt_list$tt
+    model_params$hosp_beds <- tt_list$change
   }
 
   # Second create the new R0s for the R0 and any changes to Meff
   if (!is.null(R0_change)) {
     if (Meff_include) {
-      #R0 <- c(R0, exp(log(R0) - Meff*(1-R0_change)))
-      R0 <- c(R0, vapply(R0_change, function(x){
+      R0 <- vapply(R0_change, function(x){
         Rt_func(R0_change = x, R0 = R0, Meff = Meff)
-      }, FUN.VALUE = numeric(1)))
+      }, FUN.VALUE = numeric(1))
     } else {
-      R0 <- c(R0, R0 * R0_change)
+      R0 <- R0 * R0_change
     }
   }
 

@@ -21,10 +21,12 @@
 #'
 #' @import furrr
 #' @importFrom utils tail
+#' @inheritParams pmcmc
 
 sample_pmcmc <- function(pmcmc_results,
                          burnin = 0,
                          n_chains,
+                         log_likelihood = calc_loglikelihood,
                          n_trajectories = 10,
                          n_particles = 100,
                          forecast_days = 0) {
@@ -74,14 +76,6 @@ sample_pmcmc <- function(pmcmc_results,
                   replace = TRUE, prob = probs)
   params_smpl <- res[params_smpl, !grepl("log", colnames(res))]
 
-  # catch
-  assert_in(colnames(params_smpl), c("start_date", "R0", "Meff", "Meff_pl"),
-            message = paste0(
-            "Currently only allow for the start date, R0, and Meff during and ",
-            "after the lockdown to be inferred. All four must be included,",
-            "although the Meff parameters can be fixed at 1 (and therefore not inferred)."
-            ))
-
   # put this in format for calc_loglikelihood
   params_smpl$start_date <- offset_to_start_date(pmcmc_results$inputs$data$date[1],
                                                  round(params_smpl$start_date))
@@ -96,29 +90,29 @@ sample_pmcmc <- function(pmcmc_results,
   if (Sys.getenv("SQUIRE_PARALLEL_DEBUG") == "TRUE") {
     traces <- purrr::map(
       .x = pars.list,
-      .f = calc_loglikelihood,
+      .f = log_likelihood,
+      data = pmcmc_results$inputs$data,
       squire_model = pmcmc_results$inputs$squire_model,
       model_params = pmcmc_results$inputs$model_params,
-      interventions = pmcmc_results$inputs$interventions,
-      data = pmcmc_results$inputs$data,
-      roll = pmcmc_results$inputs$roll,
       pars_obs = pmcmc_results$inputs$pars_obs,
       n_particles = n_particles,
       forecast_days = forecast_days,
+      interventions = pmcmc_results$inputs$interventions,
+      Rt_args = pmcmc_results$inputs$Rt_args,
       return = "full"
     )
   } else {
     traces <- furrr::future_map(
       .x = pars.list,
-      .f = calc_loglikelihood,
+      .f = log_likelihood,
+      data = pmcmc_results$inputs$data,
       squire_model = pmcmc_results$inputs$squire_model,
       model_params = pmcmc_results$inputs$model_params,
-      interventions = pmcmc_results$inputs$interventions,
-      data = pmcmc_results$inputs$data,
-      roll = pmcmc_results$inputs$roll,
       pars_obs = pmcmc_results$inputs$pars_obs,
       n_particles = n_particles,
       forecast_days = forecast_days,
+      interventions = pmcmc_results$inputs$interventions,
+      Rt_args = pmcmc_results$inputs$Rt_args,
       return = "full",
       .progress = TRUE
     )

@@ -1,3 +1,8 @@
+# squire 0.4.26 
+
+* `pmcmc` more flexible for varying which parameters are fitted.
+* `evaluate_Rt_pmcmc` altered for increased flexibility
+
 # squire 0.4.25
 
 * `format_output` now returns `hospital_incidence` and `ICU_incidence`
