@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.25</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.26</span>
       </span>
     </div>
 
@@ -205,8 +205,8 @@
 <span class="co">#&gt; 2         1 E             0.2    20</span>
 <span class="co">#&gt; 3         1 E             0.3    20</span>
 <span class="co">#&gt; 4         1 E             0.4    20</span>
-<span class="co">#&gt; 5         1 E             0.5    19</span>
-<span class="co">#&gt; 6         1 E             0.6    19</span>
+<span class="co">#&gt; 5         1 E             0.5    20</span>
+<span class="co">#&gt; 6         1 E             0.6    20</span>
 </pre></div>
 <p>If we wanted age-disaggregated data, we could set <code>reduce_age</code> to <code>FALSE</code> which will generate the same dataframe as before, but with an additional column indicating the age-group.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit">
@@ -270,7 +270,8 @@
 <span class="co">#&gt; Warning in plot.squire_simulation(r, var_select = "infections"): Confidence</span>
 <span class="co">#&gt; bounds estimated from &lt;10 replicates</span>
 </pre></div>
-<p><img src="reference/figures/README-set%20contact%20matrix%20decrease-1.png" width="100%"> where <code>n_E2_I</code> is the daily number of new infections.</p>
+<p><img src="reference/figures/README-set%20contact%20matrix%20decrease-1.png" width="100%"></p>
+<p>where <code>n_E2_I</code> is the daily number of new infections.</p>
 <p>To show an 80% reduction after 50 days but only maintained for 30 days :</p>
 <div class="sourceCode" id="cb13"><pre class="downlit">
 
@@ -313,7 +314,6 @@
 <div class="sourceCode" id="cb15"><pre class="downlit">
 
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">patchwork</span>)
-<span class="co">#&gt; Warning: package 'patchwork' was built under R version 3.5.3</span>
 
 <span class="kw">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span>(population = <span class="kw">population</span>, 
                               contact_matrix_set = <span class="kw">contact_matrix</span>,
@@ -336,10 +336,8 @@
 <p>Whilst the above provides quick and easy ways to plot relevant outputs, we recognise users might want to play around with the data themselves. This can be done with the <code>format_output</code> function.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span>)
-<span class="co">#&gt; Warning: package 'ggplot2' was built under R version 3.5.3</span>
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">patchwork</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org">dplyr</a></span>)
-<span class="co">#&gt; Warning: package 'dplyr' was built under R version 3.5.3</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Attaching package: 'dplyr'</span>
 <span class="co">#&gt; The following objects are masked from 'package:stats':</span>
@@ -396,27 +394,27 @@
 <span class="co">#&gt; 6 6 2020-03-09T00:00:00Z      0     3</span>
 </pre></div>
 <p>We can calibrate the model to this data. This calibration will infer the most likely start date of the epidemic and the R0 at the start of the epidemic. Calibration occurs by scanning across a range of possible R0 values and start dates. Fitting works using a particle filter, which can be parallelised using <code><a href="https://rdrr.io/pkg/future/man/plan.html">future::plan(future::multiprocess())</a></code> before running <code>calibrate</code>.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># set up for parallelisation</span></span>
-<span id="cb18-2"><a href="#cb18-2"></a>future<span class="op">::</span><span class="kw">plan</span>(future<span class="op">::</span><span class="kw">multiprocess</span>())</span>
-<span id="cb18-3"><a href="#cb18-3"></a></span>
-<span id="cb18-4"><a href="#cb18-4"></a><span class="co"># Fit model</span></span>
-<span id="cb18-5"><a href="#cb18-5"></a>out &lt;-<span class="st"> </span><span class="kw">calibrate</span>(</span>
-<span id="cb18-6"><a href="#cb18-6"></a>      <span class="dt">data =</span> df,</span>
-<span id="cb18-7"><a href="#cb18-7"></a>      <span class="dt">R0_min =</span> <span class="dv">2</span>,</span>
-<span id="cb18-8"><a href="#cb18-8"></a>      <span class="dt">R0_max =</span> <span class="dv">4</span>,</span>
-<span id="cb18-9"><a href="#cb18-9"></a>      <span class="dt">R0_step =</span> <span class="fl">0.5</span>,</span>
-<span id="cb18-10"><a href="#cb18-10"></a>      <span class="dt">first_start_date =</span> <span class="st">"2020-02-10"</span>,</span>
-<span id="cb18-11"><a href="#cb18-11"></a>      <span class="dt">last_start_date =</span> <span class="st">"2020-02-22"</span>,</span>
-<span id="cb18-12"><a href="#cb18-12"></a>      <span class="dt">day_step =</span> <span class="dv">4</span>,</span>
-<span id="cb18-13"><a href="#cb18-13"></a>      <span class="dt">replicates =</span> <span class="dv">10</span>,</span>
-<span id="cb18-14"><a href="#cb18-14"></a>      <span class="dt">n_particles =</span> <span class="dv">20</span>,</span>
-<span id="cb18-15"><a href="#cb18-15"></a>      <span class="dt">country =</span> <span class="st">"Algeria"</span></span>
-<span id="cb18-16"><a href="#cb18-16"></a>    )</span>
-<span id="cb18-17"><a href="#cb18-17"></a><span class="co">#&gt; </span></span>
-<span id="cb18-18"><a href="#cb18-18"></a> Progress<span class="op">:</span><span class="st"> </span><span class="op">------------------------------------------------------------------------------------</span><span class="st"> </span><span class="dv">100</span>%</span>
-<span id="cb18-19"><a href="#cb18-19"></a><span class="co">#&gt; </span></span>
-<span id="cb18-20"><a href="#cb18-20"></a><span class="co">#&gt; </span></span>
-<span id="cb18-21"><a href="#cb18-21"></a> Progress<span class="op">:</span><span class="st"> </span><span class="op">------------------------------------------------------------------------------------</span><span class="st"> </span><span class="dv">100</span>%</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit">
+<span class="co"># set up for parallelisation</span>
+<span class="kw">future</span>::<span class="fu"><a href="https://rdrr.io/pkg/future/man/plan.html">plan</a></span>(<span class="kw">future</span>::<span class="fu"><a href="https://rdrr.io/pkg/future/man/multiprocess.html">multiprocess</a></span>())
+
+<span class="co"># Fit model</span>
+<span class="kw">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(
+      data = <span class="kw">df</span>,
+      R0_min = <span class="fl">2</span>,
+      R0_max = <span class="fl">4</span>,
+      R0_step = <span class="fl">0.5</span>,
+      first_start_date = <span class="st">"2020-02-10"</span>,
+      last_start_date = <span class="st">"2020-02-22"</span>,
+      day_step = <span class="fl">4</span>,
+      replicates = <span class="fl">10</span>,
+      n_particles = <span class="fl">20</span>,
+      country = <span class="st">"Algeria"</span>
+    )
+<span class="co">#&gt;  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────        100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────        100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+</pre></div>
 <p><code>calibrate</code> returns the same output as <code>run_explicit_SEEIR_model</code>, with the first three elements in <code>out</code> being the simulation outputs, the model and model parameters. Note that simulation replicates are aligned to the maximum date in the data provided, and as a result we can use the same plotting functions as before:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="kw">out</span>, <span class="st">"deaths"</span>, date_0 = <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="kw">df</span><span class="op">$</span><span class="kw">date</span>), x_var = <span class="st">"date"</span>)
@@ -449,27 +447,26 @@
 <span class="co">#&gt; [1] 0.900 0.850 0.550 0.225</span>
 </pre></div>
 <p>We can then provide these to <code>calibrate</code> as the dates (<code>date_R0_change</code>) and relative reductions to R0 (<code>R0_change</code>). We will also specify for model fits to be continued for 14 days into the future with <code>forceast = 14</code>:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>out &lt;-<span class="st"> </span><span class="kw">calibrate</span>(</span>
-<span id="cb24-2"><a href="#cb24-2"></a>      <span class="dt">data =</span> df,</span>
-<span id="cb24-3"><a href="#cb24-3"></a>      <span class="dt">R0_min =</span> <span class="dv">2</span>,</span>
-<span id="cb24-4"><a href="#cb24-4"></a>      <span class="dt">R0_max =</span> <span class="dv">4</span>,</span>
-<span id="cb24-5"><a href="#cb24-5"></a>      <span class="dt">R0_step =</span> <span class="fl">0.5</span>,</span>
-<span id="cb24-6"><a href="#cb24-6"></a>      <span class="dt">first_start_date =</span> <span class="st">"2020-02-10"</span>,</span>
-<span id="cb24-7"><a href="#cb24-7"></a>      <span class="dt">last_start_date =</span> <span class="st">"2020-02-22"</span>,</span>
-<span id="cb24-8"><a href="#cb24-8"></a>      <span class="dt">day_step =</span> <span class="dv">4</span>,</span>
-<span id="cb24-9"><a href="#cb24-9"></a>      <span class="dt">replicates =</span> <span class="dv">10</span>,</span>
-<span id="cb24-10"><a href="#cb24-10"></a>      <span class="dt">n_particles =</span> <span class="dv">20</span>,</span>
-<span id="cb24-11"><a href="#cb24-11"></a>      <span class="dt">forecast =</span> <span class="dv">14</span>,</span>
-<span id="cb24-12"><a href="#cb24-12"></a>      <span class="dt">R0_change =</span> int_unique<span class="op">$</span>change,</span>
-<span id="cb24-13"><a href="#cb24-13"></a>      <span class="dt">date_R0_change =</span> int_unique<span class="op">$</span>dates_change,</span>
-<span id="cb24-14"><a href="#cb24-14"></a>      <span class="dt">country =</span> <span class="st">"Algeria"</span></span>
-<span id="cb24-15"><a href="#cb24-15"></a>    )</span>
-<span id="cb24-16"><a href="#cb24-16"></a><span class="co">#&gt; </span></span>
-<span id="cb24-17"><a href="#cb24-17"></a> Progress<span class="op">:</span><span class="st"> </span><span class="op">------------------------------------------------------------------------------------</span><span class="st"> </span><span class="dv">100</span>%</span>
-<span id="cb24-18"><a href="#cb24-18"></a><span class="co">#&gt; </span></span>
-<span id="cb24-19"><a href="#cb24-19"></a><span class="co">#&gt; </span></span>
-<span id="cb24-20"><a href="#cb24-20"></a> Progress<span class="op">:</span><span class="st"> </span><span class="op">---------------------------------------------------------------------------</span><span class="st">          </span><span class="dv">100</span>%</span>
-<span id="cb24-21"><a href="#cb24-21"></a> Progress<span class="op">:</span><span class="st"> </span><span class="op">------------------------------------------------------------------------------------</span><span class="st"> </span><span class="dv">100</span>%</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="downlit">
+<span class="kw">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(
+      data = <span class="kw">df</span>,
+      R0_min = <span class="fl">2</span>,
+      R0_max = <span class="fl">4</span>,
+      R0_step = <span class="fl">0.5</span>,
+      first_start_date = <span class="st">"2020-02-10"</span>,
+      last_start_date = <span class="st">"2020-02-22"</span>,
+      day_step = <span class="fl">4</span>,
+      replicates = <span class="fl">10</span>,
+      n_particles = <span class="fl">20</span>,
+      forecast = <span class="fl">14</span>,
+      R0_change = <span class="kw">int_unique</span><span class="op">$</span><span class="kw">change</span>,
+      date_R0_change = <span class="kw">int_unique</span><span class="op">$</span><span class="kw">dates_change</span>,
+      country = <span class="st">"Algeria"</span>
+    )
+<span class="co">#&gt;  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+</pre></div>
 <p>Let’s see if that is any better.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="kw">out</span>, particle_fit = <span class="fl">TRUE</span>)
@@ -477,35 +474,35 @@
 <p><img src="reference/figures/README-particle%20fit%20ints-1.png" width="100%"></p>
 <p>That is a much better fit.</p>
 <p>Any parameter that you could provide to <code>run_explicit_SEEIR_model</code> can be passed to <code>calibrate</code>. This includes time varying arguments such as <code>contact_matrix_set</code>, <code>ICU_bed_capacity</code> and <code>hosp_bed_capacity</code>. To incorporate these into model fitting correctly, the date at which these change must be provided (similarly to how <code>date_R0_change</code> was provided above) using <code>date_ICU_bed_capacity_change</code>, <code>date_ICU_bed_capacity_change</code> and <code>date_hosp_bed_capacity_change</code> respecitvely. In addition, the user must provide a baseline value for these, i.e. the contact matrix and bed capacity at the beginning of the epidemic:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>out &lt;-<span class="st"> </span><span class="kw">calibrate</span>(</span>
-<span id="cb26-2"><a href="#cb26-2"></a>      <span class="dt">data =</span> df,</span>
-<span id="cb26-3"><a href="#cb26-3"></a>      <span class="dt">R0_min =</span> <span class="dv">2</span>,</span>
-<span id="cb26-4"><a href="#cb26-4"></a>      <span class="dt">R0_max =</span> <span class="dv">4</span>,</span>
-<span id="cb26-5"><a href="#cb26-5"></a>      <span class="dt">R0_step =</span> <span class="fl">0.5</span>,</span>
-<span id="cb26-6"><a href="#cb26-6"></a>      <span class="dt">first_start_date =</span> <span class="st">"2020-02-10"</span>,</span>
-<span id="cb26-7"><a href="#cb26-7"></a>      <span class="dt">last_start_date =</span> <span class="st">"2020-02-22"</span>,</span>
-<span id="cb26-8"><a href="#cb26-8"></a>      <span class="dt">day_step =</span> <span class="dv">4</span>,</span>
-<span id="cb26-9"><a href="#cb26-9"></a>      <span class="dt">replicates =</span> <span class="dv">10</span>,</span>
-<span id="cb26-10"><a href="#cb26-10"></a>      <span class="dt">n_particles =</span> <span class="dv">20</span>,</span>
-<span id="cb26-11"><a href="#cb26-11"></a>      <span class="dt">forecast =</span> <span class="dv">14</span>,</span>
-<span id="cb26-12"><a href="#cb26-12"></a>      <span class="dt">R0_change =</span> int_unique<span class="op">$</span>change,</span>
-<span id="cb26-13"><a href="#cb26-13"></a>      <span class="dt">date_R0_change =</span> int_unique<span class="op">$</span>dates_change,</span>
-<span id="cb26-14"><a href="#cb26-14"></a>      <span class="dt">baseline_contact_matrix =</span> <span class="kw">get_mixing_matrix</span>(<span class="st">"Algeria"</span>),</span>
-<span id="cb26-15"><a href="#cb26-15"></a>      <span class="dt">contact_matrix_set =</span> <span class="kw">list</span>(<span class="kw">get_mixing_matrix</span>(<span class="st">"Algeria"</span>)<span class="op">*</span><span class="fl">0.9</span>),</span>
-<span id="cb26-16"><a href="#cb26-16"></a>      <span class="dt">date_contact_matrix_set_change =</span> <span class="st">"2020-03-16"</span>,</span>
-<span id="cb26-17"><a href="#cb26-17"></a>      <span class="dt">baseline_hosp_bed_capacity =</span> squire<span class="op">:::</span><span class="kw">get_hosp_bed_capacity</span>(<span class="st">"Algeria"</span>),</span>
-<span id="cb26-18"><a href="#cb26-18"></a>      <span class="dt">hosp_bed_capacity =</span> squire<span class="op">:::</span><span class="kw">get_hosp_bed_capacity</span>(<span class="st">"Algeria"</span>)<span class="op">*</span><span class="kw">c</span>(<span class="fl">1.1</span>,<span class="fl">1.2</span>),</span>
-<span id="cb26-19"><a href="#cb26-19"></a>      <span class="dt">date_hosp_bed_capacity_change =</span> <span class="kw">c</span>(<span class="st">"2020-04-02"</span>, <span class="st">"2020-04-08"</span>),</span>
-<span id="cb26-20"><a href="#cb26-20"></a>      <span class="dt">baseline_ICU_bed_capacity =</span> squire<span class="op">:::</span><span class="kw">get_ICU_bed_capacity</span>(<span class="st">"Algeria"</span>),</span>
-<span id="cb26-21"><a href="#cb26-21"></a>      <span class="dt">ICU_bed_capacity =</span> squire<span class="op">:::</span><span class="kw">get_ICU_bed_capacity</span>(<span class="st">"Algeria"</span>)<span class="op">*</span><span class="kw">c</span>(<span class="fl">1.05</span>),</span>
-<span id="cb26-22"><a href="#cb26-22"></a>      <span class="dt">date_ICU_bed_capacity_change =</span> <span class="kw">c</span>(<span class="st">"2020-04-10"</span>),</span>
-<span id="cb26-23"><a href="#cb26-23"></a>      <span class="dt">country =</span> <span class="st">"Algeria"</span></span>
-<span id="cb26-24"><a href="#cb26-24"></a>    )</span>
-<span id="cb26-25"><a href="#cb26-25"></a><span class="co">#&gt; </span></span>
-<span id="cb26-26"><a href="#cb26-26"></a> Progress<span class="op">:</span><span class="st"> </span><span class="op">------------------------------------------------------------------------------------</span><span class="st"> </span><span class="dv">100</span>%</span>
-<span id="cb26-27"><a href="#cb26-27"></a><span class="co">#&gt; </span></span>
-<span id="cb26-28"><a href="#cb26-28"></a><span class="co">#&gt; </span></span>
-<span id="cb26-29"><a href="#cb26-29"></a> Progress<span class="op">:</span><span class="st"> </span><span class="op">------------------------------------------------------------------------------------</span><span class="st"> </span><span class="dv">100</span>%</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="downlit">
+<span class="kw">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(
+      data = <span class="kw">df</span>,
+      R0_min = <span class="fl">2</span>,
+      R0_max = <span class="fl">4</span>,
+      R0_step = <span class="fl">0.5</span>,
+      first_start_date = <span class="st">"2020-02-10"</span>,
+      last_start_date = <span class="st">"2020-02-22"</span>,
+      day_step = <span class="fl">4</span>,
+      replicates = <span class="fl">10</span>,
+      n_particles = <span class="fl">20</span>,
+      forecast = <span class="fl">14</span>,
+      R0_change = <span class="kw">int_unique</span><span class="op">$</span><span class="kw">change</span>,
+      date_R0_change = <span class="kw">int_unique</span><span class="op">$</span><span class="kw">dates_change</span>,
+      baseline_contact_matrix = <span class="fu"><a href="reference/get_mixing_matrix.html">get_mixing_matrix</a></span>(<span class="st">"Algeria"</span>),
+      contact_matrix_set = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="reference/get_mixing_matrix.html">get_mixing_matrix</a></span>(<span class="st">"Algeria"</span>)<span class="op">*</span><span class="fl">0.9</span>),
+      date_contact_matrix_set_change = <span class="st">"2020-03-16"</span>,
+      baseline_hosp_bed_capacity = <span class="kw">squire</span>:::<span class="fu">get_hosp_bed_capacity</span>(<span class="st">"Algeria"</span>),
+      hosp_bed_capacity = <span class="kw">squire</span>:::<span class="fu">get_hosp_bed_capacity</span>(<span class="st">"Algeria"</span>)<span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1.1</span>,<span class="fl">1.2</span>),
+      date_hosp_bed_capacity_change = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"2020-04-02"</span>, <span class="st">"2020-04-08"</span>),
+      baseline_ICU_bed_capacity = <span class="kw">squire</span>:::<span class="fu">get_ICU_bed_capacity</span>(<span class="st">"Algeria"</span>),
+      ICU_bed_capacity = <span class="kw">squire</span>:::<span class="fu">get_ICU_bed_capacity</span>(<span class="st">"Algeria"</span>)<span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1.05</span>),
+      date_ICU_bed_capacity_change = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"2020-04-10"</span>),
+      country = <span class="st">"Algeria"</span>
+    )
+<span class="co">#&gt;  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────                           100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+</pre></div>
 <p>(N.B. Given the potentially long running time for the grid search, the model state is returned at the end of every day rather than every time step (provided by <code>dt</code>). As a result model outputs such as <code>n_E2_I</code> (number of infections in a time step) and <code>delta_D</code> (number of deaths in a time step) reflect the outputs in the last time step rather than in all the time steps in the last day. The plotting functions and <code>format_output</code> provided in <code>squire</code> handle this correctly and work out the correct number for these in the last day.)</p>
 </div>
 <div id="5-conducting-scenario-projections-to-fitted-data" class="section level3">
@@ -513,25 +510,26 @@
 <a href="#5-conducting-scenario-projections-to-fitted-data" class="anchor"></a>5. Conducting scenario projections to fitted data</h3>
 <p>Once you have calibrated the model to death data, it is possible to then implement mitigation strategies forwards in time from the point of calibration. This is achieved using the <code>projections</code> function. For example, let’s consider a country that as of 28th April 2020 is yet to experience an epidemic take off but may be about to. Guinea reported its first COVID-19 death on 16th April 2020 and has reported 7 deaths by the 28th April 2020 according to data from the <a href="https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide">European CDC</a>.</p>
 <p>First let’s calibrate to this data with no interventions in place (there are likely some interventions in place but nothing major, such as a lockdown, has been implemented by 2020-04-28) and simulate forward for 180 days:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>df &lt;-<span class="st"> </span><span class="kw">read.csv</span>(squire<span class="op">:::</span><span class="kw">squire_file</span>(<span class="st">"extdata/example_GIN.csv"</span>), <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb27-2"><a href="#cb27-2"></a></span>
-<span id="cb27-3"><a href="#cb27-3"></a>out &lt;-<span class="st"> </span><span class="kw">calibrate</span>(</span>
-<span id="cb27-4"><a href="#cb27-4"></a>      <span class="dt">data =</span> df,</span>
-<span id="cb27-5"><a href="#cb27-5"></a>      <span class="dt">R0_min =</span> <span class="fl">2.5</span>,</span>
-<span id="cb27-6"><a href="#cb27-6"></a>      <span class="dt">R0_max =</span> <span class="dv">4</span>,</span>
-<span id="cb27-7"><a href="#cb27-7"></a>      <span class="dt">R0_step =</span> <span class="fl">0.5</span>,</span>
-<span id="cb27-8"><a href="#cb27-8"></a>      <span class="dt">first_start_date =</span> <span class="st">"2020-03-10"</span>,</span>
-<span id="cb27-9"><a href="#cb27-9"></a>      <span class="dt">last_start_date =</span> <span class="st">"2020-03-25"</span>,</span>
-<span id="cb27-10"><a href="#cb27-10"></a>      <span class="dt">day_step =</span> <span class="dv">5</span>,</span>
-<span id="cb27-11"><a href="#cb27-11"></a>      <span class="dt">replicates =</span> <span class="dv">10</span>,</span>
-<span id="cb27-12"><a href="#cb27-12"></a>      <span class="dt">n_particles =</span> <span class="dv">20</span>,</span>
-<span id="cb27-13"><a href="#cb27-13"></a>      <span class="dt">forecast =</span> <span class="dv">180</span>,</span>
-<span id="cb27-14"><a href="#cb27-14"></a>      <span class="dt">country =</span> <span class="st">"Guinea"</span></span>
-<span id="cb27-15"><a href="#cb27-15"></a>    )</span>
-<span id="cb27-16"><a href="#cb27-16"></a><span class="co">#&gt; </span></span>
-<span id="cb27-17"><a href="#cb27-17"></a> Progress<span class="op">:</span><span class="st"> </span><span class="op">-------------------------------------------------------------------</span><span class="st">                  </span><span class="dv">100</span>%</span>
-<span id="cb27-18"><a href="#cb27-18"></a> Progress<span class="op">:</span><span class="st"> </span><span class="op">-------------------------------------------------------------------</span><span class="st">                  </span><span class="dv">100</span>%</span>
-<span id="cb27-19"><a href="#cb27-19"></a> Progress<span class="op">:</span><span class="st"> </span><span class="op">------------------------------------------------------------------------------------</span><span class="st"> </span><span class="dv">100</span>%</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="downlit">
+<span class="kw">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw">squire</span>:::<span class="fu">squire_file</span>(<span class="st">"extdata/example_GIN.csv"</span>), stringsAsFactors = <span class="fl">FALSE</span>)
+
+<span class="kw">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calibrate.html">calibrate</a></span>(
+      data = <span class="kw">df</span>,
+      R0_min = <span class="fl">2.5</span>,
+      R0_max = <span class="fl">4</span>,
+      R0_step = <span class="fl">0.5</span>,
+      first_start_date = <span class="st">"2020-03-10"</span>,
+      last_start_date = <span class="st">"2020-03-25"</span>,
+      day_step = <span class="fl">5</span>,
+      replicates = <span class="fl">10</span>,
+      n_particles = <span class="fl">20</span>,
+      forecast = <span class="fl">180</span>,
+      country = <span class="st">"Guinea"</span>
+    )
+<span class="co">#&gt;  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;  Progress: ───────────────────────────────────────────────────────────────                                                                100% Progress: ────────────────────────────────────────────────────────────────────────────────────────                                       100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+</pre></div>
 <p>Firstly, let’s plot the fit up to the current day</p>
 <div class="sourceCode" id="cb28"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="kw">out</span>, particle_fit = <span class="fl">TRUE</span>) <span class="op">+</span> 
@@ -561,7 +559,7 @@
 </pre></div>
 <p><img src="reference/figures/README-projection%20plotting-1.png" width="100%"></p>
 <p>We can see above that the intervention introduced is nearly sufficient to prevent ICU demand (solid line red) from exceeding the supply, whereas in the unmitigated strategy this did occur.</p>
-<p>We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 75% in a week before relaxing it to 80% in 20 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with <code>add_parms_to_scenarios = FALSE</code>):</p>
+<p>We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 75% in a week before relaxing it to 80% in 30 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with <code>add_parms_to_scenarios = FALSE</code>):</p>
 <div class="sourceCode" id="cb32"><pre class="downlit">
 <span class="co"># create our projections</span>
 <span class="kw">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/projections.html">projections</a></span>(r = <span class="kw">out</span>, 
@@ -625,6 +623,9 @@
       forecast = <span class="fl">0</span>,
       country = <span class="st">"Guinea"</span>
     )
+<span class="co">#&gt;  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="kw">out</span>, particle_fit = <span class="fl">TRUE</span>)
 </pre></div>

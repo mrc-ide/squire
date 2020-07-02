@@ -102,7 +102,7 @@ the squire_model framework." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.25</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.26</span>
       </span>
     </div>
 
@@ -195,10 +195,14 @@ the <code>squire_model</code> framework.</p>
   squire_model = <span class='fu'><a href='https://rdrr.io/pkg/squire/man/explicit_model.html'>explicit_model</a></span>(),
   pars_obs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(phi_cases = <span class='fl'>1</span>, k_cases = <span class='fl'>2</span>, phi_death = <span class='fl'>1</span>, k_death = <span class='fl'>2</span>, exp_noise =
     <span class='fl'>1e+06</span>),
-  pars_init = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-07"</span>), R0 = <span class='fl'>2.5</span>, Meff = <span class='fl'>2</span>, Meff_pl = <span class='fl'>3</span>),
-  pars_min = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-01"</span>), R0 = <span class='fl'>0</span>, Meff = <span class='fl'>1</span>, Meff_pl = <span class='fl'>2</span>),
-  pars_max = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-20"</span>), R0 = <span class='fl'>5</span>, Meff = <span class='fl'>3</span>, Meff_pl = <span class='fl'>4</span>),
-  pars_discrete = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fl'>TRUE</span>, R0 = <span class='fl'>FALSE</span>, Meff = <span class='fl'>FALSE</span>, Meff_pl = <span class='fl'>FALSE</span>),
+  pars_init = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-07"</span>), R0 = <span class='fl'>2.5</span>, Meff = <span class='fl'>2</span>, Meff_pl = <span class='fl'>3</span>,
+    R0_pl_shift = <span class='fl'>0</span>),
+  pars_min = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-01"</span>), R0 = <span class='fl'>0</span>, Meff = <span class='fl'>1</span>, Meff_pl = <span class='fl'>2</span>,
+    R0_pl_shift = <span class='op'>-</span><span class='fl'>2</span>),
+  pars_max = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-20"</span>), R0 = <span class='fl'>5</span>, Meff = <span class='fl'>3</span>, Meff_pl = <span class='fl'>4</span>,
+    R0_pl_shift = <span class='fl'>5</span>),
+  pars_discrete = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fl'>TRUE</span>, R0 = <span class='fl'>FALSE</span>, Meff = <span class='fl'>FALSE</span>, Meff_pl = <span class='fl'>FALSE</span>,
+    R0_pl_shift = <span class='fl'>FALSE</span>),
   proposal_kernel = <span class='kw'>NULL</span>,
   reporting_fraction = <span class='fl'>1</span>,
   country = <span class='kw'>NULL</span>,
@@ -208,15 +212,13 @@ the <code>squire_model</code> framework.</p>
   date_contact_matrix_set_change = <span class='kw'>NULL</span>,
   date_R0_change = <span class='kw'>NULL</span>,
   R0_change = <span class='kw'>NULL</span>,
-  date_Meff_change = <span class='kw'>NULL</span>,
   hosp_bed_capacity = <span class='kw'>NULL</span>,
   baseline_hosp_bed_capacity = <span class='kw'>NULL</span>,
   date_hosp_bed_capacity_change = <span class='kw'>NULL</span>,
   ICU_bed_capacity = <span class='kw'>NULL</span>,
   baseline_ICU_bed_capacity = <span class='kw'>NULL</span>,
   date_ICU_bed_capacity_change = <span class='kw'>NULL</span>,
-  roll = <span class='fl'>7</span>,
-  scale_meff_pl = <span class='fl'>FALSE</span>,
+  Rt_args = <span class='kw'>NULL</span>,
   burnin = <span class='fl'>0</span>,
   replicates = <span class='fl'>100</span>,
   forecast = <span class='fl'>0</span>,
@@ -348,10 +350,6 @@ Defaut = NULL, i.e. no change in R0</p></td>
 i.e. no change in R0</p></td>
     </tr>
     <tr>
-      <th>date_Meff_change</th>
-      <td><p>Date when mobility changed corresponding to expected changes in R0 during and after lockdown</p></td>
-    </tr>
-    <tr>
       <th>hosp_bed_capacity</th>
       <td><p>Number of hospital beds at each date specified in
 <code>date_hosp_bed_capacity_change</code>. Must be same length as
@@ -390,12 +388,9 @@ capacity changes set in <code>model_params</code> change.
 Defaut = NULL, i.e. no change</p></td>
     </tr>
     <tr>
-      <th>roll</th>
-      <td><p>Number of days over which mean mobility at plateau is calculated. Default = 7</p></td>
-    </tr>
-    <tr>
-      <th>scale_meff_pl</th>
-      <td><p>Boolean for whether Meff_pl is scaling relative to Meff. Default = FALSE.</p></td>
+      <th>Rt_args</th>
+      <td><p>List of arguments to be passed to <code>evaluate_Rt_pmcmc</code> for calculating Rt.
+Current arguments are available in <code>Rt_args_list</code></p></td>
     </tr>
     <tr>
       <th>burnin</th>

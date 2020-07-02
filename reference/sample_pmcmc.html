@@ -74,7 +74,7 @@ filter with num_particles and sample 1 trajectory" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.25</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.26</span>
       </span>
     </div>
 
@@ -131,6 +131,7 @@ filter with <code>num_particles</code> and sample 1 trajectory</p>
   <span class='kw'>pmcmc_results</span>,
   burnin = <span class='fl'>0</span>,
   <span class='kw'>n_chains</span>,
+  log_likelihood = <span class='kw'>calc_loglikelihood</span>,
   n_trajectories = <span class='fl'>10</span>,
   n_particles = <span class='fl'>100</span>,
   forecast_days = <span class='fl'>0</span>
@@ -150,6 +151,16 @@ filter with <code>num_particles</code> and sample 1 trajectory</p>
     <tr>
       <th>n_chains</th>
       <td><p>number of chains that considered. Should inherent from pmcmc.</p></td>
+    </tr>
+    <tr>
+      <th>log_likelihood</th>
+      <td><p>function to calculate log likelihood, must take named parameter vector as input,
+allow passing of implicit arguments corresponding to the main function arguments.
+Returns a named list, with entries:
+  - $log_likelihood, a single numeric
+  - $sample_state, a numeric vector corresponding to the state of a single particle, chosen at random,
+  at the final time point for which we have data.
+  If NULL, calculated using the function calc_loglikelihood.</p></td>
     </tr>
     <tr>
       <th>n_trajectories</th>
