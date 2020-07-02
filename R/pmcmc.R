@@ -1072,8 +1072,8 @@ evaluate_Rt_pmcmc <- function(R0_change,
       if (is.null(Rt_shift)) {
         Rt_shift <- 0
       } else {
-        Rt_shift <- Rt_shift*plogis(seq(-10,10,length.out = max(2,Rt_shift_duration)),
-                              scale = Rt_shift_scale)
+        Rt_shift_x <- seq(0, 1, length.out = max(2,Rt_shift_duration))
+        Rt_shift <- Rt_shift * (1 / (1 + (Rt_shift_x/(1-Rt_shift_x))^-Rt_shift_scale))
       }
 
       # when does mobility change take place
