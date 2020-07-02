@@ -1068,6 +1068,14 @@ evaluate_Rt_pmcmc <- function(R0_change,
       }
       }
 
+      # if no shift then set to 0
+      if (is.null(Rt_shift)) {
+        Rt_shift <- 0
+      } else {
+        Rt_shift <- Rt_shift*plogis(seq(-10,10,length.out = max(2,Rt_shift_duration)),
+                              scale = Rt_shift_scale)
+      }
+
       # when does mobility change take place
       if(date_Meff_change <= date_R0_change[1]) {
 
@@ -1091,9 +1099,13 @@ evaluate_Rt_pmcmc <- function(R0_change,
         mob_up <- c(rep(0, swtchdates[1]-1),
                     R0_change[min(swtchdates):(length(R0_change))] - mob_pld)
 
-        # now work out Rt forwards based on mobility increasing from this plateau
+        Rt_pl_change <- c(rep(0, min(swtchdates[1]-1)),
+                          Rt_shift,
+                          rep(tail(Rt_shift,1), max(0, length(mob_up)-Rt_shift_duration)))
+        Rt_pl_change <- head(Rt_pl_change, length(mob_up))
 
-        Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) ))
+        # now work out Rt forwards based on mobility increasing from this plateau
+        Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) - Rt_pl_change ))
 
       }
     }

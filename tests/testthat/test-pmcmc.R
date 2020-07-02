@@ -922,7 +922,8 @@ test_that("pmcmc meff date", {
                n_chains = 1,
                replicates = 2,
                burnin = 0,
-               Rt_args = list(date_Meff_change = "2020-03-20"),
+               Rt_args = list(date_Meff_change = "2020-03-20",
+                              plateau_duration = 7),
                squire_model = squire_model,
                pars_init = pars_init,
                pars_min = pars_min,
@@ -1062,7 +1063,7 @@ test_that("evaluate_Rt", {
                                date_R0_change = date_R0_change,
                                pars = list(Meff = Meff,
                                            Meff_pl = Meff_pl),
-                               Rt_args = list(roll=1,
+                               Rt_args = list(plateau_duration = 1,
                                               date_Meff_change = date_Meff_change))
 
   expect_lt(Rt_base[6], Rt_base[4])
@@ -1072,7 +1073,7 @@ test_that("evaluate_Rt", {
                                date_R0_change = date_R0_change,
                                pars = list(Meff = Meff,
                                            Meff_pl = Meff_pl),
-                               Rt_args = list(roll=1,
+                               Rt_args = list(plateau_duration=1,
                                               date_Meff_change = date_Meff_change))
   expect_equal(R0, Rt[1])
 
@@ -1081,7 +1082,7 @@ test_that("evaluate_Rt", {
                                date_R0_change = date_R0_change,
                                pars = list(Meff = Meff,
                                            Meff_pl = Meff_pl),
-                               Rt_args = list(roll=1,
+                               Rt_args = list(plateau_duration=1,
                                               date_Meff_change = "2020-03-01"))
   expect_lt(mean(Rt_base), mean(Rt))
 
@@ -1089,7 +1090,7 @@ test_that("evaluate_Rt", {
   Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0,
                           pars = list(Meff = Meff,
                                       Meff_pl = Meff),
-                          Rt_args = list(roll=1,
+                          Rt_args = list(plateau_duration=1,
                                          date_Meff_change = "2020-03-22",
                                          scale_meff_pl = TRUE),
                           date_R0_change = date_R0_change)
