@@ -1138,7 +1138,7 @@ test_that("seasonal test", {
   date_R0_change = as.Date(int_unique$dates_change)
   env_dat = runif(length(R0_change), 1.2, 1.4)
   date_contact_matrix_set_change = NULL
-  squire_model = explicit_model()
+  squire_model = deterministic_model() # i would use this as much quicker and mixes beautifully
   n_particles = 2
 
   # proposal kernel covriance
