@@ -1097,3 +1097,94 @@ test_that("evaluate_Rt", {
   expect_equal(Rt[3], Rt[6])
 
 })
+
+
+
+#------------------------------------------------
+test_that("seasonal test", {
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  data <- data[-(1:6),] # remove days of no deaths
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+
+  min_death_date <- as.Date(data$date[which(data$deaths>0)][1])
+
+  pars_init = list('start_date'     = as.Date("2020-02-07"),
+                   'R0'             = 2.5,
+                   'Meff'           = 2,
+                   "env_slp"        = 1)
+  pars_min = list('start_date'      = min_death_date-55,
+                  'R0'              = 1e-10,
+                  'Meff'            = 0.1,
+                  "env_slp"         = 0)
+  pars_max = list('start_date'      = min_death_date-10,
+                  'R0'              = 5,
+                  'Meff'            = 5,
+                  "env_slp"         = 5)
+  pars_discrete = list('start_date' = TRUE,
+                       'R0'         = FALSE,
+                       'Meff'       = FALSE,
+                       "env_slp"    = FALSE)
+  pars_obs = list(phi_cases = 0.1,
+                  k_cases = 2,
+                  phi_death = 1,
+                  k_death = 2,
+                  exp_noise = 1e6)
+  steps_per_day = 2
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  env_dat = runif(length(R0_change), 1.2, 1.4)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  n_particles = 2
+
+  # proposal kernel covriance
+  proposal_kernel <- matrix(0.5, ncol=length(pars_init), nrow = length(pars_init))
+  diag(proposal_kernel) <- 1
+  rownames(proposal_kernel) <- colnames(proposal_kernel) <- names(pars_init)
+
+  logprior <- function(pars){
+    ret <- dunif(x = pars[["start_date"]], min = -55, max = -10, log = TRUE) +
+      dnorm(x = pars[["R0"]], mean = 3, sd = 1, log = TRUE) +
+      dnorm(x = pars[["Meff"]], mean = 3, sd = 3, log = TRUE) +
+      dnorm(x = pars[["env_slp"]], mean = 1, sd = 1, log = TRUE)
+    return(ret)
+  }
+
+
+
+  set.seed(93L)
+  out <- pmcmc(data = data,
+               n_mcmc = 100,
+               log_likelihood = NULL,
+               log_prior = logprior,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               Rt_args = list(date_Meff_change = NULL,
+                              env_dat = env_dat),
+               Rt_modify_func = function(R0, pars, Rt_args) {
+                 R0 + pars[["env_slp"]]*Rt_args[["env_dat"]]
+               },
+               start_adaptation = 50,
+               country = country)
+
+  plot(out$pmcmc_results)
+
+
+})

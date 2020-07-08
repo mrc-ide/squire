@@ -34,6 +34,8 @@
 #' @inheritParams calibrate
 #' @param Rt_args List of arguments to be passed to \code{evaluate_Rt_pmcmc} for calculating Rt.
 #'   Current arguments are available in \code{Rt_args_list}
+#' @param Rt_modify_func Function to modify our Rt after evaluate_Rt_pmcmc. Must take
+#'   R0 as vector, pars and Rt_args.
 #' @param burnin number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories
 #' @param replicates number of trajectories (replicates) to be returned that are being sampled from the posterior probability results produced by \code{run_mcmc_chain}
 #' to select parameter set. For each parmater set sampled, run particle filter with \code{n_particles} and sample 1 trajectory
@@ -157,6 +159,7 @@ pmcmc <- function(data,
                   baseline_ICU_bed_capacity = NULL,
                   date_ICU_bed_capacity_change = NULL,
                   Rt_args = NULL,
+                  Rt_modify_func = NULL,
                   burnin = 0,
                   replicates = 100,
                   forecast = 0,
@@ -449,6 +452,7 @@ pmcmc <- function(data,
                         n_particles = n_particles,
                         forecast_days = 0,
                         Rt_args = Rt_args,
+                        Rt_modify_func = Rt_modify_func,
                         return = "ll"
     )
     X
@@ -853,7 +857,7 @@ run_mcmc_chain <- function(inputs,
 calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                pars_obs, n_particles,
                                forecast_days = 0, return = "ll",
-                               Rt_args,
+                               Rt_args,Rt_modify_func = NULL,
                                interventions) {
   #----------------..
   # specify particle setup
@@ -906,6 +910,18 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   if (is.null(date_R0_change)) {
     tt_beta <- 0
   } else {
+
+    # quick handle for env changes
+    if("env_slp" %in% names(pars)) {
+      tt_list <- intervention_dates_for_odin(dates = date_R0_change,
+                                             change = Rt_args[["env_dat"]],
+                                             start_date = start_date,
+                                             steps_per_day = round(1/model_params$dt))
+      Rt_args_save <- Rt_args
+      Rt_args[["env_dat"]] <- tt_list$change
+
+    }
+
     tt_list <- intervention_dates_for_odin(dates = date_R0_change,
                                            change = R0_change,
                                            start_date = start_date,
@@ -913,6 +929,9 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
     model_params$tt_beta <- tt_list$tt
     R0_change <- tt_list$change
     date_R0_change <- tt_list$dates
+
+
+
   }
 
   # and contact matrixes
@@ -960,6 +979,15 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                           date_R0_change = date_R0_change,
                           pars = pars,
                           Rt_args = Rt_args)
+
+  # modify if extra func provided
+  if (!is.null(Rt_modify_func)) {
+    R0 <- Rt_modify_func(R0, pars, Rt_args)
+    # probably don't even need to do this save as it should be the default Rt_args each time calc_loglikelihood is run
+    if(exists("Rt_args_save")) {
+      Rt_args <- Rt_args_save
+    }
+  }
 
   # which allow us to work out our beta
   beta_set <- beta_est(squire_model = squire_model,
