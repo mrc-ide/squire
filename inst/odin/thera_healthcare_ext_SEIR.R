@@ -227,7 +227,7 @@ number_GetICU_NoOx_NeedMV[] <- number_req_ICU_MV[i] - number_GetICU_GetOx_NeedMV
 MV_occ <- sum(ICrit_GetICU_GetOx_GetMV_Surv1) + sum(ICrit_GetICU_GetOx_GetMV_Surv2) + sum(ICrit_GetICU_GetOx_GetMV_Die1) + sum(ICrit_GetICU_GetOx_GetMV_Die2) # Current Mechanical Ventilator Usage
 current_free_MV <- MV_capacity + sum(n_ICrit_GetICU_GetOx_GetMV_Surv2_Rec) + sum(n_ICrit_GetICU_GetOx_GetMV_Die2_D_Hospital) - MV_occ # Number of mechanical ventilators that are currently free
 total_GetICU_GetOx_GetMV <- if(current_free_MV <= 0) 0 else(if(current_free_MV - total_GetICU_GetOx_Need_MV >= 0) total_GetICU_GetOx_Need_MV else(current_free_MV))
-number_GetICU_GetOx_GetMV[] <-  rmhyper(total_GetICU_GetOx_GetMV, number_GetICU_GetOx_NeedMV) # rmhyper(total_GetICU_GetOx_GetMV, number_GetICU_GetOx_NeedMV) # CHANGE
+number_GetICU_GetOx_GetMV[] <-  rmhyper(total_GetICU_GetOx_GetMV, number_GetICU_GetOx_NeedMV)
 number_GetICU_GetOx_NoMV[] <- number_GetICU_GetOx_NeedMV[i] - number_GetICU_GetOx_GetMV[i]
 
 ## TALLYING UP USED AND REMAINING OXYGEN, INCLUDING ANY LEFTOVER, WHICH MAY OR MAY NOT BE CARRIED OVER INTO NEXT TIMESTEP
@@ -322,6 +322,9 @@ delta_ICase1[] <- n_E2_ICase1[i] - n_ICase1_ICase2[i]
 delta_ICase2[] <- n_ICase1_ICase2[i] - n_ICase2_Hosp[i]
 
 # Stepdown Bed, Recovery and Death Related Compartments
+# NOTE THAT IF NUMBER ENTERING IREC FROM ICU BEDS IS > NUMBER LEAVING HOSPITAL BEDS, WE
+# GO OVER CAPACITY - AS NOTED FOR SQUIRE PREVIOUSLY. ISSUE ISN'T DIFFERENT BUT WE MIGHT WANT
+# TO THINK ABOUT ADDRESSING.
 delta_IRec1[] <- n_ISev_GetICU_GetOx_Surv2_Rec[i] + n_ISev_GetICU_NoOx_Surv2_Rec[i] +
                  n_ICrit_GetICU_GetOx_GetMV_Surv2_Rec[i]  + n_ICrit_GetICU_GetOx_NoMV_Surv2_Rec[i] + n_ICrit_GetICU_NoOx_NoMV_Surv2_Rec[i] -
                  n_IRec1_IRec2[i]
@@ -957,3 +960,17 @@ output(oxygen_used) <- TRUE
 output(number_GetICU_GetOx) <- TRUE
 output(oxygen_needed_overall) <- TRUE
 output(temp_leftover) <- TRUE
+output(n_IMod_GetHosp_GetOx_Die2_D_Hospital) <- TRUE
+output(n_IMod_GetHosp_GetOx_Surv2_R) <- TRUE
+output(n_IMod_GetHosp_NoOx_Die2_D_Hospital) <- TRUE
+output(n_IMod_GetHosp_NoOx_Surv2_R) <- TRUE
+output(n_ISev_GetICU_GetOx_Die2_D_Hospital) <- TRUE
+output(n_ISev_GetICU_GetOx_Surv2_Rec) <- TRUE
+output(n_ISev_GetICU_NoOx_Die2_D_Hospital) <- TRUE
+output(n_ISev_GetICU_NoOx_Surv2_Rec) <- TRUE
+output(n_ICrit_GetICU_GetOx_GetMV_Die2_D_Hospital) <- TRUE
+output(n_ICrit_GetICU_GetOx_GetMV_Surv2_Rec) <- TRUE
+output(n_ICrit_GetICU_GetOx_NoMV_Die2_D_Hospital) <- TRUE
+output(n_ICrit_GetICU_GetOx_NoMV_Surv2_Rec) <- TRUE
+output(n_ICrit_GetICU_NoOx_NoMV_Die2_D_Hospital) <- TRUE
+output(n_ICrit_GetICU_NoOx_NoMV_Surv2_Rec) <- TRUE
