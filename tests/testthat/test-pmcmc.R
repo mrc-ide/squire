@@ -944,6 +944,90 @@ test_that("pmcmc meff date", {
 
 })
 
+#-------------------------------------
+test_that("pmcmc 6p meff date", {
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
+
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  pars_init = list('start_date'     = as.Date("2020-02-07"),
+                   'R0'             = 2.5,
+                   'Meff'           = 1,
+                   'Meff_pl'        = 0.2,
+                   "Rt_shift"       = 2,
+                   "Rt_shift_scale" = 5)
+  pars_min = list('start_date'      = as.Date("2020-02-01"),
+                  'R0'              = 1e-10,
+                  'Meff'            = 1,
+                  'Meff_pl'         = 0,
+                  "Rt_shift"       = 0,
+                  "Rt_shift_scale" = 0)
+  pars_max = list('start_date'      = as.Date("2020-02-20"),
+                  'R0'              = 5,
+                  'Meff'            = 5,
+                  'Meff_pl'         = 1,
+                  "Rt_shift"       = 5,
+                  "Rt_shift_scale" = 10)
+  pars_discrete = list('start_date' = TRUE,
+                       'R0'         = FALSE,
+                       'Meff'       = FALSE,
+                       'Meff_pl'    = FALSE,
+                       "Rt_shift"       = FALSE,
+                       "Rt_shift_scale" = FALSE)
+  pars_obs = list(phi_cases = 0.1,
+                  k_cases = 2,
+                  phi_death = 1,
+                  k_death = 2,
+                  exp_noise = 1e6)
+  # proposal kernel covriance
+  proposal_kernel <- matrix(0.5, ncol=length(pars_init), nrow = length(pars_init))
+  diag(proposal_kernel) <- 1
+  rownames(proposal_kernel) <- colnames(proposal_kernel) <- names(pars_init)
+
+  steps_per_day = 1
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  n_particles = 2
+
+  out <- pmcmc(data = data,
+               n_mcmc = 50,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               Rt_args = Rt_args_list(date_Meff_change = "2020-03-20",
+                                      scale_Meff_pl = TRUE,
+                                      Rt_shift_duration = 30,
+                                      plateau_duration = 7),
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country)
+  expect_false("rhat" %in% names(out$pmcmc_results))
+
+  pl <- plot(out$pmcmc_results)
+  expect_warning(expect_s3_class(plot(out, particle_fit = TRUE), "gg"))
+
+  summa <- summary(out$pmcmc_results, burn_in = 10)
+  expect_named(summa, c("summary", "corr_mat", "sd"))
+
+})
+
 
 #-------------------------------------
 test_that("Start date and R0 only pmcmc", {
@@ -1024,16 +1108,16 @@ test_that("Start date and R0 only pmcmc", {
                                     steps_per_day = 10)
 
   from_int_eval <- evaluate_Rt_pmcmc(R0_change = tt$change,
-                    R0 = out$replicate_parameters$R0[1],
-                    date_R0_change = tt$dates,
-                    pars = list(),
-                    Rt_args = out$pmcmc_results$inputs$Rt_args
-                    )
+                                     R0 = out$replicate_parameters$R0[1],
+                                     date_R0_change = tt$dates,
+                                     pars = list(),
+                                     Rt_args = out$pmcmc_results$inputs$Rt_args
+  )
 
   expect_equal(c(out$replicate_parameters$R0[1],out$replicate_parameters$R0*out$interventions$R0_change),
                from_int_eval)
 
-  })
+})
 
 
 #-------------------------------------
@@ -1069,21 +1153,21 @@ test_that("evaluate_Rt", {
   expect_lt(Rt_base[6], Rt_base[4])
 
   Rt <- evaluate_Rt_pmcmc(R0_change = NULL,
-                               R0 = R0,
-                               date_R0_change = date_R0_change,
-                               pars = list(Meff = Meff,
-                                           Meff_pl = Meff_pl),
-                               Rt_args = list(plateau_duration=1,
-                                              date_Meff_change = date_Meff_change))
+                          R0 = R0,
+                          date_R0_change = date_R0_change,
+                          pars = list(Meff = Meff,
+                                      Meff_pl = Meff_pl),
+                          Rt_args = list(plateau_duration=1,
+                                         date_Meff_change = date_Meff_change))
   expect_equal(R0, Rt[1])
 
   Rt <- evaluate_Rt_pmcmc(R0_change = R0_change,
-                               R0 = R0,
-                               date_R0_change = date_R0_change,
-                               pars = list(Meff = Meff,
-                                           Meff_pl = Meff_pl),
-                               Rt_args = list(plateau_duration=1,
-                                              date_Meff_change = "2020-03-01"))
+                          R0 = R0,
+                          date_R0_change = date_R0_change,
+                          pars = list(Meff = Meff,
+                                      Meff_pl = Meff_pl),
+                          Rt_args = list(plateau_duration=1,
+                                         date_Meff_change = "2020-03-01"))
   expect_lt(mean(Rt_base), mean(Rt))
 
   # with scale
@@ -1095,5 +1179,14 @@ test_that("evaluate_Rt", {
                                          scale_meff_pl = TRUE),
                           date_R0_change = date_R0_change)
   expect_equal(Rt[3], Rt[6])
+
+  # with no shift
+  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0,
+                          pars = list(Meff = Meff,
+                                      Meff_pl = Meff),
+                          Rt_args = list(plateau_duration=1,
+                                         date_Meff_change = "2020-03-22",
+                                         scale_meff_pl = TRUE),
+                          date_R0_change = date_R0_change)
 
 })

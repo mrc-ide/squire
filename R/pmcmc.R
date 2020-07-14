@@ -1072,8 +1072,8 @@ evaluate_Rt_pmcmc <- function(R0_change,
       if (is.null(Rt_shift)) {
         Rt_shift <- 0
       } else {
-        Rt_shift <- Rt_shift*plogis(seq(-10,10,length.out = max(2,Rt_shift_duration)),
-                              scale = Rt_shift_scale)
+        Rt_shift_x <- seq(0, 1, length.out = max(2,Rt_shift_duration))
+        Rt_shift <- Rt_shift * (1 / (1 + (Rt_shift_x/(1-Rt_shift_x))^-Rt_shift_scale))
       }
 
       # when does mobility change take place
@@ -1088,7 +1088,7 @@ evaluate_Rt_pmcmc <- function(R0_change,
 
       } else {
 
-        # when is the swithc in our data
+        # when is the switch in our data
         swtchdates <- which(date_R0_change >= date_Meff_change)
         min_d <- as.Date(date_R0_change[min(swtchdates)])
         dates_to_median <- seq(min_d - floor(plateau_duration/2),min_d + floor(plateau_duration/2),1)
@@ -1099,9 +1099,10 @@ evaluate_Rt_pmcmc <- function(R0_change,
         mob_up <- c(rep(0, swtchdates[1]-1),
                     R0_change[min(swtchdates):(length(R0_change))] - mob_pld)
 
-        Rt_pl_change <- c(rep(0, min(swtchdates[1]-1)),
-                          Rt_shift,
-                          rep(tail(Rt_shift,1), max(0, length(mob_up)-Rt_shift_duration)))
+        # what does our shift look like
+        Rt_pl_change <- c(rep(0, min(swtchdates[1]-1)), Rt_shift)
+        Rt_pl_change <- c(Rt_pl_change,
+                          rep(tail(Rt_shift,1), max(0, length(mob_up) - length(Rt_pl_change))))
         Rt_pl_change <- head(Rt_pl_change, length(mob_up))
 
         # now work out Rt forwards based on mobility increasing from this plateau
