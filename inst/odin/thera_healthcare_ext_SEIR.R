@@ -11,6 +11,7 @@ N_age <- user() # Number of age groups
 ## RATES
 ##------------------------------------------------------------------------------
 gamma_E <- user() # passage through latent infection
+gamma_IAsymp <- user() # asymptomatic infection to recovery
 gamma_IMild <- user() # mild infection to recovery
 gamma_ICase <- user() # symptom onset to requiring hospitalisation
 gamma_rec <- user() # rate of progression through post-ICU recovery compartment
@@ -43,6 +44,7 @@ gamma_ICrit_NoICU_NoOx_NoMV_Die <- user() # through requiring ICU bed, oxygen an
 
 ## PROBABILITIES
 ##------------------------------------------------------------------------------
+prob_asymp[] <- user() # probability of being asymptomatic conditional on being subclinical, by age
 prob_hosp[] <- user() # probability of requiring hospitalisation by age
 prob_severe[] <- user() # probability of severe disease (requiring ICU bed) by age
 prob_critical[] <- user() # probability of critical disease (requiring ICU bed AND MV) by age, conditional on having severe disease
@@ -69,6 +71,7 @@ prob_critical_death_no_ICU_no_ox_no_MV[] <- user() # probability of dying from c
 p_S_E1[] <- 1 - exp(-lambda[i] * dt) # Infection - age dependent FOI based on mixing patterns
 p_E1_E2 <- 1 - exp(-gamma_E * dt) # Progression through latent infection
 p_E2_I <- 1 - exp(-gamma_E * dt) # Progression to onset of infectiousness. Number split between I_Mild and I_Case
+p_IAsymp_R <- 1 - exp(-gamma_IAsymp * dt) # Recovery from mild disease
 p_IMild_R <- 1 - exp(-gamma_IMild * dt) # Recovery from mild disease
 p_ICase1_ICase2 <- 1 - exp(-gamma_ICase * dt) # Delay between symptom onset and requiring hospitalisation
 p_ICase2_Hosp <- 1 - exp(-gamma_ICase * dt) # Progression to requiring hospitalisation. Number split between I_Oxygen and I_MV
@@ -113,8 +116,11 @@ n_S_E1[] <- rbinom(S[i], p_S_E1[i]) # Number of newly infected individuals
 n_E1_E2[] <- rbinom(E1[i], p_E1_E2) # Number progressing through latent compartments
 n_E2_I[] <- rbinom(E2[i], p_E2_I) # Number of new symptom onsets
 n_E2_ICase1[] <- rbinom(n_E2_I[i], prob_hosp[i]) # Proportion of the new symptom onsets that will require hospitalisation (note: haven't entered hospital yet, delay between onset and hospitalisation)
-n_E2_IMild[] <- n_E2_I[i] - n_E2_ICase1[i] # 1 - Above, the rest of the infections, which we consider to be mild and not require hospitalisation
+n_E2_IMild_or_IAsymp[] <- n_E2_I[i] - n_E2_ICase1[i] # 1 - Above, the rest of the infections, which we consider to be asymptomatic/mild and not require hospitalisation
+n_E2_IAsymp[] <- rbinom(n_E2_IMild_or_IAsymp[i], prob_asymp[i]) # Number of non-hospitalised infections that are asymptomatic
+n_E2_IMild[] <- n_E2_IMild_or_IAsymp[i] - n_E2_IAsymp[i] # Number of non-hospitalised infections that are mildly symptomatic
 n_IMild_R[] <- rbinom(IMild[i], p_IMild_R) # Number of mild infections recovering
+n_IAsymp_R[] <- rbinom(IAsymp[i], p_IAsymp_R) # Number of mild infections recovering
 n_ICase1_ICase2[] <- rbinom(ICase1[i], p_ICase1_ICase2) # Number progressing through the onset but not hospitalised compartment
 n_ICase2_Hosp[] <- rbinom(ICase2[i], p_ICase2_Hosp) # Number progressing to requiring hospitalisation
 n_IRec1_IRec2[] <- rbinom(IRec1[i], p_Rec1_Rec2) # Number progressing through ICU recovery compartment
@@ -317,6 +323,7 @@ n_ICrit_NoICU_NoOx_NoMV_Surv2_R[] <- rbinom(ICrit_NoICU_NoOx_NoMV_Surv2[i], p_IC
 # Non-Hospital/ICU Bed Related Compartments
 delta_E1[] <- n_S_E1[i] - n_E1_E2[i]
 delta_E2[] <- n_E1_E2[i] - n_E2_I[i]
+delta_IAsymp[] <- n_E2_IAsymp[i] - n_IAsymp_R[i]
 delta_IMild[] <- n_E2_IMild[i] - n_IMild_R[i]
 delta_ICase1[] <- n_E2_ICase1[i] - n_ICase1_ICase2[i]
 delta_ICase2[] <- n_ICase1_ICase2[i] - n_ICase2_Hosp[i]
@@ -329,7 +336,7 @@ delta_IRec1[] <- n_ISev_GetICU_GetOx_Surv2_Rec[i] + n_ISev_GetICU_NoOx_Surv2_Rec
                  n_ICrit_GetICU_GetOx_GetMV_Surv2_Rec[i]  + n_ICrit_GetICU_GetOx_NoMV_Surv2_Rec[i] + n_ICrit_GetICU_NoOx_NoMV_Surv2_Rec[i] -
                  n_IRec1_IRec2[i]
 delta_IRec2[] <- n_IRec1_IRec2[i] - n_IRec2_R[i]
-delta_R[] <- n_IMild_R[i] +
+delta_R[] <- n_IMild_R[i] + n_IAsymp_R[i] +
              n_IRec2_R[i] +
              n_IMod_GetHosp_GetOx_Surv2_R[i] + n_IMod_GetHosp_NoOx_Surv2_R[i] + n_IMod_NoHosp_NoOx_Surv2_R[i] +
              n_ISev_NoICU_NoOx_Surv2_R[i] +
@@ -391,6 +398,7 @@ delta_ICrit_NoICU_NoOx_NoMV_Surv2[] <- n_ICrit_NoICU_NoOx_NoMV_Surv1_ICrit_NoICU
 update(S[]) <- S[i] - n_S_E1[i]  # Susceptibles (1 comp)
 update(E1[]) <- E1[i] + delta_E1[i]  # First of the latent infection compartments (2 comps)
 update(E2[]) <- E2[i] + delta_E2[i]  # Second of the latent infection compartments (2 comps)
+update(IAsymp[]) <- IAsymp[i] + delta_IAsymp[i] # Asymptomatic infections (1 comp)
 update(IMild[]) <- IMild[i] + delta_IMild[i]  # Mild infections (1 comp)
 update(ICase1[]) <- ICase1[i] + delta_ICase1[i] # First of the compartments for infections that will require hospitalisation (2 comps)
 update(ICase2[]) <- ICase2[i] + delta_ICase2[i] # Second of the compartments for infections that will require hospitalisation (2 comps)
@@ -466,7 +474,7 @@ dim(tt_beta) <- user()
 dim(beta_set) <- length(tt_beta)
 
 # Generating Force of Infection
-temp[] <- IMild[i] + ICase1[i] + ICase2[i]
+temp[] <- (rel_inf_asymp * IAsymp[i]) + (rel_inf_mild * IMild[i]) + ICase1[i] + ICase2[i]
 s_ij[,] <- m[i, j] * temp[j]
 lambda[] <- beta * sum(s_ij[i, ])
 
@@ -509,6 +517,7 @@ initial(oxygen_availability) <- oxygen_availability_0
 initial(S[]) <- S_0[i]
 initial(E1[]) <- E1_0[i]
 initial(E2[]) <- E2_0[i]
+initial(IAsymp[]) <- IAsymp_0[i]
 initial(IMild[]) <- IMild_0[i]
 initial(ICase1[]) <- ICase1_0[i]
 initial(ICase2[]) <- ICase2_0[i]
@@ -562,10 +571,13 @@ initial(ICrit_NoICU_NoOx_NoMV_Die1[]) <- ICrit_NoICU_NoOx_NoMV_Die1_0[i]
 initial(ICrit_NoICU_NoOx_NoMV_Die2[]) <- ICrit_NoICU_NoOx_NoMV_Die2_0[i]
 
 ##Initial vectors
+rel_inf_asymp <- user()
+rel_inf_mild <- user()
 oxygen_availability_0 <- user()
 S_0[] <- user()
 E1_0[] <- user()
 E2_0[] <- user()
+IAsymp_0[] <- user()
 IMild_0[] <- user()
 ICase1_0[] <- user()
 ICase2_0[] <- user()
@@ -623,6 +635,7 @@ ICrit_NoICU_NoOx_NoMV_Die2_0[] <- user()
 dim(S) <- N_age
 dim(E1) <- N_age
 dim(E2) <- N_age
+dim(IAsymp) <- N_age
 dim(IMild) <- N_age
 dim(ICase1) <- N_age
 dim(ICase2) <- N_age
@@ -679,6 +692,7 @@ dim(ICrit_NoICU_NoOx_NoMV_Die2) <- N_age
 dim(S_0) <- N_age
 dim(E1_0) <- N_age
 dim(E2_0) <- N_age
+dim(IAsymp_0) <- N_age
 dim(IMild_0) <- N_age
 dim(ICase1_0) <- N_age
 dim(ICase2_0) <- N_age
@@ -734,6 +748,7 @@ dim(ICrit_NoICU_NoOx_NoMV_Die2_0) <- N_age
 # For the Flows Between State Variables
 dim(delta_E1) <- N_age
 dim(delta_E2) <- N_age
+dim(delta_IAsymp) <- N_age
 dim(delta_IMild) <- N_age
 dim(delta_ICase1) <- N_age
 dim(delta_ICase2) <- N_age
@@ -790,7 +805,10 @@ dim(delta_ICrit_NoICU_NoOx_NoMV_Die2) <- N_age
 dim(n_E1_E2) <- N_age
 dim(n_E2_I) <- N_age
 dim(n_E2_ICase1) <- N_age
+dim(n_E2_IMild_or_IAsymp) <- N_age
+dim(n_E2_IAsymp) <- N_age
 dim(n_E2_IMild) <- N_age
+dim(n_IAsymp_R) <- N_age
 dim(n_IMild_R) <- N_age
 dim(n_ICase1_ICase2) <- N_age
 dim(n_ICase2_Hosp) <- N_age
@@ -887,6 +905,7 @@ dim(s_ij) <- c(N_age,N_age)
 dim(temp) <- N_age
 
 # Severity Parameters
+dim(prob_asymp) <- N_age
 dim(prob_hosp) <- N_age
 dim(prob_severe) <- N_age
 dim(prob_critical) <- N_age
@@ -974,3 +993,4 @@ output(n_ICrit_GetICU_GetOx_NoMV_Die2_D_Hospital) <- TRUE
 output(n_ICrit_GetICU_GetOx_NoMV_Surv2_Rec) <- TRUE
 output(n_ICrit_GetICU_NoOx_NoMV_Die2_D_Hospital) <- TRUE
 output(n_ICrit_GetICU_NoOx_NoMV_Surv2_Rec) <- TRUE
+output(n_E2_IAsymp) <- TRUE
