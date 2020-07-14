@@ -1101,7 +1101,8 @@ evaluate_Rt_pmcmc <- function(R0_change,
 
         # what does our shift look like
         Rt_pl_change <- c(rep(0, min(swtchdates[1]-1)), Rt_shift)
-        Rt_pl_change <- c(Rt_pl_change, rep(tail(Rt_shift,1), length(mob_up) - length(Rt_pl_change)))
+        Rt_pl_change <- c(Rt_pl_change,
+                          rep(tail(Rt_shift,1), max(0, length(mob_up) - length(Rt_pl_change))))
         Rt_pl_change <- head(Rt_pl_change, length(mob_up))
 
         # now work out Rt forwards based on mobility increasing from this plateau
