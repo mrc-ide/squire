@@ -1,3 +1,7 @@
+# squire 0.4.27 
+
+* `evaluate_Rt_pmcmc` patch for non specified `Rt_shift` in 3 parameter version
+
 # squire 0.4.26 
 
 * `pmcmc` more flexible for varying which parameters are fitted.

@@ -1180,4 +1180,13 @@ test_that("evaluate_Rt", {
                           date_R0_change = date_R0_change)
   expect_equal(Rt[3], Rt[6])
 
+  # with no shift
+  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0,
+                          pars = list(Meff = Meff,
+                                      Meff_pl = Meff),
+                          Rt_args = list(plateau_duration=1,
+                                         date_Meff_change = "2020-03-22",
+                                         scale_meff_pl = TRUE),
+                          date_R0_change = date_R0_change)
+
 })
