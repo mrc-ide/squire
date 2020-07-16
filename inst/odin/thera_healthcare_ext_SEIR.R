@@ -8,6 +8,86 @@ dt <- user() # Specified timestep
 time <- step * dt # Tracking actual time
 N_age <- user() # Number of age groups
 
+## DRUG RELATED PARAMETERS AND EFFECTS
+##------------------------------------------------------------------------------
+# Drug 1 reduces the severity of individuals in ICase, resulting in some of them flowing to IMild
+drug_1_indic_ICase1 <- user() # indicator used to note whether Drug 1 is turned on or off for ICase1
+drug_1_indic_ICase2 <- user() # indicator used to note whether Drug 1 is turned on or off for ICase1
+drug_1_effect <- user() # the proportion of treated individuals which flow from ICase -> IMild
+drug_1_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_1_prop_treat <- user() # proportion of individuals in ICase who receive the drug
+
+# Drug 2 reduces the time which individuals spend in IMild, leading them to recover more quickly
+drug_2_indic <- user() # indicator used to note whether Drug 2 is turned on or off
+drug_2_effect <- user() # the increase to the speed at which individuals flow from IMild -> R
+drug_2_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_2_prop_treat <- user() # proportion of individuals in IMild who receive the drug
+
+# Drug 3 reduces the severity of disease in hospital, leading to a greater proportion of individuals flowing to IMod
+drug_3_indic <- user() # indicator used to note whether Drug 3 is turned on or off
+drug_3_effect <- user() # the increase in the proportion of individual flowing into IMod rather than ISev or ICrit
+drug_3_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_3_prop_treat <- user() # proportion of individuals treated who receive the drug
+
+# Drug 4 reduces the severity of disease in hospital, leading to a greater proportion of individuals flowing to ISev over ICrit
+drug_4_indic <- user() # indicator used to note whether Drug 4 is turned on or off
+drug_4_effect <- user() # the increase in the proportion of individual flowing into ISev rather than ICrit
+drug_4_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_4_prop_treat <- user() # proportion of individuals treated who receive the drug
+
+# Drug 5 reduces the duration of stay in hospital for IMod Patients who survive - can be dependent on whether receiving other appropriate treatment (Oxygen) or not
+drug_5_indic_IMod_GetHosp_GetOx <- user() # indicator used to note whether Drug 5 is turned on or off for IMod who get Hosp Bed and Oxygen
+drug_5_indic_IMod_GetHosp_NoOx <- user() # indicator used to note whether Drug 5 is turned on or off for IMod who get Hosp Bed and Oxygen
+drug_5_effect <- user() # the increase in the rate of leaving IMod and Recovering
+drug_5_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_5_prop_treat <- user() # proportion of individuals treated who receive the drug
+drug_5_NoOx_mod <- user() # modifier of effect size for Drug 5 action in individuals not receiving oxygen
+
+# Drug 6 reduces the duration of stay in hospital for ISev Patients who survive - can be dependent on whether receiving other appropriate treatment (Oxygen) or not
+drug_6_indic_ISev_GetICU_GetOx <- user() # indicator used to note whether Drug 5 is turned on or off for IMod who get Hosp Bed and Oxygen
+drug_6_indic_ISev_GetICU_NoOx <- user() # indicator used to note whether Drug 5 is turned on or off for IMod who get Hosp Bed and Oxygen
+drug_6_effect <- user() # the increase in the rate of leaving ISev and Recovering
+drug_6_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_6_prop_treat <- user() # proportion of individuals treated who receive the drug
+drug_6_NoOx_mod <- user() # modifier of effect size for Drug 6 action in individuals not receiving oxygen
+
+# Drug 7 reduces the duration of stay in hospital for ICrit Patients - can be dependent on whether receiving other appropriate treatment (Oxygen and MV) or not
+drug_7_indic_ICrit_GetICU_GetOx_GetMV <- user() # indicator used to note whether Drug 7 is turned on or off for ICrit who get ICU Bed, Oxygen and MV
+drug_7_indic_ICrit_GetICU_GetOx_NoMV <- user() # indicator used to note whether Drug 7 is turned on or off for ICrit who get ICU Bed and Oxygen, but not MV
+drug_7_indic_ICrit_GetICU_NoOx_NoMV <- user() # indicator used to note whether Drug 7 is turned on or off for ICrit who get ICU Bed but no Oxygen or MV
+drug_7_effect <- user() # the increase in the rate of leaving ICrit and Recovering
+drug_7_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_7_prop_treat <- user() # proportion of individuals treated who receive the drug
+drug_7_GetOx_NoMV_mod <- user() # modifier of effect size for Drug 7 action in individuals receiving oxygen but not MV
+drug_7_NoOx_NoMV_mod <- user() # modifier of effect size for Drug 7 action in individuals not receiving oxygen or MV
+
+# Drug 8 reduces mortality in IMod Patients - can be dependent on receiving other appropriate treatment (Oxygen) or not
+drug_8_indic_IMod_GetHosp_GetOx <- user() # indicator used to note whether Drug 8 is turned on or off for IMod who get Hosp Bed and Oxygen
+drug_8_indic_IMod_GetHosp_NoOx <- user() # indicator used to note whether Drug 8 is turned on or off for IMod who get Hosp Bed but no Oxygen
+drug_8_effect <- user() # the decrease in the proportion of IMod dying
+drug_8_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_8_prop_treat <- user() # proportion of individuals treated who receive the drug
+drug_8_NoOx_mod <- user() # modifier of effect size for Drug 8 action in individuals not receiving oxygen
+
+# Drug 9 reduces mortality in ISev Patients - can be dependent on receiving other appropriate treatment (Oxygen) or not
+drug_9_indic_ISev_GetICU_GetOx <- user() # indicator used to note whether Drug 9 is turned on or off for ISev who get ICU Bed and Oxygen
+drug_9_indic_ISev_GetICU_NoOx <- user() # indicator used to note whether Drug 9 is turned on or off for ISev who get ICU Bed but no Oxygen
+drug_9_effect <- user() # the decrease in the proportion of ISev dying
+drug_9_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_9_prop_treat <- user() # proportion of individuals treated who receive the drug
+drug_9_NoOx_mod <- user() # modifier of effect size for Drug 9 action in individuals not receiving oxygen
+
+# Drug 10 reduces mortality in ICrit Patients - can be dependent on receiving other appropriate treatment (Oxygen and MV) or not
+drug_10_indic_ICrit_GetICU_GetOx_GetMV <- user() # indicator used to note whether Drug 10 is turned on or off for ICrit who get ICU Bed, Oxygen and MV
+drug_10_indic_ICrit_GetICU_GetOx_NoMV <- user() # indicator used to note whether Drug 10 is turned on or off for ICrit who get ICU Bed and Oxygen, but not MV
+drug_10_indic_ICrit_GetICU_NoOx_NoMV <- user() # indicator used to note whether Drug 10 is turned on or off for ICrit who get ICU Bed but no Oxygen or MV
+drug_10_effect <- user() # the decrease in the proportion of ICrit dying
+drug_10_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_10_prop_treat <- user() # proportion of individuals treated who receive the drug
+drug_10_GetOx_NoMV_mod <- user() # modifier of effect size for Drug 10 action in individuals receiving oxygen but not MV
+drug_10_NoOx_NoMV_mod <- user() # modifier of effect size for Drug 10 action in individuals not receiving oxygen or MV
+
+
 ## RATES
 ##------------------------------------------------------------------------------
 gamma_E <- user() # passage through latent infection
@@ -993,4 +1073,3 @@ output(n_ICrit_GetICU_GetOx_NoMV_Die2_D_Hospital) <- TRUE
 output(n_ICrit_GetICU_GetOx_NoMV_Surv2_Rec) <- TRUE
 output(n_ICrit_GetICU_NoOx_NoMV_Die2_D_Hospital) <- TRUE
 output(n_ICrit_GetICU_NoOx_NoMV_Surv2_Rec) <- TRUE
-output(n_E2_IAsymp) <- TRUE
