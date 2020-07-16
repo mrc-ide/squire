@@ -10,20 +10,16 @@ test_that("pmcmc fitting works", {
   country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
-                   'Meff'           = 2,
-                   'Meff_pl'        = 1)
+                   'Meff'           = 2)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
                   'R0'              = 1e-10,
-                  'Meff'            = 0.1,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 0.1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff'            = 5,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 5)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
-                       'Meff'       = FALSE,
-                       'Meff_pl'    = FALSE)
+                       'Meff'       = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,
                   phi_death = 1,
@@ -43,26 +39,26 @@ test_that("pmcmc fitting works", {
 
   set.seed(93L)
   out <- pmcmc(data = data,
-                              n_mcmc = 5,
-                              log_likelihood = NULL,
-                              log_prior = NULL,
-                              n_particles = 2,
-                              steps_per_day = steps_per_day,
-                              output_proposals = FALSE,
-                              n_chains = 1,
-                              replicates = 2,
-                              burnin = 0,
-                              squire_model = squire_model,
-                              pars_init = pars_init,
-                              pars_min = pars_min,
-                              pars_max = pars_max,
-                              pars_discrete = pars_discrete,
-                              pars_obs = pars_obs,
-                              proposal_kernel = proposal_kernel,
-                              R0_change = R0_change,
-                              date_R0_change = date_R0_change,
-                              date_Meff_change = NULL,
-                              country = country)
+               n_mcmc = 5,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               Rt_args = list(date_Meff_change = NULL),
+               country = country)
 
   expect_named(out, c("output", "parameters", "model", "replicate_parameters", "pmcmc_results", "interventions"))
   expect_warning(expect_s3_class(plot(out, what = "cases", particle_fit = TRUE), "gg"))
@@ -87,14 +83,14 @@ test_that("pmcmc fitting works", {
                  pars_min = pars_min,
                  pars_max = list('start_date'      = as.Date("2020-05-20"),
                                  'R0'              = 5,
-                                 'Meff'            = 1,
-                                 'Meff_pl'         = 5),
+                                 'Meff'            = 1),
                  pars_discrete = pars_discrete,
                  pars_obs = pars_obs,
                  proposal_kernel = proposal_kernel,
                  R0_change = R0_change,
                  date_R0_change = date_R0_change,
-                 country = country)
+                 country = country),
+    "Maximum start date must be at least 2 days before the first date in data"
   )
 
   expect_error(
@@ -110,20 +106,19 @@ test_that("pmcmc fitting works", {
                  burnin = 0,
                  squire_model = squire_model,
                  pars_init = pars_init,
-                 pars_min = list('start_date'      = as.Date("2020-05-20"),
+                 pars_min = list('start_date'      = as.Date("2020-02-20"),
                                  'R0'              = 1,
-                                 'Meff'            = 1,
-                                 'Meff_pl'         = 1),
-                 pars_max = list('start_date'      = as.Date("2020-05-20"),
+                                 'Meff'            = 1),
+                 pars_max = list('start_date'      = as.Date("2020-02-20"),
                                  'R0'              = 5,
-                                 'Meff'            = 5,
-                                 'Meff_pl'         = 1),
+                                 'Meff'            = 5),
                  pars_discrete = pars_discrete,
                  pars_obs = pars_obs,
                  proposal_kernel = proposal_kernel,
                  R0_change = R0_change,
                  date_R0_change = date_R0_change,
-                 country = country)
+                 country = country),
+    "start_date init must be greater than"
   )
 
   expect_error(
@@ -146,7 +141,8 @@ test_that("pmcmc fitting works", {
                  proposal_kernel = proposal_kernel,
                  R0_change = 0.5,
                  date_R0_change = "2022-05-10",
-                 country = country)
+                 country = country),
+    "Last date in date_R0_change is greater than the last date in data"
   )
 
   # DATE CHECKS DATE_CONTACT
@@ -173,7 +169,8 @@ test_that("pmcmc fitting works", {
                  country = country,
                  baseline_contact_matrix = contact_matrices[[1]],
                  contact_matrix_set = contact_matrices[1],
-                 date_contact_matrix_set_change = "2020-05-10")
+                 date_contact_matrix_set_change = "2020-05-10"),
+    "Last date in date_contact_matrix_set_change is greater than"
   )
 
   expect_error(
@@ -198,33 +195,34 @@ test_that("pmcmc fitting works", {
                  date_R0_change = date_R0_change,
                  country = country,
                  contact_matrix_set = list(contact_matrices[[1]]),
-                 date_contact_matrix_set_change = date_R0_change[1])
+                 date_contact_matrix_set_change = date_R0_change[1]),
+    "baseline_contact_matrix can't be NULL if date_contact_matrix_set_change"
   )
 
   out <- pmcmc(data = data,
-                              n_mcmc = 5,
-                              log_likelihood = NULL,
-                              log_prior = NULL,
-                              n_particles = 2,
-                              steps_per_day = steps_per_day,
-                              output_proposals = FALSE,
-                              n_chains = 1,
-                              replicates = 2,
-                              burnin = 0,
-                              squire_model = squire_model,
-                              pars_init = pars_init,
-                              pars_min = pars_min,
-                              pars_max = pars_max,
-                              pars_discrete = pars_discrete,
-                              pars_obs = pars_obs,
-                              proposal_kernel = proposal_kernel,
-                              R0_change = R0_change,
-                              date_R0_change = date_R0_change,
-                              date_Meff_change = NULL,
-                              country = country,
-                              baseline_contact_matrix = contact_matrices[[1]],
-                              contact_matrix_set = list(contact_matrices[[1]]),
-                              date_contact_matrix_set_change = date_R0_change[1])
+               n_mcmc = 5,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               Rt_args = list(date_Meff_change = NULL),
+               country = country,
+               baseline_contact_matrix = contact_matrices[[1]],
+               contact_matrix_set = list(contact_matrices[[1]]),
+               date_contact_matrix_set_change = date_R0_change[1])
 
 
 
@@ -251,7 +249,8 @@ test_that("pmcmc fitting works", {
                  country = country,
                  baseline_contact_matrix = contact_matrices[[1]],
                  contact_matrix_set = contact_matrices[1],
-                 date_contact_matrix_set_change = "2020-02-01")
+                 date_contact_matrix_set_change = "2020-02-01"),
+    "First date in date_contact_matrix_set_change is earlier than maximum start date"
   )
 
   # DATE CHECKS date_hosp
@@ -278,7 +277,8 @@ test_that("pmcmc fitting works", {
                  date_hosp_bed_capacity_change = "2022-05-10",
                  baseline_hosp_bed_capacity = 10,
                  hosp_bed_capacity = 100,
-                 country = country)
+                 country = country),
+    "Last date in date_hosp_bed_capacity_change is greater than the last date "
   )
 
   expect_error(
@@ -304,7 +304,8 @@ test_that("pmcmc fitting works", {
                  date_hosp_bed_capacity_change = "2020-02-02",
                  baseline_hosp_bed_capacity = 10,
                  hosp_bed_capacity = 100,
-                 country = country)
+                 country = country),
+    "First date in date_hosp_bed_capacity_change is earlier than maximum start"
   )
 
   expect_error(
@@ -329,33 +330,34 @@ test_that("pmcmc fitting works", {
                  date_R0_change = date_R0_change,
                  hosp_bed_capacity = 10,
                  date_hosp_bed_capacity_change = date_R0_change[1],
-                 country = country)
+                 country = country),
+    "baseline_hosp_bed_capacity can't be NULL if date_hosp_bed_capacity_change"
   )
 
   out <- pmcmc(data = data,
-                              n_mcmc = 5,
-                              log_likelihood = NULL,
-                              log_prior = NULL,
-                              n_particles = 2,
-                              steps_per_day = steps_per_day,
-                              output_proposals = FALSE,
-                              n_chains = 1,
-                              replicates = 2,
-                              burnin = 0,
-                              squire_model = squire_model,
-                              pars_init = pars_init,
-                              pars_min = pars_min,
-                              pars_max = pars_max,
-                              pars_discrete = pars_discrete,
-                              pars_obs = pars_obs,
-                              proposal_kernel = proposal_kernel,
-                              baseline_hosp_bed_capacity = 5,
-                              hosp_bed_capacity = 10,
-                              date_hosp_bed_capacity_change = date_R0_change[1],
-                              R0_change = R0_change,
-                              date_R0_change = date_R0_change,
-                              date_Meff_change = NULL,
-                              country = country)
+               n_mcmc = 5,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               baseline_hosp_bed_capacity = 5,
+               hosp_bed_capacity = 10,
+               date_hosp_bed_capacity_change = date_R0_change[1],
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               Rt_args = list(date_Meff_change = NULL),
+               country = country)
 
 
   # DATE CHECKS DATE_ICU
@@ -438,28 +440,28 @@ test_that("pmcmc fitting works", {
   )
 
   out <- pmcmc(data = data,
-                              n_mcmc = 5,
-                              log_likelihood = NULL,
-                              log_prior = NULL,
-                              n_particles = 2,
-                              steps_per_day = steps_per_day,
-                              output_proposals = FALSE,
-                              n_chains = 1,
-                              replicates = 2,
-                              burnin = 0,
-                              squire_model = squire_model,
-                              pars_init = pars_init,
-                              pars_min = pars_min,
-                              pars_max = pars_max,
-                              pars_discrete = pars_discrete,
-                              pars_obs = pars_obs,
-                              proposal_kernel = proposal_kernel,
-                              R0_change = R0_change,
-                              date_R0_change = date_R0_change,
-                              country = country,
-                              baseline_ICU_bed_capacity = 5,
-                              ICU_bed_capacity = 10,
-                              date_ICU_bed_capacity_change = date_R0_change[1]
+               n_mcmc = 5,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country,
+               baseline_ICU_bed_capacity = 5,
+               ICU_bed_capacity = 10,
+               date_ICU_bed_capacity_change = date_R0_change[1]
   )
 
 })
@@ -475,20 +477,16 @@ test_that("pmcmc non future works", {
   country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
-                   'Meff'           = 2,
-                   'Meff_pl'         = 1)
+                   'Meff'           = 2)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
                   'R0'              = 1e-10,
-                  'Meff'            = 1,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 0.1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff'            = 3,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 5)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
-                       'Meff'       = FALSE,
-                       'Meff_pl'    = FALSE)
+                       'Meff'       = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,
                   phi_death = 1,
@@ -509,25 +507,25 @@ test_that("pmcmc non future works", {
 
   Sys.setenv("SQUIRE_PARALLEL_DEBUG"=TRUE)
   out <- pmcmc(data = data,
-                              n_mcmc = 5,
-                              log_likelihood = NULL,
-                              log_prior = NULL,
-                              n_particles = 2,
-                              steps_per_day = steps_per_day,
-                              output_proposals = FALSE,
-                              n_chains = 1,
-                              replicates = 2,
-                              burnin = 0,
-                              squire_model = squire_model,
-                              pars_init = pars_init,
-                              pars_min = pars_min,
-                              pars_max = pars_max,
-                              pars_discrete = pars_discrete,
-                              pars_obs = pars_obs,
-                              proposal_kernel = proposal_kernel,
-                              R0_change = R0_change,
-                              date_R0_change = date_R0_change,
-                              country = country)
+               n_mcmc = 5,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country)
 
 
 })
@@ -543,20 +541,16 @@ test_that("pmcmc deterministic", {
   country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
-                   'Meff'           = 2,
-                   'Meff_pl'         = 1)
+                   'Meff'           = 2)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
-                  'R0'              = 0,
-                  'Meff'            = 1,
-                  'Meff_pl'         = 1)
+                  'R0'              = 1e-10,
+                  'Meff'            = 0.1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff'            = 5,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 5)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
-                       'Meff'       = FALSE,
-                       'Meff_pl'    = FALSE)
+                       'Meff'       = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,
                   phi_death = 1,
@@ -576,26 +570,26 @@ test_that("pmcmc deterministic", {
   n_particles = 2
 
   out <- pmcmc(data = data,
-                              n_mcmc = 5,
-                              log_likelihood = NULL,
-                              log_prior = NULL,
-                              n_particles = 2,
-                              steps_per_day = steps_per_day,
-                              output_proposals = FALSE,
-                              n_chains = 1,
-                              replicates = 2,
-                              burnin = 0,
-                              squire_model = deterministic_model(),
-                              pars_init = pars_init,
-                              pars_min = pars_min,
-                              pars_max = pars_max,
-                              pars_discrete = pars_discrete,
-                              pars_obs = pars_obs,
-                              proposal_kernel = proposal_kernel,
-                              R0_change = R0_change,
-                              date_R0_change = date_R0_change,
-                              date_Meff_change = NULL,
-                              country = country)
+               n_mcmc = 5,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = deterministic_model(),
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               Rt_args = list(date_Meff_change = NULL),
+               country = country)
 
 
   expect_true(inherits(out$pmcmc_results$inputs$squire_model, "deterministic"))
@@ -617,20 +611,16 @@ test_that("pmcmc user pop and contact", {
   country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
-                   'Meff'           = 1,
-                   'Meff_pl'        = 1)
+                   'Meff'           = 2)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
                   'R0'              = 1e-10,
-                  'Meff'            = 1,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 0.1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff'            = 5,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 5)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
-                       'Meff'       = FALSE,
-                       'Meff_pl'    = FALSE)
+                       'Meff'       = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,
                   phi_death = 1,
@@ -649,27 +639,27 @@ test_that("pmcmc user pop and contact", {
   n_particles = 2
 
   out <- pmcmc(data = data,
-                              n_mcmc = 5,
-                              log_likelihood = NULL,
-                              log_prior = NULL,
-                              n_particles = 2,
-                              steps_per_day = steps_per_day,
-                              output_proposals = FALSE,
-                              n_chains = 1,
-                              replicates = 2,
-                              burnin = 0,
-                              squire_model = squire_model,
-                              pars_init = pars_init,
-                              pars_min = pars_min,
-                              pars_max = pars_max,
-                              pars_discrete = pars_discrete,
-                              pars_obs = pars_obs,
-                              proposal_kernel = proposal_kernel,
-                              R0_change = R0_change,
-                              date_R0_change = date_R0_change,
-                              country = country,
-                              population = pop$n,
-                              baseline_contact_matrix = mat)
+               n_mcmc = 5,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country,
+               population = pop$n,
+               baseline_contact_matrix = mat)
 
   expect_true(
     identical(out$pmcmc_results$inputs$model_params$contact_matrix_set[[1]], mat)
@@ -689,20 +679,16 @@ test_that("pmcmc future", {
   country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
-                   'Meff'           = 1,
-                   'Meff_pl'        = 1)
+                   'Meff'           = 2)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
                   'R0'              = 1e-10,
-                  'Meff'            = 1,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 0.1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff'            = 5,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 5)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
-                       'Meff'       = FALSE,
-                       'Meff_pl'    = FALSE)
+                       'Meff'       = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,
                   phi_death = 1,
@@ -721,25 +707,25 @@ test_that("pmcmc future", {
   n_particles = 2
 
   expect_message(out <- pmcmc(data = data,
-                                             n_mcmc = 3,
-                                             log_likelihood = NULL,
-                                             log_prior = NULL,
-                                             n_particles = 2,
-                                             steps_per_day = steps_per_day,
-                                             output_proposals = FALSE,
-                                             n_chains = 2,
-                                             replicates = 2,
-                                             burnin = 0,
-                                             squire_model = squire_model,
-                                             pars_init = pars_init,
-                                             pars_min = pars_min,
-                                             pars_max = pars_max,
-                                             pars_discrete = pars_discrete,
-                                             pars_obs = pars_obs,
-                                             proposal_kernel = proposal_kernel,
-                                             R0_change = R0_change,
-                                             date_R0_change = date_R0_change,
-                                             country = country),
+                              n_mcmc = 3,
+                              log_likelihood = NULL,
+                              log_prior = NULL,
+                              n_particles = 2,
+                              steps_per_day = steps_per_day,
+                              output_proposals = FALSE,
+                              n_chains = 2,
+                              replicates = 2,
+                              burnin = 0,
+                              squire_model = squire_model,
+                              pars_init = pars_init,
+                              pars_min = pars_min,
+                              pars_max = pars_max,
+                              pars_discrete = pars_discrete,
+                              pars_obs = pars_obs,
+                              proposal_kernel = proposal_kernel,
+                              R0_change = R0_change,
+                              date_R0_change = date_R0_change,
+                              country = country),
                  "rhat")
 
 
@@ -757,20 +743,16 @@ test_that("pmcmc multiple chains and rhat", {
   country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
-                   'Meff'           = 1,
-                   'Meff_pl'        = 1)
+                   'Meff'           = 2)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
                   'R0'              = 1e-10,
-                  'Meff'            = 1,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 0.1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff'            = 5,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 5)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
-                       'Meff'       = FALSE,
-                       'Meff_pl'    = FALSE)
+                       'Meff'       = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,
                   phi_death = 1,
@@ -790,25 +772,25 @@ test_that("pmcmc multiple chains and rhat", {
 
   set.seed(93L)
   out <- pmcmc(data = data,
-                              n_mcmc = 200,
-                              log_likelihood = NULL,
-                              log_prior = NULL,
-                              n_particles = 2,
-                              steps_per_day = steps_per_day,
-                              output_proposals = FALSE,
-                              n_chains = 3,
-                              replicates = 2,
-                              burnin = 0,
-                              squire_model = squire_model,
-                              pars_init = pars_init,
-                              pars_min = pars_min,
-                              pars_max = pars_max,
-                              pars_discrete = pars_discrete,
-                              pars_obs = pars_obs,
-                              proposal_kernel = proposal_kernel,
-                              R0_change = R0_change,
-                              date_R0_change = date_R0_change,
-                              country = country)
+               n_mcmc = 200,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 3,
+               replicates = 2,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country)
   expect_named(out$pmcmc_results$rhat, c("psrf","mpsrf"))
 
   pl <- plot(out$pmcmc_results)
@@ -830,20 +812,16 @@ test_that("pmcmc single chain and rhat", {
   country = "Algeria"
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
-                   'Meff'           = 1,
-                   'Meff_pl'        = 1)
+                   'Meff'           = 2)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
                   'R0'              = 1e-10,
-                  'Meff'            = 1,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 0.1)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
-                  'Meff'            = 5,
-                  'Meff_pl'         = 1)
+                  'Meff'            = 5)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
-                       'Meff'       = FALSE,
-                       'Meff_pl'    = FALSE)
+                       'Meff'       = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,
                   phi_death = 1,
@@ -862,25 +840,25 @@ test_that("pmcmc single chain and rhat", {
   n_particles = 2
 
   out <- pmcmc(data = data,
-                              n_mcmc = 50,
-                              log_likelihood = NULL,
-                              log_prior = NULL,
-                              n_particles = 2,
-                              steps_per_day = steps_per_day,
-                              output_proposals = FALSE,
-                              n_chains = 1,
-                              replicates = 2,
-                              burnin = 0,
-                              squire_model = squire_model,
-                              pars_init = pars_init,
-                              pars_min = pars_min,
-                              pars_max = pars_max,
-                              pars_discrete = pars_discrete,
-                              pars_obs = pars_obs,
-                              proposal_kernel = proposal_kernel,
-                              R0_change = R0_change,
-                              date_R0_change = date_R0_change,
-                              country = country)
+               n_mcmc = 50,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country)
   expect_false("rhat" %in% names(out$pmcmc_results))
 
   pl <- plot(out$pmcmc_results)
@@ -935,26 +913,27 @@ test_that("pmcmc meff date", {
   n_particles = 2
 
   out <- pmcmc(data = data,
-                              n_mcmc = 50,
-                              log_likelihood = NULL,
-                              log_prior = NULL,
-                              n_particles = 2,
-                              steps_per_day = steps_per_day,
-                              output_proposals = FALSE,
-                              n_chains = 1,
-                              replicates = 2,
-                              burnin = 0,
-                              date_Meff_change = "2020-03-20",
-                              squire_model = squire_model,
-                              pars_init = pars_init,
-                              pars_min = pars_min,
-                              pars_max = pars_max,
-                              pars_discrete = pars_discrete,
-                              pars_obs = pars_obs,
-                              proposal_kernel = proposal_kernel,
-                              R0_change = R0_change,
-                              date_R0_change = date_R0_change,
-                              country = country)
+               n_mcmc = 50,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               Rt_args = list(date_Meff_change = "2020-03-20",
+                              plateau_duration = 7),
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country)
   expect_false("rhat" %in% names(out$pmcmc_results))
 
   pl <- plot(out$pmcmc_results)
@@ -965,9 +944,8 @@ test_that("pmcmc meff date", {
 
 })
 
-
 #-------------------------------------
-test_that("Rt_func pmcmc", {
+test_that("pmcmc 6p meff date", {
   Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
 
   data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
@@ -978,19 +956,27 @@ test_that("Rt_func pmcmc", {
   pars_init = list('start_date'     = as.Date("2020-02-07"),
                    'R0'             = 2.5,
                    'Meff'           = 1,
-                   'Meff_pl'        = 1)
+                   'Meff_pl'        = 0.2,
+                   "Rt_shift"       = 2,
+                   "Rt_shift_scale" = 5)
   pars_min = list('start_date'      = as.Date("2020-02-01"),
                   'R0'              = 1e-10,
                   'Meff'            = 1,
-                  'Meff_pl'         = 1)
+                  'Meff_pl'         = 0,
+                  "Rt_shift"       = 0,
+                  "Rt_shift_scale" = 0)
   pars_max = list('start_date'      = as.Date("2020-02-20"),
                   'R0'              = 5,
                   'Meff'            = 5,
-                  'Meff_pl'         = 10)
+                  'Meff_pl'         = 1,
+                  "Rt_shift"       = 5,
+                  "Rt_shift_scale" = 10)
   pars_discrete = list('start_date' = TRUE,
                        'R0'         = FALSE,
                        'Meff'       = FALSE,
-                       'Meff_pl'    = FALSE)
+                       'Meff_pl'    = FALSE,
+                       "Rt_shift"       = FALSE,
+                       "Rt_shift_scale" = FALSE)
   pars_obs = list(phi_cases = 0.1,
                   k_cases = 2,
                   phi_death = 1,
@@ -1008,32 +994,30 @@ test_that("Rt_func pmcmc", {
   squire_model = explicit_model()
   n_particles = 2
 
-  # Rt function matching what's under the hood in squire
-  Rt_func <- function (R0_change, R0, Meff) {
-    R0 * (2 * plogis(-(R0_change - 1) * -Meff))
-  }
-
   out <- pmcmc(data = data,
-                              n_mcmc = 50,
-                              log_likelihood = NULL,
-                              log_prior = NULL,
-                              n_particles = 2,
-                              steps_per_day = steps_per_day,
-                              output_proposals = FALSE,
-                              n_chains = 1,
-                              replicates = 2,
-                              burnin = 0,
-                              date_Meff_change = "2020-03-20",
-                              squire_model = squire_model,
-                              pars_init = pars_init,
-                              pars_min = pars_min,
-                              pars_max = pars_max,
-                              pars_discrete = pars_discrete,
-                              pars_obs = pars_obs,
-                              proposal_kernel = proposal_kernel,
-                              R0_change = R0_change,
-                              date_R0_change = date_R0_change,
-                              country = country)
+               n_mcmc = 50,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               Rt_args = Rt_args_list(date_Meff_change = "2020-03-20",
+                                      scale_Meff_pl = TRUE,
+                                      Rt_shift_duration = 30,
+                                      plateau_duration = 7),
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country)
   expect_false("rhat" %in% names(out$pmcmc_results))
 
   pl <- plot(out$pmcmc_results)
@@ -1041,6 +1025,97 @@ test_that("Rt_func pmcmc", {
 
   summa <- summary(out$pmcmc_results, burn_in = 10)
   expect_named(summa, c("summary", "corr_mat", "sd"))
+
+})
+
+
+#-------------------------------------
+test_that("Start date and R0 only pmcmc", {
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
+
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  pars_init = list('start_date'     = as.Date("2020-02-07"),
+                   'R0'             = 2.5)
+  pars_min = list('start_date'      = as.Date("2020-02-01"),
+                  'R0'              = 1e-10)
+  pars_max = list('start_date'      = as.Date("2020-02-20"),
+                  'R0'              = 5)
+  pars_discrete = list('start_date' = TRUE,
+                       'R0'         = FALSE)
+  pars_obs = list(phi_cases = 0.1,
+                  k_cases = 2,
+                  phi_death = 1,
+                  k_death = 2,
+                  exp_noise = 1e6)
+  # proposal kernel covriance
+  proposal_kernel <- matrix(0.5, ncol=length(pars_init), nrow = length(pars_init))
+  diag(proposal_kernel) <- 1
+  rownames(proposal_kernel) <- colnames(proposal_kernel) <- names(pars_init)
+
+  steps_per_day = 1
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  n_particles = 2
+
+  out <- pmcmc(data = data,
+               n_mcmc = 50,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country)
+  expect_false("rhat" %in% names(out$pmcmc_results))
+
+  pl <- plot(out$pmcmc_results)
+  expect_warning(expect_s3_class(plot(out, particle_fit = TRUE), "gg"))
+
+  summa <- summary(out$pmcmc_results, burn_in = 10)
+  expect_named(summa, c("summary", "corr_mat", "sd"))
+
+  # check that evaluate Rt works
+  from_eval <- evaluate_Rt_pmcmc(R0_change = out$interventions$R0_change,
+                                 R0 = out$replicate_parameters$R0[1],
+                                 date_R0_change = out$interventions$date_R0_change,
+                                 pars = list(),
+                                 Rt_args = out$pmcmc_results$inputs$Rt_args)
+
+  expect_equal(out$replicate_parameters$R0*out$interventions$R0_change,
+               from_eval)
+
+  # and check it by interventions_dates_for_odin
+  tt <- intervention_dates_for_odin(dates = out$interventions$date_R0_change,
+                                    change = out$interventions$R0_change,
+                                    start_date = out$replicate_parameters$start_date[1],
+                                    steps_per_day = 10)
+
+  from_int_eval <- evaluate_Rt_pmcmc(R0_change = tt$change,
+                                     R0 = out$replicate_parameters$R0[1],
+                                     date_R0_change = tt$dates,
+                                     pars = list(),
+                                     Rt_args = out$pmcmc_results$inputs$Rt_args
+  )
+
+  expect_equal(c(out$replicate_parameters$R0[1],out$replicate_parameters$R0*out$interventions$R0_change),
+               from_int_eval)
 
 })
 
@@ -1067,32 +1142,51 @@ test_that("evaluate_Rt", {
   Meff <- 2
   Meff_pl <- 6
 
-  Rt_base <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
-                         date_R0_change = date_R0_change,roll=1,
-                         date_Meff_change = date_Meff_change)
+  Rt_base <- evaluate_Rt_pmcmc(R0_change = R0_change,
+                               R0 = R0,
+                               date_R0_change = date_R0_change,
+                               pars = list(Meff = Meff,
+                                           Meff_pl = Meff_pl),
+                               Rt_args = list(plateau_duration = 1,
+                                              date_Meff_change = date_Meff_change))
 
-  expect_lt(Rt_base[7], Rt_base[4])
+  expect_lt(Rt_base[6], Rt_base[4])
 
-  Rt <- evaluate_Rt_pmcmc(R0_change = NULL, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
-                    date_R0_change = date_R0_change,roll=1,
-                    date_Meff_change = date_Meff_change)
+  Rt <- evaluate_Rt_pmcmc(R0_change = NULL,
+                          R0 = R0,
+                          date_R0_change = date_R0_change,
+                          pars = list(Meff = Meff,
+                                      Meff_pl = Meff_pl),
+                          Rt_args = list(plateau_duration=1,
+                                         date_Meff_change = date_Meff_change))
   expect_equal(R0, Rt[1])
 
-  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff_pl,
-                    date_R0_change = date_R0_change,roll=1,
-                    date_Meff_change = "2010-01-01")
+  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change,
+                          R0 = R0,
+                          date_R0_change = date_R0_change,
+                          pars = list(Meff = Meff,
+                                      Meff_pl = Meff_pl),
+                          Rt_args = list(plateau_duration=1,
+                                         date_Meff_change = "2020-03-01"))
   expect_lt(mean(Rt_base), mean(Rt))
 
   # with scale
-  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = Meff,
-                          date_R0_change = date_R0_change,roll=1,scale_meff_pl = FALSE,
-                          date_Meff_change = "2010-01-01")
-  expect_equal(Rt[4], Rt[5])
+  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0,
+                          pars = list(Meff = Meff,
+                                      Meff_pl = Meff),
+                          Rt_args = list(plateau_duration=1,
+                                         date_Meff_change = "2020-03-22",
+                                         scale_meff_pl = TRUE),
+                          date_R0_change = date_R0_change)
+  expect_equal(Rt[3], Rt[6])
 
-  # with scale
-  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0, Meff = Meff, Meff_pl = 1,
-                          date_R0_change = date_R0_change,roll=1,scale_meff_pl = TRUE,
-                          date_Meff_change = "2010-01-01")
-  expect_equal(Rt[4], Rt[5])
+  # with no shift
+  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0,
+                          pars = list(Meff = Meff,
+                                      Meff_pl = Meff),
+                          Rt_args = list(plateau_duration=1,
+                                         date_Meff_change = "2020-03-22",
+                                         scale_meff_pl = TRUE),
+                          date_R0_change = date_R0_change)
 
 })

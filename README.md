@@ -53,7 +53,8 @@ control scenarios. It consists of the following:
 
 If you are new to squire, the best place to start is below, where we
 detail how to install the package, how to set up the model, and how to
-run it with and without control interventions.
+run it with and without control
+interventions.
 
 ## Model Structure
 
@@ -72,7 +73,8 @@ disease severity pathways. These compartments are:
 \* I<sub>ICU</sub> = ICU (Requires ICU Bed)  
 \* I<sub>Rec</sub> = Recovering from ICU Stay (Requires Hospital Bed)  
 \* R = Recovered  
-\* D = Dead
+\* D =
+Dead
 
 ### Decision Trees for Healthcare Capacity
 
@@ -129,7 +131,8 @@ devtools::install_github("mrc-ide/squire")
 If you have any problems installing then please raise an issue on the
 <i>squire</i> [`GitHub`](https://github.com/mrc-ide/squire/issues).
 
-If everything has installed correctly, we then need to load the package:
+If everything has installed correctly, we then need to load the
+package:
 
 ``` r
 library(squire)
@@ -181,7 +184,8 @@ plot(r)
 This plot will plot each of the compartments of the model output. We can
 also plot specific compartments using the `var_select` argument that can
 be passed to `plot()`. Arguments passed to `var_select` must be one of
-the variables in the plot above.
+the variables in the plot
+above.
 
 ``` r
 plot(r, var_select = c("E", "IMild"))
@@ -191,7 +195,8 @@ plot(r, var_select = c("E", "IMild"))
 Or, you can specify one of `deaths`, `infections`, `hospital_occupancy`,
 `ICU_occupancy`, `hospital_demand` or `ICU_demand`, and plot these
 summary metrics that represent the combintion of a number of different
-compartment e.g:
+compartment
+e.g:
 
 ``` r
 plot(r, var_select = "deaths")
@@ -219,8 +224,8 @@ head(output)
 #> 2         1 E             0.2    20
 #> 3         1 E             0.3    20
 #> 4         1 E             0.4    20
-#> 5         1 E             0.5    19
-#> 6         1 E             0.6    19
+#> 5         1 E             0.5    20
+#> 6         1 E             0.6    20
 ```
 
 If we wanted age-disaggregated data, we could set `reduce_age` to
@@ -305,6 +310,7 @@ plot(r, var_select = "infections")
 ```
 
 <img src="man/figures/README-set contact matrix decrease-1.png" width="100%" />
+
 where `n_E2_I` is the daily number of new infections.
 
 To show an 80% reduction after 50 days but only maintained for 30 days :
@@ -360,7 +366,6 @@ However, you can also specify your own:
 ``` r
 
 library(patchwork)
-#> Warning: package 'patchwork' was built under R version 3.5.3
 
 r <- run_explicit_SEEIR_model(population = population, 
                               contact_matrix_set = contact_matrix,
@@ -386,10 +391,8 @@ This can be done with the `format_output` function.
 
 ``` r
 library(ggplot2)
-#> Warning: package 'ggplot2' was built under R version 3.5.3
 library(patchwork)
 library(dplyr)
-#> Warning: package 'dplyr' was built under R version 3.5.3
 #> 
 #> Attaching package: 'dplyr'
 #> The following objects are masked from 'package:stats':
@@ -488,11 +491,9 @@ out <- calibrate(
       n_particles = 20,
       country = "Algeria"
     )
+#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────        100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────        100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 #> 
- Progress: ------------------------------------------------------------------------------------ 100%
-#> 
-#> 
- Progress: ------------------------------------------------------------------------------------ 100%
+#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
 
 `calibrate` returns the same output as `run_explicit_SEEIR_model`, with
@@ -539,7 +540,8 @@ plot(out$scan_results, what = "probability")
 The reason for the poor fits to the data shown earlier is because
 Algeria has implemented interventions prior to today. These can also be
 incorporated into `calibrate`. For example, we can grab the assumed
-changes to transmission fased on government intervention for Algeria.
+changes to transmission fased on government intervention for
+Algeria.
 
 ``` r
 interventions <- read.csv(squire:::squire_file("extdata/example_DZA_intervention.csv"))
@@ -573,12 +575,9 @@ out <- calibrate(
       date_R0_change = int_unique$dates_change,
       country = "Algeria"
     )
+#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 #> 
- Progress: ------------------------------------------------------------------------------------ 100%
-#> 
-#> 
- Progress: ---------------------------------------------------------------------------          100%
- Progress: ------------------------------------------------------------------------------------ 100%
+#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
 
 Let’s see if that is any better.
@@ -627,11 +626,9 @@ out <- calibrate(
       date_ICU_bed_capacity_change = c("2020-04-10"),
       country = "Algeria"
     )
+#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 #> 
- Progress: ------------------------------------------------------------------------------------ 100%
-#> 
-#> 
- Progress: ------------------------------------------------------------------------------------ 100%
+#>  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────                           100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
 
 (N.B. Given the potentially long running time for the grid search, the
@@ -657,7 +654,8 @@ CDC](https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geogra
 First let’s calibrate to this data with no interventions in place (there
 are likely some interventions in place but nothing major, such as a
 lockdown, has been implemented by 2020-04-28) and simulate forward for
-180 days:
+180
+days:
 
 ``` r
 df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
@@ -675,10 +673,9 @@ out <- calibrate(
       forecast = 180,
       country = "Guinea"
     )
+#>  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 #> 
- Progress: -------------------------------------------------------------------                  100%
- Progress: -------------------------------------------------------------------                  100%
- Progress: ------------------------------------------------------------------------------------ 100%
+#>  Progress: ───────────────────────────────────────────────────────────────                                                                100% Progress: ────────────────────────────────────────────────────────────────────────────────────────                                       100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
 
 Firstly, let’s plot the fit up to the current day
@@ -693,7 +690,8 @@ plot(out, particle_fit = TRUE) +
 
 The fit is good and captures the stuttering chains at the beginning of
 the epidemic. However, if we plot the forecasted deaths we can see the
-epidemic is likely to take off:
+epidemic is likely to take
+off:
 
 ``` r
 plot(out, "deaths")
@@ -733,7 +731,7 @@ whereas in the unmitigated strategy this did occur.
 
 We can also model changing interventions by changing the contact matrix
 over time as well as the availability of ICU and hospital beds. E.g.
-decreasing contacts by 75% in a week before relaxing it to 80% in 20
+decreasing contacts by 75% in a week before relaxing it to 80% in 30
 days time, while increasing hospital and ICU beds by 20% in 30 days
 time. (N.B. We can turn off the automatic scenario parameter labelling
 with `add_parms_to_scenarios = FALSE`):
@@ -801,7 +799,8 @@ projection_plotting(r_list = list(out,p),
 Lastly, in order to run simulations for longer than the number set in
 `calibrate(forecast = x)`, we can use the argument `time_period` to set
 the numbers of days that `projections` should simulate for. For example,
-we could redo our calibration and have it only run up the current day:
+we could redo our calibration and have it only run up the current
+day:
 
 ``` r
 df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
@@ -819,6 +818,9 @@ out <- calibrate(
       forecast = 0,
       country = "Guinea"
     )
+#>  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
+#> 
+#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 
 plot(out, particle_fit = TRUE)
 ```

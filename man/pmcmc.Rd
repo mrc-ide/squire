@@ -16,10 +16,14 @@ pmcmc(
   squire_model = explicit_model(),
   pars_obs = list(phi_cases = 1, k_cases = 2, phi_death = 1, k_death = 2, exp_noise =
     1e+06),
-  pars_init = list(start_date = as.Date("2020-02-07"), R0 = 2.5, Meff = 2, Meff_pl = 3),
-  pars_min = list(start_date = as.Date("2020-02-01"), R0 = 0, Meff = 1, Meff_pl = 2),
-  pars_max = list(start_date = as.Date("2020-02-20"), R0 = 5, Meff = 3, Meff_pl = 4),
-  pars_discrete = list(start_date = TRUE, R0 = FALSE, Meff = FALSE, Meff_pl = FALSE),
+  pars_init = list(start_date = as.Date("2020-02-07"), R0 = 2.5, Meff = 2, Meff_pl = 3,
+    R0_pl_shift = 0),
+  pars_min = list(start_date = as.Date("2020-02-01"), R0 = 0, Meff = 1, Meff_pl = 2,
+    R0_pl_shift = -2),
+  pars_max = list(start_date = as.Date("2020-02-20"), R0 = 5, Meff = 3, Meff_pl = 4,
+    R0_pl_shift = 5),
+  pars_discrete = list(start_date = TRUE, R0 = FALSE, Meff = FALSE, Meff_pl = FALSE,
+    R0_pl_shift = FALSE),
   proposal_kernel = NULL,
   reporting_fraction = 1,
   country = NULL,
@@ -29,15 +33,13 @@ pmcmc(
   date_contact_matrix_set_change = NULL,
   date_R0_change = NULL,
   R0_change = NULL,
-  date_Meff_change = NULL,
   hosp_bed_capacity = NULL,
   baseline_hosp_bed_capacity = NULL,
   date_hosp_bed_capacity_change = NULL,
   ICU_bed_capacity = NULL,
   baseline_ICU_bed_capacity = NULL,
   date_ICU_bed_capacity_change = NULL,
-  roll = 7,
-  scale_meff_pl = FALSE,
+  Rt_args = NULL,
   burnin = 0,
   replicates = 100,
   forecast = 0,
@@ -120,8 +122,6 @@ Defaut = NULL, i.e. no change in R0}
 \item{R0_change}{Numeric vector for relative changes in R0. Default = NULL,
 i.e. no change in R0}
 
-\item{date_Meff_change}{Date when mobility changed corresponding to expected changes in R0 during and after lockdown}
-
 \item{hosp_bed_capacity}{Number of hospital beds at each date specified in
 \code{date_hosp_bed_capacity_change}. Must be same length as
 \code{date_hosp_bed_capacity_change}.}
@@ -148,9 +148,8 @@ hospital beds}
 capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
 
-\item{roll}{Number of days over which mean mobility at plateau is calculated. Default = 7}
-
-\item{scale_meff_pl}{Boolean for whether Meff_pl is scaling relative to Meff. Default = FALSE.}
+\item{Rt_args}{List of arguments to be passed to \code{evaluate_Rt_pmcmc} for calculating Rt.
+Current arguments are available in \code{Rt_args_list}}
 
 \item{burnin}{number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories}
 

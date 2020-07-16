@@ -8,6 +8,7 @@ sample_pmcmc(
   pmcmc_results,
   burnin = 0,
   n_chains,
+  log_likelihood = calc_loglikelihood,
   n_trajectories = 10,
   n_particles = 100,
   forecast_days = 0
@@ -19,6 +20,14 @@ sample_pmcmc(
 \item{burnin}{integer; Number of iterations to discard from the start of MCMC run. Default = 0}
 
 \item{n_chains}{number of chains that considered. Should inherent from pmcmc.}
+
+\item{log_likelihood}{function to calculate log likelihood, must take named parameter vector as input,
+allow passing of implicit arguments corresponding to the main function arguments.
+Returns a named list, with entries:
+  - $log_likelihood, a single numeric
+  - $sample_state, a numeric vector corresponding to the state of a single particle, chosen at random,
+  at the final time point for which we have data.
+  If NULL, calculated using the function calc_loglikelihood.}
 
 \item{n_trajectories}{interger; Number of trajectories to be returned. Integer. Default = 10.}
 
