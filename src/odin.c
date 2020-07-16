@@ -4581,8 +4581,6 @@ void explicit_SEIR_deterministic_rhs(explicit_SEIR_deterministic_internal* inter
   double * IMild = state + internal->offset_variable_IMild;
   double * ICase1 = state + internal->offset_variable_ICase1;
   double * ICase2 = state + internal->offset_variable_ICase2;
-  double * cum_hosp_inc = state + internal->offset_variable_cum_hosp_inc;
-  double * cum_ICU_inc = state + internal->offset_variable_cum_ICU_inc;
   double * IMVGetLive1 = state + internal->offset_variable_IMVGetLive1;
   double * IMVGetLive2 = state + internal->offset_variable_IMVGetLive2;
   double * IMVGetDie1 = state + internal->offset_variable_IMVGetDie1;
@@ -4661,10 +4659,10 @@ void explicit_SEIR_deterministic_rhs(explicit_SEIR_deterministic_internal* inter
     internal->temp[i - 1] = IMild[i - 1] + ICase1[i - 1] + ICase2[i - 1];
   }
   for (int i = 1; i <= internal->dim_cum_hosp_inc; ++i) {
-    dstatedt[internal->offset_variable_cum_hosp_inc + i - 1] = cum_hosp_inc[i - 1] + internal->number_requiring_Ox[i - 1];
+    dstatedt[internal->offset_variable_cum_hosp_inc + i - 1] = internal->number_requiring_Ox[i - 1];
   }
   for (int i = 1; i <= internal->dim_cum_ICU_inc; ++i) {
-    dstatedt[internal->offset_variable_cum_ICU_inc + i - 1] = cum_ICU_inc[i - 1] + internal->number_requiring_IMV[i - 1];
+    dstatedt[internal->offset_variable_cum_ICU_inc + i - 1] = internal->number_requiring_IMV[i - 1];
   }
   for (int i = 1; i <= internal->dim_IMV_dist_weighting; ++i) {
     internal->IMV_dist_weighting[i - 1] = internal->number_requiring_IMV[i - 1] * internal->p_dist[i - 1];

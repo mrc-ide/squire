@@ -90,8 +90,8 @@ IMV_dist_weighting[] <- number_requiring_IMV[i] * p_dist[i]
 number_get_IMV[] <- if (total_number_requiring_IMV == 0) 0 else IMV_dist_weighting[i]/sum(IMV_dist_weighting) * total_number_get_IMV
 
 # Tracking Cumulative Hosp/ICU Incidence for Analysis Purposes
-deriv(cum_hosp_inc[]) <- cum_hosp_inc[i] +  number_requiring_Ox[i]
-deriv(cum_ICU_inc[]) <- cum_ICU_inc[i] + number_requiring_IMV[i]
+deriv(cum_hosp_inc[]) <- number_requiring_Ox[i]
+deriv(cum_ICU_inc[]) <- number_requiring_IMV[i]
 
 # Updating MV and Ox Related Compartments
 deriv(IMVGetLive1[]) <- (1 - prob_severe_death_treatment[i]) * number_get_IMV[i] - gamma_get_mv_survive * IMVGetLive1[i]
