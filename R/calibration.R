@@ -211,6 +211,7 @@ calibrate <- function(data,
                                               tt_hosp_beds = tt_hosp_beds,
                                               ICU_bed_capacity = ICU_bed_capacity,
                                               tt_ICU_beds = tt_ICU_beds,
+                                              dt = dt,
                                               ...)
 
   # intervention list for later

@@ -109,6 +109,14 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
             "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
             "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
 
+  ## Check they are available if simple model
+  if(grepl("simple", x$model$ir[2])) {
+    if(sum(!(var_select %in% c("S", "E", "I", "R", "n_EI")) > 0)) {
+      stop("Selected variable are not all present in output. Variables must be one of:\n\n",
+           "S, E, I, R, n_EI")
+    }
+  }
+
   ## Fix for handling deterministic outputs
   # ----------------------------------------------------------------------------
 
@@ -146,7 +154,30 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   ## Fix for handling day_return outputs
   # ----------------------------------------------------------------------------
 
+  # Generate hospital incidence at each timestep from the cumulative hospital incidence
+  if(!grepl("simple", x$model$ir[2])) {
+  for(i in seq_along(x$parameters$population)) {
+    collect <- vapply(1:x$parameters$replicates, function(j) {
+      pos <- seq(i, length(index$cum_hosp_inc), by = length(x$parameters$population))
+      pos <- index$cum_hosp_inc[pos]
+      diff(x$output[,pos,j])
+    }, FUN.VALUE = numeric(nt-1))
+    x$output[1+seq_len(nt-1),index$cum_hosp_inc[i],] <- collect
+  }
+
+  # Generate ICU incidence at each timestep from the cumulative ICU incidence
+  for(i in seq_along(x$parameters$population)) {
+    collect <- vapply(1:x$parameters$replicates, function(j) {
+      pos <- seq(i, length(index$cum_ICU_inc), by = length(x$parameters$population))
+      pos <- index$cum_ICU_inc[pos]
+      diff(x$output[,pos,j])
+    }, FUN.VALUE = numeric(nt-1))
+    x$output[1+seq_len(nt-1),index$cum_ICU_inc[i],] <- collect
+  }
+  }
+
   # are the steps not 1 apart? if so we need to sum the incident variables (infecions/deaths)
+  if(!grepl("simple", x$model$ir[2])) {
   if (x$parameters$day_return || !x$model$.__enclos_env__$private$discrete) {
 
     # assign the infections
@@ -170,6 +201,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
     }
 
   }
+  }
 
   # Summary Values and Relevant Compartments
   summary_variables <- c("deaths", "infections", "hospital_occupancy",
@@ -183,8 +215,8 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
                         "IOxNotGetLive1","IOxNotGetLive2","IOxNotGetDie1","IOxNotGetDie2"),
     ICU_demand = c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2",
                    "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2"),
-    hospital_incidence = "number_requiring_Ox",
-    ICU_incidence = "number_requiring_IMV"
+    hospital_incidence = "cum_hosp_inc",
+    ICU_incidence = "cum_ICU_inc"
   )
 
   # Check var_select contains only variables described above

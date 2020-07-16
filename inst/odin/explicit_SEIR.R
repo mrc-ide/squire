@@ -54,6 +54,10 @@ update(IMild[]) <- IMild[i] + delta_IMild[i]  # Mild infections (1 comp)
 update(ICase1[]) <- ICase1[i] + delta_ICase1[i] # First of the compartments for infections that will require hospitalisation (2 comps)
 update(ICase2[]) <- ICase2[i] + delta_ICase2[i] # Second of the compartments for infections that will require hospitalisation (2 comps)
 
+# Tracking Cumulative Hosp/ICU Incidence for Analysis Purposes
+update(cum_hosp_inc[]) <- cum_hosp_inc[i] +  number_requiring_Ox[i]
+update(cum_ICU_inc[]) <- cum_ICU_inc[i] + number_requiring_IMV[i]
+
 # Passage Through Requiring Oxygen, Either Receiving It or Not, and Surviving or Not
 update(IOxGetLive1[]) <- IOxGetLive1[i] + delta_IOxGetLive1[i] # First of the compartments for infections that will require oxygen, get it, and who survive (2 comps)
 update(IOxGetLive2[]) <- IOxGetLive2[i] + delta_IOxGetLive2[i] # Second of the compartments for infections that will require oxygen, get it and who survive (2 comps)
@@ -284,6 +288,8 @@ initial(E2[]) <- E2_0[i]
 initial(IMild[]) <- IMild_0[i]
 initial(ICase1[]) <- ICase1_0[i]
 initial(ICase2[]) <- ICase2_0[i]
+initial(cum_hosp_inc[]) <- 0
+initial(cum_ICU_inc[]) <- 0
 initial(IOxGetLive1[]) <- IOxGetLive1_0[i]
 initial(IOxGetLive2[]) <- IOxGetLive2_0[i]
 initial(IOxGetDie1[]) <- IOxGetDie1_0[i]
@@ -342,6 +348,8 @@ dim(E2) <- N_age
 dim(IMild) <- N_age
 dim(ICase1) <- N_age
 dim(ICase2) <- N_age
+dim(cum_hosp_inc) <- N_age
+dim(cum_ICU_inc) <- N_age
 dim(IOxGetLive1) <- N_age
 dim(IOxGetLive2) <- N_age
 dim(IOxGetDie1) <- N_age

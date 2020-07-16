@@ -6,7 +6,6 @@ N_age <- user()
 time <- t
 output(time) <- TRUE
 
-
 # Generating Force of Infection
 m[, ] <- interpolate(tt_matrix, mix_mat_set, "constant")
 dim(m) <- c(N_age, N_age)
@@ -90,6 +89,11 @@ total_number_get_IMV <- if(current_free_ICUs <= 0) 0 else(if(current_free_ICUs -
 IMV_dist_weighting[] <- number_requiring_IMV[i] * p_dist[i]
 number_get_IMV[] <- if (total_number_requiring_IMV == 0) 0 else IMV_dist_weighting[i]/sum(IMV_dist_weighting) * total_number_get_IMV
 
+# Tracking Cumulative Hosp/ICU Incidence for Analysis Purposes
+deriv(cum_hosp_inc[]) <- number_requiring_Ox[i]
+deriv(cum_ICU_inc[]) <- number_requiring_IMV[i]
+
+# Updating MV and Ox Related Compartments
 deriv(IMVGetLive1[]) <- (1 - prob_severe_death_treatment[i]) * number_get_IMV[i] - gamma_get_mv_survive * IMVGetLive1[i]
 deriv(IMVGetLive2[]) <- gamma_get_mv_survive * IMVGetLive1[i] -  gamma_get_mv_survive * IMVGetLive2[i]
 deriv(IMVGetDie1[]) <- (prob_severe_death_treatment[i] * number_get_IMV[i]) - gamma_get_mv_die * IMVGetDie1[i]
@@ -135,6 +139,8 @@ initial(E2[]) <- E2_0[i]
 initial(IMild[]) <- IMild_0[i]
 initial(ICase1[]) <- ICase1_0[i]
 initial(ICase2[]) <- ICase2_0[i]
+initial(cum_hosp_inc[]) <- 0
+initial(cum_ICU_inc[]) <- 0
 initial(IOxGetLive1[]) <- IOxGetLive1_0[i]
 initial(IOxGetLive2[]) <- IOxGetLive2_0[i]
 initial(IOxGetDie1[]) <- IOxGetDie1_0[i]
@@ -192,6 +198,8 @@ dim(E2) <- N_age
 dim(IMild) <- N_age
 dim(ICase1) <- N_age
 dim(ICase2) <- N_age
+dim(cum_hosp_inc) <- N_age
+dim(cum_ICU_inc) <- N_age
 dim(IOxGetLive1) <- N_age
 dim(IOxGetLive2) <- N_age
 dim(IOxGetDie1) <- N_age

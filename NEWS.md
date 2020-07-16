@@ -1,3 +1,8 @@
+# squire 0.4.28
+
+* `calibrate` patched as `dt` argument was not being passed through
+* `format_output` corrected for hospital/ICU incidence
+
 # squire 0.4.27 
 
 * `evaluate_Rt_pmcmc` patch for non specified `Rt_shift` in 3 parameter version
