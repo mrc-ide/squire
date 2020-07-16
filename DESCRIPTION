@@ -23,7 +23,7 @@ Suggests:
     knitr,
     odin.js,
     rmarkdown
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Imports: 
     odin (>= 1.0.3), 
     dde (>= 1.0.2),

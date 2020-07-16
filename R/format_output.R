@@ -147,6 +147,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   # ----------------------------------------------------------------------------
 
   # Generate hospital incidence at each timestep from the cumulative hospital incidence
+  if(!grepl("simple", x$model$ir[2])) {
   for(i in seq_along(x$parameters$population)) {
     collect <- vapply(1:x$parameters$replicates, function(j) {
       pos <- seq(i, length(index$cum_hosp_inc), by = length(x$parameters$population))
@@ -164,6 +165,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
       diff(x$output[,pos,j])
     }, FUN.VALUE = numeric(nt-1))
     x$output[1+seq_len(nt-1),index$cum_ICU_inc[i],] <- collect
+  }
   }
 
   # are the steps not 1 apart? if so we need to sum the incident variables (infecions/deaths)
