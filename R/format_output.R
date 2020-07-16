@@ -109,6 +109,14 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
             "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
             "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
 
+  ## Check they are available if simple model
+  if(grepl("simple", x$model$ir[2])) {
+    if(sum(!(var_select %in% c("S", "E", "I", "R", "n_EI")) > 0)) {
+      stop("Selected variable are not all present in output. Variables must be one of:\n\n",
+           "S, E, I, R, n_EI")
+    }
+  }
+
   ## Fix for handling deterministic outputs
   # ----------------------------------------------------------------------------
 
@@ -169,6 +177,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   }
 
   # are the steps not 1 apart? if so we need to sum the incident variables (infecions/deaths)
+  if(!grepl("simple", x$model$ir[2])) {
   if (x$parameters$day_return || !x$model$.__enclos_env__$private$discrete) {
 
     # assign the infections
@@ -191,6 +200,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
       x$output[1+seq_len(nt-1),index$delta_D[i],] <- collect
     }
 
+  }
   }
 
   # Summary Values and Relevant Compartments

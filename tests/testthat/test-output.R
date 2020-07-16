@@ -288,6 +288,46 @@ test_that("output format works for hospitalisation and ICU incidence for stochas
   expect_true("hospital_incidence" %in% compartment_names)
   expect_true("ICU_incidence" %in% compartment_names)
 
+  set.seed(93L)
+
+  m1 <- run_explicit_SEEIR_model(R0 = 2,
+                                 population = pop$n,
+                                 dt = 1,
+                                 time_period = 200,
+                                 replicates = 1,
+                                 contact_matrix_set=contact_matrices[[1]])
+
+  m2 <- run_explicit_SEEIR_model(R0 = 2,
+                                 population = pop$n,
+                                 dt = 0.2,
+                                 time_period = 200,
+                                 replicates = 1,
+                                 contact_matrix_set=contact_matrices[[1]])
+
+  m3 <- run_explicit_SEEIR_model(R0 = 2,
+                                 population = pop$n,
+                                 dt = 0.2,
+                                 day_return = TRUE,
+                                 time_period = 200,
+                                 replicates = 1,
+                                 contact_matrix_set=contact_matrices[[1]])
+
+  m4 <- run_simple_SEEIR_model(
+    population = get_population("Afghanistan", simple_SEIR = TRUE)$n,
+    contact_matrix_set = m,
+    tt_R0 = c(0), R0 = c(3), time_period = 2,
+    day_return = TRUE)
+
+
+  f <- format_output(m1, "ICU_incidence")
+  f2 <- format_output(m2, "ICU_incidence")
+  f3 <- format_output(m3, "ICU_incidence")
+  expect_error(f4 <- format_output(m4, "ICU_incidence"), "S, E, I, R, n_EI")
+
+  expect_gt(max(f$y), 3*max(f2$y))
+  expect_lt(max(f$y), 3*max(f3$y))
+
+
 })
 
 
