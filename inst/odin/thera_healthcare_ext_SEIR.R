@@ -1,7 +1,3 @@
-# KNOWN ISSUES OR RELATED:
-# 1) WHAT TO DO ABOUT IREC CASES AND THEIR OXYGEN REQUIREMENTS (AND THEIR HOSPITAL BED REQUIREMENTS, PER THE PREVIOUS ISSUE)???
-# 2)
-
 ## TIMESTEP RELATED PARAMETERS
 ##------------------------------------------------------------------------------
 dt <- user() # Specified timestep
@@ -189,6 +185,13 @@ p_ICrit_NoICU_NoOx_NoMV_Die <- 1 - exp(-gamma_ICrit_NoICU_NoOx_NoMV_Die * dt) # 
 
 ## NUMBER OF INDIVIDUALS LEAVING DIFFERENT COMPARTMENTS
 ##------------------------------------------------------------------------------
+
+drug_1_indic_ICase1 <- user() # indicator used to note whether Drug 1 is turned on or off for ICase1
+drug_1_indic_ICase2 <- user() # indicator used to note whether Drug 1 is turned on or off for ICase1
+drug_1_effect <- user() # the proportion of treated individuals which flow from ICase -> IMild
+drug_1_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_1_prop_treat <- user() # proportion of individuals in ICase who receive the drug
+
 
 ## DRAWS FOR NUMBER OF INDIVIDUALS MOVING BETWEEN NON-HOSPITAL/ICU BED RELATED COMPARTMENTS
 ##-----------------------------------------------------------------------------------------
