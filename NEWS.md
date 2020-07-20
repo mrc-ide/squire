@@ -1,3 +1,7 @@
+# squire 0.4.29
+
+* `format_output` backwards compatible for incidence
+
 # squire 0.4.28
 
 * `calibrate` patched as `dt` argument was not being passed through
