@@ -155,6 +155,8 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   # ----------------------------------------------------------------------------
 
   # Generate hospital incidence at each timestep from the cumulative hospital incidence
+  # backwards compatible
+  if ("cum_hosp_inc" %in% names(index)) {
   if(!grepl("simple", x$model$ir[2])) {
   for(i in seq_along(x$parameters$population)) {
     collect <- vapply(1:x$parameters$replicates, function(j) {
@@ -173,6 +175,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
       diff(x$output[,pos,j])
     }, FUN.VALUE = numeric(nt-1))
     x$output[1+seq_len(nt-1),index$cum_ICU_inc[i],] <- collect
+  }
   }
   }
 
