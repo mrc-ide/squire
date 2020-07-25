@@ -1,3 +1,10 @@
+# CHANGE NEED TO ACCOUNT FOR E GETTING ERRONEOUSLY TREATED BUT NO EFFECT OR EFFECT WHEN CONSIDERING DRUG PROPERTY 2??? POSS IASYMP AS WELL???
+# CHANGE NOTE NEED TO DECIDE WHETHER WE APPLY THE INCREASED RATES OF RECOVERY TO THE REC COMPARTMENTS AS WELL - THINK WE NEED TO, BUT NEED TO WORK OUT HOW TO APPLY DIFF RATESTO 1 COMPARTMENT
+# CHANGE NOTE ONLY TRULY SUSCEPTIBLE PEOPLE GET DRUG, PEOPLE WHO ARE IN E COMPARTMENT NOT TREATED, ALTHOUGH IN PRACTICE LIKELY THEY ARE
+# CHANGE CURRENTLY PROABLY NOT MUCH DIFF BETWEEN PROPHYLACTIC DRUG THAT REDUCES SEVERITY AND DRUG TAKEN WHILST SYMPTOMATIC THAT REDUCES SEVERITY DUE TO
+#   THE REPRESENTATION, WITH THE LATTER BEING TAKEN IMMEDIATELY AFTER BECOMING SYMPTOMATIC AND DRUG ACTING IMMEDIATELY. NEED TO THINK ABOUT HOW MUCH THE
+#   LACK OF THIS DISTINCTION IS A PROBLEM.
+
 ## TIMESTEP RELATED PARAMETERS
 ##------------------------------------------------------------------------------
 dt <- user() # Specified timestep
@@ -6,82 +13,97 @@ N_age <- user() # Number of age groups
 
 ## DRUG RELATED PARAMETERS AND EFFECTS
 ##------------------------------------------------------------------------------
-# Drug 1 reduces the severity of individuals in ICase, resulting in some of them flowing to IMild
-drug_1_indic_ICase1 <- user() # indicator used to note whether Drug 1 is turned on or off for ICase1
-drug_1_indic_ICase2 <- user() # indicator used to note whether Drug 1 is turned on or off for ICase1
-drug_1_effect <- user() # the proportion of treated individuals which flow from ICase -> IMild
-drug_1_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
-drug_1_prop_treat <- user() # proportion of individuals in ICase who receive the drug
 
-# Drug 2 reduces the time which individuals spend in IMild, leading them to recover more quickly
-drug_2_indic <- user() # indicator used to note whether Drug 2 is turned on or off
-drug_2_effect <- user() # the increase to the speed at which individuals flow from IMild -> R
-drug_2_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
-drug_2_prop_treat <- user() # proportion of individuals in IMild who receive the drug
+## Drugs Taken Prophylactically - Includes Properties 1 & 2
+##---------------------------------------------------------
 
-# Drug 3 reduces the severity of disease in hospital, leading to a greater proportion of individuals flowing to IMod
-drug_3_indic <- user() # indicator used to note whether Drug 3 is turned on or off
-drug_3_effect <- user() # the increase in the proportion of individual flowing into IMod rather than ISev or ICrit
-drug_3_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
-drug_3_prop_treat <- user() # proportion of individuals treated who receive the drug
+# General Properties of the Prophylactic Drug (Independent of the Specific Pharmacological Properties Below)
+prophylactic_drug_timing_1 <- user()
+prophylactic_drug_timing_2 <- user()
+prophylactic_prop_treat <- user() # proportion of individuals in S who receive the drug and move to compartment P
+prophylactic_drug_wane <- user() # proportion of individuals at each timestep for whom the drug wears off and who move back to S/E
 
-# Drug 4 reduces the severity of disease in hospital, leading to a greater proportion of individuals flowing to ISev over ICrit
-drug_4_indic <- user() # indicator used to note whether Drug 4 is turned on or off
-drug_4_effect <- user() # the increase in the proportion of individual flowing into ISev rather than ICrit
-drug_4_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
-drug_4_prop_treat <- user() # proportion of individuals treated who receive the drug
+# Property 1 - protects Susceptible individuals from Infection
+drug_1_effect_size <- user() # the multiple of the FOI experienced by the individuals in the P compartment (0 means drug completely protective)
 
-# Drug 5 reduces the duration of stay in hospital for IMod Patients who survive - can be dependent on whether receiving other appropriate treatment (Oxygen) or not
-drug_5_indic_IMod_GetHosp_GetOx <- user() # indicator used to note whether Drug 5 is turned on or off for IMod who get Hosp Bed and Oxygen
-drug_5_indic_IMod_GetHosp_NoOx <- user() # indicator used to note whether Drug 5 is turned on or off for IMod who get Hosp Bed and Oxygen
-drug_5_effect <- user() # the increase in the rate of leaving IMod and Recovering
-drug_5_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
-drug_5_prop_treat <- user() # proportion of individuals treated who receive the drug
-drug_5_NoOx_mod <- user() # modifier of effect size for Drug 5 action in individuals not receiving oxygen
+# Property 2 - reduces the severity of disease that occurs if infected whilst still protected
+drug_2_effect_size <- user() # the reduction in the probability of ICase disease severity that occurs upon infection
 
-# Drug 6 reduces the duration of stay in hospital for ISev Patients who survive - can be dependent on whether receiving other appropriate treatment (Oxygen) or not
-drug_6_indic_ISev_GetICU_GetOx <- user() # indicator used to note whether Drug 5 is turned on or off for IMod who get Hosp Bed and Oxygen
-drug_6_indic_ISev_GetICU_NoOx <- user() # indicator used to note whether Drug 5 is turned on or off for IMod who get Hosp Bed and Oxygen
-drug_6_effect <- user() # the increase in the rate of leaving ISev and Recovering
-drug_6_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+## Drugs Taken Whilst Infected But Pre-Hospital - Includes Properties 3, 4 & 5
+##----------------------------------------------------------------------------
+
+# Property 3 - reduces the severity of individuals in or who would flow into ICase, resulting in some of them flowing to IMild
+drug_3_prop_treat <- user() # the proportion of treated individuals receiving the drug at either of the two forks described above
+drug_3_effect_size <- user() # the reduction in the proportion of individuals that flow to ICase (and hence flow to IMild)
+
+# Drug 4 reduces the time which individuals spend in IMild, leading them to recover more quickly
+drug_4_prop_treat <- user() # proportion of individuals in IMild who receive the drug
+drug_4_effect_size <- user() # the increase to the speed at which individuals flow from IMild -> R
+
+# Drug 5 reduces infectivity of individuals in IMild/ICase, reducing the FOI experienced by Susceptible individuals
+drug_5_indic_IMild <- user() # indicator used to note whether Drug 5 is turned on or off for IMild individuals
+drug_5_indic_ICase <- user() # indicator used to note whether Drug 5 is turned on or off for ICase individuals
+drug_5_prop_treat <- user() # proportion of individuals in IMild/ICase who receive the drug
+drug_5_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug (Range: 0 - 1)
+drug_5_effect_size <- user() # the multiple which treated individuals are as infectious compared to untreated individuals
+
+## Drugs Taken In Hospital - Includes Properties 6 & 7 (reduce disease severity),
+## Properties 8, 9 & 10 (reduce duration of stay), and Properties 11, 12 and 13 (reduce mortality)
+##---------------------------------------------------------------------------------------------------------------------
+
+# Drug 6 reduces the severity of disease in hospital, leading to a greater proportion of individuals flowing to IMod over ISev/ICrit
 drug_6_prop_treat <- user() # proportion of individuals treated who receive the drug
-drug_6_NoOx_mod <- user() # modifier of effect size for Drug 6 action in individuals not receiving oxygen
+drug_6_effect_size <- user() # the increase in the proportion of individual flowing into IMod rather than ISev or ICrit
 
-# Drug 7 reduces the duration of stay in hospital for ICrit Patients - can be dependent on whether receiving other appropriate treatment (Oxygen and MV) or not
-drug_7_indic_ICrit_GetICU_GetOx_GetMV <- user() # indicator used to note whether Drug 7 is turned on or off for ICrit who get ICU Bed, Oxygen and MV
-drug_7_indic_ICrit_GetICU_GetOx_NoMV <- user() # indicator used to note whether Drug 7 is turned on or off for ICrit who get ICU Bed and Oxygen, but not MV
-drug_7_indic_ICrit_GetICU_NoOx_NoMV <- user() # indicator used to note whether Drug 7 is turned on or off for ICrit who get ICU Bed but no Oxygen or MV
-drug_7_effect <- user() # the increase in the rate of leaving ICrit and Recovering
-drug_7_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+# Drug 7 reduces the severity of disease in hospital, leading to a greater proportion of individuals flowing to ISev over ICrit
 drug_7_prop_treat <- user() # proportion of individuals treated who receive the drug
-drug_7_GetOx_NoMV_mod <- user() # modifier of effect size for Drug 7 action in individuals receiving oxygen but not MV
-drug_7_NoOx_NoMV_mod <- user() # modifier of effect size for Drug 7 action in individuals not receiving oxygen or MV
+drug_7_effect_size <- user() # the increase in the proportion of individual flowing into ISev rather than ICrit
 
-# Drug 8 reduces mortality in IMod Patients - can be dependent on receiving other appropriate treatment (Oxygen) or not
+# Drug 8 reduces the duration of stay in hospital for IMod Patients who survive - can be dependent on whether receiving other appropriate treatment (Oxygen) or not
 drug_8_indic_IMod_GetHosp_GetOx <- user() # indicator used to note whether Drug 8 is turned on or off for IMod who get Hosp Bed and Oxygen
-drug_8_indic_IMod_GetHosp_NoOx <- user() # indicator used to note whether Drug 8 is turned on or off for IMod who get Hosp Bed but no Oxygen
-drug_8_effect <- user() # the decrease in the proportion of IMod dying
-drug_8_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_8_indic_IMod_GetHosp_NoOx <- user() # indicator used to note whether Drug 8 is turned on or off for IMod who get Hosp Bed and no Oxygen
 drug_8_prop_treat <- user() # proportion of individuals treated who receive the drug
-drug_8_NoOx_mod <- user() # modifier of effect size for Drug 8 action in individuals not receiving oxygen
+drug_8_GetOx_effect_size <- user() # the increase in the rate of leaving IMod and Recovering
+drug_8_NoOx_effect_size <- user() # modifier of effect size for Drug 8 action in individuals not receiving oxygen
 
-# Drug 9 reduces mortality in ISev Patients - can be dependent on receiving other appropriate treatment (Oxygen) or not
+# Drug 9 reduces the duration of stay in hospital for ISev Patients who survive - can be dependent on whether receiving other appropriate treatment (Oxygen) or not
 drug_9_indic_ISev_GetICU_GetOx <- user() # indicator used to note whether Drug 9 is turned on or off for ISev who get ICU Bed and Oxygen
-drug_9_indic_ISev_GetICU_NoOx <- user() # indicator used to note whether Drug 9 is turned on or off for ISev who get ICU Bed but no Oxygen
-drug_9_effect <- user() # the decrease in the proportion of ISev dying
-drug_9_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
+drug_9_indic_ISev_GetICU_NoOx <- user() # indicator used to note whether Drug 9 is turned on or off for ISev who get ICU Bed and no Oxygen
 drug_9_prop_treat <- user() # proportion of individuals treated who receive the drug
-drug_9_NoOx_mod <- user() # modifier of effect size for Drug 9 action in individuals not receiving oxygen
+drug_9_GetOx_effect_size <- user() # the increase in the rate of leaving ISev and Recovering
+drug_9_NoOx_effect_size <- user() # modifier of effect size for Drug 6 action in individuals not receiving oxygen
 
-# Drug 10 reduces mortality in ICrit Patients - can be dependent on receiving other appropriate treatment (Oxygen and MV) or not
+# Drug 10 reduces the duration of stay in hospital for ICrit Patients - can be dependent on whether receiving other appropriate treatment (Oxygen and MV) or not
 drug_10_indic_ICrit_GetICU_GetOx_GetMV <- user() # indicator used to note whether Drug 10 is turned on or off for ICrit who get ICU Bed, Oxygen and MV
 drug_10_indic_ICrit_GetICU_GetOx_NoMV <- user() # indicator used to note whether Drug 10 is turned on or off for ICrit who get ICU Bed and Oxygen, but not MV
 drug_10_indic_ICrit_GetICU_NoOx_NoMV <- user() # indicator used to note whether Drug 10 is turned on or off for ICrit who get ICU Bed but no Oxygen or MV
-drug_10_effect <- user() # the decrease in the proportion of ICrit dying
-drug_10_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
 drug_10_prop_treat <- user() # proportion of individuals treated who receive the drug
-drug_10_GetOx_NoMV_mod <- user() # modifier of effect size for Drug 10 action in individuals receiving oxygen but not MV
-drug_10_NoOx_NoMV_mod <- user() # modifier of effect size for Drug 10 action in individuals not receiving oxygen or MV
+drug_10_GetOx_GetMV_effect_size <- user() # the increase in the rate of leaving ICrit and Recovering
+drug_10_GetOx_NoMV_effect_size <- user() # modifier of effect size for Drug 10 action in individuals receiving oxygen but not MV
+drug_10_NoOx_NoMV_effect_size <- user() # modifier of effect size for Drug 10 action in individuals not receiving oxygen or MV
+
+# Drug 11 reduces mortality in IMod Patients - can be dependent on receiving other appropriate treatment (Oxygen) or not
+drug_11_indic_IMod_GetHosp_GetOx <- user() # indicator used to note whether Drug 11 is turned on or off for IMod who get Hosp Bed and Oxygen
+drug_11_indic_IMod_GetHosp_NoOx <- user() # indicator used to note whether Drug 11 is turned on or off for IMod who get Hosp Bed but no Oxygen
+drug_11_prop_treat <- user() # proportion of individuals treated who receive the drug
+drug_11_GetOx_effect_size <- user() # the decrease in the proportion of IMod dying
+drug_11_NoOx_effect_size <- user() # modifier of effect size for Drug 11 action in individuals not receiving oxygen
+
+# Drug 12 reduces mortality in ISev Patients - can be dependent on receiving other appropriate treatment (Oxygen) or not
+drug_12_indic_ISev_GetICU_GetOx <- user() # indicator used to note whether Drug 9 is turned on or off for ISev who get ICU Bed and Oxygen
+drug_12_indic_ISev_GetICU_NoOx <- user() # indicator used to note whether Drug 9 is turned on or off for ISev who get ICU Bed but no Oxygen
+drug_12_prop_treat <- user() # proportion of individuals treated who receive the drug
+drug_12_GetOx_effect_size <- user() # the decrease in the proportion of ISev dying
+drug_12_NoOx_effect_size <- user() # modifier of effect size for Drug 9 action in individuals not receiving oxygen
+
+# Drug 13 reduces mortality in ICrit Patients - can be dependent on receiving other appropriate treatment (Oxygen and MV) or not
+drug_13_indic_ICrit_GetICU_GetOx_GetMV <- user() # indicator used to note whether Drug 13 is turned on or off for ICrit who get ICU Bed, Oxygen and MV
+drug_13_indic_ICrit_GetICU_GetOx_NoMV <- user() # indicator used to note whether Drug 13 is turned on or off for ICrit who get ICU Bed and Oxygen, but not MV
+drug_13_indic_ICrit_GetICU_NoOx_NoMV <- user() # indicator used to note whether Drug 13 is turned on or off for ICrit who get ICU Bed but no Oxygen or MV
+drug_13_prop_treat <- user() # proportion of individuals treated who receive the drug
+drug_13_GetOx_GetMV_effect_size <- user() # the decrease in the proportion of ICrit dying
+drug_13_GetOx_NoMV_effect_size <- user() # modifier of effect size for Drug 10 action in individuals receiving oxygen but not MV
+drug_13_NoOx_NoMV_effect_size <- user() # modifier of effect size for Drug 10 action in individuals not receiving oxygen or MV
 
 
 ## RATES
@@ -89,31 +111,39 @@ drug_10_NoOx_NoMV_mod <- user() # modifier of effect size for Drug 10 action in 
 gamma_E <- user() # passage through latent infection
 gamma_IAsymp <- user() # asymptomatic infection to recovery
 gamma_IMild <- user() # mild infection to recovery
+gamma_IMild_drug <- ((1 - drug_4_prop_treat) * gamma_IMild) + (drug_4_prop_treat * drug_4_effect_size * gamma_IMild)
 gamma_ICase <- user() # symptom onset to requiring hospitalisation
 gamma_rec <- user() # rate of progression through post-ICU recovery compartment
 
 # Rates Related to Requiring Hospital Bed and Oxygen
 gamma_IMod_GetHosp_GetOx_Surv <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed and oxygen and surviving
+gamma_IMod_GetHosp_GetOx_Surv_Drug_8 <- (((1 - drug_8_prop_treat) * gamma_IMod_GetHosp_GetOx_Surv) + (drug_8_prop_treat * gamma_IMod_GetHosp_GetOx_Surv * drug_8_GetOx_effect_size))
 gamma_IMod_GetHosp_GetOx_Die <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed and oxygen and dying
 gamma_IMod_GetHosp_NoOx_Surv <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed but NOT oxygen and surviving
+gamma_IMod_GetHosp_NoOx_Surv_Drug_8 <- (((1 - drug_8_prop_treat) * gamma_IMod_GetHosp_GetOx_Surv) + (drug_8_prop_treat * gamma_IMod_GetHosp_GetOx_Surv * drug_8_NoOx_effect_size))
 gamma_IMod_GetHosp_NoOx_Die <- user() # through requiring hosp bed and oxygen compartment conditional on getting  hosp bed but NOT oxygen and dying
 gamma_IMod_NoHosp_NoOx_Surv <- user() # through requiring hosp bed and oxygen compartment conditional on NOT getting hosp bed and NOT oxygen and surviving
 gamma_IMod_NoHosp_NoOx_Die <- user() # through requiring hosp bed and oxygen compartment conditional on NOT getting hosp bed and NOT oxygen and dying
 
 # Rates Related to Requiring ICU Bed and Oxygen
 gamma_ISev_GetICU_GetOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed and oxygen and surviving
+gamma_ISev_GetICU_GetOx_Surv_Drug_9 <- (((1 - drug_9_prop_treat) * gamma_ISev_GetICU_GetOx_Surv) + (drug_9_prop_treat * gamma_ISev_GetICU_GetOx_Surv * drug_9_GetOx_effect_size))
 gamma_ISev_GetICU_GetOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed and oxygen and dying
 gamma_ISev_GetICU_NoOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed but NOT oxygen and surviving
+gamma_ISev_GetICU_GetOx_Surv_Drug_9 <- (((1 - drug_9_prop_treat) * gamma_ISev_GetICU_NoOx_Surv) + (drug_9_prop_treat * gamma_ISev_GetICU_NoOx_Surv * drug_9_NoOx_effect_size))
 gamma_ISev_GetICU_NoOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed but NOT oxygen and dying
 gamma_ISev_NoICU_NoOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on NOT getting ICU bed and NOT oxygen and surviving
 gamma_ISev_NoICU_NoOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on NOT getting ICU bed and NOT oxygen and dying
-gamma_ICrit_GetICU_GetOx_GetMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, oxygen and MV and surviving
 
 # Rates Related to Requiring ICU Bed, Oxygen and Mechanical Ventilation
+gamma_ICrit_GetICU_GetOx_GetMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, oxygen and MV and surviving
+gamma_ICrit_GetICU_GetOx_GetMV_Surv_Drug_10 <- (((1 - drug_10_prop_treat) * gamma_ICrit_GetICU_GetOx_GetMV_Surv) + (drug_10_prop_treat * gamma_ICrit_GetICU_GetOx_GetMV_Surv * drug_10_GetOx_GetMV_effect_size))
 gamma_ICrit_GetICU_GetOx_GetMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, oxygen and MV and dying
 gamma_ICrit_GetICU_GetOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed and oxygen, but NOT MV and surviving
+gamma_ICrit_GetICU_GetOx_NoMV_Surv_Drug_10 <- (((1 - drug_10_prop_treat) * gamma_ICrit_GetICU_GetOx_NoMV_Surv) + (drug_10_prop_treat * gamma_ICrit_GetICU_GetOx_NoMV_Surv * drug_10_GetOx_NoMV_effect_size))
 gamma_ICrit_GetICU_GetOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed and oxygen, but NOT MV and dying
 gamma_ICrit_GetICU_NoOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, but NOT oxygen and NOT MV and surviving
+gamma_ICrit_GetICU_NoOx_NoMV_Surv_Drug_10 <- (((1 - drug_10_prop_treat) * gamma_ICrit_GetICU_NoOx_NoMV_Surv) + (drug_10_prop_treat * gamma_ICrit_GetICU_NoOx_NoMV_Surv * drug_10_NoOx_NoMV_effect_size))
 gamma_ICrit_GetICU_NoOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, but NOT oxygen and NOT MV and dying
 gamma_ICrit_NoICU_NoOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on NOT getting ICU bed, NOT oxygen and NOT MV and surviving
 gamma_ICrit_NoICU_NoOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on NOT getting ICU bed, NOT oxygen and NOT MV and dying
@@ -147,37 +177,39 @@ prob_critical_death_no_ICU_no_ox_no_MV[] <- user() # probability of dying from c
 p_S_E1[] <- 1 - exp(-lambda[i] * dt) # Infection - age dependent FOI based on mixing patterns
 p_E1_E2 <- 1 - exp(-gamma_E * dt) # Progression through latent infection
 p_E2_I <- 1 - exp(-gamma_E * dt) # Progression to onset of infectiousness. Number split between I_Mild and I_Case
+p_IMild_R <- 1 - exp(-gamma_IMild_drug * dt) # Recovery from mild disease taking into account proportion of people receiving drug with property 4
 p_IAsymp_R <- 1 - exp(-gamma_IAsymp * dt) # Recovery from mild disease
-p_IMild_R <- 1 - exp(-gamma_IMild * dt) # Recovery from mild disease
 p_ICase1_ICase2 <- 1 - exp(-gamma_ICase * dt) # Delay between symptom onset and requiring hospitalisation
 p_ICase2_Hosp <- 1 - exp(-gamma_ICase * dt) # Progression to requiring hospitalisation. Number split between I_Oxygen and I_MV
+p_prophylactic_drug_wane <- 1 - exp(-prophylactic_drug_wane * dt) # Reversion back to untreated state following pharmacokinetic decay of prophylactic drug
 
 # Transition Probabilities for Those Recovering from ICU
 p_Rec1_Rec2 <- 1 - exp(-gamma_rec * dt) # Progression through recovery from ICU in hospital bed to eventual discharge (R)
 p_Rec2_R <- 1 - exp(-gamma_rec * dt) # Progression through recovery from ICU in hospital bed to eventual discharge (R)
 
 # Transition Probabilities for Those Requiring Hospital Bed and Oxygen -> Recovery/Death
-p_IMod_GetHosp_GetOx_Surv <- 1 - exp(-gamma_IMod_GetHosp_GetOx_Surv * dt) # Progression through requiring hosp bed and oxygen and receiving both -> Recovery
+p_IMod_GetHosp_GetOx_Surv <- if (drug_8_indic_IMod_GetHosp_GetOx == 1) 1 - exp(-gamma_IMod_GetHosp_GetOx_Surv_Drug_8 * dt) else 1 - exp(-gamma_IMod_GetHosp_GetOx_Surv * dt) # Progression through requiring hosp bed and oxygen and receiving both -> Recovery
 p_IMod_GetHosp_GetOx_Die <- 1 - exp(-gamma_IMod_GetHosp_GetOx_Die * dt) # Progression through requiring hosp bed and oxygen and receiving both -> Dying
-p_IMod_GetHosp_NoOx_Surv <- 1 - exp(-gamma_IMod_GetHosp_NoOx_Surv * dt) # Progression through requiring hosp bed and oxygen, receiving hosp bed only -> Recovery
+p_IMod_GetHosp_NoOx_Surv <- if (drug_8_indic_IMod_GetHosp_NoOx == 1) 1 - exp(-gamma_IMod_GetHosp_NoOx_Surv_Drug_8 * dt) else 1 - exp(-gamma_IMod_GetHosp_GetOx_Surv * dt) # Progression through requiring hosp bed and oxygen, receiving hosp bed only -> Recovery
 p_IMod_GetHosp_NoOx_Die <- 1 - exp(-gamma_IMod_GetHosp_NoOx_Die * dt) # Progression through requiring hosp bed and oxygen, receiving hosp bed only -> Dying
 p_IMod_NoHosp_NoOx_Surv <- 1 - exp(-gamma_IMod_NoHosp_NoOx_Surv * dt) # Progression through requiring hosp bed and oxygen, receiving neither -> Recovery
 p_IMod_NoHosp_NoOx_Die <- 1 - exp(-gamma_IMod_NoHosp_NoOx_Die * dt) # Progression through requiring hosp bed and oxygen, receiving neither -> Dying
 
+# CHANGE NOTE NEED TO DECIDE WHETHER WE APPLY THE INCREASED RATES OF RECOVERY TO THE REC COMPARTMENTS AS WELL - THINK WE NEED TO, BUT NEED TO WORK OUT HOW TO APPLY DIFF RATESTO 1 COMPARTMENT
 # Transition Probabilities for Those Requiring ICU Bed and Oxygen -> Recovery/Death
-p_ISev_GetICU_GetOx_Surv <- 1 - exp(-gamma_ISev_GetICU_GetOx_Surv * dt) # Progression through requiring ICU bed and oxygen and receiving both -> Recovery
+p_ISev_GetICU_GetOx_Surv <- if (drug_9_indic_ISev_GetICU_GetOx == 1) 1 - exp(-gamma_ISev_GetICU_GetOx_Surv_Drug_9 * dt) else 1 - exp(-gamma_ISev_GetICU_GetOx_Surv * dt) # Progression through requiring ICU bed and oxygen and receiving both -> Recovery
 p_ISev_GetICU_GetOx_Die <- 1 - exp(-gamma_ISev_GetICU_GetOx_Die * dt) # Progression through requiring ICU bed and oxygen and receiving both -> Dying
-p_ISev_GetICU_NoOx_Surv <- 1 - exp(-gamma_ISev_GetICU_NoOx_Surv * dt) # Progression through requiring ICU bed and oxygen, receiving ICU bed only -> Recovery
+p_ISev_GetICU_NoOx_Surv <- if (drug_9_indic_ISev_GetICU_NoOx == 1) 1 - exp(-gamma_ISev_GetICU_NoOx_Surv_Drug_9 * dt) else 1 - exp(-gamma_ISev_GetICU_NoOx_Surv * dt) # Progression through requiring ICU bed and oxygen and receiving both -> Recovery
 p_ISev_GetICU_NoOx_Die <- 1 - exp(-gamma_ISev_GetICU_NoOx_Die * dt) # Progression through requiring hosp bed and oxygen, receiving ICU bed only -> Dying
 p_ISev_NoICU_NoOx_Surv <- 1 - exp(-gamma_ISev_NoICU_NoOx_Surv * dt) # Progression through requiring ICU bed and oxygen, receiving neither -> Recovery
 p_ISev_NoICU_NoOx_Die <- 1 - exp(-gamma_ISev_NoICU_NoOx_Die * dt) # Progression through requiring ICU bed and oxygen, receiving neither -> Dying
 
 # Transition Probabilities for Those Requiring ICU Bed, Oxygen and Mechanical Ventilation -> Recovery/Death
-p_ICrit_GetICU_GetOx_GetMV_Surv <- 1 - exp(-gamma_ICrit_GetICU_GetOx_GetMV_Surv * dt) # Progression through requiring ICU bed, oxygen and MV, and receiving all -> Recovery
+p_ICrit_GetICU_GetOx_GetMV_Surv <- if (drug_10_indic_ICrit_GetICU_GetOx_GetMV == 1) 1 - exp(-gamma_ICrit_GetICU_GetOx_GetMV_Surv_Drug_10 * dt) else 1 - exp(-gamma_ICrit_GetICU_GetOx_GetMV_Surv * dt) # Progression through requiring ICU bed, oxygen and MV, and receiving all -> Recovery
 p_ICrit_GetICU_GetOx_GetMV_Die <- 1 - exp(-gamma_ICrit_GetICU_GetOx_GetMV_Die * dt) # Progression through requiring ICU bed, oxygen and MV, and receiving all -> Dying
-p_ICrit_GetICU_GetOx_NoMV_Surv <- 1 - exp(-gamma_ICrit_GetICU_GetOx_NoMV_Surv * dt) # Progression through requiring ICU bed, oxygen and MV, and receiving ICU bed and oxygen only -> Recovery
+p_ICrit_GetICU_GetOx_NoMV_Surv <- if (drug_10_indic_ICrit_GetICU_GetOx_NoMV == 1) 1 - exp(-gamma_ICrit_GetICU_GetOx_NoMV_Surv_Drug_10 * dt) else 1 - exp(-gamma_ICrit_GetICU_GetOx_NoMV_Surv * dt) # Progression through requiring ICU bed, oxygen and MV, and receiving ICU bed and oxygen only -> Recovery
 p_ICrit_GetICU_GetOx_NoMV_Die <- 1 - exp(-gamma_ICrit_GetICU_GetOx_NoMV_Die * dt) # Progression through requiring ICU bed, oxygen and MV, and receiving ICU bed and oxygen only -> Dying
-p_ICrit_GetICU_NoOx_NoMV_Surv <- 1 - exp(-gamma_ICrit_GetICU_NoOx_NoMV_Surv * dt) # Progression through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Recovery
+p_ICrit_GetICU_NoOx_NoMV_Surv <- if (drug_10_indic_ICrit_GetICU_NoOx_NoMV) 1 - exp(-gamma_ICrit_GetICU_NoOx_NoMV_Surv_Drug_10 * dt) else 1 - exp(-gamma_ICrit_GetICU_NoOx_NoMV_Surv * dt) # Progression through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Recovery
 p_ICrit_GetICU_NoOx_NoMV_Die <- 1 - exp(-gamma_ICrit_GetICU_NoOx_NoMV_Die * dt) # Progression through requiring ICU bed, oxygen and MV, receiving ICU bed only -> Dying
 p_ICrit_NoICU_NoOx_NoMV_Surv <- 1 - exp(-gamma_ICrit_NoICU_NoOx_NoMV_Surv * dt) # Progression through requiring ICU bed, oxygen and MV, receiving nothing -> Recovery
 p_ICrit_NoICU_NoOx_NoMV_Die <- 1 - exp(-gamma_ICrit_NoICU_NoOx_NoMV_Die * dt) # Progression through requiring ICU bed, oxygen and MV, receiving nothing -> Dying
@@ -186,23 +218,52 @@ p_ICrit_NoICU_NoOx_NoMV_Die <- 1 - exp(-gamma_ICrit_NoICU_NoOx_NoMV_Die * dt) # 
 ## NUMBER OF INDIVIDUALS LEAVING DIFFERENT COMPARTMENTS
 ##------------------------------------------------------------------------------
 
-drug_1_indic_ICase1 <- user() # indicator used to note whether Drug 1 is turned on or off for ICase1
-drug_1_indic_ICase2 <- user() # indicator used to note whether Drug 1 is turned on or off for ICase1
-drug_1_effect <- user() # the proportion of treated individuals which flow from ICase -> IMild
-drug_1_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug
-drug_1_prop_treat <- user() # proportion of individuals in ICase who receive the drug
-
-
 ## DRAWS FOR NUMBER OF INDIVIDUALS MOVING BETWEEN NON-HOSPITAL/ICU BED RELATED COMPARTMENTS
 ##-----------------------------------------------------------------------------------------
-n_S_E1[] <- rbinom(S[i], p_S_E1[i]) # Number of newly infected individuals
+
+# For those treated with the prophylactic drug (properties 1 and 2)
+n_S_PS[] <- if (time == prophylactic_drug_timing_1 | time == prophylactic_drug_timing_2) rbinom(S[i], prophylactic_prop_treat) else 0
+
+n_leave_PS[] <- rbinom(PS[i], 1 - exp(-(prophylactic_drug_wane + lambda[i] * drug_1_effect_size) * dt))
+n_PS_PE1[] <- rbinom(n_leave_PS[i], (lambda[i] * drug_1_effect_size)/(lambda[i] * drug_1_effect_size + prophylactic_drug_wane))
+n_PS_S[] <- n_leave_PS[i] - n_PS_PE1[i]
+
+n_leave_PE1[] <- rbinom(PE1[i], 1 - exp(-(prophylactic_drug_wane + gamma_E) * dt))
+n_PE1_PE2[] <- rbinom(n_leave_PE1[i], gamma_E/(prophylactic_drug_wane + gamma_E))
+n_PE1_E1[] <- n_leave_PE1[i] - n_PE1_PE2[i]
+
+n_leave_PE2[] <- rbinom(PE1[i], 1 - exp(-(prophylactic_drug_wane + gamma_E) * dt))
+n_PE2_I[] <- rbinom(PE2[i], p_E2_I)
+n_PE2_E2[] <- n_leave_PE2[i] - n_PE2_I[i]
+
+n_PE2_ICase1_initial[] <- rbinom(n_PE2_I[i], prob_hosp[i])
+n_PE2_ICase1[] <- rbinom(n_PE2_ICase1_initial[i], drug_2_effect_size) # check the drug_2_effect_size is right way round
+n_PE2_ICase1_Drug_5[] <- rbinom(n_PE2_ICase1[i], drug_5_indic_ICase * drug_5_prop_treat)
+n_PE2_ICase1_No_Drug_5[] <- n_PE2_ICase1[i] - n_PE2_ICase1_Drug_5[i]
+
+n_PE2_IMild_or_IAsymp[] <- n_PE2_I[i] - n_PE2_ICase1[i]
+n_PE2_IAsymp[] <- rbinom(n_PE2_IMild_or_IAsymp[i], prob_asymp[i])
+n_PE2_IMild[] <- n_PE2_IMild_or_IAsymp[i] - n_PE2_IAsymp[i] + (n_PE2_ICase1_initial[i] - n_PE2_ICase1_drug[i])
+n_PE2_IMild_Drug_5[] <- rbinom(n_PE2_IMild[i], drug_5_indic_IMild * drug_5_prop_treat)
+n_PE2_IMild_No_Drug_5[] <- n_PE2_IMild[i] - n_PE2_IMild_Drug_5[i]
+
+#######
+n_S_E1[] <- rbinom(S[i] - n_S_PS[i], p_S_E1[i]) # Number of newly infected individuals
 n_E1_E2[] <- rbinom(E1[i], p_E1_E2) # Number progressing through latent compartments
 n_E2_I[] <- rbinom(E2[i], p_E2_I) # Number of new symptom onsets
-n_E2_ICase1[] <- rbinom(n_E2_I[i], prob_hosp[i]) # Proportion of the new symptom onsets that will require hospitalisation (note: haven't entered hospital yet, delay between onset and hospitalisation)
+
+n_E2_ICase1_initial[] <- rbinom(n_E2_I[i], prob_hosp[i]) # Proportion of the new symptom onsets that will require hospitalisation (note: haven't entered hospital yet, delay between onset and hospitalisation)
+n_E2_ICase1[] <- rbinom(n_E2_ICase1_initial[i], drug_3_prop_treat * drug_3_effect_size)
+n_E2_ICase1_Drug_5[] <- rbinom(n_E2_ICase1[i], drug_5_indic_ICase * drug_5_prop_treat)
+n_E2_ICase1_No_Drug_5[] <- n_E2_ICase1[i] - n_E2_ICase1_Drug_5[i]
+
 n_E2_IMild_or_IAsymp[] <- n_E2_I[i] - n_E2_ICase1[i] # 1 - Above, the rest of the infections, which we consider to be asymptomatic/mild and not require hospitalisation
 n_E2_IAsymp[] <- rbinom(n_E2_IMild_or_IAsymp[i], prob_asymp[i]) # Number of non-hospitalised infections that are asymptomatic
-n_E2_IMild[] <- n_E2_IMild_or_IAsymp[i] - n_E2_IAsymp[i] # Number of non-hospitalised infections that are mildly symptomatic
-n_IMild_R[] <- rbinom(IMild[i], p_IMild_R) # Number of mild infections recovering
+n_E2_IMild[] <- n_E2_IMild_or_IAsymp[i] - n_E2_IAsymp[i] + (n_E2_ICase1_initial[i] - n_E2_ICase1[i]) # Number of non-hospitalised infections that are mildly symptomatic
+n_E2_IMild_Drug_5[] <- rbinom(n_E2_IMild[i], drug_5_indic_IMild * drug_5_prop_treat)
+n_E2_IMild_No_Drug_5[] <- n_E2_IMild[i] - n_E2_IMild_Drug_5[i]
+
+n_IMild_R[] <- rbinom(IMild[i], p_IMild_R) # Number of mild infections recovering, taking into account proportion receiving drug 4 and its effect to hasten recovery
 n_IAsymp_R[] <- rbinom(IAsymp[i], p_IAsymp_R) # Number of mild infections recovering
 n_ICase1_ICase2[] <- rbinom(ICase1[i], p_ICase1_ICase2) # Number progressing through the onset but not hospitalised compartment
 n_ICase2_Hosp[] <- rbinom(ICase2[i], p_ICase2_Hosp) # Number progressing to requiring hospitalisation
@@ -229,7 +290,8 @@ n_IRec2_R[] <- rbinom(IRec2[i], p_Rec2_R) # Number recovering completely
 
 ## WORKING OUT NUMBER OF ICU BEDS AVAILABILE AND HOW MANY INDIVIDUALS RECEIVE THEM
 ##--------------------------------------------------------------------------------
-number_req_ICU[] <- rbinom(n_ICase2_Hosp[i], prob_severe[i]) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
+number_req_ICU_initial[] <- rbinom(n_ICase2_Hosp[i], prob_severe[i]) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
+number_req_ICU[] <- rbinom(number_req_ICU_initial, drug_6_prop_treat * drug_6_effect_size) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
 total_req_ICU <- sum(number_req_ICU) # Totalling number newly requiring an ICU bed over age groups
 
 # Calculating Current ICU Occupancy and New Occupancy After Taking Into Account Individuals Leaving ICU Beds This Timestep
@@ -249,7 +311,9 @@ current_free_ICU <- ICU_bed_capacity +
 total_GetICU <- if(current_free_ICU <= 0) 0 else(if(current_free_ICU - total_req_ICU >= 0) total_req_ICU else(current_free_ICU)) # Working out the number of new ICU requiring infections that get a bed
 number_GetICU[] <- rmhyper(total_GetICU, number_req_ICU) # number who get an ICU bed
 
-number_req_ICU_MV[] <- rbinom(number_GetICU[i], prob_critical[i]) # Number of new ICU admissions that are going to require oxygen and mechanical ventilation
+number_req_ICU_MV_initial[] <- rbinom(number_GetICU[i], prob_critical[i]) # Number of new ICU admissions that are going to require oxygen and mechanical ventilation
+number_req_ICU_MV[] <- rbinom(number_req_ICU_MV_initial[i], drug_7_prop_treat * drug_7_effect_size)
+
 number_req_ICU_Ox[] <- number_GetICU[i] - number_req_ICU_MV[i] # Number of new ICU admissions that going to require oxygen only
 total_req_ICU_MV <- sum(number_req_ICU_MV)
 total_req_ICU_Ox <- sum(number_req_ICU_Ox)
@@ -557,7 +621,7 @@ dim(tt_beta) <- user()
 dim(beta_set) <- length(tt_beta)
 
 # Generating Force of Infection
-temp[] <- (rel_inf_asymp * IAsymp[i]) + (rel_inf_mild * IMild[i]) + ICase1[i] + ICase2[i]
+temp[] <- (rel_inf_asymp * IAsymp[i]) + (rel_inf_mild * IMild[i]) + ICase1[i] + ICase2[i] # ADD IN THE DRUG 5 REDUCED INFECTIVITY COMPARTMENTS TO THE FOI CALCULATION HERE CHANGE - INCLUDE drug_5_effect_size
 s_ij[,] <- m[i, j] * temp[j]
 lambda[] <- beta * sum(s_ij[i, ])
 
