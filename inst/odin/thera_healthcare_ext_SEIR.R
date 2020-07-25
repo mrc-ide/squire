@@ -5,6 +5,10 @@
 #   THE REPRESENTATION, WITH THE LATTER BEING TAKEN IMMEDIATELY AFTER BECOMING SYMPTOMATIC AND DRUG ACTING IMMEDIATELY. NEED TO THINK ABOUT HOW MUCH THE
 #   LACK OF THIS DISTINCTION IS A PROBLEM.
 # CHANGE DO WE WANT INDIVIDUALS WHO TOOK PROPHYLACTIC DRUG TO ALSO BE ABLE TO TAKE DRUG WITH PROPERTY 3 AND GAIN A MULTIPLICATIVE BENEFIT FROM THAT????
+# CHANGE NOTE THAT IF NUMBER ENTERING IREC FROM ICU BEDS IS > NUMBER LEAVING HOSPITAL BEDS, WE GO OVER CAPACITY - AS NOTED FOR SQUIRE PREVIOUSLY. ISSUE ISN'T DIFFERENT BUT WE MIGHT WANT
+#   TO THINK ABOUT ADDRESSING.
+# NOTE - DO WE WANT TO APPLY ANY OF THE DRUG PROPERTIES E.G. RATE CHANGING TO PEOPLE ASSIGNED TO DIE IN HOSPITALS. MIGHT BE IMPORTANT IF THE DRUG EXTENDS THE PERIOD
+#   BEFORE THEY DIE, LEADING TO INCREASED OCCUPANCY AND HENCE MORE PEOPLE DYING THAT RATE. DUNNO, SOMETHING TO THINK ABOUT.
 
 ## TIMESTEP RELATED PARAMETERS
 ##------------------------------------------------------------------------------
@@ -38,6 +42,7 @@ drug_3_prop_treat <- user() # the proportion of treated individuals receiving th
 drug_3_effect_size <- user() # the reduction in the proportion of individuals that flow to ICase (and hence flow to IMild)
 
 # Drug 4 reduces the time which individuals spend in IMild, leading them to recover more quickly
+drug_4_indic <- user()
 drug_4_prop_treat <- user() # proportion of individuals in IMild who receive the drug
 drug_4_effect_size <- user() # the increase to the speed at which individuals flow from IMild -> R
 
@@ -45,7 +50,6 @@ drug_4_effect_size <- user() # the increase to the speed at which individuals fl
 drug_5_indic_IMild <- user() # indicator used to note whether Drug 5 is turned on or off for IMild individuals
 drug_5_indic_ICase <- user() # indicator used to note whether Drug 5 is turned on or off for ICase individuals
 drug_5_prop_treat <- user() # proportion of individuals in IMild/ICase who receive the drug
-drug_5_efficacy <- user() # efficacy - number of people treated who derive benefit from the drug (Range: 0 - 1)
 drug_5_effect_size <- user() # the multiple which treated individuals are as infectious compared to untreated individuals
 
 ## Drugs Taken In Hospital - Includes Properties 6 & 7 (reduce disease severity),
@@ -112,40 +116,47 @@ drug_13_NoOx_NoMV_effect_size <- user() # modifier of effect size for Drug 10 ac
 gamma_E <- user() # passage through latent infection
 gamma_IAsymp <- user() # asymptomatic infection to recovery
 gamma_IMild <- user() # mild infection to recovery
-gamma_IMild_drug <- ((1 - drug_4_prop_treat) * gamma_IMild) + (drug_4_prop_treat * drug_4_effect_size * gamma_IMild)
+gamma_IMild_Drug_4 <- ((1 - drug_4_prop_treat) * gamma_IMild) + (drug_4_prop_treat * drug_4_effect_size * gamma_IMild)
 gamma_ICase <- user() # symptom onset to requiring hospitalisation
 gamma_rec <- user() # rate of progression through post-ICU recovery compartment
 
-# Rates Related to Requiring Hospital Bed and Oxygen
+# Rates Related to Requiring Hospital Bed and Oxygen, Incorporating Effects of Drug 8 If Relevant
 gamma_IMod_GetHosp_GetOx_Surv <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed and oxygen and surviving
 gamma_IMod_GetHosp_GetOx_Surv_Drug_8 <- (((1 - drug_8_prop_treat) * gamma_IMod_GetHosp_GetOx_Surv) + (drug_8_prop_treat * gamma_IMod_GetHosp_GetOx_Surv * drug_8_GetOx_effect_size))
 gamma_IMod_GetHosp_GetOx_Die <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed and oxygen and dying
+
 gamma_IMod_GetHosp_NoOx_Surv <- user() # through requiring hosp bed and oxygen compartment conditional on getting hosp bed but NOT oxygen and surviving
-gamma_IMod_GetHosp_NoOx_Surv_Drug_8 <- (((1 - drug_8_prop_treat) * gamma_IMod_GetHosp_GetOx_Surv) + (drug_8_prop_treat * gamma_IMod_GetHosp_GetOx_Surv * drug_8_NoOx_effect_size))
+gamma_IMod_GetHosp_NoOx_Surv_Drug_8 <- (((1 - drug_8_prop_treat) * gamma_IMod_GetHosp_NoOx_Surv) + (drug_8_prop_treat * gamma_IMod_GetHosp_NoOx_Surv * drug_8_NoOx_effect_size))
 gamma_IMod_GetHosp_NoOx_Die <- user() # through requiring hosp bed and oxygen compartment conditional on getting  hosp bed but NOT oxygen and dying
+
 gamma_IMod_NoHosp_NoOx_Surv <- user() # through requiring hosp bed and oxygen compartment conditional on NOT getting hosp bed and NOT oxygen and surviving
 gamma_IMod_NoHosp_NoOx_Die <- user() # through requiring hosp bed and oxygen compartment conditional on NOT getting hosp bed and NOT oxygen and dying
 
-# Rates Related to Requiring ICU Bed and Oxygen
+# Rates Related to Requiring ICU Bed and Oxygen, Incorporating Effects of Drug 9 If Relevant
 gamma_ISev_GetICU_GetOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed and oxygen and surviving
 gamma_ISev_GetICU_GetOx_Surv_Drug_9 <- (((1 - drug_9_prop_treat) * gamma_ISev_GetICU_GetOx_Surv) + (drug_9_prop_treat * gamma_ISev_GetICU_GetOx_Surv * drug_9_GetOx_effect_size))
 gamma_ISev_GetICU_GetOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed and oxygen and dying
+
 gamma_ISev_GetICU_NoOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed but NOT oxygen and surviving
-gamma_ISev_GetICU_GetOx_Surv_Drug_9 <- (((1 - drug_9_prop_treat) * gamma_ISev_GetICU_NoOx_Surv) + (drug_9_prop_treat * gamma_ISev_GetICU_NoOx_Surv * drug_9_NoOx_effect_size))
+gamma_ISev_GetICU_NoOx_Surv_Drug_9 <- (((1 - drug_9_prop_treat) * gamma_ISev_GetICU_NoOx_Surv) + (drug_9_prop_treat * gamma_ISev_GetICU_NoOx_Surv * drug_9_NoOx_effect_size))
 gamma_ISev_GetICU_NoOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on getting ICU bed but NOT oxygen and dying
+
 gamma_ISev_NoICU_NoOx_Surv <- user() # through requiring ICU bed and oxygen compartment conditional on NOT getting ICU bed and NOT oxygen and surviving
 gamma_ISev_NoICU_NoOx_Die <- user() # through requiring ICU bed and oxygen compartment conditional on NOT getting ICU bed and NOT oxygen and dying
 
-# Rates Related to Requiring ICU Bed, Oxygen and Mechanical Ventilation
+# Rates Related to Requiring ICU Bed, Oxygen and Mechanical Ventilation, Incorporating Effects of Drug 10 If Relevant
 gamma_ICrit_GetICU_GetOx_GetMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, oxygen and MV and surviving
 gamma_ICrit_GetICU_GetOx_GetMV_Surv_Drug_10 <- (((1 - drug_10_prop_treat) * gamma_ICrit_GetICU_GetOx_GetMV_Surv) + (drug_10_prop_treat * gamma_ICrit_GetICU_GetOx_GetMV_Surv * drug_10_GetOx_GetMV_effect_size))
 gamma_ICrit_GetICU_GetOx_GetMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, oxygen and MV and dying
+
 gamma_ICrit_GetICU_GetOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed and oxygen, but NOT MV and surviving
 gamma_ICrit_GetICU_GetOx_NoMV_Surv_Drug_10 <- (((1 - drug_10_prop_treat) * gamma_ICrit_GetICU_GetOx_NoMV_Surv) + (drug_10_prop_treat * gamma_ICrit_GetICU_GetOx_NoMV_Surv * drug_10_GetOx_NoMV_effect_size))
 gamma_ICrit_GetICU_GetOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed and oxygen, but NOT MV and dying
+
 gamma_ICrit_GetICU_NoOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, but NOT oxygen and NOT MV and surviving
 gamma_ICrit_GetICU_NoOx_NoMV_Surv_Drug_10 <- (((1 - drug_10_prop_treat) * gamma_ICrit_GetICU_NoOx_NoMV_Surv) + (drug_10_prop_treat * gamma_ICrit_GetICU_NoOx_NoMV_Surv * drug_10_NoOx_NoMV_effect_size))
 gamma_ICrit_GetICU_NoOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on getting ICU bed, but NOT oxygen and NOT MV and dying
+
 gamma_ICrit_NoICU_NoOx_NoMV_Surv <- user() # through requiring ICU bed, oxygen and MV compartment conditional on NOT getting ICU bed, NOT oxygen and NOT MV and surviving
 gamma_ICrit_NoICU_NoOx_NoMV_Die <- user() # through requiring ICU bed, oxygen and MV compartment conditional on NOT getting ICU bed, NOT oxygen and NOT MV and dying
 
@@ -156,21 +167,43 @@ prob_hosp[] <- user() # probability of requiring hospitalisation by age
 prob_severe[] <- user() # probability of severe disease (requiring ICU bed) by age
 prob_critical[] <- user() # probability of critical disease (requiring ICU bed AND MV) by age, conditional on having severe disease
 
-# Probabilities Related to Requiring Hospital Bed and Oxygen
-prob_moderate_death_get_hosp_get_ox[] <- user() # probability of dying from moderate disease (i.e. requiring hospital bed and oxygen) by age given you receive a hospital bed AND oxygen)
-prob_moderate_death_get_hosp_no_ox[] <- user() # probability of dying from moderate disease (i.e. requiring hospital bed and oxygen) by age given you receive a hospital bed BUT no oxygen)
+# Probabilities of Death Related to Requiring Hospital Bed and Oxygen, Incorporating Effects of Drug 11 If Relevant
+prob_moderate_death_get_hosp_get_ox_baseline[] <- user() # probability of dying from moderate disease (i.e. requiring hospital bed and oxygen) by age given you receive a hospital bed AND oxygen)
+prob_moderate_death_get_hosp_get_ox_Drug_11[] <- ((1 - drug_11_prop_treat) * prob_moderate_death_get_hosp_get_ox_baseline[i]) + (drug_11_prop_treat * drug_11_GetOx_effect_size * prob_moderate_death_get_hosp_get_ox_baseline[i])
+prob_moderate_death_get_hosp_get_ox[] <- if (drug_11_indic_IMod_GetHosp_GetOx == 1) prob_moderate_death_get_hosp_get_ox_Drug_11[i] else prob_moderate_death_get_hosp_get_ox_baseline[i]
+
+prob_moderate_death_get_hosp_no_ox_baseline[] <- user() # probability of dying from moderate disease (i.e. requiring hospital bed and oxygen) by age given you receive a hospital bed BUT no oxygen)
+prob_moderate_death_get_hosp_no_ox_Drug_11[] <- ((1 - drug_11_prop_treat) * prob_moderate_death_get_hosp_no_ox_baseline[i]) + (drug_11_prop_treat * drug_11_NoOx_effect_size * prob_moderate_death_get_hosp_no_ox_baseline[i])
+prob_moderate_death_get_hosp_no_ox[] <- if (drug_11_indic_IMod_GetHosp_NoOx == 1) prob_moderate_death_get_hosp_no_ox_Drug_11[i] else prob_moderate_death_get_hosp_no_ox_baseline[i]
+
 prob_moderate_death_no_hosp_no_ox[] <- user() # probability of dying from moderate disease (i.e. requiring hospital bed and oxygen) by age given you do NOT receive a hospital bed and you do NOT receive oxygen
 
-# Probabilities Related to Requiring ICU Bed and Oxygen
-prob_severe_death_get_ICU_get_ox[] <- user() # probability of dying from severe disease (i.e. requiring ICU bed and oxygen) by age given you receive an ICU bed AND oxygen)
-prob_severe_death_get_ICU_no_ox[] <- user() # probability of dying from severe disease (i.e. requiring ICU bed and oxygen) by age given you receive an ICU bed BUT no oxygen)
+# Probabilities of Death Related to Requiring ICU Bed and Oxygen, Incorporating Effects of Drug 12 If Relevant
+prob_severe_death_get_ICU_get_ox_baseline[] <- user() # probability of dying from severe disease (i.e. requiring ICU bed and oxygen) by age given you receive an ICU bed AND oxygen)
+prob_severe_death_get_ICU_get_ox_Drug_12[] <- ((1 - drug_12_prop_treat) * prob_severe_death_get_ICU_get_ox_baseline[i]) + (drug_12_prop_treat * drug_12_GetOx_effect_size * prob_severe_death_get_ICU_get_ox_baseline[i])
+prob_severe_death_get_ICU_get_ox[] <- if (drug_12_indic_ISev_GetICU_GetOx == 1) prob_severe_death_get_ICU_get_ox_Drug_12[i] else prob_severe_death_get_ICU_get_ox_baseline[i]
+
+prob_severe_death_get_ICU_no_ox_baseline[] <- user() # probability of dying from severe disease (i.e. requiring ICU bed and oxygen) by age given you receive an ICU bed BUT no oxygen)
+prob_severe_death_get_ICU_no_ox_Drug_12[] <- ((1 - drug_12_prop_treat) * prob_severe_death_get_ICU_no_ox_baseline[i]) + (drug_12_prop_treat * drug_12_NoOx_effect_size * prob_severe_death_get_ICU_no_ox_baseline[i])
+prob_severe_death_get_ICU_no_ox[] <- if (drug_12_indic_ISev_GetICU_NoOx == 1) prob_severe_death_get_ICU_no_ox_Drug_12[i] else prob_severe_death_get_ICU_no_ox_baseline[i]
+
 prob_severe_death_no_ICU_no_ox[] <- user() # probability of dying from severe disease (i.e. requiring ICU bed and oxygen) by age given you do NOT receive an ICU bed and you do NOT receive oxygen
 
-# Probabilities Related to Requiring ICU Bed, Oxygen and Mechanical Ventilation
-prob_critical_death_get_ICU_get_ox_get_MV[] <- user() # probability of dying from critical disease (i.e. requiring ICU bed, oxygen and MV) by age given you receive an ICU bed AND oxygen AND MV)
-prob_critical_death_get_ICU_get_ox_no_MV[] <- user() # probability of dying from critical disease (i.e. requiring ICU bed, oxygen and MV) by age given you receive an ICU bed AND oxygen BUT no MV)
-prob_critical_death_get_ICU_no_ox_no_MV[] <- user() # probability of dying from critical disease (i.e. requiring ICU bed, oxygen and MV) by age given you receive an ICU bed BUT no oxygen and you do NOT receive MV
+# Probabilities of Death Related to Requiring ICU Bed, Oxygen and Mechanical Ventilation, Incorporating Effects of Drug 13 If Relevant
+prob_critical_death_get_ICU_get_ox_get_MV_baseline[] <- user() # probability of dying from critical disease (i.e. requiring ICU bed, oxygen and MV) by age given you receive an ICU bed AND oxygen AND MV)
+prob_critical_death_get_ICU_get_ox_get_MV_Drug_13[] <- ((1 - drug_13_prop_treat) * prob_critical_death_get_ICU_get_ox_get_MV_baseline[i]) + (drug_13_prop_treat * drug_13_GetOx_GetMV_effect_size * prob_critical_death_get_ICU_get_ox_get_MV_baseline[i])
+prob_critical_death_get_ICU_get_ox_get_MV[] <- if (drug_13_indic_ICrit_GetICU_GetOx_GetMV == 1) prob_critical_death_get_ICU_get_ox_get_MV_Drug_13[i] else prob_critical_death_get_ICU_get_ox_get_MV_baseline[i]
+
+prob_critical_death_get_ICU_get_ox_no_MV_baseline[] <- user() # probability of dying from critical disease (i.e. requiring ICU bed, oxygen and MV) by age given you receive an ICU bed AND oxygen BUT no MV)
+prob_critical_death_get_ICU_get_ox_no_MV_Drug_13[] <- ((1 - drug_13_prop_treat) * prob_critical_death_get_ICU_get_ox_no_MV_baseline[i]) + (drug_13_prop_treat * drug_13_GetOx_NoMV_effect_size * prob_critical_death_get_ICU_get_ox_no_MV_baseline[i])
+prob_critical_death_get_ICU_get_ox_no_MV[] <- if (drug_13_indic_ICrit_GetICU_GetOx_NoMV == 1) prob_critical_death_get_ICU_get_ox_no_MV_Drug_13[i] else prob_critical_death_get_ICU_get_ox_no_MV_baseline[i]
+
+prob_critical_death_get_ICU_no_ox_no_MV_baseline[] <- user() # probability of dying from critical disease (i.e. requiring ICU bed, oxygen and MV) by age given you receive an ICU bed BUT no oxygen and you do NOT receive MV
+prob_critical_death_get_ICU_no_ox_no_MV_Drug_13[] <- ((1 - drug_13_prop_treat) * prob_critical_death_get_ICU_no_ox_no_MV_baseline[i]) + (drug_13_prop_treat * drug_13_NoOx_NoMV_effect_size * prob_critical_death_get_ICU_no_ox_no_MV_baseline[i])
+prob_critical_death_get_ICU_no_ox_no_MV[] <- if (drug_13_indic_ICrit_GetICU_NoOx_NoMV == 1) prob_critical_death_get_ICU_no_ox_no_MV_Drug_13[i] else prob_critical_death_get_ICU_no_ox_no_MV_baseline[i]
+
 prob_critical_death_no_ICU_no_ox_no_MV[] <- user() # probability of dying from critical disease (i.e. requiring ICU bed, oxygen and MV) by age given you do NOT receive an ICU bed, you do NOT receive oxygen, and you do NOT receive MV
+
 
 ## INDIVIDUAL PROBABILITIES OF TRANSITION BETWEEN COMPARTMENTS
 ##------------------------------------------------------------------------------
@@ -178,11 +211,10 @@ prob_critical_death_no_ICU_no_ox_no_MV[] <- user() # probability of dying from c
 p_S_E1[] <- 1 - exp(-lambda[i] * dt) # Infection - age dependent FOI based on mixing patterns
 p_E1_E2 <- 1 - exp(-gamma_E * dt) # Progression through latent infection
 p_E2_I <- 1 - exp(-gamma_E * dt) # Progression to onset of infectiousness. Number split between I_Mild and I_Case
-p_IMild_R <- 1 - exp(-gamma_IMild_drug * dt) # Recovery from mild disease taking into account proportion of people receiving drug with property 4
+p_IMild_R <- if (drug_4_indic == 1) 1 - exp(-gamma_IMild_Drug_4 * dt) else 1 - exp(-gamma_IMild * dt) # Recovery from mild disease taking into account proportion of people receiving drug with property 4
 p_IAsymp_R <- 1 - exp(-gamma_IAsymp * dt) # Recovery from mild disease
 p_ICase1_ICase2 <- 1 - exp(-gamma_ICase * dt) # Delay between symptom onset and requiring hospitalisation
 p_ICase2_Hosp <- 1 - exp(-gamma_ICase * dt) # Progression to requiring hospitalisation. Number split between I_Oxygen and I_MV
-p_prophylactic_drug_wane <- 1 - exp(-prophylactic_drug_wane * dt) # Reversion back to untreated state following pharmacokinetic decay of prophylactic drug
 
 # Transition Probabilities for Those Recovering from ICU
 p_Rec1_Rec2 <- 1 - exp(-gamma_rec * dt) # Progression through recovery from ICU in hospital bed to eventual discharge (R)
@@ -223,7 +255,7 @@ p_ICrit_NoICU_NoOx_NoMV_Die <- 1 - exp(-gamma_ICrit_NoICU_NoOx_NoMV_Die * dt) # 
 ##-----------------------------------------------------------------------------------------
 
 # For those treated with the prophylactic drug (properties 1 and 2)
-n_S_PS[] <- if (time == prophylactic_drug_timing_1 | time == prophylactic_drug_timing_2) rbinom(S[i], prophylactic_prop_treat) else 0
+n_S_PS[] <- if (time == prophylactic_drug_timing_1 || time == prophylactic_drug_timing_2) rbinom(S[i], prophylactic_prop_treat) else 0
 
 n_leave_PS[] <- rbinom(PS[i], 1 - exp(-(prophylactic_drug_wane + lambda[i] * drug_1_effect_size) * dt))
 n_PS_PE1[] <- rbinom(n_leave_PS[i], (lambda[i] * drug_1_effect_size)/(lambda[i] * drug_1_effect_size + prophylactic_drug_wane))
@@ -238,15 +270,19 @@ n_PE2_I[] <- rbinom(PE2[i], p_E2_I)
 n_PE2_E2[] <- n_leave_PE2[i] - n_PE2_I[i]
 
 n_PE2_ICase1_initial[] <- rbinom(n_PE2_I[i], prob_hosp[i])
-n_PE2_ICase1[] <- rbinom(n_PE2_ICase1_initial[i], drug_2_effect_size) # check the drug_2_effect_size is right way round
+n_PE2_ICase1[] <- rbinom(n_PE2_ICase1_initial[i], drug_2_effect_size) # check the drug_2_effect_size is right way round # CHANGE DO WE WANT DRUG_EFFECT_3 IN HERE AS WELL??
 n_PE2_ICase1_Drug_5[] <- rbinom(n_PE2_ICase1[i], drug_5_indic_ICase * drug_5_prop_treat)
 n_PE2_ICase1_No_Drug_5[] <- n_PE2_ICase1[i] - n_PE2_ICase1_Drug_5[i]
 
 n_PE2_IMild_or_IAsymp[] <- n_PE2_I[i] - n_PE2_ICase1[i]
 n_PE2_IAsymp[] <- rbinom(n_PE2_IMild_or_IAsymp[i], prob_asymp[i])
-n_PE2_IMild[] <- n_PE2_IMild_or_IAsymp[i] - n_PE2_IAsymp[i] + (n_PE2_ICase1_initial[i] - n_PE2_ICase1_drug[i])
+n_PE2_IMild[] <- n_PE2_IMild_or_IAsymp[i] - n_PE2_IAsymp[i] + (n_PE2_ICase1_initial[i] - n_PE2_ICase1_Drug_5[i])
 n_PE2_IMild_Drug_5[] <- rbinom(n_PE2_IMild[i], drug_5_indic_IMild * drug_5_prop_treat)
 n_PE2_IMild_No_Drug_5[] <- n_PE2_IMild[i] - n_PE2_IMild_Drug_5[i]
+
+n_IMild_Drug_5_R[] <- rbinom(IMild[i], p_IMild_R)
+n_ICase1_Drug_5_ICase2_Drug_5[] <- rbinom(ICase1_Drug_5[i], p_ICase1_ICase2)
+n_ICase2_Drug_5_Hosp[] <- rbinom(ICase2_Drug_5[i], p_ICase2_Hosp) # CHANGE: MAKE SURE THESE ARE PROPERLY INCLUDED AND DON'T GET MISSED OUT
 
 #######
 n_S_E1[] <- rbinom(S[i] - n_S_PS[i], p_S_E1[i]) # Number of newly infected individuals
@@ -269,7 +305,7 @@ n_IAsymp_R[] <- rbinom(IAsymp[i], p_IAsymp_R) # Number of mild infections recove
 n_ICase1_ICase2[] <- rbinom(ICase1[i], p_ICase1_ICase2) # Number progressing through the onset but not hospitalised compartment
 n_ICase2_Hosp[] <- rbinom(ICase2[i], p_ICase2_Hosp) # Number progressing to requiring hospitalisation
 n_IRec1_IRec2[] <- rbinom(IRec1[i], p_Rec1_Rec2) # Number progressing through ICU recovery compartment
-n_IRec2_R[] <- rbinom(IRec2[i], p_Rec2_R) # Number recovering completely
+n_IRec2_R[] <- rbinom(IRec2[i], p_Rec2_R) # Number recovering completely NOTE, CHANGE: P_REC NEEDS TO INCORPORATE DRUG EFFECT (OR NOT??)
 
 
 ##  This section is non-trivial and so a brief description of everything that occurs below
@@ -292,7 +328,7 @@ n_IRec2_R[] <- rbinom(IRec2[i], p_Rec2_R) # Number recovering completely
 ## WORKING OUT NUMBER OF ICU BEDS AVAILABILE AND HOW MANY INDIVIDUALS RECEIVE THEM
 ##--------------------------------------------------------------------------------
 number_req_ICU_initial[] <- rbinom(n_ICase2_Hosp[i], prob_severe[i]) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
-number_req_ICU[] <- rbinom(number_req_ICU_initial, drug_6_prop_treat * drug_6_effect_size) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
+number_req_ICU[] <- rbinom(number_req_ICU_initial[i], drug_6_prop_treat * drug_6_effect_size) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
 total_req_ICU <- sum(number_req_ICU) # Totalling number newly requiring an ICU bed over age groups
 
 # Calculating Current ICU Occupancy and New Occupancy After Taking Into Account Individuals Leaving ICU Beds This Timestep
@@ -468,18 +504,26 @@ n_ICrit_NoICU_NoOx_NoMV_Surv2_R[] <- rbinom(ICrit_NoICU_NoOx_NoMV_Surv2[i], p_IC
 
 ## TOTALLING UP THE FLOWS IN AND OUT OF EACH COMPARTMENT
 ##------------------------------------------------------
+
 # Non-Hospital/ICU Bed Related Compartments
-delta_E1[] <- n_S_E1[i] - n_E1_E2[i]
-delta_E2[] <- n_E1_E2[i] - n_E2_I[i]
-delta_IAsymp[] <- n_E2_IAsymp[i] - n_IAsymp_R[i]
-delta_IMild[] <- n_E2_IMild[i] - n_IMild_R[i]
-delta_ICase1[] <- n_E2_ICase1[i] - n_ICase1_ICase2[i]
+delta_S[] <- - n_S_E1[i] - n_S_PS[i] + n_PS_S[i]
+delta_E1[] <- n_S_E1[i] + n_PE1_E1[i] - n_E1_E2[i]
+delta_E2[] <- n_E1_E2[i] + n_PE2_E2[i] - n_E2_I[i]
+delta_IAsymp[] <- n_E2_IAsymp[i] + n_PE2_IAsymp[i] - n_IAsymp_R[i]
+
+delta_IMild[] <- n_E2_IMild_No_Drug_5[i] + n_PE2_IMild_No_Drug_5[i] - n_IMild_R[i]
+delta_ICase1[] <- n_E2_ICase1_No_Drug_5[i] + n_PE2_ICase1_No_Drug_5[i] - n_ICase1_ICase2[i]
 delta_ICase2[] <- n_ICase1_ICase2[i] - n_ICase2_Hosp[i]
 
+delta_IMild_Drug_5[] <- n_E2_IMild_Drug_5[i] + n_PE2_IMild_Drug_5[i] - n_IMild_Drug_5_R[i]
+delta_ICase1_Drug_5[] <- n_E2_ICase1_Drug_5[i] + n_PE2_ICase1_Drug_5[i] - n_ICase1_Drug_5_ICase2_Drug_5[i]
+delta_ICase2_Drug_5[] <- n_ICase1_Drug_5_ICase2_Drug_5[i] - n_ICase2_Drug_5_Hosp[i]
+
+delta_PS[] <- n_S_PS[i] - n_leave_PS[i]
+delta_PE1[] <- n_PS_PE1[i] - n_leave_PE1[i]
+delta_PE2[] <- n_PE1_PE2[i] - n_leave_PE2[i]
+
 # Stepdown Bed, Recovery and Death Related Compartments
-# NOTE THAT IF NUMBER ENTERING IREC FROM ICU BEDS IS > NUMBER LEAVING HOSPITAL BEDS, WE
-# GO OVER CAPACITY - AS NOTED FOR SQUIRE PREVIOUSLY. ISSUE ISN'T DIFFERENT BUT WE MIGHT WANT
-# TO THINK ABOUT ADDRESSING.
 delta_IRec1[] <- n_ISev_GetICU_GetOx_Surv2_Rec[i] + n_ISev_GetICU_NoOx_Surv2_Rec[i] +
                  n_ICrit_GetICU_GetOx_GetMV_Surv2_Rec[i]  + n_ICrit_GetICU_GetOx_NoMV_Surv2_Rec[i] + n_ICrit_GetICU_NoOx_NoMV_Surv2_Rec[i] -
                  n_IRec1_IRec2[i]
@@ -543,13 +587,23 @@ delta_ICrit_NoICU_NoOx_NoMV_Surv2[] <- n_ICrit_NoICU_NoOx_NoMV_Surv1_ICrit_NoICU
 ## UPDATING STATE VARIABLES WITH THE OVERALL TRANSITIONS IN AND OUT OF EACH COMPARTMENT
 ##-------------------------------------------------------------------------------------
 # Passage Through Initial Latent and Infection Stages
-update(S[]) <- S[i] - n_S_E1[i]  # Susceptibles (1 comp)
-update(E1[]) <- E1[i] + delta_E1[i]  # First of the latent infection compartments (2 comps)
+update(S[]) <- S[i] + delta_S[i] # Susceptibles (1 comp) # CHANGE CONSIDER WRAPPING THIS INTO A DELTA_S TERM AS WELL!
+update(E1[]) <- E1[i] + delta_E1[i] # First of the latent infection compartments (2 comps)
 update(E2[]) <- E2[i] + delta_E2[i]  # Second of the latent infection compartments (2 comps)
 update(IAsymp[]) <- IAsymp[i] + delta_IAsymp[i] # Asymptomatic infections (1 comp)
 update(IMild[]) <- IMild[i] + delta_IMild[i]  # Mild infections (1 comp)
 update(ICase1[]) <- ICase1[i] + delta_ICase1[i] # First of the compartments for infections that will require hospitalisation (2 comps)
 update(ICase2[]) <- ICase2[i] + delta_ICase2[i] # Second of the compartments for infections that will require hospitalisation (2 comps)
+
+update(IMild_Drug_5[]) <- IMild_Drug_5[i] + delta_IMild_Drug_5[i]
+update(ICase1_Drug_5[]) <- ICase1_Drug_5[i] + delta_ICase1_Drug_5[i]
+update(ICase2_Drug_5[]) <- ICase2_Drug_5[i] + delta_ICase2_Drug_5[i]
+
+# Passage Through Drug Treated Initial Susceptible/Latent Stages
+update(PS[]) <- PS[i] + delta_PS[i]
+update(PE1[]) <- PE1[i] + delta_PE1[i]
+update(PE2[]) <- PE2[i] + delta_PE2[i]
+
 
 # Passage Through Requiring Hospital Bed and Oxygen, Either Receiving Both, Oxygen or Neither, and Surviving or Not
 update(IMod_GetHosp_GetOx_Die1[]) <- IMod_GetHosp_GetOx_Die1[i] + delta_IMod_GetHosp_GetOx_Die1[i] # Require hosp bed and oxygen, get both, die (1st)
@@ -622,7 +676,8 @@ dim(tt_beta) <- user()
 dim(beta_set) <- length(tt_beta)
 
 # Generating Force of Infection
-temp[] <- (rel_inf_asymp * IAsymp[i]) + (rel_inf_mild * IMild[i]) + ICase1[i] + ICase2[i] # ADD IN THE DRUG 5 REDUCED INFECTIVITY COMPARTMENTS TO THE FOI CALCULATION HERE CHANGE - INCLUDE drug_5_effect_size
+temp[] <- (rel_inf_asymp * IAsymp[i]) + (rel_inf_mild * IMild[i]) + ICase1[i] + ICase2[i]  +
+  (rel_inf_mild * drug_5_effect_size * IMild_Drug_5[i]) + (ICase1_Drug_5[i] + ICase2_Drug_5[i]) * drug_5_effect_size # ADD IN THE DRUG 5 REDUCED INFECTIVITY COMPARTMENTS TO THE FOI CALCULATION HERE CHANGE - INCLUDE drug_5_effect_size
 s_ij[,] <- m[i, j] * temp[j]
 lambda[] <- beta * sum(s_ij[i, ])
 
@@ -669,11 +724,17 @@ initial(IAsymp[]) <- IAsymp_0[i]
 initial(IMild[]) <- IMild_0[i]
 initial(ICase1[]) <- ICase1_0[i]
 initial(ICase2[]) <- ICase2_0[i]
+initial(IMild_Drug_5[]) <- IMild_Drug_5_0[i]
+initial(ICase1_Drug_5[]) <- ICase1_Drug_5_0[i]
+initial(ICase2_Drug_5[]) <- ICase2_Drug_5_0[i]
 initial(IRec1[]) <- IRec1_0[i]
 initial(IRec2[]) <- IRec2_0[i]
 initial(R[]) <- R_0[i]
 initial(D_Community[]) <- D_Community_0[i]
 initial(D_Hospital[]) <- D_Hospital_0[i]
+initial(PS[]) <- PS_0[i]
+initial(PE1[]) <- PE1_0[i]
+initial(PE2[]) <- PE2_0[i]
 
 initial(IMod_GetHosp_GetOx_Surv1[]) <- IMod_GetHosp_GetOx_Surv1_0[i]
 initial(IMod_GetHosp_GetOx_Surv2[]) <- IMod_GetHosp_GetOx_Surv2_0[i]
@@ -735,6 +796,13 @@ R_0[] <- user()
 D_Community_0[] <- user()
 D_Hospital_0[] <- user()
 
+PS_0[] <- user()
+PE1_0[] <- user()
+PE2_0[] <- user()
+IMild_Drug_5_0[] <- user()
+ICase1_Drug_5_0[] <- user()
+ICase2_Drug_5_0[] <- user()
+
 IMod_GetHosp_GetOx_Surv1_0[] <- user()
 IMod_GetHosp_GetOx_Surv2_0[] <- user()
 IMod_GetHosp_GetOx_Die1_0[] <- user()
@@ -793,6 +861,13 @@ dim(R) <- N_age
 dim(D_Community) <- N_age
 dim(D_Hospital) <- N_age
 
+dim(PS) <- N_age
+dim(PE1) <- N_age
+dim(PE2) <- N_age
+dim(IMild_Drug_5) <- N_age
+dim(ICase1_Drug_5) <- N_age
+dim(ICase2_Drug_5) <- N_age
+
 dim(IMod_GetHosp_GetOx_Surv1) <- N_age
 dim(IMod_GetHosp_GetOx_Surv2) <- N_age
 dim(IMod_GetHosp_GetOx_Die1) <- N_age
@@ -850,6 +925,13 @@ dim(R_0) <- N_age
 dim(D_Community_0) <- N_age
 dim(D_Hospital_0) <- N_age
 
+dim(PS_0) <- N_age
+dim(PE1_0) <- N_age
+dim(PE2_0) <- N_age
+dim(IMild_Drug_5_0) <- N_age
+dim(ICase1_Drug_5_0) <- N_age
+dim(ICase2_Drug_5_0) <- N_age
+
 dim(IMod_GetHosp_GetOx_Surv1_0) <- N_age
 dim(IMod_GetHosp_GetOx_Surv2_0) <- N_age
 dim(IMod_GetHosp_GetOx_Die1_0) <- N_age
@@ -894,17 +976,25 @@ dim(ICrit_NoICU_NoOx_NoMV_Die1_0) <- N_age
 dim(ICrit_NoICU_NoOx_NoMV_Die2_0) <- N_age
 
 # For the Flows Between State Variables
+dim(delta_S) <- N_age
 dim(delta_E1) <- N_age
 dim(delta_E2) <- N_age
 dim(delta_IAsymp) <- N_age
 dim(delta_IMild) <- N_age
 dim(delta_ICase1) <- N_age
 dim(delta_ICase2) <- N_age
+dim(delta_IMild_Drug_5) <- N_age
+dim(delta_ICase1_Drug_5) <- N_age
+dim(delta_ICase2_Drug_5) <- N_age
 dim(delta_IRec1) <- N_age
 dim(delta_IRec2) <- N_age
 dim(delta_R) <- N_age
 dim(delta_D_Community) <- N_age
 dim(delta_D_Hospital) <- N_age
+
+dim(delta_PS) <- N_age
+dim(delta_PE1) <- N_age
+dim(delta_PE2) <- N_age
 
 dim(delta_IMod_GetHosp_GetOx_Surv1) <- N_age
 dim(delta_IMod_GetHosp_GetOx_Surv2) <- N_age
@@ -1057,16 +1147,71 @@ dim(prob_asymp) <- N_age
 dim(prob_hosp) <- N_age
 dim(prob_severe) <- N_age
 dim(prob_critical) <- N_age
+
+dim(prob_moderate_death_get_hosp_get_ox_baseline) <- N_age
+dim(prob_moderate_death_get_hosp_get_ox_Drug_11) <- N_age
 dim(prob_moderate_death_get_hosp_get_ox) <- N_age
+
+dim(prob_moderate_death_get_hosp_no_ox_baseline) <- N_age
+dim(prob_moderate_death_get_hosp_no_ox_Drug_11) <- N_age
 dim(prob_moderate_death_get_hosp_no_ox) <- N_age
+
 dim(prob_moderate_death_no_hosp_no_ox) <- N_age
+
+dim(prob_severe_death_get_ICU_get_ox_baseline) <- N_age
+dim(prob_severe_death_get_ICU_get_ox_Drug_12) <- N_age
 dim(prob_severe_death_get_ICU_get_ox) <- N_age
+
+dim(prob_severe_death_get_ICU_no_ox_baseline) <- N_age
+dim(prob_severe_death_get_ICU_no_ox_Drug_12) <- N_age
 dim(prob_severe_death_get_ICU_no_ox) <- N_age
+
 dim(prob_severe_death_no_ICU_no_ox) <- N_age
+
+dim(prob_critical_death_get_ICU_get_ox_get_MV_baseline) <- N_age
+dim(prob_critical_death_get_ICU_get_ox_get_MV_Drug_13) <- N_age
 dim(prob_critical_death_get_ICU_get_ox_get_MV) <- N_age
+
+dim(prob_critical_death_get_ICU_get_ox_no_MV_baseline) <- N_age
+dim(prob_critical_death_get_ICU_get_ox_no_MV_Drug_13) <- N_age
 dim(prob_critical_death_get_ICU_get_ox_no_MV) <- N_age
+
+dim(prob_critical_death_get_ICU_no_ox_no_MV_baseline) <- N_age
+dim(prob_critical_death_get_ICU_no_ox_no_MV_Drug_13) <- N_age
 dim(prob_critical_death_get_ICU_no_ox_no_MV) <- N_age
+
 dim(prob_critical_death_no_ICU_no_ox_no_MV) <- N_age
+
+
+dim(n_S_PS) <- N_age
+dim(n_leave_PS) <- N_age
+dim(n_PS_PE1) <- N_age
+dim(n_PS_S) <- N_age
+dim(n_leave_PE1) <- N_age
+dim(n_PE1_PE2) <- N_age
+dim(n_PE1_E1) <- N_age
+dim(n_leave_PE2) <- N_age
+dim(n_PE2_I) <- N_age
+dim(n_PE2_E2) <- N_age
+dim(n_PE2_ICase1_initial) <- N_age
+dim(n_PE2_ICase1) <- N_age
+dim(n_PE2_ICase1_Drug_5) <- N_age
+dim(n_PE2_ICase1_No_Drug_5) <- N_age
+dim(n_E2_IMild_No_Drug_5) <- N_age
+dim(number_req_ICU_initial) <- N_age
+dim(number_req_ICU_MV_initial) <- N_age
+dim(n_PE2_IMild_or_IAsymp) <- N_age
+dim(n_PE2_IAsymp) <- N_age
+dim(n_PE2_IMild) <- N_age
+dim(n_PE2_IMild_Drug_5) <- N_age
+dim(n_PE2_IMild_No_Drug_5) <- N_age
+dim(n_E2_ICase1_initial) <- N_age
+dim(n_E2_ICase1_Drug_5) <- N_age
+dim(n_E2_ICase1_No_Drug_5) <- N_age
+dim(n_E2_IMild_Drug_5) <- N_age
+dim(n_IMild_Drug_5_R) <- N_age
+dim(n_ICase1_Drug_5_ICase2_Drug_5) <- N_age
+dim(n_ICase2_Drug_5_Hosp) <- N_age
 
 # Extra Non-State Variables Outputted by the Model
 output(time) <- TRUE
