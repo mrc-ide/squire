@@ -276,21 +276,15 @@ n_PE2_I[] <- rbinom(PE2[i], gamma_E/(prophylactic_drug_wane + gamma_E))
 n_PE2_E2[] <- n_leave_PE2[i] - n_PE2_I[i]
 
 n_PE2_ICase1_initial[] <- rbinom(n_PE2_I[i], prob_hosp[i])
-n_PE2_ICase1[] <- if (drug_2_indic == 1) rbinom(n_PE2_ICase1_initial[i], (1 - drug_2_effect_size)) else n_PE2_ICase1_initial[i] # CHANGE DO WE WANT DRUG_EFFECT_3 IN HERE AS WELL?? SEE BELOW FOR SNIPPET OF WHAT THIS SHOULD LOOK LIKE
-# n_PE2_ICase1[] <- if (drug_3_indic == 1) rbinom(n_PE2_ICase1[i], 1 - (drug_3_prop_treat * drug_3_effect_size)) else n_PE2_ICase1[i]
+n_PE2_ICase1[] <- if (drug_2_indic == 1) rbinom(n_PE2_ICase1_initial[i], (1 - drug_2_effect_size)) else n_PE2_ICase1_initial[i] # CHANGE DO WE WANT DRUG_EFFECT_3 IN HERE AS WELL?? SEE BELOW FOR SNIPPET OF WHAT THIS SHOULD LOOK LIKE: # n_PE2_ICase1[] <- if (drug_3_indic == 1) rbinom(n_PE2_ICase1[i], 1 - (drug_3_prop_treat * drug_3_effect_size)) else n_PE2_ICase1[i]
 n_PE2_ICase1_Drug_5[] <- if (drug_5_indic_ICase == 1) rbinom(n_PE2_ICase1[i], drug_5_prop_treat) else 0
 n_PE2_ICase1_No_Drug_5[] <- n_PE2_ICase1[i] - n_PE2_ICase1_Drug_5[i]
 
-# some of the drug 2 modded people are flowing and becoming asymptomatics here - don't want that I don't think COME BACK AND CHANGE WHEN LOOKED AT THE CODE BELOW
 n_PE2_IMild_or_IAsymp[] <- n_PE2_I[i] - n_PE2_ICase1[i]
 n_PE2_IAsymp[] <- rbinom(n_PE2_IMild_or_IAsymp[i], prob_asymp[i])
 n_PE2_IMild[] <- n_PE2_IMild_or_IAsymp[i] - n_PE2_IAsymp[i] + (n_PE2_ICase1_initial[i] - n_PE2_ICase1[i])
 n_PE2_IMild_Drug_5[] <- if (drug_5_indic_IMild == 1) rbinom(n_PE2_IMild[i], drug_5_prop_treat) else 0
 n_PE2_IMild_No_Drug_5[] <- n_PE2_IMild[i] - n_PE2_IMild_Drug_5[i]
-
-n_IMild_Drug_5_R[] <- rbinom(IMild[i], p_IMild_R)
-n_ICase1_Drug_5_ICase2_Drug_5[] <- rbinom(ICase1_Drug_5[i], p_ICase1_ICase2)
-n_ICase2_Drug_5_Hosp[] <- rbinom(ICase2_Drug_5[i], p_ICase2_Hosp) # CHANGE: MAKE SURE THESE ARE PROPERLY INCLUDED AND DON'T GET MISSED OUT
 
 #######
 n_S_E1[] <- rbinom(S[i] - n_S_PS[i], p_S_E1[i]) # Number of newly infected individuals
@@ -309,7 +303,10 @@ n_E2_IMild_Drug_5[] <- if (drug_5_indic_IMild == 1) rbinom(n_E2_IMild[i], drug_5
 n_E2_IMild_No_Drug_5[] <- n_E2_IMild[i] - n_E2_IMild_Drug_5[i]
 
 n_IMild_R[] <- rbinom(IMild[i], p_IMild_R) # Number of mild infections recovering, taking into account proportion receiving drug 4 and its effect to hasten recovery
+n_IMild_Drug_5_R[] <- rbinom(IMild_Drug_5[i], p_IMild_R)
 n_IAsymp_R[] <- rbinom(IAsymp[i], p_IAsymp_R) # Number of mild infections recovering
+n_ICase1_Drug_5_ICase2_Drug_5[] <- rbinom(ICase1_Drug_5[i], p_ICase1_ICase2)
+n_ICase2_Drug_5_Hosp[] <- rbinom(ICase2_Drug_5[i], p_ICase2_Hosp) # CHANGE: MAKE SURE THESE ARE PROPERLY INCLUDED AND DON'T GET MISSED OUT
 n_ICase1_ICase2[] <- rbinom(ICase1[i], p_ICase1_ICase2) # Number progressing through the onset but not hospitalised compartment
 n_ICase2_Hosp[] <- rbinom(ICase2[i], p_ICase2_Hosp) # Number progressing to requiring hospitalisation
 n_IRec1_IRec2[] <- rbinom(IRec1[i], p_Rec1_Rec2) # Number progressing through ICU recovery compartment
