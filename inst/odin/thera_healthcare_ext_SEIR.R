@@ -29,15 +29,18 @@ prophylactic_prop_treat <- user() # proportion of individuals in S who receive t
 prophylactic_drug_wane <- user() # proportion of individuals at each timestep for whom the drug wears off and who move back to S/E
 
 # Property 1 - protects Susceptible individuals from Infection
+drug_1_indic <- user()
 drug_1_effect_size <- user() # the multiple of the FOI experienced by the individuals in the P compartment (0 means drug completely protective)
 
 # Property 2 - reduces the severity of disease that occurs if infected whilst still protected
+drug_2_indic <- user()
 drug_2_effect_size <- user() # the reduction in the probability of ICase disease severity that occurs upon infection
 
 ## Drugs Taken Whilst Infected But Pre-Hospital - Includes Properties 3, 4 & 5
 ##----------------------------------------------------------------------------
 
 # Property 3 - reduces the severity of individuals in or who would flow into ICase, resulting in some of them flowing to IMild
+drug_3_indic <- user()
 drug_3_prop_treat <- user() # the proportion of treated individuals receiving the drug at either of the two forks described above
 drug_3_effect_size <- user() # the reduction in the proportion of individuals that flow to ICase (and hence flow to IMild)
 
@@ -57,10 +60,12 @@ drug_5_effect_size <- user() # the multiple which treated individuals are as inf
 ##---------------------------------------------------------------------------------------------------------------------
 
 # Drug 6 reduces the severity of disease in hospital, leading to a greater proportion of individuals flowing to IMod over ISev/ICrit
+drug_6_indic <- user()
 drug_6_prop_treat <- user() # proportion of individuals treated who receive the drug
 drug_6_effect_size <- user() # the increase in the proportion of individual flowing into IMod rather than ISev or ICrit
 
 # Drug 7 reduces the severity of disease in hospital, leading to a greater proportion of individuals flowing to ISev over ICrit
+drug_7_indic <- user()
 drug_7_prop_treat <- user() # proportion of individuals treated who receive the drug
 drug_7_effect_size <- user() # the increase in the proportion of individual flowing into ISev rather than ICrit
 
@@ -255,10 +260,11 @@ p_ICrit_NoICU_NoOx_NoMV_Die <- 1 - exp(-gamma_ICrit_NoICU_NoOx_NoMV_Die * dt) # 
 ##-----------------------------------------------------------------------------------------
 
 # For those treated with the prophylactic drug (properties 1 and 2)
-n_S_PS[] <- if (time == prophylactic_drug_timing_1 || time == prophylactic_drug_timing_2) rbinom(S[i], prophylactic_prop_treat) else 0
+n_S_PS[] <- if ((time == prophylactic_drug_timing_1 || time == prophylactic_drug_timing_2) & (drug_1_indic == 1|| drug_2_indic == 1)) rbinom(S[i], prophylactic_prop_treat) else 0
 
-n_leave_PS[] <- rbinom(PS[i], 1 - exp(-(prophylactic_drug_wane + lambda[i] * drug_1_effect_size) * dt))
-n_PS_PE1[] <- rbinom(n_leave_PS[i], (lambda[i] * drug_1_effect_size)/(lambda[i] * drug_1_effect_size + prophylactic_drug_wane))
+p_leave_PS[] <- if (drug_1_indic == 1) 1 - exp(-(prophylactic_drug_wane + lambda[i] * drug_1_effect_size) * dt) else 1 - exp(-(prophylactic_drug_wane + lambda[i]) * dt)
+n_leave_PS[] <- rbinom(PS[i], p_leave_PS[i])
+n_PS_PE1[] <- if (drug_1_indic == 1) rbinom(n_leave_PS[i], (lambda[i] * drug_1_effect_size)/(lambda[i] * drug_1_effect_size + prophylactic_drug_wane)) else rbinom(n_leave_PS[i], (lambda[i])/(lambda[i] + prophylactic_drug_wane))
 n_PS_S[] <- n_leave_PS[i] - n_PS_PE1[i]
 
 n_leave_PE1[] <- rbinom(PE1[i], 1 - exp(-(prophylactic_drug_wane + gamma_E) * dt))
@@ -266,18 +272,20 @@ n_PE1_PE2[] <- rbinom(n_leave_PE1[i], gamma_E/(prophylactic_drug_wane + gamma_E)
 n_PE1_E1[] <- n_leave_PE1[i] - n_PE1_PE2[i]
 
 n_leave_PE2[] <- rbinom(PE1[i], 1 - exp(-(prophylactic_drug_wane + gamma_E) * dt))
-n_PE2_I[] <- rbinom(PE2[i], p_E2_I)
+n_PE2_I[] <- rbinom(PE2[i], gamma_E/(prophylactic_drug_wane + gamma_E))
 n_PE2_E2[] <- n_leave_PE2[i] - n_PE2_I[i]
 
 n_PE2_ICase1_initial[] <- rbinom(n_PE2_I[i], prob_hosp[i])
-n_PE2_ICase1[] <- rbinom(n_PE2_ICase1_initial[i], drug_2_effect_size) # check the drug_2_effect_size is right way round # CHANGE DO WE WANT DRUG_EFFECT_3 IN HERE AS WELL??
-n_PE2_ICase1_Drug_5[] <- rbinom(n_PE2_ICase1[i], drug_5_indic_ICase * drug_5_prop_treat)
+n_PE2_ICase1[] <- if (drug_2_indic == 1) rbinom(n_PE2_ICase1_initial[i], (1 - drug_2_effect_size)) else n_PE2_ICase1_initial[i] # CHANGE DO WE WANT DRUG_EFFECT_3 IN HERE AS WELL?? SEE BELOW FOR SNIPPET OF WHAT THIS SHOULD LOOK LIKE
+# n_PE2_ICase1[] <- if (drug_3_indic == 1) rbinom(n_PE2_ICase1[i], 1 - (drug_3_prop_treat * drug_3_effect_size)) else n_PE2_ICase1[i]
+n_PE2_ICase1_Drug_5[] <- if (drug_5_indic_ICase == 1) rbinom(n_PE2_ICase1[i], drug_5_prop_treat) else 0
 n_PE2_ICase1_No_Drug_5[] <- n_PE2_ICase1[i] - n_PE2_ICase1_Drug_5[i]
 
+# some of the drug 2 modded people are flowing and becoming asymptomatics here - don't want that I don't think COME BACK AND CHANGE WHEN LOOKED AT THE CODE BELOW
 n_PE2_IMild_or_IAsymp[] <- n_PE2_I[i] - n_PE2_ICase1[i]
 n_PE2_IAsymp[] <- rbinom(n_PE2_IMild_or_IAsymp[i], prob_asymp[i])
-n_PE2_IMild[] <- n_PE2_IMild_or_IAsymp[i] - n_PE2_IAsymp[i] + (n_PE2_ICase1_initial[i] - n_PE2_ICase1_Drug_5[i])
-n_PE2_IMild_Drug_5[] <- rbinom(n_PE2_IMild[i], drug_5_indic_IMild * drug_5_prop_treat)
+n_PE2_IMild[] <- n_PE2_IMild_or_IAsymp[i] - n_PE2_IAsymp[i] + (n_PE2_ICase1_initial[i] - n_PE2_ICase1[i])
+n_PE2_IMild_Drug_5[] <- if (drug_5_indic_IMild == 1) rbinom(n_PE2_IMild[i], drug_5_prop_treat) else 0
 n_PE2_IMild_No_Drug_5[] <- n_PE2_IMild[i] - n_PE2_IMild_Drug_5[i]
 
 n_IMild_Drug_5_R[] <- rbinom(IMild[i], p_IMild_R)
@@ -290,14 +298,14 @@ n_E1_E2[] <- rbinom(E1[i], p_E1_E2) # Number progressing through latent compartm
 n_E2_I[] <- rbinom(E2[i], p_E2_I) # Number of new symptom onsets
 
 n_E2_ICase1_initial[] <- rbinom(n_E2_I[i], prob_hosp[i]) # Proportion of the new symptom onsets that will require hospitalisation (note: haven't entered hospital yet, delay between onset and hospitalisation)
-n_E2_ICase1[] <- rbinom(n_E2_ICase1_initial[i], drug_3_prop_treat * drug_3_effect_size)
-n_E2_ICase1_Drug_5[] <- rbinom(n_E2_ICase1[i], drug_5_indic_ICase * drug_5_prop_treat)
+n_E2_ICase1[] <- if (drug_3_indic == 1) rbinom(n_E2_ICase1_initial[i], 1 - (drug_3_prop_treat * drug_3_effect_size)) else n_E2_ICase1_initial[i]
+n_E2_ICase1_Drug_5[] <- if (drug_5_indic_ICase == 1) rbinom(n_E2_ICase1[i], drug_5_prop_treat) else 0
 n_E2_ICase1_No_Drug_5[] <- n_E2_ICase1[i] - n_E2_ICase1_Drug_5[i]
 
 n_E2_IMild_or_IAsymp[] <- n_E2_I[i] - n_E2_ICase1[i] # 1 - Above, the rest of the infections, which we consider to be asymptomatic/mild and not require hospitalisation
 n_E2_IAsymp[] <- rbinom(n_E2_IMild_or_IAsymp[i], prob_asymp[i]) # Number of non-hospitalised infections that are asymptomatic
 n_E2_IMild[] <- n_E2_IMild_or_IAsymp[i] - n_E2_IAsymp[i] + (n_E2_ICase1_initial[i] - n_E2_ICase1[i]) # Number of non-hospitalised infections that are mildly symptomatic
-n_E2_IMild_Drug_5[] <- rbinom(n_E2_IMild[i], drug_5_indic_IMild * drug_5_prop_treat)
+n_E2_IMild_Drug_5[] <- if (drug_5_indic_IMild == 1) rbinom(n_E2_IMild[i], drug_5_prop_treat) else 0
 n_E2_IMild_No_Drug_5[] <- n_E2_IMild[i] - n_E2_IMild_Drug_5[i]
 
 n_IMild_R[] <- rbinom(IMild[i], p_IMild_R) # Number of mild infections recovering, taking into account proportion receiving drug 4 and its effect to hasten recovery
@@ -328,7 +336,7 @@ n_IRec2_R[] <- rbinom(IRec2[i], p_Rec2_R) # Number recovering completely NOTE, C
 ## WORKING OUT NUMBER OF ICU BEDS AVAILABILE AND HOW MANY INDIVIDUALS RECEIVE THEM
 ##--------------------------------------------------------------------------------
 number_req_ICU_initial[] <- rbinom(n_ICase2_Hosp[i], prob_severe[i]) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
-number_req_ICU[] <- rbinom(number_req_ICU_initial[i], drug_6_prop_treat * drug_6_effect_size) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
+number_req_ICU[] <- if (drug_6_indic == 1) rbinom(number_req_ICU_initial[i], 1 - (drug_6_prop_treat * drug_6_effect_size)) else number_req_ICU_initial[i] # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
 total_req_ICU <- sum(number_req_ICU) # Totalling number newly requiring an ICU bed over age groups
 
 # Calculating Current ICU Occupancy and New Occupancy After Taking Into Account Individuals Leaving ICU Beds This Timestep
@@ -349,7 +357,7 @@ total_GetICU <- if(current_free_ICU <= 0) 0 else(if(current_free_ICU - total_req
 number_GetICU[] <- rmhyper(total_GetICU, number_req_ICU) # number who get an ICU bed
 
 number_req_ICU_MV_initial[] <- rbinom(number_GetICU[i], prob_critical[i]) # Number of new ICU admissions that are going to require oxygen and mechanical ventilation
-number_req_ICU_MV[] <- rbinom(number_req_ICU_MV_initial[i], drug_7_prop_treat * drug_7_effect_size)
+number_req_ICU_MV[] <- if (drug_7_indic == 1) rbinom(number_req_ICU_MV_initial[i], 1 - (drug_7_prop_treat * drug_7_effect_size)) else number_req_ICU_MV_initial[i]
 
 number_req_ICU_Ox[] <- number_GetICU[i] - number_req_ICU_MV[i] # Number of new ICU admissions that going to require oxygen only
 total_req_ICU_MV <- sum(number_req_ICU_MV)
@@ -603,7 +611,6 @@ update(ICase2_Drug_5[]) <- ICase2_Drug_5[i] + delta_ICase2_Drug_5[i]
 update(PS[]) <- PS[i] + delta_PS[i]
 update(PE1[]) <- PE1[i] + delta_PE1[i]
 update(PE2[]) <- PE2[i] + delta_PE2[i]
-
 
 # Passage Through Requiring Hospital Bed and Oxygen, Either Receiving Both, Oxygen or Neither, and Surviving or Not
 update(IMod_GetHosp_GetOx_Die1[]) <- IMod_GetHosp_GetOx_Die1[i] + delta_IMod_GetHosp_GetOx_Die1[i] # Require hosp bed and oxygen, get both, die (1st)
