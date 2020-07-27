@@ -332,7 +332,7 @@ n_IRec2_R[] <- rbinom(IRec2[i], p_Rec2_R) # Number recovering completely NOTE, C
 
 ## WORKING OUT NUMBER OF ICU BEDS AVAILABILE AND HOW MANY INDIVIDUALS RECEIVE THEM
 ##--------------------------------------------------------------------------------
-number_req_ICU_initial[] <- rbinom(n_ICase2_Hosp[i], prob_severe[i]) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
+number_req_ICU_initial[] <- rbinom(n_ICase2_Hosp[i] + n_ICase2_Drug_5_Hosp[i], prob_severe[i]) # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
 number_req_ICU[] <- if (drug_6_indic == 1) rbinom(number_req_ICU_initial[i], 1 - (drug_6_prop_treat * drug_6_effect_size)) else number_req_ICU_initial[i] # Number of new hospitalisations that are going to require an ICU bed (either with or w/o mechanical ventilation)
 total_req_ICU <- sum(number_req_ICU) # Totalling number newly requiring an ICU bed over age groups
 
@@ -367,7 +367,7 @@ number_NotICU_NotOx[] <- number_NotICU[i] - number_NotICU_NotOx_NotMV[i] # numbe
 
 ## WORKING OUT NUMBER OF HOSPITAL BEDS AVAILABILE AND HOW MANY INDIVIDUALS RECEIVE THEM
 ##-------------------------------------------------------------------------------------
-number_req_Hosp[] <- n_ICase2_Hosp[i] - number_req_ICU[i]  # Number of new hospitalisations that are going to require a hospital bed IS THIS UNCLEAR AND SHOULD IT BE CALLED REQ_HOSP_BED CHANGE
+number_req_Hosp[] <- (n_ICase2_Hosp[i] + n_ICase2_Drug_5_Hosp[i]) - number_req_ICU[i]  # Number of new hospitalisations that are going to require a hospital bed IS THIS UNCLEAR AND SHOULD IT BE CALLED REQ_HOSP_BED CHANGE
 total_req_Hosp <- sum(number_req_Hosp) # Totalling number newly requiring a hospital bed over age groups
 
 # Current Hospital Bed Occupancy
@@ -1216,6 +1216,7 @@ dim(n_E2_IMild_Drug_5) <- N_age
 dim(n_IMild_Drug_5_R) <- N_age
 dim(n_ICase1_Drug_5_ICase2_Drug_5) <- N_age
 dim(n_ICase2_Drug_5_Hosp) <- N_age
+dim(p_leave_PS) <- N_age
 
 # Extra Non-State Variables Outputted by the Model
 output(time) <- TRUE
