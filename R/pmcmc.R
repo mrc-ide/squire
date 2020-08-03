@@ -220,10 +220,10 @@ pmcmc <- function(data,
   # check bounds
   for(var in names(pars_init[[1]])) {
 
-  assert_bounded(as.numeric(pars_init[[1]][[var]]),
-                 left = as.numeric(pars_min[[var]]),
-                 right = as.numeric(pars_max[[var]]),
-                 name = paste(var, "init"))
+    assert_bounded(as.numeric(pars_init[[1]][[var]]),
+                   left = as.numeric(pars_min[[var]]),
+                   right = as.numeric(pars_max[[var]]),
+                   name = paste(var, "init"))
 
     assert_single_numeric(as.numeric(pars_min[[var]]), name = paste(var, "min"))
     assert_single_numeric(as.numeric(pars_max[[var]]), name = paste(var, "max"))
@@ -1008,7 +1008,8 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
 Rt_args_list <- function(plateau_duration = 7,
                          date_Meff_change = NULL,
                          scale_Meff_pl = FALSE,
-                         Rt_shift_duration = 30) {
+                         Rt_shift_duration = 30,
+                         Rt_rw_duration = 14) {
 
   if(!is.null(date_Meff_change)) {
     assert_date(date_Meff_change)
@@ -1017,7 +1018,8 @@ Rt_args_list <- function(plateau_duration = 7,
   list(plateau_duration = plateau_duration,
        date_Meff_change = date_Meff_change,
        scale_Meff_pl = scale_Meff_pl,
-       Rt_shift_duration = Rt_shift_duration)
+       Rt_shift_duration = Rt_shift_duration,
+       Rt_rw_duration = Rt_rw_duration)
 
 }
 
@@ -1035,11 +1037,20 @@ evaluate_Rt_pmcmc <- function(R0_change,
   Rt_shift <- pars[["Rt_shift"]]
   Rt_shift_scale <- pars[["Rt_shift_scale"]]
 
+  # get random walk parameters
+  if(any(grepl("Rt_rw", names(pars)))) {
+    Rt_rw_bool <- TRUE
+    Rt_rws <- pars[grepl("Rt_rw", names(pars))]
+  } else {
+    Rt_rw_bool <- FALSE
+  }
+
   # unpack Rt_args
   plateau_duration <- Rt_args[["plateau_duration"]]
   date_Meff_change <- Rt_args[["date_Meff_change"]]
   scale_meff_pl <- Rt_args[["scale_Meff_pl"]]
   Rt_shift_duration <- Rt_args[["Rt_shift_duration"]]
+  Rt_rw_duration <- Rt_args[["Rt_rw_duration"]]
 
   # and now get new Rts for the R0
   if (!is.null(R0_change)) {
@@ -1051,65 +1062,98 @@ evaluate_Rt_pmcmc <- function(R0_change,
 
     } else {
 
-    # if no date_Meff_change then all from R0_change and Meff
-    if (is.null(date_Meff_change)) {
-
-      Rt <- R0 * (2 * plogis(-(R0_change - 1) * -Meff))
-
-    } else if (!is.null(date_Meff_change)) {
-
-      date_Meff_change <- as.Date(date_Meff_change)
-      date_R0_change <- as.Date(date_R0_change)
-
-      # scale Meff accordingly
-      if (!is.null(scale_meff_pl)) {
-      if (scale_meff_pl) {
-        Meff_pl <- Meff_pl*Meff
-      }
-      }
-
-      # if no shift then set to 0
-      if (is.null(Rt_shift)) {
-        Rt_shift <- 0
-      } else {
-        Rt_shift_x <- seq(0, 1, length.out = max(2,Rt_shift_duration))
-        Rt_shift <- Rt_shift * (1 / (1 + (Rt_shift_x/(1-Rt_shift_x))^-Rt_shift_scale))
-      }
-
-      # when does mobility change take place
-      if(date_Meff_change <= date_R0_change[1]) {
-
-        mob_up <- R0_change-R0_change[1]
-        Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) ))
-
-      } else if (date_Meff_change > tail(date_R0_change, 1)) {
+      # if no date_Meff_change then all from R0_change and Meff
+      if (is.null(date_Meff_change)) {
 
         Rt <- R0 * (2 * plogis(-(R0_change - 1) * -Meff))
 
-      } else {
+      } else if (!is.null(date_Meff_change)) {
 
-        # when is the switch in our data
-        swtchdates <- which(date_R0_change >= date_Meff_change)
-        min_d <- as.Date(date_R0_change[min(swtchdates)])
-        dates_to_median <- seq(min_d - floor(plateau_duration/2),min_d + floor(plateau_duration/2),1)
+        date_Meff_change <- as.Date(date_Meff_change)
+        date_R0_change <- as.Date(date_R0_change)
 
-        # Work out the mobility during this period
-        mob_pld <- median(R0_change[which(date_R0_change %in% dates_to_median)])
+        # scale Meff accordingly
+        if (!is.null(scale_meff_pl)) {
+          if (scale_meff_pl) {
+            Meff_pl <- Meff_pl*Meff
+          }
+        }
 
-        mob_up <- c(rep(0, swtchdates[1]-1),
-                    R0_change[min(swtchdates):(length(R0_change))] - mob_pld)
+        # if no shift then set to 0
+        if (is.null(Rt_shift) || is.null(Rt_shift_scale)) {
+          Rt_shift <- 0
+          Rt_shift_duration <- 1
+        } else {
+          Rt_shift_x <- seq(0, 1, length.out = max(2,Rt_shift_duration))
+          Rt_shift <- Rt_shift * (1 / (1 + (Rt_shift_x/(1-Rt_shift_x))^-Rt_shift_scale))
+          if(is.null(Rt_shift_duration)) {
+            stop("Rt_shift provided but no Rt_shift_duration")
+          }
+        }
 
-        # what does our shift look like
-        Rt_pl_change <- c(rep(0, min(swtchdates[1]-1)), Rt_shift)
-        Rt_pl_change <- c(Rt_pl_change,
-                          rep(tail(Rt_shift,1), max(0, length(mob_up) - length(Rt_pl_change))))
-        Rt_pl_change <- head(Rt_pl_change, length(mob_up))
+        # when does mobility change take place
 
-        # now work out Rt forwards based on mobility increasing from this plateau
-        Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) - Rt_pl_change ))
+        if (date_Meff_change > tail(date_R0_change, 1)) {
 
+          Rt <- R0 * (2 * plogis(-(R0_change - 1) * -Meff))
+
+        } else {
+
+          # when is the switch in our data
+          swtchdates <- which(date_R0_change >= date_Meff_change)
+          min_d <- as.Date(date_R0_change[min(swtchdates)])
+          dates_to_median <- seq(min_d - floor(plateau_duration/2),min_d + floor(plateau_duration/2),1)
+
+          # Work out the mobility during this period
+          mob_pld <- median(R0_change[which(date_R0_change %in% dates_to_median)])
+
+          mob_up <- c(rep(0, swtchdates[1]-1),
+                      R0_change[min(swtchdates):(length(R0_change))] - mob_pld)
+
+          # what does our shift look like
+          shift_dates <- seq.Date(date_R0_change[swtchdates[1]], (date_R0_change[swtchdates[1]]+Rt_shift_duration-1), 1)
+          Rt_pl_change <- c(rep(0, min(swtchdates[1]-1)), Rt_shift[shift_dates %in% date_R0_change])
+          Rt_pl_change <- c(Rt_pl_change,
+                            rep(tail(Rt_shift,1), max(0, length(mob_up) - length(Rt_pl_change))))
+          Rt_pl_change <- head(Rt_pl_change, length(mob_up))
+
+          # if we have random walks
+          if (Rt_rw_bool) {
+
+            # if no duration have as default 14 days
+            if (is.null(Rt_rw_duration)) {
+              Rt_rw_duration <- 14
+            }
+
+            # 0 up until the end of the shift
+            Rt_rw_change <- c(rep(0, min(swtchdates[1]-1) + length(Rt_shift[shift_dates %in% date_R0_change])))
+
+            # append the rw params
+            for (i in seq_along(Rt_rws)) {
+              rw_dates <- date_R0_change[swtchdates[1]]+Rt_shift_duration + ((i-1)*Rt_rw_duration)+(seq_len(Rt_rw_duration)-1)
+              Rt_rw_change <- c(Rt_rw_change, rep(Rt_rws[[i]], Rt_rw_duration)[rw_dates %in% date_R0_change])
+            }
+
+            # take the head if it overruns
+            Rt_rw_change <- head(Rt_rw_change, length(mob_up))
+
+            # fill the end if too short
+            if (length(Rt_rw_change) < length(Rt_pl_change)) {
+              Rt_rw_change <- c(Rt_rw_change, rep(tail(Rt_rw_change, 1), length(Rt_pl_change) - length(Rt_rw_change)))
+            }
+
+          } else {
+
+            Rt_rw_change <- rep(0, length(Rt_pl_change))
+
+          }
+
+
+          # now work out Rt forwards based on mobility increasing from this plateau
+          Rt <- R0 * 2*(plogis( -Meff * -(R0_change-1) - Meff_pl*(mob_up) - Rt_pl_change - Rt_rw_change))
+
+        }
       }
-    }
 
     }
 
