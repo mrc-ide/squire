@@ -1226,7 +1226,7 @@ test_that("evaluate_Rt", {
                           Rt_args = list(plateau_duration = 3,
                                          date_Meff_change = "2020-03-18",
                                          scale_meff_pl = TRUE,
-                                         Rt_shift_duration = 3,
+                                         Rt_shift_duration = 5,
                                          Rt_rw_duration = 3),
                           date_R0_change = date_R0_change)
 
