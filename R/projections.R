@@ -213,9 +213,9 @@ projections <- function(r,
     t_initial <- unique(stats::na.omit(r$output[1,1,]))
 
     if (r$model$.__enclos_env__$private$discrete) {
-    t_steps <- lapply(t_steps, function(x) {
-      seq(t_start, t_start - t_diff + time_period/r$parameters$dt, t_diff)
-    })
+      t_steps <- lapply(t_steps, function(x) {
+        seq(t_start, t_start - t_diff + time_period/r$parameters$dt, t_diff)
+      })
     } else {
       t_steps <- lapply(t_steps, function(x) {
         seq(t_start, t_start - t_diff + time_period, t_diff)
@@ -533,27 +533,39 @@ t0_variables <- function(r) {
     # grab the final R0, contact matrix and bed capacity.
     ret <- lapply(seq_len(dims[3]), function(x) {
 
-      if(!is.null(r$interventions$R0_change)) {
-        if (is.null(r$replicate_parameters$Meff)) {
-          R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change, 1)
-        } else if (is.null(r$replicate_parameters$Meff_pl)) {
-          R0 <- r[[wh]]$inputs$Rt_func(R0 = r$replicate_parameters$R0[x],
-                                       R0_change = tail(r$interventions$R0_change, 1),
-                                       Meff = r$replicate_parameters$Meff[x])
+      if("scan_results" %in% names(r)) {
+
+        if(!is.null(r$interventions$R0_change)) {
+          if (is.null(r$replicate_parameters$Meff)) {
+            R0 <- tail(r$replicate_parameters$R0[x] * r$interventions$R0_change, 1)
+          } else {
+            R0 <- r[[wh]]$inputs$Rt_func(R0 = r$replicate_parameters$R0[x],
+                                         R0_change = tail(r$interventions$R0_change, 1),
+                                         Meff = r$replicate_parameters$Meff[x])
+          }
         } else {
+          R0 <- r$replicate_parameters$R0[x]
+        }
+
+      } else if (("pmcmc_results" %in% names(r))) {
+
+        if(!is.null(r$interventions$R0_change)) {
+
           pars <- as.list(r$replicate_parameters[x,-which(names(r$replicate_parameters) %in% c("start_date", "R0"))])
           names(pars) <- names(r$replicate_parameters)[-which(names(r$replicate_parameters) %in% c("start_date", "R0"))]
           R0 <- tail(evaluate_Rt_pmcmc(R0_change = r$interventions$R0_change,
-                                 R0 = r$replicate_parameters$R0[x],
-                                 date_R0_change = r$interventions$date_R0_change,
-                                 pars = pars,
-                                 Rt_args = r[[wh]]$inputs$Rt_args), 1)
-        }
-      } else {
-        R0 <- r$replicate_parameters$R0[x]
-      }
-      contact_matrix_set <- tail(r$parameters$contact_matrix_set,1)
+                                       R0 = r$replicate_parameters$R0[x],
+                                       date_R0_change = r$interventions$date_R0_change,
+                                       pars = pars,
+                                       Rt_args = r[[wh]]$inputs$Rt_args), 1)
 
+        } else {
+          R0 <- r$replicate_parameters$R0[x]
+        }
+
+      }
+
+      contact_matrix_set <- tail(r$parameters$contact_matrix_set,1)
       hosp_bed_capacity <- tail(r$parameters$hosp_bed_capacity,1)
       ICU_bed_capacity <- tail(r$parameters$ICU_bed_capacity,1)
 

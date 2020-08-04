@@ -1189,4 +1189,49 @@ test_that("evaluate_Rt", {
                                          scale_meff_pl = TRUE),
                           date_R0_change = date_R0_change)
 
+
+  # with early shift
+  expect_error(Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0,
+                          pars = list(Meff = Meff,
+                                      Meff_pl = Meff,
+                                      Rt_shift = 0.1,
+                                      Rt_shift_scale = 1),
+                          Rt_args = list(plateau_duration=1,
+                                         date_Meff_change = "2020-03-01",
+                                         scale_meff_pl = TRUE),
+                          date_R0_change = date_R0_change),
+               "Rt_shift provided but no Rt_shift_duration")
+
+  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0,
+                          pars = list(Meff = Meff,
+                                      Meff_pl = Meff,
+                                      Rt_shift = 0.1,
+                                      Rt_shift_scale = 1),
+                          Rt_args = list(plateau_duration=1,
+                                         date_Meff_change = "2020-03-01",
+                                         scale_meff_pl = TRUE,
+                                         Rt_shift_duration = 3),
+                          date_R0_change = date_R0_change)
+
+  expect_lt(Rt[2], Rt[1])
+
+  # with Rw params
+  Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0,
+                          pars = list(Meff = Meff,
+                                      Meff_pl = Meff,
+                                      Rt_shift = 0.1,
+                                      Rt_shift_scale = 1,
+                                      Rt_rw_1 = 1,
+                                      Rt_rw_2 = 2),
+                          Rt_args = list(plateau_duration = 3,
+                                         date_Meff_change = "2020-03-18",
+                                         scale_meff_pl = TRUE,
+                                         Rt_shift_duration = 5,
+                                         Rt_rw_duration = 3),
+                          date_R0_change = date_R0_change)
+
+  expect_lt(Rt[3], Rt[2])
+  expect_lt(Rt[4], Rt[3])
+  expect_lt(Rt[5], Rt[4])
+  expect_equal(Rt[5], Rt[6])
 })

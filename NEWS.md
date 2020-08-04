@@ -1,3 +1,7 @@
+# squire 0.4.30
+
+* `evaluate_Rt_pmcmc` takes `Rt_rw_n` for random walk esque shifts
+
 # squire 0.4.29
 
 * `format_output` backwards compatible for incidence
