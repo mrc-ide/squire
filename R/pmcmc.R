@@ -1126,12 +1126,13 @@ evaluate_Rt_pmcmc <- function(R0_change,
             }
 
             # 0 up until the end of the shift
-            Rt_rw_change <- c(rep(0, min(swtchdates[1]-1) + length(Rt_shift[shift_dates %in% date_R0_change])))
+            Rt_rw_change <- rep(0, length(mob_up))
 
             # append the rw params
             for (i in seq_along(Rt_rws)) {
-              rw_dates <- date_R0_change[swtchdates[1]]+Rt_shift_duration + ((i-1)*Rt_rw_duration)+(seq_len(Rt_rw_duration)-1)
-              Rt_rw_change <- c(Rt_rw_change, rep(Rt_rws[[i]], Rt_rw_duration)[rw_dates %in% date_R0_change])
+              rw_dates <- date_R0_change[swtchdates[1]]+Rt_shift_duration + ((i-1)*Rt_rw_duration)
+              pos_i <- which(date_R0_change > rw_dates)
+              Rt_rw_change[pos_i] <- Rt_rw_change[pos_i] + Rt_rws[[i]]
             }
 
             # take the head if it overruns

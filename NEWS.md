@@ -1,3 +1,7 @@
+# squire 0.4.31
+
+* Correction to random walk parameters to more accurately continue the walk
+
 # squire 0.4.30
 
 * `evaluate_Rt_pmcmc` takes `Rt_rw_n` for random walk esque shifts
