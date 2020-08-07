@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.26</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.31</span>
       </span>
     </div>
 
@@ -123,7 +123,7 @@
     <p>Calibrate via particle filter grid search using time series of deaths</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/squire/man/calibrate.html'>calibrate</a></span>(
+    <pre class="usage"><span class='fu'>calibrate</span>(
   <span class='kw'>data</span>,
   <span class='kw'>R0_min</span>,
   <span class='kw'>R0_max</span>,
@@ -135,7 +135,7 @@
   Meff_min = <span class='fl'>1</span>,
   Meff_max = <span class='fl'>1</span>,
   Meff_step = <span class='fl'>0.1</span>,
-  squire_model = <span class='fu'><a href='https://rdrr.io/pkg/squire/man/explicit_model.html'>explicit_model</a></span>(),
+  squire_model = <span class='fu'><a href='explicit_model.html'>explicit_model</a></span>(),
   Rt_func = <span class='fu'>function</span>(<span class='kw'>R0_change</span>, <span class='kw'>R0</span>, <span class='kw'>Meff</span>) {     <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='kw'>R0</span>) <span class='op'>-</span> <span class='kw'>Meff</span> <span class='op'>*</span> (<span class='fl'>1</span> <span class='op'>-</span> <span class='kw'>R0_change</span>)) },
   pars_obs = <span class='kw'>NULL</span>,
   forecast = <span class='fl'>0</span>,
@@ -165,7 +165,7 @@
     <tr>
       <th>data</th>
       <td><p>Deaths data to fit to. See <code>example_deaths.csv</code>
-and <code><a href='https://rdrr.io/pkg/squire/man/particle_filter_data.html'>particle_filter_data()</a></code></p></td>
+and <code><a href='particle_filter_data.html'>particle_filter_data()</a></code></p></td>
     </tr>
     <tr>
       <th>R0_min</th>
@@ -333,7 +333,7 @@ which will cause population to be sourced from <code>country</code></p></td>
     <tr>
       <th>...</th>
       <td><p>Further aguments for the model parameter function. If using the
-<code><a href='https://rdrr.io/pkg/squire/man/explicit_model.html'>explicit_model</a></code> (default) this will be
+<code><a href='explicit_model.html'>explicit_model</a></code> (default) this will be
 <code>parameters_explicit_SEEIR</code>.</p></td>
     </tr>
     </table>

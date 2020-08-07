@@ -102,7 +102,7 @@ the squire_model framework." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.26</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.31</span>
       </span>
     </div>
 
@@ -183,7 +183,7 @@ posterior probability. The parameters from those iterations are then used to gen
 the <code>squire_model</code> framework.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/squire/man/pmcmc.html'>pmcmc</a></span>(
+    <pre class="usage"><span class='fu'>pmcmc</span>(
   <span class='kw'>data</span>,
   <span class='kw'>n_mcmc</span>,
   log_likelihood = <span class='kw'>NULL</span>,
@@ -192,7 +192,7 @@ the <code>squire_model</code> framework.</p>
   steps_per_day = <span class='fl'>4</span>,
   output_proposals = <span class='fl'>FALSE</span>,
   n_chains = <span class='fl'>1</span>,
-  squire_model = <span class='fu'><a href='https://rdrr.io/pkg/squire/man/explicit_model.html'>explicit_model</a></span>(),
+  squire_model = <span class='fu'><a href='explicit_model.html'>explicit_model</a></span>(),
   pars_obs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(phi_cases = <span class='fl'>1</span>, k_cases = <span class='fl'>2</span>, phi_death = <span class='fl'>1</span>, k_death = <span class='fl'>2</span>, exp_noise =
     <span class='fl'>1e+06</span>),
   pars_init = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(start_date = <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2020-02-07"</span>), R0 = <span class='fl'>2.5</span>, Meff = <span class='fl'>2</span>, Meff_pl = <span class='fl'>3</span>,
@@ -416,7 +416,7 @@ to select parameter set. For each parmater set sampled, run particle filter with
     <tr>
       <th>...</th>
       <td><p>Further aguments for the model parameter function. If using the
-<code><a href='https://rdrr.io/pkg/squire/man/explicit_model.html'>explicit_model</a></code> (default) this will be
+<code><a href='explicit_model.html'>explicit_model</a></code> (default) this will be
 <code>parameters_explicit_SEEIR</code>.</p></td>
     </tr>
     </table>

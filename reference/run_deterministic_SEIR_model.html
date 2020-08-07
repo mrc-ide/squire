@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.26</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.31</span>
       </span>
     </div>
 
@@ -123,7 +123,7 @@
     <p>Run the deterministic explicit SEIR model</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/squire/man/run_deterministic_SEIR_model.html'>run_deterministic_SEIR_model</a></span>(
+    <pre class="usage"><span class='fu'>run_deterministic_SEIR_model</span>(
   country = <span class='kw'>NULL</span>,
   population = <span class='kw'>NULL</span>,
   tt_contact_matrix = <span class='fl'>0</span>,
@@ -358,9 +358,9 @@ death. Default = 1</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='kw'>pop</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/squire/man/get_population.html'>get_population</a></span>(<span class='st'>"Afghanistan"</span>)
-<span class='kw'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/squire/man/get_mixing_matrix.html'>get_mixing_matrix</a></span>(<span class='st'>"Afghanistan"</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/squire/man/run_deterministic_SEIR_model.html'>run_deterministic_SEIR_model</a></span>(<span class='kw'>pop</span><span class='op'>$</span><span class='kw'>n</span>, <span class='kw'>m</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>50</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>3</span><span class='op'>/</span><span class='fl'>2</span>), <span class='fl'>365</span>, <span class='fl'>100000</span>,
+<span class='kw'>pop</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_population.html'>get_population</a></span>(<span class='st'>"Afghanistan"</span>)
+<span class='kw'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_mixing_matrix.html'>get_mixing_matrix</a></span>(<span class='st'>"Afghanistan"</span>)
+<span class='fu'>run_deterministic_SEIR_model</span>(<span class='kw'>pop</span><span class='op'>$</span><span class='kw'>n</span>, <span class='kw'>m</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>50</span>), <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>3</span><span class='op'>/</span><span class='fl'>2</span>), <span class='fl'>365</span>, <span class='fl'>100000</span>,
 <span class='fl'>1000000</span>)
 }</div></pre>
   </div>
