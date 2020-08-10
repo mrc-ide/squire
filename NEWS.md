@@ -1,3 +1,7 @@
+# squire 0.4.32
+
+* `intervention_dates_for_odin` fills dates earlier than `date_R0_change`
+
 # squire 0.4.31
 
 * Correction to random walk parameters to more accurately continue the walk

@@ -491,8 +491,9 @@ intervention_dates_for_odin <- function(dates,
   # and we assume the first change value is 1 (i.e. the R0)
   } else {
 
-    dates <- c(start_date, dates)
-    change <- c(1, change)
+    extra_start <- seq.Date(start_date, dates[1]-1, 1)
+    dates <- c(extra_start, dates)
+    change <- c(rep(1, length(extra_start)), change)
 
   }
 

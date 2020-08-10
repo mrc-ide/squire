@@ -275,6 +275,19 @@ test_that("interventions_unique error cases", {
   expect_error(intervention_dates_for_odin(c("2020-03-10","2020-03-09"), "2020-02-21", 4))
 })
 
+test_that("intervention_dates_for_odin early start_date", {
+
+  dates <- seq.Date(as.Date("2020-01-01"), as.Date("2020-08-10"), 1)
+  tt <- intervention_dates_for_odin(dates = dates,
+                                    change = seq(1, 0.2, length.out = length(dates)),
+                                    start_date = as.Date("2019-12-29"),
+                                    steps_per_day = 4)
+
+  expect_true(as.Date("2019-12-30") %in% tt$dates)
+  expect_true(as.Date("2019-12-31") %in% tt$dates)
+
+})
+
 test_that("run_deterministic_comparison error cases", {
 
 data <- read.csv(squire_file("extdata/example.csv"))
