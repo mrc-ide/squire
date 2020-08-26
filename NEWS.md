@@ -1,3 +1,7 @@
+# squire 0.4.33
+
+* `format_output` accepts `deaths_treatment` and `deaths_no_treatment`
+
 # squire 0.4.32
 
 * `intervention_dates_for_odin` fills dates earlier than `date_R0_change`
