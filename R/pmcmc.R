@@ -143,6 +143,7 @@ pmcmc <- function(data,
                                        "R0_pl_shift" = FALSE),
                   proposal_kernel = NULL,
                   reporting_fraction = 1,
+                  treated_deaths_only = FALSE,
                   country = NULL,
                   population = NULL,
                   contact_matrix_set = NULL,
@@ -379,6 +380,7 @@ pmcmc <- function(data,
   # adjust for reporting fraction
   pars_obs$phi_cases <- reporting_fraction
   pars_obs$phi_death <- reporting_fraction
+  pars_obs$treated_deaths_only <- treated_deaths_only
 
   # build model parameters
   model_params <- squire_model$parameter_func(country = country,

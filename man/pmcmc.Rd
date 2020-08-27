@@ -26,6 +26,7 @@ pmcmc(
     R0_pl_shift = FALSE),
   proposal_kernel = NULL,
   reporting_fraction = 1,
+  treated_deaths_only = FALSE,
   country = NULL,
   population = NULL,
   contact_matrix_set = NULL,

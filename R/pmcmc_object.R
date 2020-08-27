@@ -34,7 +34,12 @@ plot_pmcmc_sample  <- function(x, what = "deaths") {
 
   else if(what == "deaths") {
 
-    index <- c(idx$D)
+    if (x$pmcmc_results$inputs$pars_obs$treated_deaths_only) {
+      index <- c(idx$D_get)
+    } else {
+      index <- c(idx$D)
+    }
+
     ylab <- "Deaths"
     xlab <- "Date"
     particles <- vapply(seq_len(dim(x$output)[3]), function(y) {
@@ -335,7 +340,7 @@ plot.squire_pmcmc_list <- function(x, burn_in = 1, thin = 1, ...) {
         if (thin == 1) {
           smp <- seq_len(length(master_chain[[i]]))
         } else {
-        smp <- sample(length(master_chain[[i]]),size = round(length(master_chain[[i]])*thin), replace = FALSE)
+          smp <- sample(length(master_chain[[i]]),size = round(length(master_chain[[i]])*thin), replace = FALSE)
         }
         plot(x = master_chain[[i]][smp],
              y = master_chain[[j]][smp],

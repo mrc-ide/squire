@@ -1,3 +1,7 @@
+# squire 0.4.34
+
+* `pmcmc` argument `treated_deaths_only` will use deaths from treatment in likelihood
+
 # squire 0.4.33
 
 * `format_output` accepts `deaths_treatment` and `deaths_no_treatment`

@@ -1236,3 +1236,164 @@ test_that("evaluate_Rt", {
   expect_lt(Rt[5], Rt[4])
   expect_equal(Rt[5], Rt[6])
 })
+
+
+#------------------------------------------------
+test_that("pmcmc deaths from treatment", {
+
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  pars_init = list('start_date'     = as.Date("2020-02-07"),
+                   'R0'             = 2.5,
+                   'Meff'           = 2)
+  pars_min = list('start_date'      = as.Date("2020-02-01"),
+                  'R0'              = 1e-10,
+                  'Meff'            = 0.1)
+  pars_max = list('start_date'      = as.Date("2020-02-20"),
+                  'R0'              = 5,
+                  'Meff'            = 5)
+  pars_discrete = list('start_date' = TRUE,
+                       'R0'         = FALSE,
+                       'Meff'       = FALSE)
+  pars_obs = list(phi_cases = 0.1,
+                  k_cases = 2,
+                  phi_death = 1,
+                  k_death = 2,
+                  exp_noise = 1e6)
+  # proposal kernel covriance
+  proposal_kernel <- matrix(0.5, ncol=length(pars_init), nrow = length(pars_init))
+  diag(proposal_kernel) <- 1
+  rownames(proposal_kernel) <- colnames(proposal_kernel) <- names(pars_init)
+
+  steps_per_day = 4
+
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  n_particles = 2
+
+  out <- pmcmc(data = data,
+               n_mcmc = 50,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = deterministic_model(),
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               baseline_hosp_bed_capacity = 1,
+               baseline_ICU_bed_capacity = 1,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               Rt_args = list(date_Meff_change = NULL),
+               treated_deaths_only = FALSE,
+               country = country)
+
+  out2 <- pmcmc(data = data,
+               n_mcmc = 50,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = deterministic_model(),
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               baseline_hosp_bed_capacity = 1,
+               baseline_ICU_bed_capacity = 1,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               Rt_args = list(date_Meff_change = NULL),
+               treated_deaths_only = TRUE,
+               country = country)
+
+
+  expect_lt(sum(format_output(out, "deaths")$y, na.rm = TRUE),
+            sum(format_output(out2, "deaths")$y, na.rm = TRUE))
+
+  expect_warning(expect_s3_class(plot(out, particle_fit = TRUE), "gg"))
+  expect_warning(expect_s3_class(plot(out2, particle_fit = TRUE), "gg"))
+
+
+
+  out <- pmcmc(data = data,
+               n_mcmc = 50,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = explicit_model(),
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               baseline_hosp_bed_capacity = 1,
+               baseline_ICU_bed_capacity = 1,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               Rt_args = list(date_Meff_change = NULL),
+               treated_deaths_only = FALSE,
+               country = country)
+
+  out2 <- pmcmc(data = data,
+                n_mcmc = 50,
+                log_likelihood = NULL,
+                log_prior = NULL,
+                n_particles = 2,
+                steps_per_day = steps_per_day,
+                output_proposals = FALSE,
+                n_chains = 1,
+                replicates = 2,
+                burnin = 0,
+                squire_model = explicit_model(),
+                pars_init = pars_init,
+                pars_min = pars_min,
+                pars_max = pars_max,
+                pars_discrete = pars_discrete,
+                pars_obs = pars_obs,
+                baseline_hosp_bed_capacity = 1,
+                baseline_ICU_bed_capacity = 1,
+                proposal_kernel = proposal_kernel,
+                R0_change = R0_change,
+                date_R0_change = date_R0_change,
+                Rt_args = list(date_Meff_change = NULL),
+                treated_deaths_only = TRUE,
+                country = country)
+
+  expect_lt(sum(format_output(out, "deaths")$y, na.rm = TRUE),
+            sum(format_output(out2, "deaths")$y, na.rm = TRUE))
+
+  expect_warning(expect_s3_class(plot(out, particle_fit = TRUE), "gg"))
+  expect_warning(expect_s3_class(plot(out2, particle_fit = TRUE), "gg"))
+
+
+
+})
+
+
