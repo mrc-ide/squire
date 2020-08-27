@@ -34,11 +34,7 @@ plot_pmcmc_sample  <- function(x, what = "deaths") {
 
   else if(what == "deaths") {
 
-    if (x$pmcmc_results$inputs$pars_obs$treated_deaths_only) {
-      index <- c(idx$D_get)
-    } else {
       index <- c(idx$D)
-    }
 
     ylab <- "Deaths"
     xlab <- "Date"
@@ -57,7 +53,35 @@ plot_pmcmc_sample  <- function(x, what = "deaths") {
       ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
       ggplot2::geom_point(ggplot2::aes(y=.data$deaths/x$pmcmc_results$inputs$pars_obs$phi_death,
-                                       x=as.Date(.data$date)), x$pmcmc_results$inputs$data)
+                                       x=as.Date(.data$date)), x$pmcmc_results$inputs$data) +
+      ggplot2::theme(legend.position = "top")
+
+    if ("treated_deaths_only" %in% names(x$pmcmc_results$inputs$pars_obs)) {
+      if (x$pmcmc_results$inputs$pars_obs$treated_deaths_only) {
+
+        d_get <- format_output(x, "deaths_treatment", date_0 = max(x$pmcmc_results$inputs$data$date))
+
+        particles_get <- vapply(seq_len(dim(x$output)[3]), function(y) {
+          out <- c(0,diff(rowSums(x$output[,idx$D_get,y], na.rm = TRUE)))
+          names(out)[1] <- rownames(x$output)[1]
+          out},
+          FUN.VALUE = numeric(dim(x$output)[1]))
+        quants_get <- as.data.frame(t(apply(particles_get, 1, quantile, c(0.025, 0.975))))
+        quants_get$date <- rownames(quants_get)
+        names(quants_get)[1:2] <- c("ymin","ymax")
+
+        base_plot <- base_plot +
+          ggplot2::geom_line(ggplot2::aes(
+            y=.data$y, x=as.Date(.data$date), color = .data$compartment, group = .data$replicate),
+          alpha = 0.2, d_get, show.legend = TRUE) +
+          ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants_get, linetype="dotted") +
+          ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants_get, linetype="dotted") +
+          ggplot2::theme(legend.position = "top")
+
+      }
+    }
+
+
 
   } else {
 
@@ -67,8 +91,7 @@ plot_pmcmc_sample  <- function(x, what = "deaths") {
 
   base_plot <-  base_plot +
     ggplot2::ylab(ylab) +
-    ggplot2::xlab(xlab) +
-    ggplot2::theme(legend.position = "none")
+    ggplot2::xlab(xlab)
   return(base_plot)
 
 

@@ -326,6 +326,9 @@ compare_output <- function(model, pars_obs, data, type="explicit_SEEIR_model") {
   k_cases <- pars_obs$k_cases
   exp_noise <- pars_obs$exp_noise
   treated_deaths_only <- pars_obs$treated_deaths_only
+  if (is.null(treated_deaths_only)) {
+    treated_deaths_only <- FALSE
+  }
 
   # locations of these
   index_cases <- cases_total_index(model) - 1L
