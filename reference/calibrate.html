@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.31</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.34</span>
       </span>
     </div>
 
@@ -141,6 +141,7 @@
   forecast = <span class='fl'>0</span>,
   n_particles = <span class='fl'>100</span>,
   reporting_fraction = <span class='fl'>1</span>,
+  treated_deaths_only = <span class='fl'>FALSE</span>,
   replicates = <span class='fl'>100</span>,
   date_R0_change = <span class='kw'>NULL</span>,
   R0_change = <span class='kw'>NULL</span>,
@@ -244,6 +245,12 @@ on the log scale given by <code><a href='https://rdrr.io/r/base/Log.html'>exp(lo
       <td><p>Reporting fraction. Numeric for what proportion of
 the total deaths the reported deaths represent. E.g. 0.5 results in
 the model calibrating to twice the deaths provided by <code>data$deaths</code></p></td>
+    </tr>
+    <tr>
+      <th>treated_deaths_only</th>
+      <td><p>Boolean for whether likelihood is based only on
+deaths that occur from healthcare systems, i.e. are treated. Default = FALSE,
+which uses all deaths.</p></td>
     </tr>
     <tr>
       <th>replicates</th>
