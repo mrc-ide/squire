@@ -22,6 +22,7 @@ calibrate(
   forecast = 0,
   n_particles = 100,
   reporting_fraction = 1,
+  treated_deaths_only = FALSE,
   replicates = 100,
   date_R0_change = NULL,
   R0_change = NULL,
@@ -89,6 +90,10 @@ on the log scale given by \code{exp(log(R0) - Meff*(1-R0_change))}.}
 \item{reporting_fraction}{Reporting fraction. Numeric for what proportion of
 the total deaths the reported deaths represent. E.g. 0.5 results in
 the model calibrating to twice the deaths provided by \code{data$deaths}}
+
+\item{treated_deaths_only}{Boolean for whether likelihood is based only on
+deaths that occur from healthcare systems, i.e. are treated. Default = FALSE,
+which uses all deaths.}
 
 \item{replicates}{Replicates to be run. Default = 100}
 
