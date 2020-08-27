@@ -126,7 +126,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
     index$n_E2_I <- seq(tail(unlist(index),1)+1, tail(unlist(index),1)+length(index$S),1)
     dimnms <- dimnames(x$output)
     dimnms[[2]] <- c(dimnms[[2]], paste0("n_E2_I[", seq_len(length(index$S)),"]"))
-    new_data <- array(data = NA,
+    new_data <- array(data = 0,
                       dim = c(dim(x$output) + c(0, length(index$n_E2_I), 0)),
                       dimnames = dimnms)
 
@@ -141,7 +141,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
     index$delta_D <- seq(tail(unlist(index),1)+1, tail(unlist(index),1)+length(index$S),1)
     dimnms <- dimnames(x$output)
     dimnms[[2]] <- c(dimnms[[2]], paste0("delta_D[", seq_len(length(index$S)),"]"))
-    new_data <- array(data = NA,
+    new_data <- array(data = 0,
                       dim = c(dim(x$output) + c(0, length(index$delta_D), 0)),
                       dimnames = dimnms)
 
@@ -158,6 +158,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   # backwards compatible
   if ("cum_hosp_inc" %in% names(index)) {
   if(!grepl("simple", x$model$ir[2])) {
+
   for(i in seq_along(x$parameters$population)) {
     collect <- vapply(1:x$parameters$replicates, function(j) {
       pos <- seq(i, length(index$cum_hosp_inc), by = length(x$parameters$population))
@@ -178,6 +179,31 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   }
   }
   }
+
+  if ("D_not_get" %in% names(index)) {
+    if(!grepl("simple", x$model$ir[2])) {
+
+      # Generate D get incidence at each timestep from the cumulative
+      for(i in seq_along(x$parameters$population)) {
+        collect <- vapply(1:x$parameters$replicates, function(j) {
+          pos <- seq(i, length(index$D_get), by = length(x$parameters$population))
+          pos <- index$D_get[pos]
+          diff(x$output[,pos,j])
+        }, FUN.VALUE = numeric(nt-1))
+        x$output[1+seq_len(nt-1),index$D_get[i],] <- collect
+      }
+
+      # Generate D not get incidence at each timestep from the cumulative
+      for(i in seq_along(x$parameters$population)) {
+        collect <- vapply(1:x$parameters$replicates, function(j) {
+          pos <- seq(i, length(index$D_not_get), by = length(x$parameters$population))
+          pos <- index$D_not_get[pos]
+          diff(x$output[,pos,j])
+        }, FUN.VALUE = numeric(nt-1))
+        x$output[1+seq_len(nt-1),index$D_not_get[i],] <- collect
+      }
+    }
+    }
 
   # are the steps not 1 apart? if so we need to sum the incident variables (infecions/deaths)
   if(!grepl("simple", x$model$ir[2])) {
@@ -207,10 +233,12 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   }
 
   # Summary Values and Relevant Compartments
-  summary_variables <- c("deaths", "infections", "hospital_occupancy",
+  summary_variables <- c("deaths", "deaths_treatment", "deaths_no_treatment", "infections", "hospital_occupancy",
                          "ICU_occupancy", "hospital_demand", "ICU_demand", "hospital_incidence", "ICU_incidence")
   summary_variable_compartments <- list(
     deaths = "delta_D",
+    deaths_treatment = "D_get",
+    deaths_no_treatment = "D_not_get",
     infections = "n_E2_I",
     hospital_occupancy = c("IOxGetLive1","IOxGetLive2","IOxGetDie1","IOxGetDie2", "IRec1", "IRec2"),
     ICU_occupancy = c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2"),

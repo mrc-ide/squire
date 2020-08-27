@@ -325,10 +325,15 @@ compare_output <- function(model, pars_obs, data, type="explicit_SEEIR_model") {
   phi_cases <- pars_obs$phi_cases
   k_cases <- pars_obs$k_cases
   exp_noise <- pars_obs$exp_noise
+  treated_deaths_only <- pars_obs$treated_deaths_only
+  if (is.null(treated_deaths_only)) {
+    treated_deaths_only <- FALSE
+  }
 
   # locations of these
   index_cases <- cases_total_index(model) - 1L
   index_D <- c(index$D) - 1L
+  index_D_get <- c(index$D_get) - 1L
 
   force(data)
 
@@ -345,12 +350,18 @@ compare_output <- function(model, pars_obs, data, type="explicit_SEEIR_model") {
     log_weights <- rep(0, ncol(state))
 
     if (!is.na(data$deaths[t])) {
+
       ## new deaths summed across ages/infectivities
-      model_deaths <- colSums(state[index_D, ]) -
-        colSums(prev_state[index_D, ])
+      if (treated_deaths_only) {
+        model_deaths <- colSums(state[index_D_get, ]) - colSums(prev_state[index_D_get, ])
+      } else {
+        model_deaths <- colSums(state[index_D, ]) - colSums(prev_state[index_D, ])
+      }
+
       log_weights <- log_weights +
         ll_nbinom(data$deaths[t], model_deaths, phi_death, k_death, exp_noise)
-    }
+
+      }
 
     # We are not going to be bringing cases in so comment this out
 
@@ -491,8 +502,9 @@ intervention_dates_for_odin <- function(dates,
   # and we assume the first change value is 1 (i.e. the R0)
   } else {
 
-    dates <- c(start_date, dates)
-    change <- c(1, change)
+    extra_start <- seq.Date(start_date, dates[1]-1, 1)
+    dates <- c(extra_start, dates)
+    change <- c(rep(1, length(extra_start)), change)
 
   }
 
@@ -685,7 +697,17 @@ run_deterministic_comparison <- function(data,
   deaths <- data$deaths[-1]
 
   # calculate ll
-  ll <- ll_nbinom(deaths, Ds, obs_params$phi_death, obs_params$k_death, obs_params$exp_noise)
+  if (obs_params$treated_deaths_only) {
+
+    Ds_heathcare <- diff(rowSums(out[,index$D_get]))
+    Ds_heathcare <- Ds_heathcare[data$day_end[-1]]
+    ll <- ll_nbinom(deaths, Ds_heathcare, obs_params$phi_death, obs_params$k_death, obs_params$exp_noise)
+
+  } else {
+
+    ll <- ll_nbinom(deaths, Ds, obs_params$phi_death, obs_params$k_death, obs_params$exp_noise)
+
+  }
 
   # format the out object
   date <- data$date[[1]] + seq_len(nrow(out)) - 1L

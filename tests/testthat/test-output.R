@@ -331,3 +331,80 @@ test_that("output format works for hospitalisation and ICU incidence for stochas
 })
 
 
+
+test_that("output format works for deaths from hospitals and those not", {
+
+  set.seed(123)
+  pop <- get_population("Afghanistan", simple_SEIR = FALSE)
+  m1 <- run_explicit_SEEIR_model(R0 = 2,
+                                 population = pop$n,
+                                 dt = 1,
+                                 time_period = 300,
+                                 replicates = 1,
+                                 day_return = TRUE,
+                                 contact_matrix_set=contact_matrices[[1]])
+
+  D_get <- format_output(m1, var_select = "deaths_treatment")
+  D_no_get <- format_output(m1, var_select = "deaths_no_treatment")
+  deaths <- format_output(m1, var_select = "deaths")
+
+  expect_type(D_get, "list")
+  expect_type(D_no_get, "list")
+  expect_equal(deaths$y, (D_get$y + D_no_get$y))
+
+
+  m <- get_mixing_matrix("Afghanistan")
+  model_output <- run_deterministic_SEIR_model(
+    population = pop$n, contact_matrix_set = m,
+    tt_R0 = c(0), R0 = c(3), time_period = 100,
+    day_return = TRUE,
+    hosp_bed_capacity = 100000,
+    ICU_bed_capacity = 1000000)
+
+  D_get_det <- format_output(model_output, var_select = "deaths_treatment")
+  D_no_get_det <- format_output(model_output, var_select = "deaths_no_treatment")
+  deaths_det <- format_output(model_output, var_select = "deaths")
+  expect_equal(deaths_det$y, (D_get_det$y + D_no_get_det$y))
+
+  set.seed(93L)
+
+  m1 <- run_explicit_SEEIR_model(R0 = 2,
+                                 population = pop$n,
+                                 dt = 1,
+                                 time_period = 200,
+                                 replicates = 1,
+                                 contact_matrix_set=contact_matrices[[1]])
+
+  m2 <- run_explicit_SEEIR_model(R0 = 2,
+                                 population = pop$n,
+                                 dt = 0.2,
+                                 time_period = 200,
+                                 replicates = 1,
+                                 contact_matrix_set=contact_matrices[[1]])
+
+  m3 <- run_explicit_SEEIR_model(R0 = 2,
+                                 population = pop$n,
+                                 dt = 0.2,
+                                 day_return = TRUE,
+                                 time_period = 200,
+                                 replicates = 1,
+                                 contact_matrix_set=contact_matrices[[1]])
+
+  m4 <- run_simple_SEEIR_model(
+    population = get_population("Afghanistan", simple_SEIR = TRUE)$n,
+    contact_matrix_set = m,
+    tt_R0 = c(0), R0 = c(3), time_period = 2,
+    day_return = TRUE)
+
+
+  f <- format_output(m1, "deaths_treatment")
+  f2 <- format_output(m2, "deaths_treatment")
+  f3 <- format_output(m3, "deaths_treatment")
+  expect_error(f4 <- format_output(m4, "deaths_treatment"), "S, E, I, R, n_EI")
+
+  expect_gt(max(f$y), 3*max(f2$y))
+  expect_lt(max(f$y), 3*max(f3$y))
+
+})
+
+

@@ -128,6 +128,9 @@ deriv(IOxNotGetDie2[]) <- gamma_not_get_ox_die * IOxNotGetDie1[i] -  gamma_not_g
 deriv(R[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox_survive * IOxGetLive2[i]) + (gamma_not_get_ox_survive * IOxNotGetLive2[i]) + (gamma_not_get_mv_survive * IMVNotGetLive2[i])
 deriv(D[]) <- (gamma_get_ox_die * IOxGetDie2[i]) + (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_get_mv_die * IMVGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
 
+deriv(D_get[]) <- (gamma_get_ox_die * IOxGetDie2[i]) + (gamma_get_mv_die * IMVGetDie2[i])
+deriv(D_not_get[]) <- (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
+
 # Outputting Hospitalisation and ICU Incidence
 output(number_requiring_Ox[]) <- TRUE
 output(number_requiring_IMV[]) <- TRUE
@@ -161,6 +164,8 @@ initial(IRec1[]) <- IRec1_0[i]
 initial(IRec2[]) <- IRec2_0[i]
 initial(R[]) <- R_0[i]
 initial(D[]) <- D_0[i]
+initial(D_get[]) <- 0
+initial(D_not_get[]) <- 0
 
 ##Initial vectors
 S_0[] <- user()
@@ -220,6 +225,8 @@ dim(IRec1) <- N_age
 dim(IRec2) <- N_age
 dim(R) <- N_age
 dim(D) <- N_age
+dim(D_get) <- N_age
+dim(D_not_get) <- N_age
 
 # For the Initial Values
 dim(S_0) <- N_age

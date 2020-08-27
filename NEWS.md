@@ -1,3 +1,15 @@
+# squire 0.4.34
+
+* `pmcmc` argument `treated_deaths_only` will use deaths from treatment in likelihood
+
+# squire 0.4.33
+
+* `format_output` accepts `deaths_treatment` and `deaths_no_treatment`
+
+# squire 0.4.32
+
+* `intervention_dates_for_odin` fills dates earlier than `date_R0_change`
+
 # squire 0.4.31
 
 * Correction to random walk parameters to more accurately continue the walk

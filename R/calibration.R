@@ -3,6 +3,9 @@
 #' @param reporting_fraction Reporting fraction. Numeric for what proportion of
 #'   the total deaths the reported deaths represent. E.g. 0.5 results in
 #'   the model calibrating to twice the deaths provided by \code{data$deaths}
+#' @param treated_deaths_only Boolean for whether likelihood is based only on
+#'   deaths that occur from healthcare systems, i.e. are treated. Default = FALSE,
+#'   which uses all deaths.
 #' @param replicates Replicates to be run. Default = 100
 #' @param forecast Number of days to forecast forward. Default = 0
 #' @param baseline_hosp_bed_capacity The starting number of hospital beds before
@@ -66,6 +69,7 @@ calibrate <- function(data,
                       forecast = 0,
                       n_particles = 100,
                       reporting_fraction = 1,
+                      treated_deaths_only = FALSE,
                       replicates = 100,
                       date_R0_change = NULL,
                       R0_change = NULL,
@@ -233,12 +237,11 @@ calibrate <- function(data,
                     k_death = 2,
                     exp_noise = 1e6)
 
-    } else {
-
-    pars_obs$phi_cases <- reporting_fraction
-    pars_obs$phi_death <- reporting_fraction
-
   }
+
+  pars_obs$phi_cases <- reporting_fraction
+  pars_obs$phi_death <- reporting_fraction
+  pars_obs$treated_deaths_only <- treated_deaths_only
 
   # construct scan
   if (Meff_min == Meff_max) {

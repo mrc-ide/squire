@@ -83,6 +83,8 @@ update(IRec1[]) <- IRec1[i] + delta_IRec1[i] # First of the compartments for tho
 update(IRec2[]) <- IRec2[i] + delta_IRec2[i] # Second of the compartments for those recovering from ICU (2 comps)
 update(R[]) <- R[i] + delta_R[i] # Recovered
 update(D[]) <- D[i] + delta_D[i] # Deaths
+update(D_get[]) <- D_get[i] + delta_D_get[i] # Deaths broken down by reporting
+update(D_not_get[]) <- D_not_get[i] + delta_D_not_get[i] # Deaths broken down by reporting
 
 ###########################################################################
 ## Defining individual probabilities of transition between compartments: ##
@@ -245,6 +247,8 @@ delta_IRec1[] <- n_IMVGetLive2_Rec[i] - n_IRec1_IRec2[i]
 delta_IRec2[] <- n_IRec1_IRec2[i] - n_IRec2_R[i]
 delta_R[] <- n_IOxGetLive2_R[i] + n_IOxNotGetLive2_R[i] + n_IRec2_R[i] + n_IMVNotGetLive2_R[i] + n_IMild_R[i]
 delta_D[] <- n_IOxGetDie2_D[i] + n_IOxNotGetDie2_D[i] + n_IMVGetDie2_D[i] + n_IMVNotGetDie2_D[i]
+delta_D_get[] <- n_IOxGetDie2_D[i] + n_IMVGetDie2_D[i]
+delta_D_not_get[] <- n_IOxNotGetDie2_D[i] + n_IMVNotGetDie2_D[i]
 
 ##Compute the Force of infection
 
@@ -310,6 +314,8 @@ initial(IRec1[]) <- IRec1_0[i]
 initial(IRec2[]) <- IRec2_0[i]
 initial(R[]) <- R_0[i]
 initial(D[]) <- D_0[i]
+initial(D_get[]) <- 0
+initial(D_not_get[]) <- 0
 
 ##Initial vectors
 S_0[] <- user()
@@ -370,6 +376,8 @@ dim(IRec1) <- N_age
 dim(IRec2) <- N_age
 dim(R) <- N_age
 dim(D) <- N_age
+dim(D_get) <- N_age
+dim(D_not_get) <- N_age
 
 # For the Initial Values
 dim(S_0) <- N_age
@@ -425,6 +433,8 @@ dim(delta_IRec1) <- N_age
 dim(delta_IRec2) <- N_age
 dim(delta_R) <- N_age
 dim(delta_D) <- N_age
+dim(delta_D_get) <- N_age
+dim(delta_D_not_get) <- N_age
 
 # For the Number of People Moving In and Out of Compartments
 dim(n_E1_E2) <- N_age

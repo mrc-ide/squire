@@ -26,6 +26,7 @@ pmcmc(
     R0_pl_shift = FALSE),
   proposal_kernel = NULL,
   reporting_fraction = 1,
+  treated_deaths_only = FALSE,
   country = NULL,
   population = NULL,
   contact_matrix_set = NULL,
@@ -96,6 +97,10 @@ list(phi_cases = 0.1,
 \item{reporting_fraction}{Reporting fraction. Numeric for what proportion of
 the total deaths the reported deaths represent. E.g. 0.5 results in
 the model calibrating to twice the deaths provided by \code{data$deaths}}
+
+\item{treated_deaths_only}{Boolean for whether likelihood is based only on
+deaths that occur from healthcare systems, i.e. are treated. Default = FALSE,
+which uses all deaths.}
 
 \item{country}{Character for country beign simulated. WIll be used to
 generate \code{population} and \code{contact_matrix_set} if
