@@ -113,6 +113,16 @@ beta_est <- function(squire_model, model_params, R0) {
                                                 mixing_matrix = mat,
                                                 R0 = R0)
 
+  } else {
+
+    mat <- process_contact_matrix(model_params$contact_matrix_set[[1]],
+                                  model_params$population)
+
+    new_beta <- squire_model$generate_beta_func(model_params = model_params,
+                                                mixing_matrix = mat,
+                                                R0 = R0)
+
+
   }
 
   return(new_beta)
