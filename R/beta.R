@@ -113,16 +113,20 @@ beta_est <- function(squire_model, model_params, R0) {
                                                 mixing_matrix = mat,
                                                 R0 = R0)
 
-  } else {
+  } else if (class(squire_model)[1] == "apothecary_model") {
 
     mat <- process_contact_matrix(model_params$contact_matrix_set[[1]],
                                   model_params$population)
 
-    new_beta <- squire_model$generate_beta_func(model_params = model_params,
+    new_beta <- squire_model$generate_beta_func(dur_IAsymp = 1/model_params$gamma_IAsymp,
+                                                dur_IMild = 1/model_params$gamma_IMild,
+                                                dur_ICase = 2/model_params$gamma_ICase,
+                                                rel_inf_asymp = model_params$rel_inf_asymp,
+                                                rel_inf_mild = model_params$rel_inf_mild,
+                                                prob_asymp = model_params$prob_asymp,
+                                                prob_hosp = model_params$prob_hosp,
                                                 mixing_matrix = mat,
                                                 R0 = R0)
-
-
   }
 
   return(new_beta)
