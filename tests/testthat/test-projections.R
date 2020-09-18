@@ -181,6 +181,7 @@ test_that("projection plotting", {
 test_that("projection with normal run", {
 
   r <- run_explicit_SEEIR_model("Angola",replicates = 1, time_period = 100)
+  r$output[,"time",1] <- r$output[,"time",1] + 1
   expect_error(p <- projections(r, R0 = 10), "0 to know how")
   r$output[,"time",1] <- r$output[,"time",1] - 50
   p <- projections(r, R0 = 10)
@@ -194,6 +195,7 @@ test_that("projection with normal run", {
 test_that("projection with deterministic normal run", {
 
   r <- run_deterministic_SEIR_model("Angola",replicates = 1, time_period = 100)
+  r$output[,"time",1] <- r$output[,"time",1] +1
   expect_error(p <- projections(r, R0 = 10), "0 to know how")
   r$output[,"time",1] <- r$output[,"time",1] - 50
   p <- projections(r, R0 = 10)

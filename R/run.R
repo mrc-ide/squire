@@ -81,10 +81,10 @@ run_simple_SEEIR_model <- function(R0 = 3,
 
   # Running the Model
   mod <- simple_SEIR(user = pars, unused_user_action = "ignore")
-  t <- seq(from = 1, to = time_period/dt)
+  t <- seq(from = 0, to = time_period/dt)
 
   if (day_return) {
-    t <- round(seq(1/dt, length(t)+(1/dt), by=1/dt))
+    t <- round(seq(0/dt, length(t), by=1/dt))
   }
 
   results <- mod$run(t, replicate = replicates)
@@ -289,13 +289,11 @@ run_explicit_SEEIR_model <- function(
 
   # Running the Model
   mod <- explicit_SEIR(user = pars, unused_user_action = "ignore")
-  t <- seq(from = 1, to = time_period/dt)
+  t <- seq(from = 0, to = time_period/dt)
 
   # if we ar doing day return then proceed in steps of day length
-  # We also will do an extra day so we know the numebr of infections/deaths
-  # that would happen in the last day
   if (day_return) {
-    t <- round(seq(1/dt, length(t)+(1/dt), by=1/dt))
+    t <- round(seq(0/dt, length(t), by=1/dt))
   }
   results <- mod$run(t, replicate = replicates)
 
@@ -441,13 +439,11 @@ run_deterministic_SEIR_model <- function(
 
   # Running the Model
   mod <- mod_gen(user = pars, unused_user_action = "ignore")
-  t <- seq(from = 1, to = time_period, by = dt)
+  t <- seq(from = 0, to = time_period, by = dt)
 
   # if we ar doing day return then proceed in steps of day length
-  # We also will do an extra day so we know the numebr of infections/deaths
-  # that would happen in the last day
   if (day_return) {
-    t <- round(seq(from = 1, to = time_period))
+    t <- round(seq(from = 0, to = time_period))
   }
   results <- mod$run(t, replicate = replicates)
 

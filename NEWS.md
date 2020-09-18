@@ -1,3 +1,7 @@
+# squire 0.4.35
+
+* `run_x_model` functions now start with t = 0 (inital conditions)
+
 # squire 0.4.34
 
 * `pmcmc` argument `treated_deaths_only` will use deaths from treatment in likelihood

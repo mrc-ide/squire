@@ -3,7 +3,7 @@ test_that("deterministic output format works", {
   m <- get_mixing_matrix("Afghanistan")
   model_output <- run_deterministic_SEIR_model(
       population = pop$n, contact_matrix_set = m,
-      tt_R0 = c(0), R0 = c(3), time_period = 2,
+      tt_R0 = c(0), R0 = c(3), time_period = 1,
       day_return = TRUE,
       hosp_bed_capacity = 100000,
       ICU_bed_capacity = 1000000)
@@ -31,7 +31,7 @@ test_that("deterministic output format works", {
   actual <- format_deterministic_output(model_output)
   vars <- c('deaths','infections','hospital_demand','ICU_demand', 'hospital_incidence', 'ICU_incidence')
   expected <- data.frame(
-    t = rep(c(1, 2), length(vars)),
+    t = rep(c(0, 1), length(vars)),
     compartment = rep(vars, each = 2),
     value = c(2, 5, 4, 10, 2, 6, 1, 4, 0, 0, 0, 0),
     stringsAsFactors = FALSE
@@ -70,7 +70,7 @@ test_that("output format works", {
                                  contact_matrix_set=contact_matrices[[1]])
 
   o1 <- format_output(m1)
-  expect_true(all(table(o1$compartment) == 100))
+  expect_true(all(table(o1$compartment) == 110))
   o2 <- format_output(m1, reduce_age = FALSE)
   o4 <- format_output(m1, reduce_age = FALSE, date_0 = Sys.Date())
   o5 <- format_output(m1, var_select = c("E", "ICase"))

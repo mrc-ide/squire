@@ -5,7 +5,7 @@ test_that("run works", {
   r1 <- run_simple_SEEIR_model(population = pop$n,
                                dt = 1,
                                R0 = 2,
-                               time_period = 100,
+                               time_period = 99,
                                replicates = 10,
                                contact_matrix_set=contact_matrices[[1]])
   expect_type(r1$output, "double")
@@ -24,7 +24,7 @@ test_that("run works", {
                                dt = 1,
                                R0 = c(2,2),
                                tt_R0 = c(0, 10),
-                               time_period = 100,
+                               time_period = 99,
                                replicates = 10,
                                contact_matrix_set=contact_matrices[[1]])
   expect_identical(r1$output, r2$output)
@@ -33,7 +33,7 @@ test_that("run works", {
                                dt = 1,
                                R0 = c(2,5),
                                tt_R0 = c(0, 10),
-                               time_period = 100,
+                               time_period = 99,
                                replicates = 10,
                                contact_matrix_set=contact_matrices[[1]])
   o2 <- format_output(r2)
@@ -46,7 +46,7 @@ test_that("run works", {
   r4 <- run_simple_SEEIR_model(population = pop$n,
                                dt = 1,
                                R0 = 2,
-                               time_period = 100,
+                               time_period = 99,
                                replicates = 10,
                                contact_matrix_set = list(contact_matrices[[1]],
                                                          contact_matrices[[1]]),
@@ -57,7 +57,7 @@ test_that("run works", {
   r5 <- run_simple_SEEIR_model(population = pop$n,
                                dt = 1,
                                R0 = 2,
-                               time_period = 100,
+                               time_period = 99,
                                replicates = 10,
                                contact_matrix_set = list(contact_matrices[[1]],
                                                          contact_matrices[[2]]),
@@ -68,7 +68,7 @@ test_that("run works", {
   r6 <- run_simple_SEEIR_model(population = pop$n,
                                dt = 1,
                                R0 = 2,
-                               time_period = 100,
+                               time_period = 99,
                                replicates = 10,
                                contact_matrix_set = list(contact_matrices[[1]]),
                                tt_contact_matrix = c(0, 50))
@@ -83,7 +83,7 @@ test_that("run explicit works", {
   r1 <- run_explicit_SEEIR_model(population = pop$n,
                                  dt = 1,
                                  R0 = 2,
-                                 time_period = 100,
+                                 time_period = 99,
                                  replicates = 10,
                                  contact_matrix_set=contact_matrices[[1]])
   expect_type(r1$output, "double")
@@ -101,7 +101,7 @@ test_that("run explicit works", {
                                  dt = 1,
                                  R0 = c(2,2),
                                  tt_R0 = c(0, 10),
-                                 time_period = 100,
+                                 time_period = 99,
                                  replicates = 10,
                                  contact_matrix_set=contact_matrices[[1]])
   expect_identical(r1$output, r2$output)
@@ -110,7 +110,7 @@ test_that("run explicit works", {
                                  dt = 1,
                                  R0 = c(2,5),
                                  tt_R0 = c(0, 10),
-                                 time_period = 100,
+                                 time_period = 99,
                                  replicates = 10,
                                  contact_matrix_set=contact_matrices[[1]])
   o2 <- format_output(r2)
@@ -123,7 +123,7 @@ test_that("run explicit works", {
   r4 <- run_explicit_SEEIR_model(population = pop$n,
                                  dt = 1,
                                  R0 = 2,
-                                 time_period = 100,
+                                 time_period = 99,
                                  replicates = 10,
                                  contact_matrix_set = list(contact_matrices[[1]],
                                                            contact_matrices[[1]]),
@@ -134,7 +134,7 @@ test_that("run explicit works", {
   r5 <- run_explicit_SEEIR_model(population = pop$n,
                                  dt = 1,
                                  R0 = 2,
-                                 time_period = 100,
+                                 time_period = 99,
                                  replicates = 10,
                                  contact_matrix_set = list(contact_matrices[[1]],
                                                            contact_matrices[[1]]*0.5,
@@ -146,7 +146,7 @@ test_that("run explicit works", {
   r6 <- run_explicit_SEEIR_model(population = pop$n,
                                  dt = 1,
                                  R0 = 2,
-                                 time_period = 100,
+                                 time_period = 99,
                                  replicates = 10,
                                  contact_matrix_set = list(contact_matrices[[1]]),
                                  tt_contact_matrix = c(0, 50))
@@ -258,7 +258,7 @@ test_that("run deterministic parameterises model correctly", {
     ICU_bed_capacity = 1000000,
     day_return = TRUE
   )
-  expect_equal(length(output$output[,1,1]), 365)
+  expect_equal(length(output$output[,1,1]), 366)
   expect_equal(as.numeric(output$parameters$hosp_bed_capacity), 100000)
   expect_equal(as.numeric(output$parameters$ICU_bed_capacity), 1000000)
 })
