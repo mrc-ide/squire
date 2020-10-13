@@ -142,7 +142,6 @@ projections <- function(r,
       contact_matrix_set <- list(contact_matrix_set)
     }
     mc <- matrix_check(r$parameters$population[-1], contact_matrix_set)
-    matrices_set <- matrix_set_explicit(contact_matrix_set, r$parameters$population)
     assert_same_length(contact_matrix_set, tt_contact_matrix)
   }
 
@@ -249,7 +248,7 @@ projections <- function(r,
   # ----------------------------------------------------------------------------
   # conduct simulations
   # ----------------------------------------------------------------------------
-  conduct_replicate <- function(x) {
+  conduct_replicate_projections <- function(x) {
 
     # ----------------------------------------------------------------------------
     # adapt our time changing variables as needed
@@ -380,7 +379,7 @@ projections <- function(r,
 
   }
 
-  out <- lapply(seq_len(ds[3]), conduct_replicate)
+  out <- lapply(seq_len(ds[3]), conduct_replicate_projections)
 
   ## get output columns that match
   cn <- colnames(r$output[which(r$output[,1,1] %in% t_steps[[1]]), , 1])
@@ -404,6 +403,7 @@ projections <- function(r,
 
   ## append projections
   r$projection_args <- args
+  r$projection_args$args$r <- NULL
 
   return(r)
 

@@ -1,0 +1,666 @@
+#' Provide projections from calibrated simulations by changing RO, contact
+#' matrices or bed availability.
+#'
+#' This differs to \code{projections} as you can pass in lists of each argument
+#' that then get passed to each simulation replicate. In time this will become
+#' \code{projections} as it will have the same functionality.
+#'
+#' @details The user can specify changes to R0, contact matrices and bed
+#' provision, which will come into effect from the current day in the calibration.
+#' These changes can either set these to be specific values or change them
+#' relative to their values in the original simulation. If no change is
+#' requested, the simulation will use parameters chosen for the calibration run.
+#'
+#' @param r Calibrated \code{{squire_simulation}} object.
+#' @param time_period How many days is the projection. Deafult = NULL, which will
+#'   carry the projection forward from t = 0 in the calibration (i.e. the number
+#'   of days set in calibrate using forecast)
+#' @param R0 Numeric vector for R0 from t = 0 in the calibration.
+#'   E.g. \code{R0 = c(2, 1)}. Default = NULL, which will use \code{R0_change}
+#'   to alter R0 if provided.
+#' @param R0_change Numeric vector for relative changes in R0 relative to the
+#'   final R0 used in the calibration (i.e. at t = 0 in the calibration)
+#'   E.g. \code{R0 = c(0.8, 0.5)}. Default = NULL, which will use \code{R0} to
+#'   parameterise changes in R0 if provided.
+#' @param tt_R0 Change time points for R0
+#'
+#' @param contact_matrix_set Contact matrices used in simulation. Default =
+#'   NULL, which will use \code{contact_matrix_set_change} to alter the contact
+#'   matrix if provided.
+#' @param contact_matrix_set_change Numeric vector for relative changes in the
+#'   contact matrix realtive to the final contact matrix used in the calibration
+#'   (i.e. at t = 0 in the calibration).
+#'   E.g. \code{contact_matrix_set_change = c(0.8, 0.5)}. Default = NULL, which
+#'   will use \code{contact_matrix_set} to parameterise changes in contact
+#'   matrices if if provided.
+#' @param tt_contact_matrix Time change points for matrix change. Default = 0
+#'
+#' @param hosp_bed_capacity Numeric vector for hospital bed capacity
+#'   from t = 0 in the calibration. Default = NULL, which will use
+#'   \code{hosp_bed_capacity_change} to alter hosp_bed_capacity if provided.
+#' @param hosp_bed_capacity_change Numeric vector for relative changes in
+#'   hospital bed capacity relative to the final hospital bed capacity used in the
+#'   calibration (i.e. at t = 0 in the calibration).
+#'   E.g. \code{hosp_bed_capacity_change = c(0.8, 0.5)}. Default = NULL, which
+#'   will use \code{hosp_bed_capacity} to parameterise changes in hospital bed capacity
+#'   if provided.
+#' @param tt_hosp_beds Change time points for hosp_bed_capacity
+#'
+#' @param ICU_bed_capacity Numeric vector for ICU bed capacity
+#'   from t = 0 in the calibration. Default = NULL, which will use
+#'   \code{ICU_bed_capacity_change} to alter ICU_bed_capacity if provided.
+#' @param ICU_bed_capacity_change Numeric vector for relative changes in
+#'   ICU bed capacity relative to the final ICU bed capacity used in the
+#'   calibration (i.e. at t = 0 in the calibration).
+#'   E.g. \code{ICU_bed_capacity_change = c(0.8, 0.5)}. Default = NULL, which
+#'   will use \code{ICU_bed_capacity} to parameterise changes in ICU bed capacity
+#'   if provided.
+#' @param tt_ICU_beds Change time points for ICU_bed_capacity
+#' @param to_be_run List of logicals for whether each replicate should be run.
+#'   Default = TRUE, which causes all replictes to be run.
+#'
+#'
+#' @export
+projections_by_replicate <- function(r,
+                                     time_period = NULL,
+                                     R0 = NULL,
+                                     R0_change = NULL,
+                                     tt_R0 = 0,
+                                     contact_matrix_set = NULL,
+                                     contact_matrix_set_change = NULL,
+                                     tt_contact_matrix = 0,
+                                     hosp_bed_capacity = NULL,
+                                     hosp_bed_capacity_change = NULL,
+                                     tt_hosp_beds = 0,
+                                     ICU_bed_capacity = NULL,
+                                     ICU_bed_capacity_change = NULL,
+                                     tt_ICU_beds = 0,
+                                     to_be_run = 1) {
+
+  # Grab function arguments
+  args <- as.list(environment())
+
+  # Grab replicates
+  reps <- dim(r$output)[3]
+
+  # ----------------------------------------------------------------------------
+  ## assertion checks on parameters
+  # ----------------------------------------------------------------------------
+  assert_custom_class(r, "squire_simulation")
+  # TODO future asserts if these are our "end" classes
+  if (is.null(r$output) & is.null(r$scan_results) & is.null(r$pmcmc_results)) {
+    stop("Model must have been produced either with Squire Default, Scan Grid (calibrate), or pMCMC (pmcmc) Approach")
+  }
+
+  # ----------------------------------------------------------------------------
+  ## tt_ checks
+  # ----------------------------------------------------------------------------
+
+  tt_creation <- function(tt, reps, name = deparse(substitute(tt))) {
+
+    if (!is.list(tt)) {
+      assert_pos_int(tt, name = name)
+      if(tt[1] != 0) {
+        stop(paste0(name, " must start with 0"))
+      }
+      tt <- rep(list(tt), reps)
+    } else {
+      lapply(seq_along(tt), function(x) {
+        assert_pos_int(tt[[x]], name = paste0(name, " replicate ", x))
+        if(tt[[x]][1] != 0) {
+          stop(paste0(name, " replicate ", x, " must start with 0"))
+        }
+      })
+    }
+    assert_length(tt, reps)
+    return(tt)
+
+  }
+
+  # tt checks
+  tt_R0 <- tt_creation(tt_R0, reps = reps)
+  tt_contact_matrix <- tt_creation(tt_contact_matrix, reps = reps)
+  tt_hosp_beds <- tt_creation(tt_hosp_beds, reps = reps)
+  tt_ICU_beds <- tt_creation(tt_ICU_beds, reps = reps)
+
+
+  # ----------------------------------------------------------------------------
+  # remove the change arguments if the absolute is provided
+  # ----------------------------------------------------------------------------
+
+  if(!is.null(R0) && !is.null(R0_change)) {
+    message("Both R0 or R0_change were specified. R0 is being used.")
+    R0_change <- NULL
+  }
+  if(!is.null(contact_matrix_set) && !is.null(contact_matrix_set_change)) {
+    message("Both contact_matrix_set or contact_matrix_set_change were specified. contact_matrix_set is being used.")
+    contact_matrix_set_change <- NULL
+  }
+  if(!is.null(hosp_bed_capacity) && !is.null(hosp_bed_capacity_change)) {
+    message("Both hosp_bed_capacity or hosp_bed_capacity_change were specified. hosp_bed_capacity is being used.")
+    hosp_bed_capacity_change <- NULL
+  }
+  if(!is.null(ICU_bed_capacity) && !is.null(ICU_bed_capacity_change)) {
+    message("Both ICU_bed_capacity or ICU_bed_capacity_change were specified. ICU_bed_capacity is being used.")
+    ICU_bed_capacity_change <- NULL
+  }
+
+  # ----------------------------------------------------------------------------
+  # check are variables are correctly formatted
+  # ----------------------------------------------------------------------------
+
+  # ----------------------------------------------------------------------------
+  ## num checks
+  # ----------------------------------------------------------------------------
+
+  num_creation <- function(num, tt, reps,
+                           name = deparse(substitute(num)),
+                           name2 = deparse(substitute(tt))) {
+
+    if(!is.null(num)) {
+
+      if (!is.list(num)) {
+        assert_numeric(num, name = name)
+        assert_pos(num, name = name)
+        num <- rep(list(num), reps)
+      }
+
+      assert_length(num, reps)
+      lapply(seq_along(num), function(x) {
+        assert_same_length(num[[x]], tt[[x]],
+                           name_x = paste0(name, " replicate ", x),
+                           name_y = paste0(name2, " replicate ", x))
+        assert_numeric(num[[x]], name = paste0(name, " replicate ", x))
+        assert_pos(num[[x]], name = paste0(name, " replicate ", x))
+      })
+
+    } else {
+      num <- rep(list(num), reps)
+    }
+
+    return(num)
+
+  }
+
+  R0 <- num_creation(R0, tt_R0, reps = reps)
+  R0_change <- num_creation(R0_change, tt_R0, reps = reps)
+  hosp_bed_capacity <- num_creation(hosp_bed_capacity, tt_hosp_beds, reps = reps)
+  hosp_bed_capacity_change <- num_creation(hosp_bed_capacity_change, tt_hosp_beds, reps = reps)
+  ICU_bed_capacity <- num_creation(ICU_bed_capacity, tt_ICU_beds, reps = reps)
+  ICU_bed_capacity_change <- num_creation(ICU_bed_capacity_change, tt_ICU_beds, reps = reps)
+  contact_matrix_set_change <- num_creation(contact_matrix_set_change, tt_contact_matrix, reps = reps)
+
+
+  ## Contact matrix set is the only different one
+
+  if (!is.null(contact_matrix_set)) {
+
+    # Standardise contact matrix set if its a matrix
+    if(is.matrix(contact_matrix_set)){
+      contact_matrix_set <- list(contact_matrix_set)
+      mc <- matrix_check(r$parameters$population[-1], contact_matrix_set)
+      contact_matrix_set <- rep(contact_matrix_set, reps)
+    } else if(is.list(contact_matrix_set)) {
+      if(is.matrix(contact_matrix_set[[1]])) {
+        contact_matrix_set <- rep(contact_matrix_set, reps)
+      }
+    }
+    # check the lengths
+    lapply(seq_along(contact_matrix_set), function(x) {
+      assert_same_length(contact_matrix_set[[x]], tt_contact_matrix[[x]],
+                         name_x = paste0("contact_matrix_set", " replicate ", x),
+                         name_y = paste0("tt_contact_matrix", " replicate ", x))
+    })
+
+  } else {
+    contact_matrix_set <- rep(list(contact_matrix_set), reps)
+  }
+
+
+  # Lastly our list for whether to do each replicate
+  if (!is.list(to_be_run)) {
+    assert_logical(to_be_run)
+    to_be_run <- rep(list(to_be_run), reps)
+  } else {
+    lapply(seq_along(to_be_run), function(x) {
+      assert_logical(to_be_run[[x]], name = paste0("to_be_run replicate ", x))
+    })
+  }
+  assert_length(to_be_run, reps)
+
+  # ----------------------------------------------------------------------------
+  # generating pre simulation variables
+  # ----------------------------------------------------------------------------
+
+  # odin model keys
+  index <- odin_index(r$model)
+  initials <- seq_along(r$model$initial()) + 1L
+  ds <- dim(r$output)
+
+  # what state time point do we want
+  state_pos <- vapply(seq_len(ds[3]), function(x) {
+    pos <- which(r$output[,"time",x] == 0)
+    if(length(pos) == 0) {
+      stop("projections needs time value to be equal to 0 to know how to project forwards")
+    }
+    return(pos)
+  }, FUN.VALUE = numeric(1))
+
+  # what are the remaining time points
+  t_steps <- lapply(state_pos, function(x) {
+    r$output[which(r$output[,1,1] > r$output[x,1,1]),1 ,1]
+  })
+
+  # if there are no remaining steps
+  if(any(!unlist(lapply(t_steps, length))) && is.null(time_period)) {
+    stop("projections needs either time_period set or the calibrate/pmcmc object ",
+         "to have been run with forecast > 0")
+  }
+
+  # do we need to do more than just the remaining time from calibrate
+  if (!is.null(time_period)) {
+
+    t_diff <- diff(tail(r$output[,1,1],2))
+    t_start <- r$output[which((r$output[,"time",1]==0)),1,1]+t_diff
+    t_initial <- unique(stats::na.omit(r$output[1,1,]))
+
+    if (r$model$.__enclos_env__$private$discrete) {
+      t_steps <- lapply(t_steps, function(x) {
+        seq(t_start, t_start - t_diff + time_period/r$parameters$dt, t_diff)
+      })
+    } else {
+      t_steps <- lapply(t_steps, function(x) {
+        seq(t_start, t_start - t_diff + time_period, t_diff)
+      })
+    }
+    steps <- seq(t_initial, max(t_steps[[1]]), t_diff)
+
+    arr_new <- array(NA, dim = c(which(r$output[,"time",1]==0) + length(t_steps[[1]]),
+                                 ncol(r$output), dim(r$output)[3]))
+    arr_new[seq_len(nrow(r$output)),,] <- r$output
+    rownms <- rownames(r$output)
+    colnms <- colnames(r$output)
+    if(!is.null(rownms)) {
+      rownames(arr_new) <- as.character(as.Date(rownms[1]) + seq_len(nrow(arr_new)) - 1L)
+    }
+    r$output <- arr_new
+    colnames(r$output) <- colnms
+    r$output[(which(r$output[,1,1]==(t_start-t_diff))+1):nrow(r$output),1,] <- matrix(unlist(t_steps), ncol = r$parameters$replicates)
+  }
+
+  # ----------------------------------------------------------------------------
+  # conduct simulations
+  # ----------------------------------------------------------------------------
+  out <- lapply(seq_len(ds[3]), function(x) {
+
+    # are we doing this replicate
+    if (to_be_run[[x]]) {
+      conduct_replicate(x = x,
+                        r = r,
+                        t_steps = t_steps,
+                        R0 = R0[[x]],
+                        R0_change = R0_change[[x]],
+                        tt_R0 = tt_R0[[x]],
+                        contact_matrix_set = contact_matrix_set[[x]],
+                        contact_matrix_set_change = contact_matrix_set_change[[x]],
+                        tt_contact_matrix = tt_contact_matrix[[x]],
+                        hosp_bed_capacity = hosp_bed_capacity[[x]],
+                        hosp_bed_capacity_change = hosp_bed_capacity_change[[x]],
+                        tt_hosp_beds = tt_hosp_beds[[x]],
+                        ICU_bed_capacity = ICU_bed_capacity[[x]],
+                        ICU_bed_capacity_change = ICU_bed_capacity_change[[x]],
+                        tt_ICU_beds = tt_ICU_beds[[x]])
+    } else {
+      NULL
+    }
+  })
+
+  ## get output columns that match
+  cn <- colnames(r$output[which(r$output[,1,1] %in% t_steps[[1]]), , 1])
+  out <- lapply(out, function(x) {
+    if(!is.null(x)) {
+      x[, which(colnames(x) %in% cn), , drop=FALSE]
+    }
+  })
+
+
+  ## collect results
+  # step handling for stochastic
+  for(i in seq_len(ds[3])) {
+    if (to_be_run[[i]]) {
+      if(r$model$.__enclos_env__$private$discrete) {
+        if(diff(tail(r$output[,1,1],2)) != 1) {
+          r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][-1, -1, 1]
+        } else {
+          r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][, -1, 1]
+        }
+      }
+      else {
+        r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][-1, -1, 1]
+      }
+    }
+  }
+
+  ## append projections
+  r$projection_args <- args
+  r$projection_args$args$r <- NULL
+
+  return(r)
+
+}
+
+
+#' Handles simulating replicates within \code{projections_by_replicate}
+#'
+#' @param x Simulation replicate number
+#' @param r Output of \code{pmcmc} or \code{calibrate}
+#' @param t_steps List of time steps to be run for each replicate
+#' @inheritParams projections_by_replicate
+#'
+conduct_replicate <- function(x,
+                              r = NULL,
+                              t_steps = NULL,
+                              R0 = NULL,
+                              R0_change = NULL,
+                              tt_R0 = NULL,
+                              contact_matrix_set = NULL,
+                              contact_matrix_set_change = NULL,
+                              tt_contact_matrix = NULL,
+                              hosp_bed_capacity = NULL,
+                              hosp_bed_capacity_change = NULL,
+                              tt_hosp_beds = NULL,
+                              ICU_bed_capacity = NULL,
+                              ICU_bed_capacity_change = NULL,
+                              tt_ICU_beds = NULL) {
+
+  # what type of object isout squire_simulation
+  if ("scan_results" %in% names(r)) {
+    wh <- "scan_results"
+  } else if ("pmcmc_results" %in% names(r)) {
+    wh <- "pmcmc_results"
+  }
+
+  # final values of R0, contacts, and beds
+  finals <- t0_variables(r)
+
+  # odin model keys
+  index <- odin_index(r$model)
+  initials <- seq_along(r$model$initial()) + 1L
+  ds <- dim(r$output)
+
+  # what state time point do we want
+  state_pos <- vapply(seq_len(ds[3]), function(x) {
+    pos <- which(r$output[,"time",x] == 0)
+    if(length(pos) == 0) {
+      stop("projections needs time value to be equal to 0 to know how to project forwards")
+    }
+    return(pos)
+  }, FUN.VALUE = numeric(1))
+
+  # ----------------------------------------------------------------------------
+  # adapt our time changing variables as needed
+  # ----------------------------------------------------------------------------
+
+  # first if R0 is not provided we use the last R0
+  if (is.null(R0)) {
+    R0 <- finals[[x]]$R0
+  }
+
+  # are we modifying the R0
+  if (!is.null(R0_change)) {
+    R0 <- R0*R0_change
+  }
+
+  # second if contact_matrix_set is not provided we use the last contact_matrix_set
+  if (is.null(contact_matrix_set)) {
+    contact_matrix_set <- finals[[x]]$contact_matrix_set
+    baseline_contact_matrix_set <- contact_matrix_set[1]
+  } else {
+    baseline_contact_matrix_set <- contact_matrix_set[1]
+  }
+
+  # are we modifying it
+  if (!is.null(contact_matrix_set_change)) {
+    if (length(contact_matrix_set) == 1) {
+      contact_matrix_set <- lapply(seq_along(tt_contact_matrix),function(x){
+        contact_matrix_set[[1]]
+      })
+    }
+    baseline_contact_matrix_set <- contact_matrix_set[1]
+    contact_matrix_set <- lapply(
+      seq_len(length(contact_matrix_set_change)),
+      function(x){
+        contact_matrix_set[[x]]*contact_matrix_set_change[x]
+      })
+  }
+
+
+  # third if hosp_bed_capacity is not provided we use the last hosp_bed_capacity
+  if (is.null(hosp_bed_capacity)) {
+    hosp_bed_capacity <- finals[[x]]$hosp_bed_capacity
+  }
+
+  # are we modifying it
+  if (!is.null(hosp_bed_capacity_change)) {
+    hosp_bed_capacity <- hosp_bed_capacity*hosp_bed_capacity_change
+  }
+
+  # last if ICU_bed_capacity is not provided we use the last contact_matrix_set
+  if (is.null(ICU_bed_capacity)) {
+    ICU_bed_capacity <- finals[[x]]$ICU_bed_capacity
+  }
+
+  # are we modifying it
+  if (!is.null(ICU_bed_capacity_change)) {
+    ICU_bed_capacity <- ICU_bed_capacity*ICU_bed_capacity_change
+  }
+
+  # ----------------------------------------------------------------------------
+  # Generate new variables to pass to model
+  # ----------------------------------------------------------------------------
+
+  # Convert contact matrices to input matrices
+  matrices_set <- matrix_set_explicit(contact_matrix_set, r$parameters$population)
+
+  # create new betas going forwards
+  beta <- beta_est_explicit(dur_IMild = r$parameters$dur_IMild,
+                            dur_ICase = r$parameters$dur_ICase,
+                            prob_hosp = r$parameters$prob_hosp,
+                            mixing_matrix = process_contact_matrix_scaled_age(
+                              baseline_contact_matrix_set[[1]],
+                              r$parameters$population),
+                            R0 = R0)
+
+  # Is the model still valid
+  if(is_ptr_null(r$model$.__enclos_env__$private$ptr)) {
+    r$model <- r[[wh]]$inputs$squire_model$odin_model(
+      user = r[[wh]]$inputs$model_params,
+      unused_user_action = "ignore")
+  }
+
+  # get the dt for the simulation
+  dt_step <- r$parameters$dt
+
+  # step handling for stochastic
+  if(r$model$.__enclos_env__$private$discrete) {
+    if(diff(tail(r$output[,1,1],2)) != 1) {
+      step <- c(0,round(seq_len(length(t_steps[[x]]))/r$parameters$dt))
+    } else {
+      step <- seq_len(length(t_steps[[x]]))
+      dt_step <- 1
+    }
+  } else {
+    if(diff(tail(r$output[,1,1],2)) != 1) {
+      step <- c(0,round(seq_len(length(t_steps[[x]]))*r$parameters$dt))
+    } else {
+      step <- c(0, seq_len(length(t_steps[[x]])))
+      dt_step <- 1
+    }
+  }
+
+  # change these user params
+  r$model$set_user(tt_beta = round(tt_R0/dt_step))
+  r$model$set_user(beta_set = beta)
+  r$model$set_user(tt_matrix = round(tt_contact_matrix/dt_step))
+  r$model$set_user(mix_mat_set = matrices_set)
+  r$model$set_user(tt_hosp_beds = round(tt_hosp_beds/dt_step))
+  r$model$set_user(hosp_beds = hosp_bed_capacity)
+  r$model$set_user(tt_ICU_beds = round(tt_ICU_beds/dt_step))
+  r$model$set_user(ICU_beds = ICU_bed_capacity)
+
+  # run the model
+
+
+  get <- r$model$run(step,
+                     y = as.numeric(r$output[state_pos[x], initials, x, drop=TRUE]),
+                     use_names = TRUE,
+                     replicate = 1)
+
+  # coerce to array if deterministic
+  if(length(dim(get)) == 2) {
+    # coerce to array
+    get <- array(get, dim = c(dim(get),1), dimnames = dimnames(get))
+  }
+
+  return(get)
+
+}
+
+#' Project lockdowns based on triggering
+#'
+#' @param out Output of \code{\link{pmcmc}} or \code{\link{calibrate}}
+#' @param trigger_metric Name of model output to tigger by. Must be one accepted
+#'   by \code{format_output}
+#' @param trigger_value Value of \code{trigger_metric} at which triggering occurs
+#' @param R0_lockdowns Vector of R0 values to be used for each lockdown.
+#'   \code{Default = c(0.5, 0.5, 0.5, 0.5)}
+#' @param lockdown_lengths Vector of lengths of each lockdown in days.
+#'   \code{Default = c(28, 42, 28, 42)}
+#' @param max_lockdowns Maximum number of lockdowns. \code{Default = 4}
+#' @param seed RNG seed to be used. \code{Default = 931L}
+#'
+trigger_projections <- function(out,
+                                trigger_metric = "deaths",
+                                trigger_value = 150,
+                                # R0_lockdowns = c(0.6, 0.7, 0.8, 0.9) # idea here being that the R0 for each successive lockdown is larger
+                                R0_lockdowns = c(0.5, 0.5, 0.5, 0.5),
+                                lockdown_lengths = c(28, 42, 28, 42),
+                                max_lockdowns = 4,
+                                seed = 931L) {
+
+
+  assert_length(R0_lockdowns, max_lockdowns)
+  assert_length(lockdown_lengths, max_lockdowns)
+  assert_pos(trigger_value)
+
+  # Start with the baseline:
+  reps <- dim(out$output)[3]
+  to_be_run <- as.list(rep(TRUE, reps))
+
+  if ("projection_args" %in% names(out)) {
+    tts <- as.list(rep(out$projection_args$tt_R0, reps))
+    R0s <- as.list(rep(out$projection_args$R0, reps))
+  } else {
+    tts <- as.list(rep(0, reps))
+    R0s <- lapply(t0_variables(out), "[[", "R0")
+  }
+
+  lockdown_i <- 1
+  while (lockdown_i <= max_lockdowns) {
+
+    message("Lockdown: ", lockdown_i)
+
+    # Set the seed here to get same rng
+    set.seed(seed)
+
+    # starting projection
+    if (lockdown_i == 1) {
+
+      # conduct out projections
+      p <- projections_by_replicate(out, tt_R0 = tts, R0 = R0s, to_be_run = to_be_run)
+
+      # get our metric
+      metric <- format_output(p, trigger_metric)
+
+      # work out trigger times
+      tts_new <- group_by(metric, replicate) %>%
+        summarise(tt = t[which(y >= trigger_value & t > 0)[1]]) %>%
+        select(tt) %>% unlist
+      tts_new[tts_new<0] <- 0
+      tts_new[is.na(tts_new)] <- 0
+
+      # set what the new tt_r0s are
+      tts_old <- tts
+      tts <- lapply(seq_along(tts), function(x) {
+        if(tts_new[[x]] == 0) {
+          return(tts[[x]])
+        } else {
+          return(c(tts[[x]][tts[[x]] < tts_new[[x]]],
+                   tts_new[[x]],
+                   tts_new[[x]] + lockdown_lengths[lockdown_i])) # here you could some interpolation
+        }
+      })
+
+      # and their corresponding R0s
+      R0s <- lapply(seq_along(tts), function(x) {
+        if(length(tts[[x]]) == 1) {
+          return(R0s[[x]])
+        } else {
+          return(c(R0s[[x]][tts[[x]] < tts_new[[x]]],
+                   R0_lockdowns[lockdown_i],
+                   R0s[[x]][tts[[x]] < tts_new[[x]]]))  # here you could some interpolation
+        }
+      })
+
+      # and do we need to do the rerun
+      to_be_run <- as.list(as.logical(tts_new != 0))
+
+    } else {
+
+      p <- projections_by_replicate(p, tt_R0 = tts, R0 = R0s, to_be_run = to_be_run)
+
+      # get our metric
+      metric <- format_output(p, trigger_metric)
+
+      # work out trigger times
+      tts_new <- lapply(seq_along(tts), function(x) {
+        ts <- metric$t[metric$replicate == x & metric$y >= trigger_value]
+        if(length(ts) > 0) {
+          if(max(ts) > max(tts[[x]])) {
+            return(c(tts[[x]],
+                     ts[ts>max(tts[[x]])][1],
+                     ts[ts>max(tts[[x]])][1] + lockdown_lengths[lockdown_i])) # here you could some interpolation
+          } else {
+            return(tts[[x]])
+          }
+        } else {
+          return(tts[[x]])
+        }
+      })
+
+      # work out trigger R0s
+      R0s <- lapply(seq_along(tts), function(x) {
+        if(length(tts_new[[x]]) == length(tts[[x]])) {
+          return(R0s[[x]])
+        } else {
+          return(c(R0s[[x]], R0_lockdowns[lockdown_i], R0s[[x]][1]))  # here you could some interpolation
+        }
+      })
+
+      # and do we need to do the rerun
+      to_be_run <- as.list(as.logical(lengths(tts_new) > lengths(tts)))
+
+      # and move the correct tts
+      tts <- tts_new
+
+    }
+
+    lockdown_i <- lockdown_i + 1
+
+  }
+
+  p$trigger_args <- list("R0s" = R0s, "tt_R0s" = tts)
+
+  return(p)
+
+}
