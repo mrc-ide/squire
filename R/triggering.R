@@ -583,9 +583,9 @@ trigger_projections <- function(out,
       metric <- format_output(p, trigger_metric)
 
       # work out trigger times
-      tts_new <- group_by(metric, replicate) %>%
-        summarise(tt = t[which(y >= trigger_value & t > 0)[1]]) %>%
-        select(tt) %>% unlist
+      tts_new <- unlist(lapply(seq_len(reps), function(x) {
+        metric$t[which(metric$y >= trigger_value & metric$t > 0)[1]]
+        }))
       tts_new[tts_new<0] <- 0
       tts_new[is.na(tts_new)] <- 0
 
