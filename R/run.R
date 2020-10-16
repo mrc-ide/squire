@@ -232,7 +232,7 @@ run_explicit_SEEIR_model <- function(
   # We also will do an extra day so we know the numebr of infections/deaths
   # that would happen in the last day
   if (day_return) {
-    t <- round(seq(1/dt, length(t)+(1/dt), by=1/dt))
+    t <- round(seq(1/dt, length(t), by=1/dt))
   }
   results <- mod$run(t, replicate = replicates)
 
@@ -378,6 +378,9 @@ run_deterministic_SEIR_model <- function(
   pars$tt_ICU_beds <- I(pars$tt_ICU_beds)
   pars$ICU_beds <- I(pars$ICU_beds)
   pars$tt_matrix <- I(pars$tt_matrix)
+  pars$gamma_get_mv_survive <- I(pars$gamma_get_mv_survive)
+  pars$tt_dur_get_mv_survive <- I(pars$tt_dur_get_mv_survive)
+
 
   # Running the Model
   mod <- mod_gen(user = pars, unused_user_action = "ignore")

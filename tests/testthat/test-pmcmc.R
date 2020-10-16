@@ -1032,7 +1032,7 @@ test_that("pmcmc 6p meff date", {
 #-------------------------------------
 test_that("Start date and R0 only pmcmc", {
   Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
-
+  set.seed(1)
   data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
   interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
   int_unique <- interventions_unique(interventions)

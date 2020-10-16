@@ -20,7 +20,7 @@ projections_by_replicate(
   ICU_bed_capacity = NULL,
   ICU_bed_capacity_change = NULL,
   tt_ICU_beds = 0,
-  to_be_run = 1
+  to_be_run = TRUE
 )
 }
 \arguments{

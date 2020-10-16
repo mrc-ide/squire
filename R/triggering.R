@@ -75,7 +75,7 @@ projections_by_replicate <- function(r,
                                      ICU_bed_capacity = NULL,
                                      ICU_bed_capacity_change = NULL,
                                      tt_ICU_beds = 0,
-                                     to_be_run = 1) {
+                                     to_be_run = TRUE) {
 
   # Grab function arguments
   args <- as.list(environment())
