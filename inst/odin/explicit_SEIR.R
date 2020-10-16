@@ -14,19 +14,29 @@ gamma_ICase <- user() # rate of progression from symptom onset to requiring hosp
 
 # rate of progression through requiring oxygen compartment conditional on getting oxygen and surviving
 gamma_get_ox_survive <- user()
+
 # rate of progression through requiring oxygen compartment conditional on getting oxygen and dying
 gamma_get_ox_die <- user()
+
 # rate of progression through requiring oxygen compartment conditional on not getting oxygen and surviving
 gamma_not_get_ox_survive <- user()
+
 # rate of progression through requiring oxygen compartment conditional on not getting oxygen and dying
 gamma_not_get_ox_die <- user()
 
-# rate of progression through requiring mechanical ventilation compartment conditional on getting ventilation and surviving
-gamma_get_mv_survive <- user()
 # rate of progression through requiring mechanical ventilation compartment conditional on getting ventilation and dying
 gamma_get_mv_die <- user()
+
+# rate of progression through requiring mechanical ventilation compartment conditional on getting ventilation and surviving
+gamma_get_mv_survive[] <- user()
+tt_dur_get_mv_survive[] <- user()
+dim(tt_dur_get_mv_survive) <- user()
+dim(gamma_get_mv_survive) <- length(tt_dur_get_mv_survive)
+gamma_get_mv_survive_i <- interpolate(tt_dur_get_mv_survive, gamma_get_mv_survive, "constant")
+
 # rate of progression through requiring mechanical ventilation compartment conditional on not getting ventilation and surviving
 gamma_not_get_mv_survive <- user()
+
 # rate of progression through requiring mechanical ventilation compartment conditional on not getting ventilation and dying
 gamma_not_get_mv_die <- user()
 
@@ -111,8 +121,8 @@ p_IOxNotGetDie1_IOxNotGetDie2 <- 1 - exp(-gamma_not_get_ox_die * dt) # Progressi
 p_IOxNotGetDie2_D <- 1 - exp(-gamma_not_get_ox_die * dt) # Progression through requiring oxygen and not receiving it -> Death
 
 # Transition Probabilities for Those Requiring Mechanical Ventilation -> Recovery
-p_IMVGetLive1_IMVGetLive2 <- 1 - exp(-gamma_get_mv_survive * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
-p_IMVGetLive2_Rec <- 1 - exp(-gamma_get_mv_survive * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
+p_IMVGetLive1_IMVGetLive2 <- 1 - exp(-gamma_get_mv_survive_i * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
+p_IMVGetLive2_Rec <- 1 - exp(-gamma_get_mv_survive_i * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
 p_IMVNotGetLive1_IMVNotGetLive2 <- 1 - exp(-gamma_not_get_mv_survive * dt) # Progression through requiring mechanical ventilation and not recieving it -> Recovery
 p_IMVNotGetLive2_R <- 1 - exp(-gamma_not_get_mv_survive * dt) # Progression through requiring mechanical ventilation and not recieving it -> Recovery
 

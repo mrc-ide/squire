@@ -161,20 +161,22 @@ get_hosp_bed_capacity <- function(country = NULL) {
 #' @param dur_IMild Mean duration of mild infection (days). Default = 2.1
 #' @param dur_ICase Mean duration from symptom onset to hospitil admission (days).
 #'   Default = 4.5
-#' @param dur_get_ox_survive Mean duration of oxygen given survive. Default = 5
-#' @param dur_get_ox_die Mean duration of oxygen given death. Default = 5
+#' @param dur_get_ox_survive Mean duration of oxygen given survive. Default = 9.5
+#' @param dur_get_ox_die Mean duration of oxygen given death. Default = 7.6
 #' @param dur_not_get_ox_survive Mean duration without oxygen given survive.
-#'   Default = 5
+#'   Default = 4.75
 #' @param dur_not_get_ox_die Mean duration without  oxygen given death.
-#'  Default = 5
+#'  Default = 3.8
 #' @param dur_get_mv_survive Mean duration of ventilation given survive.
-#'   Default = 7.3
-#' @param dur_get_mv_die Mean duration of ventilation given death. Default = 6
+#'   Default = 11.3
+#' @param tt_dur_get_mv_survive Times at which dur_get_mv_survive changes
+#'   (Default = 0 = doesn't change)
+#' @param dur_get_mv_die Mean duration of ventilation given death. Default = 10.1
 #' @param dur_not_get_mv_survive Mean duration without ventilation given
-#'   survive. Default = 7.3
+#'   survive. Default = 5.65
 #' @param dur_not_get_mv_die Mean duration without ventilation given
 #'   death. Default = 1
-#' @param dur_rec Duration of recovery after coming off ventilation. Default = 2
+#' @param dur_rec Duration of recovery after coming off ventilation. Default = 3.4
 #' @param hosp_bed_capacity General bed capacity. Can be single number or vector if capacity time-varies.
 #' @param ICU_bed_capacity ICU bed capacity. Can be single number or vector if capacity time-varies.
 #' @param tt_hosp_beds Times at which hospital bed capacity changes (Default = 0 = doesn't change)
@@ -224,6 +226,8 @@ parameters_explicit_SEEIR <- function(
   dur_not_get_ox_die = 7.6*0.5,
 
   dur_get_mv_survive = 11.3,
+  tt_dur_get_mv_survive = 0,
+
   dur_get_mv_die = 10.1,
   dur_not_get_mv_survive = 11.3*0.5,
   dur_not_get_mv_die = 1,
@@ -294,16 +298,21 @@ parameters_explicit_SEEIR <- function(
 
   # Convert contact matrices to input matrices
   matrices_set <- matrix_set_explicit(contact_matrix_set, population)
+  mc <- matrix_check(population[-1], contact_matrix_set)
 
   # Input checks
   # ----------------------------------------------------------------------------
-  mc <- matrix_check(population[-1], contact_matrix_set)
   stopifnot(length(R0) == length(tt_R0))
   stopifnot(length(contact_matrix_set) == length(tt_contact_matrix))
   stopifnot(length(hosp_bed_capacity) == length(tt_hosp_beds))
   stopifnot(length(ICU_bed_capacity) == length(tt_ICU_beds))
-  tc <- lapply(list(tt_R0/dt, tt_contact_matrix/dt), check_time_change, time_period/dt)
-  tc2 <- lapply(list(tt_hosp_beds/dt, tt_ICU_beds/dt), check_time_change, time_period/dt)
+  stopifnot(length(dur_get_mv_survive) == length(tt_dur_get_mv_survive))
+
+
+  tc <- lapply(list(tt_R0/dt, tt_contact_matrix/dt,
+                    tt_hosp_beds/dt, tt_ICU_beds/dt,
+                    tt_dur_get_mv_survive/dt),
+               check_time_change, time_period/dt)
 
   assert_pos(dt)
   assert_pos(dur_E)
@@ -430,14 +439,15 @@ parameters_explicit_SEEIR <- function(
                prob_severe_death_treatment = prob_severe_death_treatment,
                prob_severe_death_no_treatment = prob_severe_death_no_treatment,
                p_dist = p_dist,
+               mix_mat_set = matrices_set,
                hosp_beds = hosp_bed_capacity,
                ICU_beds = ICU_bed_capacity,
+               beta_set = beta_set,
                tt_hosp_beds = round(tt_hosp_beds/dt),
                tt_ICU_beds = round(tt_ICU_beds/dt),
                tt_matrix = round(tt_contact_matrix/dt),
-               mix_mat_set = matrices_set,
                tt_beta = round(tt_R0/dt),
-               beta_set = beta_set,
+               tt_dur_get_mv_survive = round(tt_dur_get_mv_survive/dt),
                dt = dt,
                population = population,
                contact_matrix_set = contact_matrix_set)

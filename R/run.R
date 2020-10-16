@@ -109,75 +109,7 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' Run the explicit SEEIR model
 #'
 #' @details All durations are in days.
-#'
-#' @param population Population vector (for each age group). Default = NULL,
-#'   which will cause population to be sourced from \code{country}
-#' @param country Character for country beign simulated. WIll be used to
-#'   generate \code{population} and \code{contact_matrix_set} if
-#'   unprovided. Either \code{country} or \code{population} and
-#'   \code{contact_matrix_set} must be provided.
-#' @param contact_matrix_set Contact matrices used in simulation. Default =
-#'   NULL, which will generate this based on the \code{country}.
-#' @param tt_contact_matrix Time change points for matrix change. Default = 0
-#' @param R0 Basic Reproduction Number. Default = 3
-#' @param tt_R0 Change time points for R0. Default = 0
-#' @param beta_set Alternative parameterisation via beta rather than R0.
-#'   Default = NULL, which causes beta to be estimated from R0
-#' @param time_period Length of simulation. Default = 365
-#' @param dt Time Step. Default = 0.1
-#' @param day_return Logical, do we want to return outut after each day rather
-#'   than each dt. Default = FALSE
-#' @param replicates  Number of replicates. Default = 10
-#' @param seeding_cases Initial number of cases seeding the epidemic
-#' @param seed Random seed used for simulations. Deafult = runif(1, 0, 10000)
-#' @param init Data.frame of initial conditions. Default = NULL
-#' @param prob_hosp probability of hospitalisation by age.
-#'   Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
-#'   0.008100662, 0.015590734, 0.024597885, 0.035377529,
-#'   0.04385549, 0.058495518, 0.08747709, 0.109730508,
-#'   0.153943118, 0.177242143, 0.221362219, 0.267628264)
-#' @param prob_severe Probability of developing severe symptoms by age.
-#'   Default = c(3.73755e-05, 3.18497e-05, 5.88166e-05, 0.000120264,
-#'   0.000268514, 0.000516788, 0.00081535, 0.001242525,
-#'   0.001729275, 0.002880196, 0.00598205, 0.010821894,
-#'   0.022736324, 0.035911156, 0.056362032, 0.081467057)
-#' @param prob_non_severe_death_treatment Probability of death from non severe
-#'   treated infection.
-#'   Default = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
-#'   0.0125702, 0.0125702, 0.0125702, 0.013361147,
-#'   0.015104687, 0.019164124, 0.027477519, 0.041762108,
-#'   0.068531658, 0.105302319, 0.149305732, 0.20349534)
-#' @param prob_severe_death_treatment Probability of death from severe infection
-#'   that is treated. Default = rep(0.5, 16)
-#' @param prob_non_severe_death_no_treatment Probability of death in non severe
-#'   hospital inections that aren't treated
-#' @param prob_severe_death_no_treatment Probability of death from severe infection
-#'   that is not treated. Default = rep(0.95, 16)
-#' @param p_dist Preferentiality of age group receiving treatment relative to
-#'   other age groups when demand exceeds healthcare capacity.
-#' @param dur_E Mean duration of incubation period (days). Default = 4.6
-#' @param dur_IMild Mean duration of mild infection (days). Default = 2.1
-#' @param dur_ICase Mean duration from symptom onset to hospitil admission (days).
-#'   Default = 4.5
-#' @param dur_get_ox_survive Mean duration of oxygen given survive. Default = 5
-#' @param dur_get_ox_die Mean duration of oxygen given death. Default = 5
-#' @param dur_not_get_ox_survive Mean duration without oxygen given survive.
-#'   Default = 5
-#' @param dur_not_get_ox_die Mean duration without  oxygen given death.
-#'  Default = 5
-#' @param dur_get_mv_survive Mean duration of ventilation given survive.
-#'   Default = 7.3
-#' @param dur_get_mv_die Mean duration of ventilation given death. Default = 6
-#' @param dur_not_get_mv_survive Mean duration without ventilation given
-#'   survive. Default = 7.3
-#' @param dur_not_get_mv_die Mean duration without ventilation given
-#'   death. Default = 1
-#' @param dur_rec Duration of recovery after coming off ventilation. Default = 2
-#' @param hosp_bed_capacity General bed capacity. Can be single number of vector if capacity time-varies.
-#' @param ICU_bed_capacity ICU bed capacity. Can be single number of vector if capacity time-varies.
-#' @param tt_hosp_beds Times at which hospital bed capacity changes (Default = 0 = doesn't change)
-#' @param tt_ICU_beds Times at which ICU bed capacity changes (Default = 0 = doesn't change)
-#' @param seeding_cases Initial number of cases seeding the epidemic
+#' @inheritParams parameters_explicit_SEEIR
 #'
 #' @return Simulation output
 #' @export
@@ -231,8 +163,12 @@ run_explicit_SEEIR_model <- function(
   dur_not_get_ox_die = 7.6*0.5,
 
   dur_get_mv_survive = 11.3,
+
   dur_get_mv_die = 10.1,
+  tt_dur_get_mv_survive = 0,
+
   dur_not_get_mv_survive = 11.3*0.5,
+
   dur_not_get_mv_die = 1,
 
   dur_rec = 3.4,
@@ -285,7 +221,8 @@ run_explicit_SEEIR_model <- function(
                                     hosp_bed_capacity=hosp_bed_capacity,
                                     ICU_bed_capacity=ICU_bed_capacity,
                                     tt_hosp_beds=tt_hosp_beds,
-                                    tt_ICU_beds=tt_ICU_beds)
+                                    tt_ICU_beds=tt_ICU_beds,
+                                    tt_dur_get_mv_survive=tt_dur_get_mv_survive)
 
   # Running the Model
   mod <- explicit_SEIR(user = pars, unused_user_action = "ignore")
@@ -371,6 +308,8 @@ run_deterministic_SEIR_model <- function(
   dur_not_get_ox_die = 7.6*0.5,
 
   dur_get_mv_survive = 11.3,
+  tt_dur_get_mv_survive = 0,
+
   dur_get_mv_die = 10.1,
   dur_not_get_mv_survive = 11.3*0.5,
   dur_not_get_mv_die = 1,
@@ -428,7 +367,8 @@ run_deterministic_SEIR_model <- function(
                                     hosp_bed_capacity=hosp_bed_capacity,
                                     ICU_bed_capacity=ICU_bed_capacity,
                                     tt_hosp_beds=tt_hosp_beds*dt,
-                                    tt_ICU_beds=tt_ICU_beds*dt)
+                                    tt_ICU_beds=tt_ICU_beds*dt,
+                                    tt_dur_get_mv_survive=tt_dur_get_mv_survive*dt)
 
   # handling time variables for js
   pars$tt_beta <- I(pars$tt_beta)

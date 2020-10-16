@@ -31,6 +31,7 @@ parameters_explicit_SEEIR(
   dur_not_get_ox_survive = 9.5 * 0.5,
   dur_not_get_ox_die = 7.6 * 0.5,
   dur_get_mv_survive = 11.3,
+  tt_dur_get_mv_survive = 0,
   dur_get_mv_die = 10.1,
   dur_not_get_mv_survive = 11.3 * 0.5,
   dur_not_get_mv_die = 1,
@@ -108,28 +109,31 @@ other age groups when demand exceeds healthcare capacity.}
 \item{dur_ICase}{Mean duration from symptom onset to hospitil admission (days).
 Default = 4.5}
 
-\item{dur_get_ox_survive}{Mean duration of oxygen given survive. Default = 5}
+\item{dur_get_ox_survive}{Mean duration of oxygen given survive. Default = 9.5}
 
-\item{dur_get_ox_die}{Mean duration of oxygen given death. Default = 5}
+\item{dur_get_ox_die}{Mean duration of oxygen given death. Default = 7.6}
 
 \item{dur_not_get_ox_survive}{Mean duration without oxygen given survive.
-Default = 5}
+Default = 4.75}
 
 \item{dur_not_get_ox_die}{Mean duration without  oxygen given death.
-Default = 5}
+Default = 3.8}
 
 \item{dur_get_mv_survive}{Mean duration of ventilation given survive.
-Default = 7.3}
+Default = 11.3}
 
-\item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 6}
+\item{tt_dur_get_mv_survive}{Times at which dur_get_mv_survive changes
+(Default = 0 = doesn't change)}
+
+\item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 10.1}
 
 \item{dur_not_get_mv_survive}{Mean duration without ventilation given
-survive. Default = 7.3}
+survive. Default = 5.65}
 
 \item{dur_not_get_mv_die}{Mean duration without ventilation given
 death. Default = 1}
 
-\item{dur_rec}{Duration of recovery after coming off ventilation. Default = 2}
+\item{dur_rec}{Duration of recovery after coming off ventilation. Default = 3.4}
 
 \item{hosp_bed_capacity}{General bed capacity. Can be single number or vector if capacity time-varies.}
 

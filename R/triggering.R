@@ -538,7 +538,7 @@ conduct_replicate <- function(x,
 #'   \code{Default = c(28, 42, 28, 42)}
 #' @param max_lockdowns Maximum number of lockdowns. \code{Default = 4}
 #' @param seed RNG seed to be used. \code{Default = 931L}
-#'
+#' @export
 trigger_projections <- function(out,
                                 trigger_metric = "deaths",
                                 trigger_value = 150,
@@ -560,6 +560,9 @@ trigger_projections <- function(out,
   if ("projection_args" %in% names(out)) {
     tts <- as.list(rep(out$projection_args$tt_R0, reps))
     R0s <- as.list(rep(out$projection_args$R0, reps))
+    if(is.null(out$projection_args$R0)) {
+      R0s <- lapply(t0_variables(out), "[[", "R0")
+    }
   } else {
     tts <- as.list(rep(0, reps))
     R0s <- lapply(t0_variables(out), "[[", "R0")
@@ -584,7 +587,7 @@ trigger_projections <- function(out,
 
       # work out trigger times
       tts_new <- unlist(lapply(seq_len(reps), function(x) {
-        metric$t[which(metric$y >= trigger_value & metric$t > 0)[1]]
+        metric$t[which(metric$y >= trigger_value & metric$t > 0 & metric$replicate == x)[1]]
         }))
       tts_new[tts_new<0] <- 0
       tts_new[is.na(tts_new)] <- 0
@@ -624,7 +627,7 @@ trigger_projections <- function(out,
 
       # work out trigger times
       tts_new <- lapply(seq_along(tts), function(x) {
-        ts <- metric$t[metric$replicate == x & metric$y >= trigger_value]
+        ts <- na.omit(metric$t[metric$replicate == x & metric$y >= trigger_value])
         if(length(ts) > 0) {
           if(max(ts) > max(tts[[x]])) {
             return(c(tts[[x]],
