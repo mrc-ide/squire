@@ -117,12 +117,17 @@ projections_by_replicate <- function(r,
 
   }
 
-  # tt checks
+
+
+  # ----------------------------------------------------------------------------
+  # check are variables are correctly formatted
+  # ----------------------------------------------------------------------------
+
+    # tt checks
   tt_R0 <- tt_creation(tt_R0, reps = reps)
   tt_contact_matrix <- tt_creation(tt_contact_matrix, reps = reps)
   tt_hosp_beds <- tt_creation(tt_hosp_beds, reps = reps)
   tt_ICU_beds <- tt_creation(tt_ICU_beds, reps = reps)
-
 
   # ----------------------------------------------------------------------------
   # remove the change arguments if the absolute is provided
@@ -144,10 +149,6 @@ projections_by_replicate <- function(r,
     message("Both ICU_bed_capacity or ICU_bed_capacity_change were specified. ICU_bed_capacity is being used.")
     ICU_bed_capacity_change <- NULL
   }
-
-  # ----------------------------------------------------------------------------
-  # check are variables are correctly formatted
-  # ----------------------------------------------------------------------------
 
   # ----------------------------------------------------------------------------
   ## num checks
@@ -191,6 +192,7 @@ projections_by_replicate <- function(r,
   contact_matrix_set_change <- num_creation(contact_matrix_set_change, tt_contact_matrix, reps = reps)
 
 
+
   ## Contact matrix set is the only different one
 
   if (!is.null(contact_matrix_set)) {
@@ -199,10 +201,15 @@ projections_by_replicate <- function(r,
     if(is.matrix(contact_matrix_set)){
       contact_matrix_set <- list(contact_matrix_set)
       mc <- matrix_check(r$parameters$population[-1], contact_matrix_set)
-      contact_matrix_set <- rep(contact_matrix_set, reps)
+      contact_matrix_set <- rep(list(contact_matrix_set), reps)
     } else if(is.list(contact_matrix_set)) {
       if(is.matrix(contact_matrix_set[[1]])) {
-        contact_matrix_set <- rep(contact_matrix_set, reps)
+
+        # if the list length is less than the tt_contact_matrix then this is to be
+        # repeated as a list
+        if(length(contact_matrix_set) < sum(lengths(tt_contact_matrix))) {
+        contact_matrix_set <- rep(list(contact_matrix_set), reps)
+        }
       }
     }
     # check the lengths
@@ -627,7 +634,7 @@ trigger_projections <- function(out,
 
       # work out trigger times
       tts_new <- lapply(seq_along(tts), function(x) {
-        ts <- na.omit(metric$t[metric$replicate == x & metric$y >= trigger_value])
+        ts <- stats::na.omit(metric$t[metric$replicate == x & metric$y >= trigger_value])
         if(length(ts) > 0) {
           if(max(ts) > max(tts[[x]])) {
             return(c(tts[[x]],

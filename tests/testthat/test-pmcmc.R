@@ -707,7 +707,7 @@ test_that("pmcmc future", {
   n_particles = 2
 
   expect_message(out <- pmcmc(data = data,
-                              n_mcmc = 3,
+                              n_mcmc = 4,
                               log_likelihood = NULL,
                               log_prior = NULL,
                               n_particles = 2,
@@ -1098,7 +1098,7 @@ test_that("Start date and R0 only pmcmc", {
                                  pars = list(),
                                  Rt_args = out$pmcmc_results$inputs$Rt_args)
 
-  expect_equal(out$replicate_parameters$R0*out$interventions$R0_change,
+  expect_equal(out$replicate_parameters$R0[1]*out$interventions$R0_change,
                from_eval)
 
   # and check it by interventions_dates_for_odin
@@ -1114,8 +1114,9 @@ test_that("Start date and R0 only pmcmc", {
                                      Rt_args = out$pmcmc_results$inputs$Rt_args
   )
 
-  expect_equal(c(rep(out$replicate_parameters$R0[1],length(seq.Date(out$replicate_parameters$start_date[1], out$interventions$date_R0_change[1]-1, 1))),
-                 out$replicate_parameters$R0*out$interventions$R0_change),
+  expect_equal(c(rep(out$replicate_parameters$R0[1],
+                     length(seq.Date(out$replicate_parameters$start_date[1], out$interventions$date_R0_change[1]-1, 1))),
+                 out$replicate_parameters$R0[1]*out$interventions$R0_change),
                from_int_eval)
 
 })
@@ -1395,5 +1396,5 @@ test_that("pmcmc deaths from treatment", {
 
 
 })
-
+#
 

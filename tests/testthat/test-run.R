@@ -268,7 +268,7 @@ test_that("run day_return", {
 
   tp <- 10
   r <- run_explicit_SEEIR_model("Angola",replicates = 1, day_return = TRUE, time_period = tp)
-  expect_true(nrow(r$output) == tp+1)
+  expect_true(nrow(r$output) == tp)
 
 })
 

@@ -110,7 +110,10 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #'
 #' @details All durations are in days.
 #' @inheritParams parameters_explicit_SEEIR
-#'
+#' @param day_return Logical, do we want to return outut after each day rather
+#'   than each dt. Default = FALSE
+#' @param replicates Number of replicates
+#' @param seed Random Number Seed.
 #' @return Simulation output
 #' @export
 #'

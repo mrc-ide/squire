@@ -71,7 +71,14 @@ Default = NULL, which causes beta to be estimated from R0}
 
 \item{dt}{Time Step. Default = 0.1}
 
+\item{day_return}{Logical, do we want to return outut after each day rather
+than each dt. Default = FALSE}
+
+\item{replicates}{Number of replicates}
+
 \item{init}{Data.frame of initial conditions. Default = NULL}
+
+\item{seed}{Random Number Seed.}
 
 \item{prob_hosp}{probability of hospitalisation by age.
 Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,

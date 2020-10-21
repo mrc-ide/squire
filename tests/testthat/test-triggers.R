@@ -377,7 +377,7 @@ test_that("projection for Meff", {
     forecast = 0
   )
 
-  out2 <- projections_by_replicate(out, time_period = 90, R0_change = 2.5)
+  out2 <- projections_by_replicate(out, time_period = 90, R0_change = 4)
   out3 <- projections_by_replicate(out, time_period = 90, R0_change = 1)
 
   fd2 <- format_output(out2, "deaths")
