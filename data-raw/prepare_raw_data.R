@@ -79,6 +79,18 @@ country_specific_healthcare_capacity <- hosp_beds_by_country %>%
   mutate(ICU_beds = hosp_beds * (ICU_median / 100)) %>%
   select(-ICU_median) %>%
   filter(hosp_beds > 0) # remove Mali result which is -ve - need to sort this
+
+# https://www.paho.org/hq/dmdocuments/2012/2012-hia-frenchguiana.pdf
+# http://www.dortek.com/project/chu-hospital-martinique/
+# https://www.wikiwand.com/en/COVID-19_pandemic_in_French_Guiana#/Preventive_measures
+# https://www.thedailyherald.sx/islands/ars-ramps-up-supply-of-beds-ventilators-for-guadeloupe-st-martin-and-st-barths
+country_specific_healthcare_capacity <- rbind(country_specific_healthcare_capacity,
+                                              data.frame("country"=c("French Guiana","Guadeloupe","Martinique"),
+                                                         "income_group"=c(NA,NA,NA),
+                                                         "hosp_beds"=c(2.7,5.5,4.1),
+                                                         "ICU_beds"=c(0.1272256,0.1249603,0.1812053)))
+
+
 usethis::use_data(country_specific_healthcare_capacity, overwrite = TRUE)
 
 income_strata_healthcare_capacity <- income %>%
