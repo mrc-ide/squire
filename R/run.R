@@ -160,7 +160,9 @@ run_explicit_SEEIR_model <- function(
   dur_IMild = 2.1,
   dur_ICase = 4.5,
 
+  tt_dur_get_ox_survive = 0,
   dur_get_ox_survive = 9.5,
+
   dur_get_ox_die = 7.6,
   dur_not_get_ox_survive = 9.5*0.5,
   dur_not_get_ox_die = 7.6*0.5,
@@ -225,7 +227,8 @@ run_explicit_SEEIR_model <- function(
                                     ICU_bed_capacity=ICU_bed_capacity,
                                     tt_hosp_beds=tt_hosp_beds,
                                     tt_ICU_beds=tt_ICU_beds,
-                                    tt_dur_get_mv_survive=tt_dur_get_mv_survive)
+                                    tt_dur_get_mv_survive=tt_dur_get_mv_survive,
+                                    tt_dur_get_ox_survive=tt_dur_get_ox_survive)
 
   # Running the Model
   mod <- explicit_SEIR(user = pars, unused_user_action = "ignore")
@@ -306,6 +309,8 @@ run_deterministic_SEIR_model <- function(
   dur_ICase = 4.5,
 
   dur_get_ox_survive = 9.5,
+  tt_dur_get_ox_survive = 0,
+
   dur_get_ox_die = 7.6,
   dur_not_get_ox_survive = 9.5*0.5,
   dur_not_get_ox_die = 7.6*0.5,
@@ -371,7 +376,8 @@ run_deterministic_SEIR_model <- function(
                                     ICU_bed_capacity=ICU_bed_capacity,
                                     tt_hosp_beds=tt_hosp_beds*dt,
                                     tt_ICU_beds=tt_ICU_beds*dt,
-                                    tt_dur_get_mv_survive=tt_dur_get_mv_survive*dt)
+                                    tt_dur_get_mv_survive=tt_dur_get_mv_survive*dt,
+                                    tt_dur_get_ox_survive=tt_dur_get_ox_survive*dt)
 
   # handling time variables for js
   pars$tt_beta <- I(pars$tt_beta)
@@ -383,6 +389,8 @@ run_deterministic_SEIR_model <- function(
   pars$tt_matrix <- I(pars$tt_matrix)
   pars$gamma_get_mv_survive <- I(pars$gamma_get_mv_survive)
   pars$tt_dur_get_mv_survive <- I(pars$tt_dur_get_mv_survive)
+  pars$gamma_get_ox_survive <- I(pars$gamma_get_ox_survive)
+  pars$tt_dur_get_ox_survive <- I(pars$tt_dur_get_ox_survive)
 
 
   # Running the Model

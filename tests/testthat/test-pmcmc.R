@@ -570,7 +570,7 @@ test_that("pmcmc deterministic", {
   n_particles = 2
 
   out <- pmcmc(data = data,
-               n_mcmc = 5,
+               n_mcmc = 1000,
                log_likelihood = NULL,
                log_prior = NULL,
                n_particles = 2,

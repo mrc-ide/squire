@@ -13,7 +13,11 @@ gamma_IMild <- user() # rate of progression from mild infection to recovery
 gamma_ICase <- user() # rate of progression from symptom onset to requiring hospitalisation
 
 # rate of progression through requiring oxygen compartment conditional on getting oxygen and surviving
-gamma_get_ox_survive <- user()
+gamma_get_ox_survive[] <- user()
+tt_dur_get_ox_survive[] <- user()
+dim(tt_dur_get_ox_survive) <- user()
+dim(gamma_get_ox_survive) <- length(tt_dur_get_ox_survive)
+gamma_get_ox_survive_i <- interpolate(tt_dur_get_ox_survive, gamma_get_ox_survive, "constant")
 
 # rate of progression through requiring oxygen compartment conditional on getting oxygen and dying
 gamma_get_ox_die <- user()
@@ -109,8 +113,8 @@ p_ICase1_ICase2 <- 1 - exp(-gamma_ICase * dt) # Delay between symptom onset and 
 p_ICase2_Hosp <- 1 - exp(-gamma_ICase * dt) # Progression to requiring hospitalisation. Number split between I_Oxygen and I_MV
 
 # Transition Probabilities for Those Requiring Oxygen -> Recovery
-p_IOxGetLive1_IOxGetLive2 <- 1 - exp(-gamma_get_ox_survive * dt) # Progression through requiring oxygen and receiving it -> Recovery
-p_IOxGetLive2_R <- 1 - exp(-gamma_get_ox_survive * dt) # Progression through requiring oxygen and recieving it -> Recovery
+p_IOxGetLive1_IOxGetLive2 <- 1 - exp(-gamma_get_ox_survive_i * dt) # Progression through requiring oxygen and receiving it -> Recovery
+p_IOxGetLive2_R <- 1 - exp(-gamma_get_ox_survive_i * dt) # Progression through requiring oxygen and recieving it -> Recovery
 p_IOxNotGetLive1_IOxNotGetLive2 <- 1 - exp(-gamma_not_get_ox_survive * dt) # Progression through requiring oxygen and not receiving it -> Recovery
 p_IOxNotGetLive2_R <- 1 - exp(-gamma_not_get_ox_survive * dt) # Progression through requiring oxygen and not receiving it -> Recovery
 

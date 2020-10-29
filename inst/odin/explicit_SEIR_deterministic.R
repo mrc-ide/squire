@@ -56,7 +56,11 @@ gamma_IMild <- user()
 gamma_ICase <- user()
 
 # rate of progression through requiring oxygen compartment conditional on getting oxygen and surviving
-gamma_get_ox_survive <- user()
+gamma_get_ox_survive[] <- user()
+tt_dur_get_ox_survive[] <- user()
+dim(tt_dur_get_ox_survive) <- user()
+dim(gamma_get_ox_survive) <- length(tt_dur_get_ox_survive)
+gamma_get_ox_survive_i <- interpolate(tt_dur_get_ox_survive, gamma_get_ox_survive, "constant")
 
 # rate of progression through requiring oxygen compartment conditional on getting oxygen and dying
 gamma_get_ox_die <- user()
@@ -136,7 +140,7 @@ deriv(IRec2[]) <- gamma_rec * IRec1[i] - gamma_rec * IRec2[i]
 
 # Infections Requiring Oxygen (a general Hosptial Bed)
 hosp_occ <- sum(IOxGetLive1) + sum(IOxGetLive2) + sum(IOxGetDie1) + sum(IOxGetDie2) + sum(IRec1) + sum(IRec2) # Summing number of infections in compartments that use general hospital beds
-current_free_hosp <- hosp_bed_capacity - hosp_occ + gamma_get_ox_die*sum(IOxGetDie2) + gamma_get_ox_survive * sum(IOxGetLive2) + gamma_rec * sum(IRec2) - gamma_get_mv_survive_i * sum(IMVGetLive2)
+current_free_hosp <- hosp_bed_capacity - hosp_occ + gamma_get_ox_die*sum(IOxGetDie2) + gamma_get_ox_survive_i * sum(IOxGetLive2) + gamma_rec * sum(IRec2) - gamma_get_mv_survive_i * sum(IMVGetLive2)
 number_requiring_Ox[] <- gamma_ICase * ICase2[i] * (1 - prob_severe[i])
 total_number_requiring_ox <- sum(number_requiring_Ox)
 
@@ -145,8 +149,8 @@ total_number_get_hosp <- if (current_free_hosp <= 0) 0 else (if(current_free_hos
 Ox_dist_weighting[] <- number_requiring_Ox[i] * p_dist[i]
 number_get_Ox[] <- if (total_number_requiring_ox == 0) 0 else Ox_dist_weighting[i]/sum(Ox_dist_weighting) * total_number_get_hosp
 
-deriv(IOxGetLive1[]) <- (1 - prob_non_severe_death_treatment[i]) * number_get_Ox[i] - gamma_get_ox_survive * IOxGetLive1[i]
-deriv(IOxGetLive2[]) <- gamma_get_ox_survive * IOxGetLive1[i] -  gamma_get_ox_survive * IOxGetLive2[i]
+deriv(IOxGetLive1[]) <- (1 - prob_non_severe_death_treatment[i]) * number_get_Ox[i] - gamma_get_ox_survive_i * IOxGetLive1[i]
+deriv(IOxGetLive2[]) <- gamma_get_ox_survive_i * IOxGetLive1[i] -  gamma_get_ox_survive_i * IOxGetLive2[i]
 deriv(IOxGetDie1[]) <- (prob_non_severe_death_treatment[i] * number_get_Ox[i]) - gamma_get_ox_die * IOxGetDie1[i]
 deriv(IOxGetDie2[]) <- gamma_get_ox_die * IOxGetDie1[i] -  gamma_get_ox_die * IOxGetDie2[i]
 deriv(IOxNotGetLive1[]) <- (number_requiring_Ox[i] - number_get_Ox[i]) * (1 - prob_non_severe_death_no_treatment[i]) - gamma_not_get_ox_survive * IOxNotGetLive1[i]
@@ -155,7 +159,7 @@ deriv(IOxNotGetDie1[]) <- (number_requiring_Ox[i] - number_get_Ox[i]) * prob_non
 deriv(IOxNotGetDie2[]) <- gamma_not_get_ox_die * IOxNotGetDie1[i] -  gamma_not_get_ox_die * IOxNotGetDie2[i]
 
 # Recoveries and Deaths
-deriv(R[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox_survive * IOxGetLive2[i]) + (gamma_not_get_ox_survive * IOxNotGetLive2[i]) + (gamma_not_get_mv_survive * IMVNotGetLive2[i])
+deriv(R[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox_survive_i * IOxGetLive2[i]) + (gamma_not_get_ox_survive * IOxNotGetLive2[i]) + (gamma_not_get_mv_survive * IMVNotGetLive2[i])
 deriv(D[]) <- (gamma_get_ox_die * IOxGetDie2[i]) + (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_get_mv_die * IMVGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
 
 deriv(D_get[]) <- (gamma_get_ox_die * IOxGetDie2[i]) + (gamma_get_mv_die * IMVGetDie2[i])

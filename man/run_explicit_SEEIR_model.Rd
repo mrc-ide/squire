@@ -28,6 +28,7 @@ run_explicit_SEEIR_model(
   dur_E = 4.6,
   dur_IMild = 2.1,
   dur_ICase = 4.5,
+  tt_dur_get_ox_survive = 0,
   dur_get_ox_survive = 9.5,
   dur_get_ox_die = 7.6,
   dur_not_get_ox_survive = 9.5 * 0.5,
@@ -116,6 +117,9 @@ other age groups when demand exceeds healthcare capacity.}
 
 \item{dur_ICase}{Mean duration from symptom onset to hospitil admission (days).
 Default = 4.5}
+
+\item{tt_dur_get_ox_survive}{Times at which dur_get_ox_survive changes
+(Default = 0 = doesn't change)}
 
 \item{dur_get_ox_survive}{Mean duration of oxygen given survive. Default = 9.5}
 

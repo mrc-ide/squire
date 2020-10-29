@@ -29,6 +29,7 @@ run_deterministic_SEIR_model(
   dur_IMild = 2.1,
   dur_ICase = 4.5,
   dur_get_ox_survive = 9.5,
+  tt_dur_get_ox_survive = 0,
   dur_get_ox_die = 7.6,
   dur_not_get_ox_survive = 9.5 * 0.5,
   dur_not_get_ox_die = 7.6 * 0.5,
@@ -119,6 +120,9 @@ other age groups when demand exceeds healthcare capacity.}
 Default = 4.5}
 
 \item{dur_get_ox_survive}{Mean duration of oxygen given survive. Default = 9.5}
+
+\item{tt_dur_get_ox_survive}{Times at which dur_get_ox_survive changes
+(Default = 0 = doesn't change)}
 
 \item{dur_get_ox_die}{Mean duration of oxygen given death. Default = 7.6}
 

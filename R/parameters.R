@@ -162,6 +162,8 @@ get_hosp_bed_capacity <- function(country = NULL) {
 #' @param dur_ICase Mean duration from symptom onset to hospitil admission (days).
 #'   Default = 4.5
 #' @param dur_get_ox_survive Mean duration of oxygen given survive. Default = 9.5
+#' @param tt_dur_get_ox_survive Times at which dur_get_ox_survive changes
+#'   (Default = 0 = doesn't change)
 #' @param dur_get_ox_die Mean duration of oxygen given death. Default = 7.6
 #' @param dur_not_get_ox_survive Mean duration without oxygen given survive.
 #'   Default = 4.75
@@ -221,6 +223,8 @@ parameters_explicit_SEEIR <- function(
   dur_ICase = 4.5,
 
   dur_get_ox_survive = 9.5,
+  tt_dur_get_ox_survive = 0,
+
   dur_get_ox_die = 7.6,
   dur_not_get_ox_survive = 9.5*0.5,
   dur_not_get_ox_die = 7.6*0.5,
@@ -307,11 +311,14 @@ parameters_explicit_SEEIR <- function(
   stopifnot(length(hosp_bed_capacity) == length(tt_hosp_beds))
   stopifnot(length(ICU_bed_capacity) == length(tt_ICU_beds))
   stopifnot(length(dur_get_mv_survive) == length(tt_dur_get_mv_survive))
+  stopifnot(length(dur_get_ox_survive) == length(tt_dur_get_ox_survive))
 
 
   tc <- lapply(list(tt_R0/dt, tt_contact_matrix/dt,
                     tt_hosp_beds/dt, tt_ICU_beds/dt,
-                    tt_dur_get_mv_survive/dt),
+                    tt_dur_get_mv_survive/dt,
+                    tt_dur_get_ox_survive/dt
+                    ),
                check_time_change, time_period/dt)
 
   assert_pos(dt)
@@ -448,6 +455,7 @@ parameters_explicit_SEEIR <- function(
                tt_matrix = round(tt_contact_matrix/dt),
                tt_beta = round(tt_R0/dt),
                tt_dur_get_mv_survive = round(tt_dur_get_mv_survive/dt),
+               tt_dur_get_ox_survive = round(tt_dur_get_ox_survive/dt),
                dt = dt,
                population = population,
                contact_matrix_set = contact_matrix_set)
