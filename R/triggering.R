@@ -576,7 +576,7 @@ trigger_projections <- function(out,
   }
 
   lockdown_i <- 1
-  while (lockdown_i <= max_lockdowns) {
+  while (lockdown_i <= max_lockdowns && any(unlist(to_be_run))) {
 
     message("Lockdown: ", lockdown_i)
 
