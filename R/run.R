@@ -18,12 +18,12 @@ default_probs <- function() {
       0.020063626, 0.022686491, 0.026012496, 0.030268714, 0.035709645,
       0.042416637, 0.049842448, 0.056400332, 0.060249095, 0.122602446,
       0.184472303, 0.340529746),
+    prob_non_severe_death_no_treatment = rep(0.5, length(prob_hosp)),
     prob_severe_death_treatment = c(
       0.226668959, 0.252420241, 0.281097009, 0.413005389, 0.518451493,
       0.573413613, 0.576222065, 0.54253573, 0.493557696, 0.447376527,
       0.416666608, 0.411186639, 0.443382594, 0.538718871, 0.570434076,
       0.643352843, 0.992620047),
-    prob_non_severe_death_no_treatment = rep(0.5, length(prob_hosp)),
     prob_severe_death_no_treatment = rep(0.95, length(prob_hosp)),
     p_dist = rep(1, length(prob_hosp))
   )

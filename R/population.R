@@ -187,9 +187,13 @@ parse_country_population_mixing_matrix <- function(country = NULL,
 #' @noRd
 parse_country_IFR <- function(country = NULL) {
 
-  # Handle country population args
+  # Handle country population args - if no country specified, no adjustment made, default probs usedc
   if (is.null(country)) {
-    stop("User must provide the country being simulated")
+    ret <- list(country = country,
+                prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
+                prob_severe_death_treatment = probs$prob_severe_death_treatment)
+
+    return(ret)
   }
 
   # If a country was provided then grab the population and matrices if needed
@@ -209,10 +213,10 @@ parse_country_IFR <- function(country = NULL) {
 
   prop_deaths_ICU_80plus <- 0.15 # assumed, based off CHESS data
   elderly_IFR <- c(0.05659,	0.08862, 0.17370) # from Brazeau et al, for 80-84, 85-89 and 90+
-  IFR_80plus <- elderly_pop/sum(elderly_pop) * elderly_IFR
+  IFR_80plus <- sum(elderly_pop/sum(elderly_pop) * elderly_IFR)
   CFR_hosp_80plus <- IFR_80plus/prob_hosp[index]
 
-  prob_severe_death_treatment[index] <- CFR_hosp_80plus * prop_deaths_ICU_80plus/prob_severe[index]
+  prob_severe_death_treatment[index] <- min(1, CFR_hosp_80plus * prop_deaths_ICU_80plus/prob_severe[index])
   prob_non_severe_death_treatment[index] <- (CFR_hosp_80plus - prob_severe_death_treatment[index] * prob_severe[index])/(1 - prob_severe[index])
 
   ret <- list(country = country,

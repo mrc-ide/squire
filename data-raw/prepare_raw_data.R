@@ -77,6 +77,8 @@ elderly_pop$iso3c[elderly_pop$country == "Channel Islands"] <- "CHI"
 elderly_pop$iso3c[elderly_pop$country == "Eswatini"] <- "SWZ"
 elderly_pop$iso3c[elderly_pop$country == "Micronesia"] <- "FSM"
 
+elderly_pop <- as.data.frame(elderly_pop)
+usethis::use_data(elderly_pop, overwrite = TRUE)
 
 # Income Group
 # ------------------------------------------------------------------------------
