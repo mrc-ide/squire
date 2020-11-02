@@ -12,9 +12,10 @@ demog <- read.csv("data-raw/WPP_demog_matrix.csv", stringsAsFactors = FALSE)
 
 population <- demog %>%
   dplyr::rename(country = "Region..subregion..country.or.area..") %>%
-  dplyr::mutate(`X80+` = X80.84 + X85.89 + X90.94 + X95.99 + X100.) %>%
+  dplyr::mutate(`X90+` = X90.94 + X95.99 + X100.) %>%
   dplyr::select(country, X0.4,   X5.9,   X10.14, X15.19, X20.24, X25.29, X30.34, X35.39,
-                  X40.44, X45.49, X50.54, X55.59, X60.64, X65.69, X70.74, X75.79,`X80+`) %>%
+                X40.44, X45.49, X50.54, X55.59, X60.64, X65.69, X70.74, X75.79, X80.84,
+                X85.89, `X90+`) %>%
   tidyr::pivot_longer(cols = -country, names_to = "age_group", values_to = "n",
                       names_prefix = "X") %>%
   dplyr::mutate(age_group = stringr::str_replace(age_group, "[.]", "-"),
@@ -36,7 +37,9 @@ population$age_group <- factor(population$age_group, levels = c("0-4",
                                                                 "65-69",
                                                                 "70-74",
                                                                 "75-79",
-                                                                "80+"))
+                                                                "80-84",
+                                                                "85-89",
+                                                                "90+"))
 population$matrix <- demog$Matrix[match(population$country, demog$Region..subregion..country.or.area..)]
 
 population$iso3c <- countrycode::countrycode(population$country, "country.name","iso3c")
