@@ -202,9 +202,7 @@ parameters_explicit_SEEIR <- function(
   init = NULL,
   seeding_cases = NULL,
 
-  # parameters
-  # probabilities
-  # probabilities
+  # parameters/probabilities
   prob_hosp = probs$prob_hosp,
   prob_severe = probs$prob_severe,
   prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
@@ -245,6 +243,11 @@ parameters_explicit_SEEIR <- function(
   country <- cpm$country
   population <- cpm$population
   contact_matrix_set <- cpm$contact_matrix_set
+
+  # Handle within-hospital mortality adjusting based on 80+ demographic composition
+  cIFR <- parse_country_IFR(country = country)
+  prob_non_severe_death_treatment <- cIFR$prob_non_severe_death_treatment
+  prob_severe_death_treatment <- cIFR$prob_severe_death_treatment
 
   # Standardise contact matrix set
   if(is.matrix(contact_matrix_set)){
