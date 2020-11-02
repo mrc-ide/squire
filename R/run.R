@@ -311,6 +311,8 @@ run_explicit_SEEIR_model <- function(
   parameters$beta_set <- pars$beta_set
   parameters$seeding_cases <- pars$E1_0
   parameters$contact_matrix_set <- pars$contact_matrix_set
+  parameters$prob_non_severe_death_treatment <- pars$prob_non_severe_death_treatment
+  parameters$prob_severe_death_treatment <- pars$prob_severe_death_treatment
 
   out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
