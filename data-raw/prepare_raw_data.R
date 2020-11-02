@@ -55,6 +55,31 @@ population$country <- iconv(
 population <- as.data.frame(population)
 usethis::use_data(population, overwrite = TRUE)
 
+# Demography for 80+ disaggregation - required for country-specific IFR estimation
+# --------------------------------------------------------------------------------
+elderly_pop <- demog %>%
+  dplyr::rename(country = "Region..subregion..country.or.area..") %>%
+  dplyr::mutate(`X90+` = X90.94 + X95.99 + X100.) %>%
+  dplyr::select(country, X80.84, X85.89, `X90+`) %>%
+  tidyr::pivot_longer(cols = -country, names_to = "age_group", values_to = "n",
+                      names_prefix = "X") %>%
+  dplyr::mutate(age_group = stringr::str_replace(age_group, "[.]", "-"),
+                n = n * 1000)
+
+elderly_pop$age_group <- factor(elderly_pop$age_group, levels = c("80-84",
+                                                          "85-89",
+                                                          "90+"))
+
+elderly_pop$matrix <- demog$Matrix[match(elderly_pop$country, demog$Region..subregion..country.or.area..)]
+
+elderly_pop$iso3c <- countrycode::countrycode(elderly_pop$country, "country.name","iso3c")
+elderly_pop$iso3c[elderly_pop$country == "Channel Islands"] <- "CHI"
+elderly_pop$iso3c[elderly_pop$country == "Eswatini"] <- "SWZ"
+elderly_pop$iso3c[elderly_pop$country == "Micronesia"] <- "FSM"
+
+elderly_pop <- as.data.frame(elderly_pop)
+usethis::use_data(elderly_pop, overwrite = TRUE)
+
 # Income Group
 # ------------------------------------------------------------------------------
 income_group <- demog %>%

@@ -12,6 +12,27 @@ test_that("population getter works", {
   expect_equal(out, out2)
 })
 
+test_that("elderly population getter works", {
+  expect_error(get_elderly_population("moon"))
+  expect_error(get_elderly_population(3))
+  expect_error(get_elderly_population(iso3c="moon"))
+  expect_error(get_elderly_population(iso3c=4))
+  out <- get_elderly_population("Angola")
+  out2 <- get_elderly_population(iso3c="AGO")
+  expect_type(out, "list")
+  expect_equal(nrow(out), 3)
+  expect_equal(ncol(out), 5)
+  expect_named(out, c("country", "age_group", "n", "matrix", "iso3c"))
+  expect_equal(out, out2)
+})
+
+test_that("parse_country_IFR works", {
+  expect_error(parse_country_IFR("moon"))
+  expect_error(parse_country_IFR(3))
+  out <- parse_country_IFR("Angola")
+  expect_type(out, "list")
+})
+
 test_that("lmic getter works", {
   expect_vector(get_lmic_countries())
   expect_true("Zambia" %in% get_lmic_countries())
