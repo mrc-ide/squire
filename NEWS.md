@@ -1,6 +1,8 @@
-# squire 0.4.35
+# squire 0.5.0
 
-* PLACEHOLDER: Major updates. Will become 0.5
+* Parameter Updates
+* `triggering`
+* Time-varying duration of ICU and hospital stay for patients that survive
 
 # squire 0.4.34
 

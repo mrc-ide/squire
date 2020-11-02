@@ -151,7 +151,8 @@ scan_R0_date <- function(
       Meff_include = FALSE,
       Rt_func = Rt_func,
       .progress = TRUE,
-      return = "ll")
+      return = "ll",
+      .options = furrr::furrr_options(seed = NULL))
 
   }
 
@@ -374,7 +375,9 @@ scan_R0_date_Meff <- function(
       .progress = TRUE,
       Meff_include = TRUE,
       Rt_func = Rt_func,
-      return = "ll")
+      return = "ll",
+      .options = furrr::furrr_options(seed = NULL)
+      )
 
   }
 
@@ -675,7 +678,8 @@ sample_grid_scan <- function(scan_results,
       save_particles = TRUE,
       Meff_include = FALSE,
       return = "sample",
-      .progress = TRUE
+      .progress = TRUE,
+      .options = furrr::furrr_options(seed = NULL)
     )
   }
   # collapse into an array of trajectories
@@ -829,7 +833,8 @@ sample_3d_grid_scan <- function(scan_results,
       save_particles = TRUE,
       Meff_include = TRUE,
       return = "sample",
-      .progress = TRUE
+      .progress = TRUE,
+      .options = furrr::furrr_options(seed = NULL)
     )
   }
   # collapse into an array of trajectories
