@@ -185,32 +185,22 @@ parse_country_population_mixing_matrix <- function(country = NULL,
 }
 
 #' @noRd
-parse_country_IFR <- function(country = NULL,
-                              population = NULL,
-                              elderly_pop = NULL,
-                              prob_non_severe_death_treatment = NULL,
-                              prob_severe_death_treatment = NULL) {
+parse_country_IFR <- function(country = NULL) {
 
   # Handle country population args
-  if (is.null(country) ||
-      (is.null(population) && is.null(elderly_population_disaggregation))) {
-    stop("User must provide either the country being simulated or both the
-          population and a more detailed breakdown of their elderly population")
+  if (is.null(country)) {
+    stop("User must provide the country being simulated")
   }
 
   # If a country was provided then grab the population and matrices if needed
-  if (is.null(population)) {
-    population <- get_population(country)
-    population <- population$n
-  }
-  if (is.null(elderly_pop)) {
-    elderly_pop <- get_elderly_population(country)
-    elderly_pop <- elderly_pop$n
-  }
+  population <- get_population(country)
+  population <- population$n
+  elderly_pop <- get_elderly_population(country)
+  elderly_pop <- elderly_pop$n
 
   # Loading in squire's prob_hosp and prob_severe
-  prob_hosp <- probs()$prob_hosp
-  prob_severe <- probs()$prob_severe
+  prob_hosp <- probs$prob_hosp
+  prob_severe <- probs$prob_severe
 
   # Adjusting death probability for country-specific 80+ demographic compositions
   prob_non_severe_death_treatment <- probs$prob_non_severe_death_treatment
