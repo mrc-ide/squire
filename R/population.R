@@ -187,7 +187,9 @@ parse_country_population_mixing_matrix <- function(country = NULL,
 #' @noRd
 parse_country_IFR <- function(country = NULL,
                               population = NULL,
-                              elderly_pop = NULL) {
+                              elderly_pop = NULL,
+                              prob_non_severe_death_treatment = NULL,
+                              prob_severe_death_treatment = NULL) {
 
   # Handle country population args
   if (is.null(country) ||
@@ -211,8 +213,8 @@ parse_country_IFR <- function(country = NULL,
   prob_severe <- probs()$prob_severe
 
   # Adjusting death probability for country-specific 80+ demographic compositions
-  prob_non_severe_death_treatment <- probs()$prob_non_severe_death_treatment
-  prob_severe_death_treatment <- probs()$prob_severe_death_treatment
+  prob_non_severe_death_treatment <- probs$prob_non_severe_death_treatment
+  prob_severe_death_treatment <- probs$prob_severe_death_treatment
   index <- length(prob_non_severe_death_treatment)
 
   prop_deaths_ICU_80plus <- 0.15 # assumed, based off CHESS data
