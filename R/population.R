@@ -196,6 +196,10 @@ parse_country_IFR <- function(country = NULL) {
     return(ret)
   }
 
+  if(!country %in% unique(squire::population$country)){
+    stop("Country not found")
+  }
+
   # If a country was provided then grab the population and matrices if needed
   population <- get_population(country)
   population <- population$n
