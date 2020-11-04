@@ -207,12 +207,12 @@ parameters_explicit_SEEIR <- function(
   seeding_cases = NULL,
 
   # parameters/probabilities
-  prob_hosp = probs$prob_hosp,
-  prob_severe = probs$prob_severe,
-  prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
-  prob_non_severe_death_no_treatment = probs$prob_non_severe_death_no_treatment,
-  prob_severe_death_treatment = probs$prob_severe_death_treatment,
-  prob_severe_death_no_treatment = probs$prob_severe_death_no_treatment,
+  prob_hosp = NULL,
+  prob_severe = NULL,
+  prob_non_severe_death_treatment = NULL,
+  prob_non_severe_death_no_treatment = NULL,
+  prob_severe_death_treatment = NULL,
+  prob_severe_death_no_treatment = NULL,
   p_dist = probs$p_dist,
 
   # durations
@@ -252,10 +252,22 @@ parameters_explicit_SEEIR <- function(
   population <- cpm$population
   contact_matrix_set <- cpm$contact_matrix_set
 
-  # Handle within-hospital mortality adjusting based on 80+ demographic composition
-  cIFR <- parse_country_IFR(country = country)
-  prob_non_severe_death_treatment <- cIFR$prob_non_severe_death_treatment
-  prob_severe_death_treatment <- cIFR$prob_severe_death_treatment
+  # Handle severity parameters and possible 80+ demographic adjustment
+  severity_params <- parse_country_severity(country = country,
+                                            prob_hosp = prob_hosp,
+                                            prob_severe = prob_severe,
+                                            prob_non_severe_death_treatment = prob_non_severe_death_treatment,
+                                            prob_severe_death_treatment = prob_severe_death_treatment,
+                                            prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
+                                            prob_severe_death_no_treatment = prob_severe_death_no_treatment,
+                                            walker = walker)
+
+  prob_hosp <- severity_params$prob_hosp
+  prob_severe <- severity_params$prob_severe
+  prob_non_severe_death_treatment <- severity_params$prob_non_severe_death_treatment
+  prob_severe_death_treatment <- severity_params$prob_severe_death_treatment
+  prob_non_severe_death_no_treatment <- severity_params$prob_severe_death_no_treatment
+  prob_severe_death_no_treatment <- severity_params$prob_severe_death_treatment
 
   # Standardise contact matrix set
   if(is.matrix(contact_matrix_set)){
