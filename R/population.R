@@ -185,47 +185,112 @@ parse_country_population_mixing_matrix <- function(country = NULL,
 }
 
 #' @noRd
-parse_country_IFR <- function(country = NULL) {
+parse_country_severity <- function(country = NULL,
+                                   prob_hosp = NULL, prob_severe = NULL,
+                                   prob_non_severe_death_treatment = NULL,
+                                   prob_severe_death_treatment = NULL,
+                                   prob_non_severe_death_no_treatment = NULL,
+                                   prob_severe_death_no_treatment = NULL,
+                                   walker = FALSE) {
 
-  # Handle country population args - if no country specified, no adjustment made, default probs usedc
-  if (is.null(country)) {
+  # If walker == TRUE, use the original squire parameters described in Walker et al.
+  if (walker) {
+    prob_hosp <- c(
+      0.000744192, 0.000634166, 0.001171109, 0.002394593, 0.005346437 ,
+      0.010289885, 0.016234604, 0.023349169, 0.028944623, 0.038607042 ,
+      0.057734879, 0.072422135, 0.101602458, 0.116979814, 0.146099064,
+      0.176634654 ,0.180000000)
+    prob_severe <- c(
+      0.05022296,	0.05022296,	0.05022296,	0.05022296,	0.05022296,
+      0.05022296,	0.05022296,	0.053214942, 0.05974426,	0.074602879,
+      0.103612417, 0.149427991, 0.223777304,	0.306985918,
+      0.385779555, 0.461217861, 0.709444444)
+    prob_non_severe_death_treatment <- c(
+      0.0125702, 0.0125702,	0.0125702, 0.0125702,
+      0.0125702, 0.0125702,	0.0125702, 0.013361147,
+      0.015104687, 0.019164124,	0.027477519, 0.041762108,
+      0.068531658, 0.105302319,	0.149305732, 0.20349534, 0.5804312)
+    prob_severe_death_treatment <- rep(0.5, length(prob_hosp))
+    prob_non_severe_death_no_treatment <- rep(0.6, length(prob_hosp))
+    prob_severe_death_no_treatment <- rep(0.95, length(prob_hosp))
     ret <- list(country = country,
+                prob_hosp = prob_hosp,
+                prob_severe = prob_severe,
+                prob_non_severe_death_treatment = prob_non_severe_death_treatment,
+                prob_severe_death_treatment = prob_severe_death_treatment,
+                prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
+                prob_severe_death_no_treatment = prob_severe_death_no_treatment)
+  }
+
+  # Filling in any missing parameters
+  if (is.null(prob_hosp)) {
+    prob_hosp <- probs$prob_hosp
+  }
+  if (is.null(prob_severe)) {
+    prob_severe <- probs$prob_severe
+  }
+  if (is.null(prob_non_severe_death_no_treatment)) {
+    prob_non_severe_death_no_treatment <- rep(0.6, length(prob_hosp))
+  }
+  if (is.null(prob_severe_death_no_treatment)) {
+    prob_severe_death_no_treatment <- rep(0.95, length(prob_hosp))
+  }
+
+  # If no country specified, fill in remaining missing probs with defaults, make no adjustment
+  if (is.null(country)) {
+    if (is.null(prob_non_severe_death_treatment)) {
+      prob_non_severe_death_treatment <- probs$prob_non_severe_death_treatment
+    }
+    if (is.null(prob_severe_death_treatment)) {
+      prob_severe_death_treatment <- probs$prob_severe_death_treatment
+    }
+    if (is.null(country)) {
+      ret <- list(country = country,
+                  prob_hosp = prob_hosp,
+                  prob_severe = prob_severe,
+                  prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
+                  prob_severe_death_treatment = probs$prob_severe_death_treatment,
+                  prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
+                  prob_severe_death_no_treatment = prob_severe_death_no_treatment)
+    }
+  }
+
+  # If country is specified, check valid and then adjust default probs based on demography
+  if (!is.null(country)) {
+
+    # Check country valid and then grab relevant elderly population
+    if(!country %in% unique(squire::population$country)){
+      stop("Country not found")
+    }
+    population <- get_population(country)
+    population <- population$n
+    elderly_pop <- get_elderly_population(country)
+    elderly_pop <- elderly_pop$n
+
+    # Adjusting death probability for country-specific 80+ demographic compositions
+    index <- length(prob_non_severe_death_treatment)
+    prop_deaths_ICU_80plus <- 0.15 # assumed, based off CHESS data
+    elderly_IFR <- c(0.05659,	0.08862, 0.17370) # from Brazeau et al, for 80-84, 85-89 and 90+
+    IFR_80plus <- sum(elderly_pop/sum(elderly_pop) * elderly_IFR)
+    CFR_hosp_80plus <- IFR_80plus/prob_hosp[index]
+
+    if (is.null(prob_non_severe_death_treatment)) {
+      prob_non_severe_death_treatment <- probs$prob_non_severe_death_treatment
+      prob_non_severe_death_treatment[index] <- min(1, (CFR_hosp_80plus - prob_severe_death_treatment[index] * prob_severe[index])/(1 - prob_severe[index]))
+    }
+    if (is.null(prob_severe_death_treatment)) {
+      prob_severe_death_treatment <- probs$prob_severe_death_treatment
+      prob_severe_death_treatment[index] <- min(1, CFR_hosp_80plus * prop_deaths_ICU_80plus/prob_severe[index])
+    }
+
+    ret <- list(country = country,
+                prob_hosp = prob_hosp,
+                prob_severe = prob_severe,
                 prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
-                prob_severe_death_treatment = probs$prob_severe_death_treatment)
-
-    return(ret)
+                prob_severe_death_treatment = probs$prob_severe_death_treatment,
+                prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
+                prob_severe_death_no_treatment = prob_severe_death_no_treatment)
   }
-
-  if(!country %in% unique(squire::population$country)){
-    stop("Country not found")
-  }
-
-  # If a country was provided then grab the population and matrices if needed
-  population <- get_population(country)
-  population <- population$n
-  elderly_pop <- get_elderly_population(country)
-  elderly_pop <- elderly_pop$n
-
-  # Loading in squire's prob_hosp and prob_severe
-  prob_hosp <- probs$prob_hosp
-  prob_severe <- probs$prob_severe
-
-  # Adjusting death probability for country-specific 80+ demographic compositions
-  prob_non_severe_death_treatment <- probs$prob_non_severe_death_treatment
-  prob_severe_death_treatment <- probs$prob_severe_death_treatment
-  index <- length(prob_non_severe_death_treatment)
-
-  prop_deaths_ICU_80plus <- 0.15 # assumed, based off CHESS data
-  elderly_IFR <- c(0.05659,	0.08862, 0.17370) # from Brazeau et al, for 80-84, 85-89 and 90+
-  IFR_80plus <- sum(elderly_pop/sum(elderly_pop) * elderly_IFR)
-  CFR_hosp_80plus <- IFR_80plus/prob_hosp[index]
-
-  prob_severe_death_treatment[index] <- min(1, CFR_hosp_80plus * prop_deaths_ICU_80plus/prob_severe[index])
-  prob_non_severe_death_treatment[index] <- (CFR_hosp_80plus - prob_severe_death_treatment[index] * prob_severe[index])/(1 - prob_severe[index])
-
-  ret <- list(country = country,
-              prob_non_severe_death_treatment = prob_non_severe_death_treatment,
-              prob_severe_death_treatment = prob_severe_death_treatment)
 
   return(ret)
 
