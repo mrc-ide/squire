@@ -195,6 +195,7 @@ parse_country_severity <- function(country = NULL,
                                    walker = FALSE) {
 
   # If walker == TRUE, use the original squire parameters described in Walker et al.
+  assert_logical(walker)
   if (walker) {
     prob_hosp <- c(
       0.000744192, 0.000634166, 0.001171109, 0.002394593, 0.005346437 ,

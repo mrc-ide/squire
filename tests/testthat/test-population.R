@@ -26,11 +26,16 @@ test_that("elderly population getter works", {
   expect_equal(out, out2)
 })
 
-test_that("parse_country_IFR works", {
-  expect_error(parse_country_IFR("moon"))
-  expect_error(parse_country_IFR(3))
-  out <- parse_country_IFR("Angola")
+test_that("parse_country_severity works", {
+  expect_error(parse_country_severity("moon"))
+  expect_error(parse_country_severity(3))
+  out <- parse_country_severity("Angola")
   expect_type(out, "list")
+  out2 <- parse_country_severity(walker = TRUE)
+  expect_type(out2, "list")
+  expect_error(parse_country_severity(walker = "bloop"))
+  out3 <- parse_country_severity()
+  expect_type(out3, "list")
 })
 
 test_that("lmic getter works", {
