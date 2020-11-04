@@ -186,7 +186,8 @@ parse_country_population_mixing_matrix <- function(country = NULL,
 
 #' @noRd
 parse_country_severity <- function(country = NULL,
-                                   prob_hosp = NULL, prob_severe = NULL,
+                                   prob_hosp = NULL,
+                                   prob_severe = NULL,
                                    prob_non_severe_death_treatment = NULL,
                                    prob_severe_death_treatment = NULL,
                                    prob_non_severe_death_no_treatment = NULL,
@@ -268,26 +269,26 @@ parse_country_severity <- function(country = NULL,
     elderly_pop <- elderly_pop$n
 
     # Adjusting death probability for country-specific 80+ demographic compositions
-    index <- length(prob_non_severe_death_treatment)
+    index <- length(prob_severe)
     prop_deaths_ICU_80plus <- 0.15 # assumed, based off CHESS data
     elderly_IFR <- c(0.05659,	0.08862, 0.17370) # from Brazeau et al, for 80-84, 85-89 and 90+
     IFR_80plus <- sum(elderly_pop/sum(elderly_pop) * elderly_IFR)
     CFR_hosp_80plus <- IFR_80plus/prob_hosp[index]
 
-    if (is.null(prob_non_severe_death_treatment)) {
-      prob_non_severe_death_treatment <- probs$prob_non_severe_death_treatment
-      prob_non_severe_death_treatment[index] <- min(1, (CFR_hosp_80plus - prob_severe_death_treatment[index] * prob_severe[index])/(1 - prob_severe[index]))
-    }
     if (is.null(prob_severe_death_treatment)) {
       prob_severe_death_treatment <- probs$prob_severe_death_treatment
       prob_severe_death_treatment[index] <- min(1, CFR_hosp_80plus * prop_deaths_ICU_80plus/prob_severe[index])
+    }
+    if (is.null(prob_non_severe_death_treatment)) {
+      prob_non_severe_death_treatment <- probs$prob_non_severe_death_treatment
+      prob_non_severe_death_treatment[index] <- min(1, (CFR_hosp_80plus - prob_severe_death_treatment[index] * prob_severe[index])/(1 - prob_severe[index]))
     }
 
     ret <- list(country = country,
                 prob_hosp = prob_hosp,
                 prob_severe = prob_severe,
-                prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
-                prob_severe_death_treatment = probs$prob_severe_death_treatment,
+                prob_non_severe_death_treatment = prob_non_severe_death_treatment,
+                prob_severe_death_treatment = prob_severe_death_treatment,
                 prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
                 prob_severe_death_no_treatment = prob_severe_death_no_treatment)
   }
