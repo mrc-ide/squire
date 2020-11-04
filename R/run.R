@@ -151,12 +151,12 @@ run_explicit_SEEIR_model <- function(
 
   # parameters
   # probabilities
-  prob_hosp = probs$prob_hosp,
-  prob_severe = probs$prob_severe,
-  prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
-  prob_non_severe_death_no_treatment = probs$prob_non_severe_death_no_treatment,
-  prob_severe_death_treatment = probs$prob_severe_death_treatment,
-  prob_severe_death_no_treatment = probs$prob_severe_death_no_treatment,
+  prob_hosp = NULL,
+  prob_severe = NULL,
+  prob_non_severe_death_treatment = NULL,
+  prob_non_severe_death_no_treatment = NULL,
+  prob_severe_death_treatment = NULL,
+  prob_severe_death_no_treatment = NULL,
   p_dist = probs$p_dist,
 
   # durations
