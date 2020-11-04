@@ -214,6 +214,7 @@ parameters_explicit_SEEIR <- function(
   prob_severe_death_treatment = NULL,
   prob_severe_death_no_treatment = NULL,
   p_dist = probs$p_dist,
+  walker = FALSE,
 
   # durations
   dur_E  = 4.6,

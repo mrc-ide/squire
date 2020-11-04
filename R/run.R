@@ -158,6 +158,7 @@ run_explicit_SEEIR_model <- function(
   prob_severe_death_treatment = NULL,
   prob_severe_death_no_treatment = NULL,
   p_dist = probs$p_dist,
+  walker = FALSE,
 
   # durations
   dur_E  = 4.6,
@@ -215,6 +216,7 @@ run_explicit_SEEIR_model <- function(
                                     prob_severe_death_treatment=prob_severe_death_treatment,
                                     prob_severe_death_no_treatment=prob_severe_death_no_treatment,
                                     p_dist=p_dist,
+                                    walker=walker,
                                     dur_E=dur_E,
                                     dur_IMild=dur_IMild,
                                     dur_ICase=dur_ICase,
