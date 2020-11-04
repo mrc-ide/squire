@@ -267,7 +267,7 @@ parameters_explicit_SEEIR <- function(
   prob_severe <- severity_params$prob_severe
   prob_non_severe_death_treatment <- severity_params$prob_non_severe_death_treatment
   prob_severe_death_treatment <- severity_params$prob_severe_death_treatment
-  prob_non_severe_death_no_treatment <- severity_params$prob_severe_death_no_treatment
+  prob_non_severe_death_no_treatment <- severity_params$prob_non_severe_death_no_treatment
   prob_severe_death_no_treatment <- severity_params$prob_severe_death_treatment
 
   # Standardise contact matrix set

@@ -25,6 +25,7 @@ run_explicit_SEEIR_model(
   prob_severe_death_treatment = NULL,
   prob_severe_death_no_treatment = NULL,
   p_dist = probs$p_dist,
+  walker = FALSE,
   dur_E = 4.6,
   dur_IMild = 2.1,
   dur_ICase = 4.5,

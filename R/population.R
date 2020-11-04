@@ -246,15 +246,13 @@ parse_country_severity <- function(country = NULL,
     if (is.null(prob_severe_death_treatment)) {
       prob_severe_death_treatment <- probs$prob_severe_death_treatment
     }
-    if (is.null(country)) {
-      ret <- list(country = country,
+    ret <- list(country = country,
                   prob_hosp = prob_hosp,
                   prob_severe = prob_severe,
-                  prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
-                  prob_severe_death_treatment = probs$prob_severe_death_treatment,
+                  prob_non_severe_death_treatment = prob_non_severe_death_treatment,
+                  prob_severe_death_treatment = prob_severe_death_treatment,
                   prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
                   prob_severe_death_no_treatment = prob_severe_death_no_treatment)
-    }
   }
 
   # If country is specified, check valid and then adjust default probs based on demography
