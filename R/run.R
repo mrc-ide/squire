@@ -307,12 +307,12 @@ run_deterministic_SEIR_model <- function(
 
   # parameters
   # probabilities
-  prob_hosp = probs$prob_hosp,
-  prob_severe = probs$prob_severe,
-  prob_non_severe_death_treatment = probs$prob_non_severe_death_treatment,
-  prob_non_severe_death_no_treatment = probs$prob_non_severe_death_no_treatment,
-  prob_severe_death_treatment = probs$prob_severe_death_treatment,
-  prob_severe_death_no_treatment = probs$prob_severe_death_no_treatment,
+  prob_hosp = NULL,
+  prob_severe = NULL,
+  prob_non_severe_death_treatment = NULL,
+  prob_non_severe_death_no_treatment = NULL,
+  prob_severe_death_treatment = NULL,
+  prob_severe_death_no_treatment = NULL,
   p_dist = probs$p_dist,
 
   # durations
@@ -428,6 +428,12 @@ run_deterministic_SEIR_model <- function(
   parameters$beta_set <- pars$beta_set
   parameters$seeding_cases <- pars$E1_0
   parameters$contact_matrix_set <- pars$contact_matrix_set
+  parameters$prob_hosp <- pars$prob_hosp
+  parameters$prob_severe <- pars$prob_severe
+  parameters$prob_non_severe_death_treatment <- pars$prob_non_severe_death_treatment
+  parameters$prob_severe_death_treatment <- pars$prob_severe_death_treatment
+  parameters$prob_non_severe_death_no_treatment <- pars$prob_non_severe_death_no_treatment
+  parameters$prob_severe_death_no_treatment <- pars$prob_severe_death_no_treatment
 
   out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
