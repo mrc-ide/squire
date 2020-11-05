@@ -221,21 +221,21 @@ parameters_explicit_SEEIR <- function(
   dur_IMild = 2.1,
   dur_ICase = 4.5,
 
-  dur_get_ox_survive = 9.5,
-  tt_dur_get_ox_survive = 0,
+  dur_get_ox_survive = NULL,
+  tt_dur_get_ox_survive = NULL,
 
-  dur_get_ox_die = 7.6,
-  dur_not_get_ox_survive = 9.5*0.5,
-  dur_not_get_ox_die = 7.6*0.5,
+  dur_get_ox_die = NULL,
+  dur_not_get_ox_survive = NULL,
+  dur_not_get_ox_die = NULL,
 
-  dur_get_mv_survive = 11.3,
-  tt_dur_get_mv_survive = 0,
+  dur_get_mv_survive = NULL,
+  tt_dur_get_mv_survive = NULL,
 
-  dur_get_mv_die = 10.1,
-  dur_not_get_mv_survive = 11.3*0.5,
-  dur_not_get_mv_die = 1,
+  dur_get_mv_die = NULL,
+  dur_not_get_mv_survive = NULL,
+  dur_not_get_mv_die = NULL,
 
-  dur_rec = 3.4,
+  dur_rec = NULL,
 
   # health system capacity
   hosp_bed_capacity = NULL,
@@ -270,6 +270,32 @@ parameters_explicit_SEEIR <- function(
   prob_non_severe_death_no_treatment <- severity_params$prob_non_severe_death_no_treatment
   prob_severe_death_no_treatment <- severity_params$prob_severe_death_no_treatment
 
+  # Handle duration of hospitalisation parameters
+  hosp_duration_params <- parse_hospital_duration(dur_get_ox_survive = dur_get_ox_survive,
+                                                  tt_dur_get_ox_survive = tt_dur_get_ox_survive,
+                                                  dur_get_ox_die = dur_get_ox_die,
+                                                  dur_not_get_ox_survive = dur_not_get_ox_survive,
+                                                  dur_not_get_ox_die = dur_not_get_ox_die,
+                                                  dur_get_mv_survive = dur_get_mv_survive,
+                                                  tt_dur_get_mv_survive = tt_dur_get_mv_survive,
+                                                  dur_get_mv_die = dur_get_mv_die,
+                                                  dur_not_get_mv_survive = dur_not_get_mv_survive,
+                                                  dur_not_get_mv_die = dur_not_get_mv_die,
+                                                  dur_rec = dur_rec,
+                                                  walker = walker)
+
+  dur_get_ox_survive <- hosp_duration_params$dur_get_ox_survive
+  tt_dur_get_ox_survive <- hosp_duration_params$tt_dur_get_ox_survive
+  dur_get_ox_die <- hosp_duration_params$dur_get_ox_die
+  dur_not_get_ox_survive <- hosp_duration_params$dur_not_get_ox_survive
+  dur_not_get_ox_die <- hosp_duration_params$dur_not_get_ox_die
+  dur_get_mv_survive <- hosp_duration_params$dur_get_mv_survive
+  tt_dur_get_mv_survive <- hosp_duration_params$tt_dur_get_mv_survive
+  dur_get_mv_die <- hosp_duration_params$dur_get_mv_die
+  dur_not_get_mv_survive <- hosp_duration_params$dur_not_get_mv_survive
+  dur_not_get_mv_die <- hosp_duration_params$dur_not_get_mv_die
+  dur_rec <- hosp_duration_params$dur_rec
+
   # Standardise contact matrix set
   if(is.matrix(contact_matrix_set)){
     contact_matrix_set <- list(contact_matrix_set)
@@ -283,7 +309,6 @@ parameters_explicit_SEEIR <- function(
       contact_matrix_set[[i]] <- baseline
     }
   }
-
 
   # populate hospital and ICU bed capacity if not provided
   if (is.null(hosp_bed_capacity)) {
@@ -328,7 +353,6 @@ parameters_explicit_SEEIR <- function(
   stopifnot(length(ICU_bed_capacity) == length(tt_ICU_beds))
   stopifnot(length(dur_get_mv_survive) == length(tt_dur_get_mv_survive))
   stopifnot(length(dur_get_ox_survive) == length(tt_dur_get_ox_survive))
-
 
   tc <- lapply(list(tt_R0/dt, tt_contact_matrix/dt,
                     tt_hosp_beds/dt, tt_ICU_beds/dt,
