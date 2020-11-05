@@ -38,6 +38,14 @@ test_that("parse_country_severity works", {
   expect_type(out3, "list")
 })
 
+test_that("parse_hospital_duration works", {
+  expect_error(parse_hospital_duration("moon"))
+  out <- parse_country_severity(walker = FALSE)
+  expect_type(out, "list")
+  out2 <- parse_country_severity(walker = TRUE)
+  expect_type(out2, "list")
+})
+
 test_that("lmic getter works", {
   expect_vector(get_lmic_countries())
   expect_true("Zambia" %in% get_lmic_countries())
