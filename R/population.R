@@ -310,8 +310,7 @@ parse_country_severity <- function(country = NULL,
 
 
 #' @noRd
-parse_hospital_duration <- function(country = NULL,
-                                    dur_get_ox_survive = NULL,
+parse_hospital_duration <- function(dur_get_ox_survive = NULL,
                                     tt_dur_get_ox_survive = NULL,
                                     dur_get_ox_die = NULL,
                                     dur_not_get_ox_survive = NULL,
