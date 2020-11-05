@@ -192,11 +192,11 @@ parse_country_severity <- function(country = NULL,
                                    prob_severe_death_treatment = NULL,
                                    prob_non_severe_death_no_treatment = NULL,
                                    prob_severe_death_no_treatment = NULL,
-                                   walker = FALSE) {
+                                   walker_params = FALSE) {
 
-  # If walker == TRUE, use the original squire parameters described in Walker et al.
-  assert_logical(walker)
-  if (walker) {
+  # If walker_params == TRUE, use the original squire parameters described in Walker et al.
+  assert_logical(walker_params)
+  if (walker_params) {
     prob_hosp <- c(
       0.000744192, 0.000634166, 0.001171109, 0.002394593, 0.005346437 ,
       0.010289885, 0.016234604, 0.023349169, 0.028944623, 0.038607042 ,

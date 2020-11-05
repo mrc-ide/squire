@@ -1278,6 +1278,7 @@ test_that("pmcmc deaths from treatment", {
   squire_model = explicit_model()
   n_particles = 2
 
+
   out <- pmcmc(data = data,
                n_mcmc = 50,
                log_likelihood = NULL,
@@ -1335,7 +1336,7 @@ test_that("pmcmc deaths from treatment", {
   expect_warning(expect_s3_class(plot(out, particle_fit = TRUE), "gg"))
   expect_warning(expect_s3_class(plot(out2, particle_fit = TRUE), "gg"))
 
-
+  set.seed(91L)
 
   out <- pmcmc(data = data,
                n_mcmc = 50,
