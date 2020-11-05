@@ -409,7 +409,6 @@ parameters_explicit_SEEIR <- function(
   assert_greq(prob_severe_death_no_treatment, 0)
   assert_greq(p_dist, 0)
 
-
   # Convert and Generate Parameters As Required
   # ----------------------------------------------------------------------------
 
@@ -498,7 +497,16 @@ parameters_explicit_SEEIR <- function(
                tt_dur_get_ox_survive = round(tt_dur_get_ox_survive/dt),
                dt = dt,
                population = population,
-               contact_matrix_set = contact_matrix_set)
+               contact_matrix_set = contact_matrix_set,
+               dur_get_ox_survive = dur_get_ox_survive,
+               dur_get_ox_die = dur_get_ox_die,
+               dur_not_get_ox_survive = dur_not_get_ox_survive,
+               dur_not_get_ox_die = dur_not_get_ox_die,
+               dur_get_mv_survive = dur_get_mv_survive,
+               dur_get_mv_die = dur_get_mv_die,
+               dur_not_get_mv_survive = dur_not_get_mv_survive,
+               dur_not_get_mv_die = dur_not_get_mv_die,
+               dur_rec = dur_rec)
 
   class(pars) <- c("explicit_SEEIR_parameters", "squire_parameters")
 
