@@ -166,14 +166,14 @@ run_explicit_SEEIR_model <- function(
   dur_ICase = 4.5,
 
   dur_get_ox_survive = NULL,
-  tt_dur_get_ox_survive = NULL,
+  tt_dur_get_ox_survive = 0,
 
   dur_get_ox_die = NULL,
   dur_not_get_ox_survive = NULL,
   dur_not_get_ox_die = NULL,
 
   dur_get_mv_survive = NULL,
-  tt_dur_get_mv_survive = NULL,
+  tt_dur_get_mv_survive = 0,
 
   dur_get_mv_die = NULL,
   dur_not_get_mv_survive = NULL,
@@ -327,6 +327,7 @@ run_deterministic_SEIR_model <- function(
   prob_severe_death_treatment = NULL,
   prob_severe_death_no_treatment = NULL,
   p_dist = probs$p_dist,
+  walker = FALSE,
 
   # durations
   dur_E  = 4.6,
@@ -334,14 +335,14 @@ run_deterministic_SEIR_model <- function(
   dur_ICase = 4.5,
 
   dur_get_ox_survive = NULL,
-  tt_dur_get_ox_survive = NULL,
+  tt_dur_get_ox_survive = 0,
 
   dur_get_ox_die = NULL,
   dur_not_get_ox_survive = NULL,
   dur_not_get_ox_die = NULL,
 
   dur_get_mv_survive = NULL,
-  tt_dur_get_mv_survive = NULL,
+  tt_dur_get_mv_survive = 0,
 
   dur_get_mv_die = NULL,
   dur_not_get_mv_survive = NULL,
@@ -385,6 +386,7 @@ run_deterministic_SEIR_model <- function(
                                     prob_severe_death_treatment=prob_severe_death_treatment,
                                     prob_severe_death_no_treatment=prob_severe_death_no_treatment,
                                     p_dist=p_dist,
+                                    walker = walker,
                                     dur_E=dur_E,
                                     dur_IMild=dur_IMild,
                                     dur_ICase=dur_ICase,
@@ -462,7 +464,6 @@ run_deterministic_SEIR_model <- function(
   parameters$dur_not_get_mv_survive <- pars$dur_not_get_mv_survive
   parameters$dur_not_get_mv_die <- pars$dur_not_get_mv_die
   parameters$dur_rec <- pars$dur_rec
-
 
   out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
