@@ -165,23 +165,21 @@ run_explicit_SEEIR_model <- function(
   dur_IMild = 2.1,
   dur_ICase = 4.5,
 
-  tt_dur_get_ox_survive = 0,
-  dur_get_ox_survive = 9.5,
+  dur_get_ox_survive = NULL,
+  tt_dur_get_ox_survive = NULL,
 
-  dur_get_ox_die = 7.6,
-  dur_not_get_ox_survive = 9.5*0.5,
-  dur_not_get_ox_die = 7.6*0.5,
+  dur_get_ox_die = NULL,
+  dur_not_get_ox_survive = NULL,
+  dur_not_get_ox_die = NULL,
 
-  dur_get_mv_survive = 11.3,
+  dur_get_mv_survive = NULL,
+  tt_dur_get_mv_survive = NULL,
 
-  dur_get_mv_die = 10.1,
-  tt_dur_get_mv_survive = 0,
+  dur_get_mv_die = NULL,
+  dur_not_get_mv_survive = NULL,
+  dur_not_get_mv_die = NULL,
 
-  dur_not_get_mv_survive = 11.3*0.5,
-
-  dur_not_get_mv_die = 1,
-
-  dur_rec = 3.4,
+  dur_rec = NULL,
 
   # health system capacity
   hosp_bed_capacity = NULL,
@@ -256,12 +254,27 @@ run_explicit_SEEIR_model <- function(
   parameters$beta_set <- pars$beta_set
   parameters$seeding_cases <- pars$E1_0
   parameters$contact_matrix_set <- pars$contact_matrix_set
+
+  # Severity inputs
   parameters$prob_hosp <- pars$prob_hosp
   parameters$prob_severe <- pars$prob_severe
   parameters$prob_non_severe_death_treatment <- pars$prob_non_severe_death_treatment
   parameters$prob_severe_death_treatment <- pars$prob_severe_death_treatment
   parameters$prob_non_severe_death_no_treatment <- pars$prob_non_severe_death_no_treatment
   parameters$prob_severe_death_no_treatment <- pars$prob_severe_death_no_treatment
+
+  # Hospitalisation duration inputs
+  parameters$dur_get_ox_survive <- pars$dur_get_ox_survive
+  parameters$tt_dur_get_ox_survive <- pars$tt_dur_get_ox_survive
+  parameters$dur_get_ox_die <- pars$dur_get_ox_die
+  parameters$dur_not_get_ox_survive <- pars$dur_not_get_ox_survive
+  parameters$dur_not_get_ox_die <- pars$dur_not_get_ox_die
+  parameters$dur_get_mv_survive <- pars$dur_get_mv_survive
+  parameters$tt_dur_get_mv_survive <- pars$tt_dur_get_mv_survive
+  parameters$dur_get_mv_die <- pars$dur_get_mv_die
+  parameters$dur_not_get_mv_survive <- pars$dur_not_get_mv_survive
+  parameters$dur_not_get_mv_die <- pars$dur_not_get_mv_die
+  parameters$dur_rec <- pars$dur_rec
 
   out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
@@ -320,21 +333,21 @@ run_deterministic_SEIR_model <- function(
   dur_IMild = 2.1,
   dur_ICase = 4.5,
 
-  dur_get_ox_survive = 9.5,
-  tt_dur_get_ox_survive = 0,
+  dur_get_ox_survive = NULL,
+  tt_dur_get_ox_survive = NULL,
 
-  dur_get_ox_die = 7.6,
-  dur_not_get_ox_survive = 9.5*0.5,
-  dur_not_get_ox_die = 7.6*0.5,
+  dur_get_ox_die = NULL,
+  dur_not_get_ox_survive = NULL,
+  dur_not_get_ox_die = NULL,
 
-  dur_get_mv_survive = 11.3,
-  tt_dur_get_mv_survive = 0,
+  dur_get_mv_survive = NULL,
+  tt_dur_get_mv_survive = NULL,
 
-  dur_get_mv_die = 10.1,
-  dur_not_get_mv_survive = 11.3*0.5,
-  dur_not_get_mv_die = 1,
+  dur_get_mv_die = NULL,
+  dur_not_get_mv_survive = NULL,
+  dur_not_get_mv_die = NULL,
 
-  dur_rec = 3.4,
+  dur_rec = NULL,
 
   # health system capacity
   hosp_bed_capacity = NULL,
@@ -428,12 +441,28 @@ run_deterministic_SEIR_model <- function(
   parameters$beta_set <- pars$beta_set
   parameters$seeding_cases <- pars$E1_0
   parameters$contact_matrix_set <- pars$contact_matrix_set
+
+  # Severity inputs
   parameters$prob_hosp <- pars$prob_hosp
   parameters$prob_severe <- pars$prob_severe
   parameters$prob_non_severe_death_treatment <- pars$prob_non_severe_death_treatment
   parameters$prob_severe_death_treatment <- pars$prob_severe_death_treatment
   parameters$prob_non_severe_death_no_treatment <- pars$prob_non_severe_death_no_treatment
   parameters$prob_severe_death_no_treatment <- pars$prob_severe_death_no_treatment
+
+  # Hospitalisation duration inputs
+  parameters$dur_get_ox_survive <- pars$dur_get_ox_survive
+  parameters$tt_dur_get_ox_survive <- pars$tt_dur_get_ox_survive
+  parameters$dur_get_ox_die <- pars$dur_get_ox_die
+  parameters$dur_not_get_ox_survive <- pars$dur_not_get_ox_survive
+  parameters$dur_not_get_ox_die <- pars$dur_not_get_ox_die
+  parameters$dur_get_mv_survive <- pars$dur_get_mv_survive
+  parameters$tt_dur_get_mv_survive <- pars$tt_dur_get_mv_survive
+  parameters$dur_get_mv_die <- pars$dur_get_mv_die
+  parameters$dur_not_get_mv_survive <- pars$dur_not_get_mv_survive
+  parameters$dur_not_get_mv_die <- pars$dur_not_get_mv_die
+  parameters$dur_rec <- pars$dur_rec
+
 
   out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
