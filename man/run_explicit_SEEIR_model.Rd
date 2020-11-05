@@ -29,17 +29,17 @@ run_explicit_SEEIR_model(
   dur_E = 4.6,
   dur_IMild = 2.1,
   dur_ICase = 4.5,
-  tt_dur_get_ox_survive = 0,
-  dur_get_ox_survive = 9.5,
-  dur_get_ox_die = 7.6,
-  dur_not_get_ox_survive = 9.5 * 0.5,
-  dur_not_get_ox_die = 7.6 * 0.5,
-  dur_get_mv_survive = 11.3,
-  dur_get_mv_die = 10.1,
-  tt_dur_get_mv_survive = 0,
-  dur_not_get_mv_survive = 11.3 * 0.5,
-  dur_not_get_mv_die = 1,
-  dur_rec = 3.4,
+  dur_get_ox_survive = NULL,
+  tt_dur_get_ox_survive = NULL,
+  dur_get_ox_die = NULL,
+  dur_not_get_ox_survive = NULL,
+  dur_not_get_ox_die = NULL,
+  dur_get_mv_survive = NULL,
+  tt_dur_get_mv_survive = NULL,
+  dur_get_mv_die = NULL,
+  dur_not_get_mv_survive = NULL,
+  dur_not_get_mv_die = NULL,
+  dur_rec = NULL,
   hosp_bed_capacity = NULL,
   ICU_bed_capacity = NULL,
   tt_hosp_beds = 0,
@@ -119,10 +119,10 @@ other age groups when demand exceeds healthcare capacity.}
 \item{dur_ICase}{Mean duration from symptom onset to hospitil admission (days).
 Default = 4.5}
 
+\item{dur_get_ox_survive}{Mean duration of oxygen given survive. Default = 9.5}
+
 \item{tt_dur_get_ox_survive}{Times at which dur_get_ox_survive changes
 (Default = 0 = doesn't change)}
-
-\item{dur_get_ox_survive}{Mean duration of oxygen given survive. Default = 9.5}
 
 \item{dur_get_ox_die}{Mean duration of oxygen given death. Default = 7.6}
 
@@ -135,10 +135,10 @@ Default = 3.8}
 \item{dur_get_mv_survive}{Mean duration of ventilation given survive.
 Default = 11.3}
 
-\item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 10.1}
-
 \item{tt_dur_get_mv_survive}{Times at which dur_get_mv_survive changes
 (Default = 0 = doesn't change)}
+
+\item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 10.1}
 
 \item{dur_not_get_mv_survive}{Mean duration without ventilation given
 survive. Default = 5.65}
