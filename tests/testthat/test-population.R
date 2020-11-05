@@ -39,10 +39,9 @@ test_that("parse_country_severity works", {
 })
 
 test_that("parse_hospital_duration works", {
-  expect_error(parse_hospital_duration("moon"))
-  out <- parse_country_severity(walker = FALSE)
+  out <- parse_country_severity(walker_params = FALSE)
   expect_type(out, "list")
-  out2 <- parse_country_severity(walker = TRUE)
+  out2 <- parse_country_severity(walker_params = TRUE)
   expect_type(out2, "list")
 })
 

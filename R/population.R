@@ -184,7 +184,8 @@ parse_country_population_mixing_matrix <- function(country = NULL,
 
 }
 
-#' @noRd
+#' Parse country severity parameters
+#' @inheritParams parameters_explicit_SEEIR
 parse_country_severity <- function(country = NULL,
                                    prob_hosp = NULL,
                                    prob_severe = NULL,
@@ -314,11 +315,13 @@ parse_country_severity <- function(country = NULL,
 parse_hospital_duration <- function(dur_get_ox_survive = NULL,
                                     tt_dur_get_ox_survive = NULL,
                                     dur_get_ox_die = NULL,
+                                    tt_dur_get_ox_die = NULL,
                                     dur_not_get_ox_survive = NULL,
                                     dur_not_get_ox_die = NULL,
                                     dur_get_mv_survive = NULL,
                                     tt_dur_get_mv_survive = NULL,
                                     dur_get_mv_die = NULL,
+                                    tt_dur_get_mv_die = NULL,
                                     dur_not_get_mv_survive = NULL,
                                     dur_not_get_mv_die = NULL,
                                     dur_rec = NULL,
@@ -332,6 +335,12 @@ parse_hospital_duration <- function(dur_get_ox_survive = NULL,
     }
     if (is.null(tt_dur_get_mv_survive)) {
       tt_dur_get_mv_survive <- 0
+    }
+    if (is.null(tt_dur_get_ox_die)) {
+      tt_dur_get_ox_die <- 0
+    }
+    if (is.null(tt_dur_get_mv_die)) {
+      tt_dur_get_mv_die <- 0
     }
     if (is.null(dur_get_ox_survive)) {
       dur_get_ox_survive <- rep(9.5, length(tt_dur_get_ox_survive))
@@ -367,6 +376,12 @@ parse_hospital_duration <- function(dur_get_ox_survive = NULL,
     if (is.null(tt_dur_get_mv_survive)) {
       tt_dur_get_mv_survive <- durations$tt_dur_get_mv_survive
     }
+    if (is.null(tt_dur_get_ox_die)) {
+      tt_dur_get_ox_die <- durations$tt_dur_get_ox_die
+    }
+    if (is.null(tt_dur_get_mv_die)) {
+      tt_dur_get_mv_die <- durations$tt_dur_get_mv_die
+    }
     if (is.null(dur_get_ox_survive)) {
       dur_get_ox_survive <- durations$dur_get_ox_survive
     }
@@ -398,11 +413,13 @@ parse_hospital_duration <- function(dur_get_ox_survive = NULL,
 
   ret <- list(tt_dur_get_ox_survive = tt_dur_get_ox_survive,
               dur_get_ox_survive = dur_get_ox_survive,
+              tt_dur_get_ox_die = tt_dur_get_ox_die,
               dur_get_ox_die = dur_get_ox_die,
               dur_not_get_ox_survive = dur_not_get_ox_survive,
               dur_not_get_ox_die = dur_not_get_ox_die,
               tt_dur_get_mv_survive = tt_dur_get_mv_survive,
               dur_get_mv_survive = dur_get_mv_survive,
+              tt_dur_get_mv_die = tt_dur_get_mv_die,
               dur_get_mv_die = dur_get_mv_die,
               dur_not_get_mv_survive = dur_not_get_mv_survive,
               dur_not_get_mv_die = dur_not_get_mv_die,

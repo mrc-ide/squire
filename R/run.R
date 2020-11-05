@@ -39,6 +39,8 @@ probs <- default_probs()
 #' \itemize{
 #'    \item{tt_dur_get_ox_survive = 0}
 #'    \item{tt_dur_get_mv_survive = 0}
+#'    \item{tt_dur_get_ox_die = 0}
+#'    \item{tt_dur_get_mv_die = 0}
 #'    \item{dur_get_ox_survive = 9}
 #'    \item{dur_get_ox_die = 9}
 #'    \item{dur_not_get_ox_survive = 9 * 0.5}
@@ -55,6 +57,8 @@ default_durations <- function() {
   list(
     tt_dur_get_ox_survive = 0,
     tt_dur_get_mv_survive = 0,
+    tt_dur_get_ox_die = 0,
+    tt_dur_get_mv_die = 0,
     dur_get_ox_survive = 9,
     dur_get_ox_die = 9,
     dur_not_get_ox_survive = 9 * 0.5,
@@ -211,6 +215,8 @@ run_explicit_SEEIR_model <- function(
   tt_dur_get_ox_survive = 0,
 
   dur_get_ox_die = NULL,
+  tt_dur_get_ox_die = 0,
+
   dur_not_get_ox_survive = NULL,
   dur_not_get_ox_die = NULL,
 
@@ -218,6 +224,8 @@ run_explicit_SEEIR_model <- function(
   tt_dur_get_mv_survive = 0,
 
   dur_get_mv_die = NULL,
+  tt_dur_get_mv_die = 0,
+
   dur_not_get_mv_survive = NULL,
   dur_not_get_mv_die = NULL,
 
@@ -274,7 +282,9 @@ run_explicit_SEEIR_model <- function(
                                     tt_hosp_beds=tt_hosp_beds,
                                     tt_ICU_beds=tt_ICU_beds,
                                     tt_dur_get_mv_survive=tt_dur_get_mv_survive,
-                                    tt_dur_get_ox_survive=tt_dur_get_ox_survive)
+                                    tt_dur_get_ox_survive=tt_dur_get_ox_survive,
+                                    tt_dur_get_mv_die=tt_dur_get_mv_die,
+                                    tt_dur_get_ox_die=tt_dur_get_ox_die)
 
   # Running the Model
   mod <- explicit_SEIR(user = pars, unused_user_action = "ignore")
@@ -309,11 +319,13 @@ run_explicit_SEEIR_model <- function(
   parameters$dur_get_ox_survive <- pars$dur_get_ox_survive
   parameters$tt_dur_get_ox_survive <- pars$tt_dur_get_ox_survive
   parameters$dur_get_ox_die <- pars$dur_get_ox_die
+  parameters$tt_dur_get_ox_die <- pars$tt_dur_get_ox_die
   parameters$dur_not_get_ox_survive <- pars$dur_not_get_ox_survive
   parameters$dur_not_get_ox_die <- pars$dur_not_get_ox_die
   parameters$dur_get_mv_survive <- pars$dur_get_mv_survive
   parameters$tt_dur_get_mv_survive <- pars$tt_dur_get_mv_survive
   parameters$dur_get_mv_die <- pars$dur_get_mv_die
+  parameters$tt_dur_get_mv_die <- pars$tt_dur_get_mv_die
   parameters$dur_not_get_mv_survive <- pars$dur_not_get_mv_survive
   parameters$dur_not_get_mv_die <- pars$dur_not_get_mv_die
   parameters$dur_rec <- pars$dur_rec
@@ -380,6 +392,8 @@ run_deterministic_SEIR_model <- function(
   tt_dur_get_ox_survive = 0,
 
   dur_get_ox_die = NULL,
+  tt_dur_get_ox_die = 0,
+
   dur_not_get_ox_survive = NULL,
   dur_not_get_ox_die = NULL,
 
@@ -387,6 +401,8 @@ run_deterministic_SEIR_model <- function(
   tt_dur_get_mv_survive = 0,
 
   dur_get_mv_die = NULL,
+  tt_dur_get_mv_die = 0,
+
   dur_not_get_mv_survive = NULL,
   dur_not_get_mv_die = NULL,
 
@@ -446,7 +462,9 @@ run_deterministic_SEIR_model <- function(
                                     tt_hosp_beds=tt_hosp_beds*dt,
                                     tt_ICU_beds=tt_ICU_beds*dt,
                                     tt_dur_get_mv_survive=tt_dur_get_mv_survive*dt,
-                                    tt_dur_get_ox_survive=tt_dur_get_ox_survive*dt)
+                                    tt_dur_get_ox_survive=tt_dur_get_ox_survive*dt,
+                                    tt_dur_get_mv_die=tt_dur_get_mv_die*dt,
+                                    tt_dur_get_ox_die=tt_dur_get_ox_die*dt)
 
   # handling time variables for js
   pars$tt_beta <- I(pars$tt_beta)
@@ -460,7 +478,10 @@ run_deterministic_SEIR_model <- function(
   pars$tt_dur_get_mv_survive <- I(pars$tt_dur_get_mv_survive)
   pars$gamma_get_ox_survive <- I(pars$gamma_get_ox_survive)
   pars$tt_dur_get_ox_survive <- I(pars$tt_dur_get_ox_survive)
-
+  pars$gamma_get_mv_die <- I(pars$gamma_get_mv_die)
+  pars$tt_dur_get_mv_die <- I(pars$tt_dur_get_mv_die)
+  pars$gamma_get_ox_die <- I(pars$gamma_get_ox_die)
+  pars$tt_dur_get_ox_die <- I(pars$tt_dur_get_ox_die)
 
   # Running the Model
   mod <- mod_gen(user = pars, unused_user_action = "ignore")
@@ -498,11 +519,13 @@ run_deterministic_SEIR_model <- function(
   parameters$dur_get_ox_survive <- pars$dur_get_ox_survive
   parameters$tt_dur_get_ox_survive <- pars$tt_dur_get_ox_survive
   parameters$dur_get_ox_die <- pars$dur_get_ox_die
+  parameters$tt_dur_get_ox_die <- pars$tt_dur_get_ox_die
   parameters$dur_not_get_ox_survive <- pars$dur_not_get_ox_survive
   parameters$dur_not_get_ox_die <- pars$dur_not_get_ox_die
   parameters$dur_get_mv_survive <- pars$dur_get_mv_survive
   parameters$tt_dur_get_mv_survive <- pars$tt_dur_get_mv_survive
   parameters$dur_get_mv_die <- pars$dur_get_mv_die
+  parameters$tt_dur_get_mv_die <- pars$tt_dur_get_mv_die
   parameters$dur_not_get_mv_survive <- pars$dur_not_get_mv_survive
   parameters$dur_not_get_mv_die <- pars$dur_not_get_mv_die
   parameters$dur_rec <- pars$dur_rec

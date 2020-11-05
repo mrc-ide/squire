@@ -16,6 +16,8 @@ Return the default hospital durations for modelling
 \itemize{
    \item{tt_dur_get_ox_survive = 0}
    \item{tt_dur_get_mv_survive = 0}
+   \item{tt_dur_get_ox_die = 0}
+   \item{tt_dur_get_mv_die = 0}
    \item{dur_get_ox_survive = 9}
    \item{dur_get_ox_die = 9}
    \item{dur_not_get_ox_survive = 9 * 0.5}

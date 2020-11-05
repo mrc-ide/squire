@@ -32,11 +32,13 @@ run_explicit_SEEIR_model(
   dur_get_ox_survive = NULL,
   tt_dur_get_ox_survive = 0,
   dur_get_ox_die = NULL,
+  tt_dur_get_ox_die = 0,
   dur_not_get_ox_survive = NULL,
   dur_not_get_ox_die = NULL,
   dur_get_mv_survive = NULL,
   tt_dur_get_mv_survive = 0,
   dur_get_mv_die = NULL,
+  tt_dur_get_mv_die = 0,
   dur_not_get_mv_survive = NULL,
   dur_not_get_mv_die = NULL,
   dur_rec = NULL,
@@ -138,6 +140,9 @@ Default = 4.5}
 
 \item{dur_get_ox_die}{Mean duration of oxygen given death. Default = 9}
 
+\item{tt_dur_get_ox_die}{Times at which dur_get_ox_die changes
+(Default = 0 = doesn't change)}
+
 \item{dur_not_get_ox_survive}{Mean duration without oxygen given survive.
 Default = 4.5}
 
@@ -151,6 +156,9 @@ Default = 15.3}
 (Default = 0 = doesn't change)}
 
 \item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 11.3}
+
+\item{tt_dur_get_mv_die}{Times at which dur_get_mv_die changes
+(Default = 0 = doesn't change)}
 
 \item{dur_not_get_mv_survive}{Mean duration without ventilation given
 survive. Default = 7.65}
@@ -186,11 +194,12 @@ Parameters detailing the age-dependent probability of disease
 severity and durations of hospital durations have been updated in v0.5.0
 of \code{squire} to reflect the changing understanding of COVID-19 transmission.
 Parameter arguments are by default equal to \code{NULL}, which
-causes the new updated parameters specified in \code{\link{parse_country_severity}}
-and \code{\link{parse_hospital_duration}} to be used. If any provided parameters
+causes the new updated parameters specified in \code{\link{default_probs}}
+and \code{\link{default_durations}} to be used. If any provided parameters
 are not \code{NULL}, these will be used. In order to ease previous fits and
 code, function argument \code{walker_params} will use the parameters described
 in \href{https://science.sciencemag.org/content/369/6502/413}{Walker et al. Science. 2020}
+which can be viewed within the function \code{\link{parse_country_severity}}
 }
 
 \examples{

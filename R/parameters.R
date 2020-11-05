@@ -122,11 +122,12 @@ get_hosp_bed_capacity <- function(country = NULL) {
 #' severity and durations of hospital durations have been updated in v0.5.0
 #' of \code{squire} to reflect the changing understanding of COVID-19 transmission.
 #' Parameter arguments are by default equal to \code{NULL}, which
-#' causes the new updated parameters specified in \code{\link{parse_country_severity}}
-#' and \code{\link{parse_hospital_duration}} to be used. If any provided parameters
+#' causes the new updated parameters specified in \code{\link{default_probs}}
+#' and \code{\link{default_durations}} to be used. If any provided parameters
 #' are not \code{NULL}, these will be used. In order to ease previous fits and
 #' code, function argument \code{walker_params} will use the parameters described
 #' in \href{https://science.sciencemag.org/content/369/6502/413}{Walker et al. Science. 2020}
+#' which can be viewed within the function \code{\link{parse_country_severity}}
 #'
 #'
 #' @param population Population vector (for each age group). Default = NULL,
@@ -186,6 +187,8 @@ get_hosp_bed_capacity <- function(country = NULL) {
 #' @param tt_dur_get_ox_survive Times at which dur_get_ox_survive changes
 #'   (Default = 0 = doesn't change)
 #' @param dur_get_ox_die Mean duration of oxygen given death. Default = 9
+#' @param tt_dur_get_ox_die Times at which dur_get_ox_die changes
+#'   (Default = 0 = doesn't change)
 #' @param dur_not_get_ox_survive Mean duration without oxygen given survive.
 #'   Default = 4.5
 #' @param dur_not_get_ox_die Mean duration without  oxygen given death.
@@ -195,6 +198,8 @@ get_hosp_bed_capacity <- function(country = NULL) {
 #' @param tt_dur_get_mv_survive Times at which dur_get_mv_survive changes
 #'   (Default = 0 = doesn't change)
 #' @param dur_get_mv_die Mean duration of ventilation given death. Default = 11.3
+#' @param tt_dur_get_mv_die Times at which dur_get_mv_die changes
+#'   (Default = 0 = doesn't change)
 #' @param dur_not_get_mv_survive Mean duration without ventilation given
 #'   survive. Default = 7.65
 #' @param dur_not_get_mv_die Mean duration without ventilation given
@@ -250,6 +255,8 @@ parameters_explicit_SEEIR <- function(
   tt_dur_get_ox_survive = NULL,
 
   dur_get_ox_die = NULL,
+  tt_dur_get_ox_die = NULL,
+
   dur_not_get_ox_survive = NULL,
   dur_not_get_ox_die = NULL,
 
@@ -257,6 +264,8 @@ parameters_explicit_SEEIR <- function(
   tt_dur_get_mv_survive = NULL,
 
   dur_get_mv_die = NULL,
+  tt_dur_get_mv_die = NULL,
+
   dur_not_get_mv_survive = NULL,
   dur_not_get_mv_die = NULL,
 
@@ -299,11 +308,13 @@ parameters_explicit_SEEIR <- function(
   hosp_duration_params <- parse_hospital_duration(dur_get_ox_survive = dur_get_ox_survive,
                                                   tt_dur_get_ox_survive = tt_dur_get_ox_survive,
                                                   dur_get_ox_die = dur_get_ox_die,
+                                                  tt_dur_get_ox_die = tt_dur_get_ox_die,
                                                   dur_not_get_ox_survive = dur_not_get_ox_survive,
                                                   dur_not_get_ox_die = dur_not_get_ox_die,
                                                   dur_get_mv_survive = dur_get_mv_survive,
                                                   tt_dur_get_mv_survive = tt_dur_get_mv_survive,
                                                   dur_get_mv_die = dur_get_mv_die,
+                                                  tt_dur_get_mv_die = tt_dur_get_mv_die,
                                                   dur_not_get_mv_survive = dur_not_get_mv_survive,
                                                   dur_not_get_mv_die = dur_not_get_mv_die,
                                                   dur_rec = dur_rec,
@@ -312,11 +323,13 @@ parameters_explicit_SEEIR <- function(
   dur_get_ox_survive <- hosp_duration_params$dur_get_ox_survive
   tt_dur_get_ox_survive <- hosp_duration_params$tt_dur_get_ox_survive
   dur_get_ox_die <- hosp_duration_params$dur_get_ox_die
+  tt_dur_get_ox_die <- hosp_duration_params$tt_dur_get_ox_die
   dur_not_get_ox_survive <- hosp_duration_params$dur_not_get_ox_survive
   dur_not_get_ox_die <- hosp_duration_params$dur_not_get_ox_die
   dur_get_mv_survive <- hosp_duration_params$dur_get_mv_survive
   tt_dur_get_mv_survive <- hosp_duration_params$tt_dur_get_mv_survive
   dur_get_mv_die <- hosp_duration_params$dur_get_mv_die
+  tt_dur_get_mv_die <- hosp_duration_params$tt_dur_get_mv_die
   dur_not_get_mv_survive <- hosp_duration_params$dur_not_get_mv_survive
   dur_not_get_mv_die <- hosp_duration_params$dur_not_get_mv_die
   dur_rec <- hosp_duration_params$dur_rec
@@ -378,11 +391,15 @@ parameters_explicit_SEEIR <- function(
   stopifnot(length(ICU_bed_capacity) == length(tt_ICU_beds))
   stopifnot(length(dur_get_mv_survive) == length(tt_dur_get_mv_survive))
   stopifnot(length(dur_get_ox_survive) == length(tt_dur_get_ox_survive))
+  stopifnot(length(dur_get_mv_die) == length(tt_dur_get_mv_die))
+  stopifnot(length(dur_get_ox_die) == length(tt_dur_get_ox_die))
 
   tc <- lapply(list(tt_R0/dt, tt_contact_matrix/dt,
                     tt_hosp_beds/dt, tt_ICU_beds/dt,
                     tt_dur_get_mv_survive/dt,
-                    tt_dur_get_ox_survive/dt
+                    tt_dur_get_ox_survive/dt,
+                    tt_dur_get_mv_die/dt,
+                    tt_dur_get_ox_die/dt
                     ),
                check_time_change, time_period/dt)
 
@@ -520,6 +537,8 @@ parameters_explicit_SEEIR <- function(
                tt_beta = round(tt_R0/dt),
                tt_dur_get_mv_survive = round(tt_dur_get_mv_survive/dt),
                tt_dur_get_ox_survive = round(tt_dur_get_ox_survive/dt),
+               tt_dur_get_mv_die = round(tt_dur_get_mv_die/dt),
+               tt_dur_get_ox_die = round(tt_dur_get_ox_die/dt),
                dt = dt,
                population = population,
                contact_matrix_set = contact_matrix_set,
