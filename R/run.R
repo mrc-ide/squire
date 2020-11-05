@@ -158,7 +158,7 @@ run_explicit_SEEIR_model <- function(
   prob_severe_death_treatment = NULL,
   prob_severe_death_no_treatment = NULL,
   p_dist = probs$p_dist,
-  walker = FALSE,
+  walker_params = FALSE,
 
   # durations
   dur_E  = 4.6,
@@ -214,7 +214,7 @@ run_explicit_SEEIR_model <- function(
                                     prob_severe_death_treatment=prob_severe_death_treatment,
                                     prob_severe_death_no_treatment=prob_severe_death_no_treatment,
                                     p_dist=p_dist,
-                                    walker=walker,
+                                    walker_params=walker_params,
                                     dur_E=dur_E,
                                     dur_IMild=dur_IMild,
                                     dur_ICase=dur_ICase,
@@ -327,7 +327,7 @@ run_deterministic_SEIR_model <- function(
   prob_severe_death_treatment = NULL,
   prob_severe_death_no_treatment = NULL,
   p_dist = probs$p_dist,
-  walker = FALSE,
+  walker_params = FALSE,
 
   # durations
   dur_E  = 4.6,
@@ -386,7 +386,7 @@ run_deterministic_SEIR_model <- function(
                                     prob_severe_death_treatment=prob_severe_death_treatment,
                                     prob_severe_death_no_treatment=prob_severe_death_no_treatment,
                                     p_dist=p_dist,
-                                    walker = walker,
+                                    walker_params = walker_params,
                                     dur_E=dur_E,
                                     dur_IMild=dur_IMild,
                                     dur_ICase=dur_ICase,

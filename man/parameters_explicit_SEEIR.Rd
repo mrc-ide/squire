@@ -23,7 +23,7 @@ parameters_explicit_SEEIR(
   prob_severe_death_treatment = NULL,
   prob_severe_death_no_treatment = NULL,
   p_dist = probs$p_dist,
-  walker = FALSE,
+  walker_params = FALSE,
   dur_E = 4.6,
   dur_IMild = 2.1,
   dur_ICase = 4.5,
@@ -103,6 +103,10 @@ that is not treated. Default = rep(0.95, 16)}
 
 \item{p_dist}{Preferentiality of age group receiving treatment relative to
 other age groups when demand exceeds healthcare capacity.}
+
+\item{walker_params}{Boolean for using parameters in Walker et al. Default = FALSE,
+which uses parameter update as of November 2020. For full information see
+parameters vignette}
 
 \item{dur_E}{Mean duration of incubation period (days). Default = 4.6}
 

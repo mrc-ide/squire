@@ -184,6 +184,10 @@ get_hosp_bed_capacity <- function(country = NULL) {
 #' @param tt_hosp_beds Times at which hospital bed capacity changes (Default = 0 = doesn't change)
 #' @param tt_ICU_beds Times at which ICU bed capacity changes (Default = 0 = doesn't change)
 #'
+#' @param walker_params Boolean for using parameters in Walker et al. Default = FALSE,
+#'   which uses parameter update as of November 2020. For full information see
+#'   parameters vignette
+#'
 #' @return Paramater List
 #' @export
 #'
@@ -214,7 +218,7 @@ parameters_explicit_SEEIR <- function(
   prob_severe_death_treatment = NULL,
   prob_severe_death_no_treatment = NULL,
   p_dist = probs$p_dist,
-  walker = FALSE,
+  walker_params = FALSE,
 
   # durations
   dur_E  = 4.6,
@@ -261,7 +265,7 @@ parameters_explicit_SEEIR <- function(
                                             prob_severe_death_treatment = prob_severe_death_treatment,
                                             prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
                                             prob_severe_death_no_treatment = prob_severe_death_no_treatment,
-                                            walker = walker)
+                                            walker_params = walker_params)
 
   prob_hosp <- severity_params$prob_hosp
   prob_severe <- severity_params$prob_severe
@@ -282,7 +286,7 @@ parameters_explicit_SEEIR <- function(
                                                   dur_not_get_mv_survive = dur_not_get_mv_survive,
                                                   dur_not_get_mv_die = dur_not_get_mv_die,
                                                   dur_rec = dur_rec,
-                                                  walker = walker)
+                                                  walker_params = walker_params)
 
   dur_get_ox_survive <- hosp_duration_params$dur_get_ox_survive
   tt_dur_get_ox_survive <- hosp_duration_params$tt_dur_get_ox_survive

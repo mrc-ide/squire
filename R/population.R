@@ -192,11 +192,11 @@ parse_country_severity <- function(country = NULL,
                                    prob_severe_death_treatment = NULL,
                                    prob_non_severe_death_no_treatment = NULL,
                                    prob_severe_death_no_treatment = NULL,
-                                   walker = FALSE) {
+                                   walker_params = FALSE) {
 
-  # If walker == TRUE, use the original squire parameters described in Walker et al.
-  assert_logical(walker)
-  if (walker) {
+  # If walker_params == TRUE, use the original squire parameters described in Walker et al.
+  assert_logical(walker_params)
+  if (walker_params) {
     if (is.null(prob_hosp)) {
       prob_hosp <- c(
         0.000744192, 0.000634166, 0.001171109, 0.002394593, 0.005346437 ,
@@ -227,6 +227,7 @@ parse_country_severity <- function(country = NULL,
     if (is.null(prob_severe_death_no_treatment)) {
       prob_severe_death_no_treatment <- rep(0.95, length(prob_hosp))
     }
+
     ret <- list(country = country,
                 prob_hosp = prob_hosp,
                 prob_severe = prob_severe,
@@ -321,11 +322,11 @@ parse_hospital_duration <- function(dur_get_ox_survive = NULL,
                                     dur_not_get_mv_survive = NULL,
                                     dur_not_get_mv_die = NULL,
                                     dur_rec = NULL,
-                                    walker = FALSE) {
+                                    walker_params = FALSE) {
 
-  # If walker == TRUE, use the original squire parameters described in Walker et al.
-  assert_logical(walker)
-  if (walker) {
+  # If walker_params == TRUE, use the original squire parameters described in Walker et al.
+  assert_logical(walker_params)
+  if (walker_params) {
     if (is.null(tt_dur_get_ox_survive)) {
       tt_dur_get_ox_survive <- 0
     }
