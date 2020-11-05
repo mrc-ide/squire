@@ -362,37 +362,37 @@ parse_hospital_duration <- function(dur_get_ox_survive = NULL,
     }
   } else {
     if (is.null(tt_dur_get_ox_survive)) {
-      tt_dur_get_ox_survive <- 0
+      tt_dur_get_ox_survive <- durations$tt_dur_get_ox_survive
     }
     if (is.null(tt_dur_get_mv_survive)) {
-      tt_dur_get_mv_survive <- 0
+      tt_dur_get_mv_survive <- durations$tt_dur_get_mv_survive
     }
     if (is.null(dur_get_ox_survive)) {
-      dur_get_ox_survive <- rep(9, length(tt_dur_get_ox_survive))
+      dur_get_ox_survive <- durations$dur_get_ox_survive
     }
     if (is.null(dur_get_ox_die)) {
-      dur_get_ox_die <- 9
+      dur_get_ox_die <- durations$dur_get_ox_die
     }
     if (is.null(dur_not_get_ox_survive)) {
-      dur_not_get_ox_survive <- dur_get_ox_survive[1] * 0.5
+      dur_not_get_ox_survive <- durations$dur_not_get_ox_survive
     }
     if (is.null(dur_not_get_ox_die)) {
-      dur_not_get_ox_die <- dur_get_ox_die * 0.5
+      dur_not_get_ox_die <- durations$dur_not_get_ox_die
     }
     if (is.null(dur_get_mv_survive)) {
-      dur_get_mv_survive <- rep(15.3, length(tt_dur_get_mv_survive))
+      dur_get_mv_survive <- durations$dur_get_mv_survive
     }
     if (is.null(dur_get_mv_die)) {
-      dur_get_mv_die <- 11.5
+      dur_get_mv_die <- durations$dur_get_mv_die
     }
     if (is.null(dur_not_get_mv_survive)) {
-      dur_not_get_mv_survive <- dur_get_mv_survive[1] * 0.5
+      dur_not_get_mv_survive <- durations$dur_get_mv_survive
     }
     if (is.null(dur_not_get_mv_die)) {
-      dur_not_get_mv_die <- 1
+      dur_not_get_mv_die <- durations$dur_not_get_mv_die
     }
     if (is.null(dur_rec)) {
-      dur_rec <- 3
+      dur_rec <- durations$dur_rec
     }
   }
 

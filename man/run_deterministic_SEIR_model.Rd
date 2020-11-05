@@ -82,33 +82,41 @@ than each dt. Default = FALSE}
 
 \item{seed}{Random Number Seed.}
 
-\item{prob_hosp}{probability of hospitalisation by age.
-Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
-0.008100662, 0.015590734, 0.024597885, 0.035377529,
-0.04385549, 0.058495518, 0.08747709, 0.109730508,
-0.153943118, 0.177242143, 0.221362219, 0.267628264)}
+\item{prob_hosp}{Probability of hospitalisation by age.
+Default, NULL, will use
+\code{c(0.000840764, 0.001182411, 0.001662887, 0.002338607,
+0.003288907, 0.004625365, 0.006504897, 0.009148183, 0.012865577,
+0.018093546, 0.025445917, 0.035785947, 0.050327683, 0.0707785,
+0.099539573, 0.1399878, 0.233470395)}}
 
 \item{prob_severe}{Probability of developing severe symptoms by age.
-Default = c(3.73755e-05, 3.18497e-05, 5.88166e-05, 0.000120264,
-0.000268514, 0.000516788, 0.00081535, 0.001242525,
-0.001729275, 0.002880196, 0.00598205, 0.010821894,
-0.022736324, 0.035911156, 0.056362032, 0.081467057)}
+Default, NULL, will use
+\code{c(0.000840764, 0.001182411, 0.001662887, 0.002338607,
+0.003288907, 0.004625365, 0.006504897, 0.009148183, 0.012865577,
+0.018093546, 0.025445917, 0.035785947, 0.050327683, 0.0707785,
+0.099539573, 0.1399878, 0.233470395)}}
 
 \item{prob_non_severe_death_treatment}{Probability of death from non severe
-treated infection.
-Default = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
-0.0125702, 0.0125702, 0.0125702, 0.013361147,
-0.015104687, 0.019164124, 0.027477519, 0.041762108,
-0.068531658, 0.105302319, 0.149305732, 0.20349534)}
+treated infection. Default, NULL, will use
+\code{c(0.181354223, 0.181354223, 0.181354223, 0.137454906,
+0.121938236, 0.122775613, 0.136057441, 0.160922182, 0.196987378,
+0.242011054, 0.289368845, 0.326537862, 0.337229819, 0.309082553,
+0.243794865, 0.160480254, 0.057084366)}}
 
 \item{prob_non_severe_death_no_treatment}{Probability of death in non severe
-hospital inections that aren't treated}
+hospital inections that aren't treated. Default, NULL, will use
+\code{rep(0.5, 17)}}
 
 \item{prob_severe_death_treatment}{Probability of death from severe infection
-that is treated. Default = rep(0.5, 16)}
+that is treated. Default, NULL, will use
+\code{c(0.226668959, 0.252420241, 0.281097009, 0.413005389,
+0.518451493, 0.573413613, 0.576222065, 0.54253573, 0.493557696,
+0.447376527, 0.416666608, 0.411186639, 0.443382594, 0.538718871,
+0.570434076, 0.643352843, 0.992620047)}}
 
 \item{prob_severe_death_no_treatment}{Probability of death from severe infection
-that is not treated. Default = rep(0.95, 16)}
+that is not treated. Default, NULL, will use
+\code{rep(0.95, 17)}}
 
 \item{p_dist}{Preferentiality of age group receiving treatment relative to
 other age groups when demand exceeds healthcare capacity.}
@@ -124,34 +132,34 @@ parameters vignette}
 \item{dur_ICase}{Mean duration from symptom onset to hospitil admission (days).
 Default = 4.5}
 
-\item{dur_get_ox_survive}{Mean duration of oxygen given survive. Default = 9.5}
+\item{dur_get_ox_survive}{Mean duration of oxygen given survive. Default = 9}
 
 \item{tt_dur_get_ox_survive}{Times at which dur_get_ox_survive changes
 (Default = 0 = doesn't change)}
 
-\item{dur_get_ox_die}{Mean duration of oxygen given death. Default = 7.6}
+\item{dur_get_ox_die}{Mean duration of oxygen given death. Default = 9}
 
 \item{dur_not_get_ox_survive}{Mean duration without oxygen given survive.
-Default = 4.75}
+Default = 4.5}
 
 \item{dur_not_get_ox_die}{Mean duration without  oxygen given death.
-Default = 3.8}
+Default = 4.5}
 
 \item{dur_get_mv_survive}{Mean duration of ventilation given survive.
-Default = 11.3}
+Default = 15.3}
 
 \item{tt_dur_get_mv_survive}{Times at which dur_get_mv_survive changes
 (Default = 0 = doesn't change)}
 
-\item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 10.1}
+\item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 11.3}
 
 \item{dur_not_get_mv_survive}{Mean duration without ventilation given
-survive. Default = 5.65}
+survive. Default = 7.65}
 
 \item{dur_not_get_mv_die}{Mean duration without ventilation given
 death. Default = 1}
 
-\item{dur_rec}{Duration of recovery after coming off ventilation. Default = 3.4}
+\item{dur_rec}{Duration of recovery after coming off ventilation. Default = 3}
 
 \item{hosp_bed_capacity}{General bed capacity. Can be single number or vector if capacity time-varies.}
 

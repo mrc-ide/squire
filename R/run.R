@@ -31,6 +31,45 @@ default_probs <- function() {
 
 probs <- default_probs()
 
+#' Return the default hospital durations for modelling
+#' @return List of default durations
+#'
+#' @details
+#'
+#' \itemize{
+#'    \item{tt_dur_get_ox_survive = 0}
+#'    \item{tt_dur_get_mv_survive = 0}
+#'    \item{dur_get_ox_survive = 9}
+#'    \item{dur_get_ox_die = 9}
+#'    \item{dur_not_get_ox_survive = 9 * 0.5}
+#'    \item{dur_not_get_ox_die = 9 * 0.5}
+#'    \item{dur_get_mv_survive = 15.3}
+#'    \item{dur_get_mv_die = 11.5}
+#'    \item{dur_not_get_mv_survive = 15.3 * 0.5}
+#'    \item{dur_not_get_mv_die = 1}
+#'    \item{dur_rec = 3}
+#' }
+#'
+default_durations <- function() {
+
+  list(
+    tt_dur_get_ox_survive = 0,
+    tt_dur_get_mv_survive = 0,
+    dur_get_ox_survive = 9,
+    dur_get_ox_die = 9,
+    dur_not_get_ox_survive = 9 * 0.5,
+    dur_not_get_ox_die = 9 * 0.5,
+    dur_get_mv_survive = 15.3,
+    dur_get_mv_die = 11.5,
+    dur_not_get_mv_survive = 15.3 * 0.5,
+    dur_not_get_mv_die = 1,
+    dur_rec = 3
+  )
+
+}
+durations <- default_durations()
+
+
 #' Run the SEEIR model
 #'
 #' @param R0 Basic reproduction number
@@ -113,6 +152,9 @@ run_simple_SEEIR_model <- function(R0 = 3,
 #' Run the explicit SEEIR model
 #'
 #' @details All durations are in days.
+#'
+#' @inheritSection parameters_explicit_SEEIR Parameter Updates
+#'
 #' @inheritParams parameters_explicit_SEEIR
 #' @param day_return Logical, do we want to return outut after each day rather
 #'   than each dt. Default = FALSE
