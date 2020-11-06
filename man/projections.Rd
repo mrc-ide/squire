@@ -3,7 +3,7 @@
 \name{projections}
 \alias{projections}
 \title{Provide projections from calibrated simulations by changing RO, contact
-matrices or bed availability}
+matrices or bed availability.}
 \usage{
 projections(
   r,
@@ -19,7 +19,9 @@ projections(
   tt_hosp_beds = 0,
   ICU_bed_capacity = NULL,
   ICU_bed_capacity_change = NULL,
-  tt_ICU_beds = 0
+  tt_ICU_beds = 0,
+  to_be_run = TRUE,
+  model_user_args = NULL
 )
 }
 \arguments{
@@ -78,10 +80,33 @@ will use \code{ICU_bed_capacity} to parameterise changes in ICU bed capacity
 if provided.}
 
 \item{tt_ICU_beds}{Change time points for ICU_bed_capacity}
+
+\item{to_be_run}{List of logicals for whether each replicate should be run.
+Default = TRUE, which causes all replictes to be run.}
+
+\item{model_user_args}{List of other parameters to be passed to the model to
+  be run. Default = NULL. An example would be:
+
+  \code{list(
+  list(
+  "prob_severe" = runif(17),
+  "tt_dur_get_ox_survive" = c(0, 10),
+  "gamma_get_ox_survive" = 0.2),
+  list(
+  "prob_severe" = runif(17),
+  "tt_dur_get_mv_survive" = c(0, 5),
+  "gamma_get_mv_survive" = 0.1)
+  )}
+
+  The list should be the same length as the number of replicates in the
+  simulations. Each list element should then be a list with elements
+  named to match the arguments expected by the odin model with \code{r}.
+  Above would be suitable to set the model parameters for a simulation with
+  2 replicates. You do not have to have the same arguments in each list.}
 }
 \description{
-Provide projections from calibrated simulations by changing RO, contact
-matrices or bed availability
+This extends previous \code{projections} as you can pass in lists of each argument
+that then get passed to each simulation replicate.
 }
 \details{
 The user can specify changes to R0, contact matrices and bed
@@ -89,4 +114,6 @@ provision, which will come into effect from the current day in the calibration.
 These changes can either set these to be specific values or change them
 relative to their values in the original simulation. If no change is
 requested, the simulation will use parameters chosen for the calibration run.
+This extends previous versions of \code{projections} as you can now pass in
+lists of each argument that then get passed to each simulation replicate.
 }

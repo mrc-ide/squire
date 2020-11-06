@@ -1,4 +1,4 @@
-context("projections_by_replicate")
+context("projections")
 
 #------------------------------------------------
 test_that("projection works", {
@@ -45,7 +45,7 @@ test_that("projection works", {
 
   # check that it runs
   p0 <- trigger_projections(out, trigger_metric = "deaths", trigger_value = 25)
-  out <- projections_by_replicate(out, R0 = 2)
+  out <- projections(out, R0 = 2)
   p <- trigger_projections(out, trigger_metric = "deaths", trigger_value = 25)
   p2 <- trigger_projections(out, trigger_metric = "ICU_occupancy", trigger_value = 250)
 
@@ -63,7 +63,7 @@ test_that("projection works", {
 
 })
 
-context("projections_by_replicate")
+context("projections")
 
 #------------------------------------------------
 test_that("projection works", {
@@ -109,55 +109,55 @@ test_that("projection works", {
   )
 
   index <- odin_index(t1$model)
-  p1 <- projections_by_replicate(r = t1, R0 = 1.8, tt_R0 = 0)
+  p1 <- projections(r = t1, R0 = 1.8, tt_R0 = 0)
   expect_lt(sum(rowSums(t1$output[,index$D,1])), sum(rowSums(p1$output[,index$D,1])))
-  p2 <- projections_by_replicate(r = t1, R0_change = c(0.1, 0.05), tt_R0 = c(0, 20))
+  p2 <- projections(r = t1, R0_change = c(0.1, 0.05), tt_R0 = c(0, 20))
   expect_gt(sum(rowSums(p1$output[,index$D,1])), sum(rowSums(p2$output[,index$D,1])))
 
   out <- format_output(p2, "infections")
   expect_gt(mean(out$y[out$t==5]), mean(out$y[out$t==40]))
 
   # arg checks
-  p3 <- projections_by_replicate(t1)
-  expect_message(p3 <- projections_by_replicate(t1, R0 = c(3,2), R0_change = c(1,0.5), tt_R0 = c(0, 30)))
-  expect_message(p3 <- projections_by_replicate(t1, contact_matrix_set = list(contact_matrices[[1]],contact_matrices[[2]]),
+  p3 <- projections(t1)
+  expect_message(p3 <- projections(t1, R0 = c(3,2), R0_change = c(1,0.5), tt_R0 = c(0, 30)))
+  expect_message(p3 <- projections(t1, contact_matrix_set = list(contact_matrices[[1]],contact_matrices[[2]]),
                                    contact_matrix_set_change = c(1,0.5), tt_contact_matrix = c(0, 30)))
-  expect_message(p3 <- projections_by_replicate(t1, hosp_bed_capacity = c(3,2), hosp_bed_capacity_change = c(1,0.5),
+  expect_message(p3 <- projections(t1, hosp_bed_capacity = c(3,2), hosp_bed_capacity_change = c(1,0.5),
                                    tt_hosp_beds = c(0, 30)))
-  expect_message(p3 <- projections_by_replicate(t1, ICU_bed_capacity = c(3,2), ICU_bed_capacity_change = c(1,0.5),
+  expect_message(p3 <- projections(t1, ICU_bed_capacity = c(3,2), ICU_bed_capacity_change = c(1,0.5),
                                    tt_ICU_beds = c(0, 30)))
-  p3 <- projections_by_replicate(t1, R0 = 2)
-  p3 <- projections_by_replicate(t1, R0_change = 0.5)
-  p3 <- projections_by_replicate(t1, contact_matrix_set = contact_matrices[[1]])
-  p3 <- projections_by_replicate(t1, contact_matrix_set_change = 0.5)
-  p3 <- projections_by_replicate(t1, hosp_bed_capacity = 2)
-  p3 <- projections_by_replicate(t1, hosp_bed_capacity_change = 0.5)
-  p3 <- projections_by_replicate(t1, ICU_bed_capacity = 2)
-  p3 <- projections_by_replicate(t1, ICU_bed_capacity_change = 0.5)
-  p3 <- projections_by_replicate(t1, ICU_bed_capacity_change = 0.5, to_be_run = TRUE)
+  p3 <- projections(t1, R0 = 2)
+  p3 <- projections(t1, R0_change = 0.5)
+  p3 <- projections(t1, contact_matrix_set = contact_matrices[[1]])
+  p3 <- projections(t1, contact_matrix_set_change = 0.5)
+  p3 <- projections(t1, hosp_bed_capacity = 2)
+  p3 <- projections(t1, hosp_bed_capacity_change = 0.5)
+  p3 <- projections(t1, ICU_bed_capacity = 2)
+  p3 <- projections(t1, ICU_bed_capacity_change = 0.5)
+  p3 <- projections(t1, ICU_bed_capacity_change = 0.5, to_be_run = TRUE)
 
 
   # length checks
-  expect_error(p3 <- projections_by_replicate(t1, R0 = c(2,1)))
-  expect_error(p3 <- projections_by_replicate(t1, contact_matrix_set = list(contact_matrices[[1]],contact_matrices[[1]])))
-  expect_error(p3 <- projections_by_replicate(t1, hosp_bed_capacity = c(2,1)))
-  expect_error(p3 <- projections_by_replicate(t1, ICU_bed_capacity = c(2,1)))
-  expect_error(p3 <- projections_by_replicate(t1, R0_change = c(2,1)))
-  expect_error(p3 <- projections_by_replicate(t1, contact_matrix_set_change = c(2,1)))
-  expect_error(p3 <- projections_by_replicate(t1, hosp_bed_capacity_change = c(2,1)))
-  expect_error(p3 <- projections_by_replicate(t1, ICU_bed_capacity_change = c(2,1)))
+  expect_error(p3 <- projections(t1, R0 = c(2,1)))
+  expect_error(p3 <- projections(t1, contact_matrix_set = list(contact_matrices[[1]],contact_matrices[[1]])))
+  expect_error(p3 <- projections(t1, hosp_bed_capacity = c(2,1)))
+  expect_error(p3 <- projections(t1, ICU_bed_capacity = c(2,1)))
+  expect_error(p3 <- projections(t1, R0_change = c(2,1)))
+  expect_error(p3 <- projections(t1, contact_matrix_set_change = c(2,1)))
+  expect_error(p3 <- projections(t1, hosp_bed_capacity_change = c(2,1)))
+  expect_error(p3 <- projections(t1, ICU_bed_capacity_change = c(2,1)))
 
   # bounds check
-  expect_error(p3 <- projections_by_replicate(t1, tt_R0 = c(30,60)))
-  expect_error(p3 <- projections_by_replicate(t1, tt_contact_matrix = c(30,60)))
-  expect_error(p3 <- projections_by_replicate(t1, tt_hosp_beds = c(30,60)))
-  expect_error(p3 <- projections_by_replicate(t1, tt_ICU_beds = c(30,60)))
+  expect_error(p3 <- projections(t1, tt_R0 = c(30,60)))
+  expect_error(p3 <- projections(t1, tt_contact_matrix = c(30,60)))
+  expect_error(p3 <- projections(t1, tt_hosp_beds = c(30,60)))
+  expect_error(p3 <- projections(t1, tt_ICU_beds = c(30,60)))
 
 
-  expect_error(p3 <- projections_by_replicate(t1, tt_R0 = c(30,60)))
-  expect_error(p3 <- projections_by_replicate(t1, tt_contact_matrix = c(30,60)))
-  expect_error(p3 <- projections_by_replicate(t1, tt_hosp_beds = c(30,60)))
-  expect_error(p3 <- projections_by_replicate(t1, tt_ICU_beds = c(30,60)))
+  expect_error(p3 <- projections(t1, tt_R0 = c(30,60)))
+  expect_error(p3 <- projections(t1, tt_contact_matrix = c(30,60)))
+  expect_error(p3 <- projections(t1, tt_hosp_beds = c(30,60)))
+  expect_error(p3 <- projections(t1, tt_ICU_beds = c(30,60)))
 
 
 })
@@ -206,8 +206,8 @@ test_that("projection plotting", {
   )
 
   set.seed(123)
-  p2 <- projections_by_replicate(r = t1, R0_change = c(0.5, 0.2), tt_R0 = c(0, 20))
-  p3 <- projections_by_replicate(r = t1,
+  p2 <- projections(r = t1, R0_change = c(0.5, 0.2), tt_R0 = c(0, 20))
+  p3 <- projections(r = t1,
                     contact_matrix_set_change = c(1, 0.5, 0.2),
                     tt_contact_matrix = c(0, 10, 20))
 
@@ -237,7 +237,7 @@ test_that("projection plotting", {
   # hack pinter invalidation
   t1$model$.__enclos_env__$private$ptr <- new("externalptr")
   set.seed(123)
-  p2_copy <- projections_by_replicate(r = t1, R0_change = c(0.5, 0.2), tt_R0 = c(0, 20))
+  p2_copy <- projections(r = t1, R0_change = c(0.5, 0.2), tt_R0 = c(0, 20))
   index <- odin_index(p2_copy$model)
   expect_true(all(p2_copy$output[nrow(p2_copy$output),index$S,1] ==
                     p2$output[nrow(p2_copy$output),index$S,1]))
@@ -247,9 +247,9 @@ test_that("projection plotting", {
 test_that("projection with normal run", {
 
   r <- run_explicit_SEEIR_model("Angola",replicates = 1, time_period = 100)
-  expect_error(p <- projections_by_replicate(r, R0 = 10), "0 to know how")
+  expect_error(p <- projections(r, R0 = 10), "0 to know how")
   r$output[,"time",1] <- r$output[,"time",1] - 50
-  p <- projections_by_replicate(r, R0 = 10)
+  p <- projections(r, R0 = 10)
   index <- odin_index(p$model)
   expect_gt(sum(p$output[nrow(p$output),index$D,1]),
             sum(r$output[nrow(r$output),index$D,1]))
@@ -260,9 +260,9 @@ test_that("projection with normal run", {
 test_that("projection with deterministic normal run", {
 
   r <- run_deterministic_SEIR_model("Angola",replicates = 1, time_period = 100)
-  expect_error(p <- projections_by_replicate(r, R0 = 10), "0 to know how")
+  expect_error(p <- projections(r, R0 = 10), "0 to know how")
   r$output[,"time",1] <- r$output[,"time",1] - 50
-  p <- projections_by_replicate(r, R0 = 10)
+  p <- projections(r, R0 = 10)
   index <- odin_index(p$model)
   expect_gt(sum(p$output[nrow(p$output),index$D,1]),
             sum(r$output[nrow(r$output),index$D,1]))
@@ -312,13 +312,13 @@ test_that("projection continuation past array size", {
     forecast = 10
   )
 
-  p <- projections_by_replicate(t1, time_period = 20, R0_change = 2)
+  p <- projections(t1, time_period = 20, R0_change = 2)
   expect_equal(as.Date(max(data$date)) + 20, as.Date(tail(rownames(p$output),1)))
   expect_true(all(diff(as.Date(rownames(p$output)))==1))
 
   r <- run_explicit_SEEIR_model("Angola",replicates = 1, time_period = 100)
   r$output[,"time",1] <- r$output[,"time",1] - 90
-  p <- projections_by_replicate(r, R0_change = 2, time_period = 20)
+  p <- projections(r, R0_change = 2, time_period = 20)
   expect_true(all(round((diff(p$output[,"time",])),1) == r$parameters$dt))
 
   expect_true(unique(diff(p$output[,1,1])) == 1)
@@ -377,8 +377,8 @@ test_that("projection for Meff", {
     forecast = 0
   )
 
-  out2 <- projections_by_replicate(out, time_period = 90, R0_change = 4)
-  out3 <- projections_by_replicate(out, time_period = 90, R0_change = 1)
+  out2 <- projections(out, time_period = 90, R0_change = 4)
+  out3 <- projections(out, time_period = 90, R0_change = 1)
 
   fd2 <- format_output(out2, "deaths")
   fd3 <- format_output(out3, "deaths")
