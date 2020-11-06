@@ -227,6 +227,8 @@ test_that("calibrate_output_parsing vs format_output",{
   pars_obs = NULL
   n_particles = 10
 
+  set.seed(123L)
+
   m1 <- calibrate(
     data = data,
     R0_min = R0_min,
@@ -251,11 +253,11 @@ test_that("calibrate_output_parsing vs format_output",{
   index <- odin_index(m1$model)
   mv <- unlist(index[c("IMVGetLive1","IMVGetLive2","IMVGetDie1","IMVGetDie2",
                            "IMVNotGetLive1","IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2")])
-  expect_true(identical(as.numeric(rowSums(m1$output[,mv,1])),
-                        o1$y[o1$replicate == 1 & o1$compartment == "ICU_demand"]))
+  expect_true(identical(na.omit(as.numeric(rowSums(m1$output[,mv,1]))),
+                        na.omit(o1$y[o1$replicate == 1 & o1$compartment == "ICU_demand"])))
 
-  expect_true(identical(as.numeric(rowSums(m1$output[,mv,2])),
-                        o1$y[o1$replicate == 2 & o1$compartment == "ICU_demand"]))
+  expect_true(identical(na.omit(as.numeric(rowSums(m1$output[,mv,2]))),
+                        na.omit(o1$y[o1$replicate == 2 & o1$compartment == "ICU_demand"])))
 
 
 })

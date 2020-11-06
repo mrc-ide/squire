@@ -66,6 +66,6 @@ test_that("best_est works for both models", {
   beta <- beta_est(squire_model = mod_exp,
                    model_params = mod_exp$parameter_func("Angola"),
                    R0 = 3)
-  expect_true(beta - 0.1242782 < 0.001)
+  expect_true(beta - 0.1254887 < 0.001)
 
 })

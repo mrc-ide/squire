@@ -12,6 +12,39 @@ test_that("population getter works", {
   expect_equal(out, out2)
 })
 
+test_that("elderly population getter works", {
+  expect_error(get_elderly_population("moon"))
+  expect_error(get_elderly_population(3))
+  expect_error(get_elderly_population(iso3c="moon"))
+  expect_error(get_elderly_population(iso3c=4))
+  out <- get_elderly_population("Angola")
+  out2 <- get_elderly_population(iso3c="AGO")
+  expect_type(out, "list")
+  expect_equal(nrow(out), 3)
+  expect_equal(ncol(out), 5)
+  expect_named(out, c("country", "age_group", "n", "matrix", "iso3c"))
+  expect_equal(out, out2)
+})
+
+test_that("parse_country_severity works", {
+  expect_error(parse_country_severity("moon"))
+  expect_error(parse_country_severity(3))
+  out <- parse_country_severity("Angola")
+  expect_type(out, "list")
+  out2 <- parse_country_severity(walker_params = TRUE)
+  expect_type(out2, "list")
+  expect_error(parse_country_severity(walker_params = "bloop"))
+  out3 <- parse_country_severity()
+  expect_type(out3, "list")
+})
+
+test_that("parse_hospital_duration works", {
+  out <- parse_country_severity(walker_params = FALSE)
+  expect_type(out, "list")
+  out2 <- parse_country_severity(walker_params = TRUE)
+  expect_type(out2, "list")
+})
+
 test_that("lmic getter works", {
   expect_vector(get_lmic_countries())
   expect_true("Zambia" %in% get_lmic_countries())
@@ -54,5 +87,18 @@ test_that("ICU and hosp bed direct work", {
   expect_error(get_hosp_bed_capacity("moon"))
   out <- get_hosp_bed_capacity("Angola")
   expect_equal(out, 30211L)
+
+})
+
+
+test_that("durations", {
+
+  expect_true(is.list(squire:::default_durations()))
+
+  expect_true(all(c("prob_severe", "prob_severe_death_treatment") %in%
+                    names(squire:::default_probs())))
+
+  expect_true(all(c("dur_rec", "dur_get_ox_survive") %in%
+                    names(squire:::default_durations())))
 
 })

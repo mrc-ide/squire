@@ -55,6 +55,31 @@ population$country <- iconv(
 population <- as.data.frame(population)
 usethis::use_data(population, overwrite = TRUE)
 
+# Demography for 80+ disaggregation - required for country-specific IFR estimation
+# --------------------------------------------------------------------------------
+elderly_pop <- demog %>%
+  dplyr::rename(country = "Region..subregion..country.or.area..") %>%
+  dplyr::mutate(`X90+` = X90.94 + X95.99 + X100.) %>%
+  dplyr::select(country, X80.84, X85.89, `X90+`) %>%
+  tidyr::pivot_longer(cols = -country, names_to = "age_group", values_to = "n",
+                      names_prefix = "X") %>%
+  dplyr::mutate(age_group = stringr::str_replace(age_group, "[.]", "-"),
+                n = n * 1000)
+
+elderly_pop$age_group <- factor(elderly_pop$age_group, levels = c("80-84",
+                                                          "85-89",
+                                                          "90+"))
+
+elderly_pop$matrix <- demog$Matrix[match(elderly_pop$country, demog$Region..subregion..country.or.area..)]
+
+elderly_pop$iso3c <- countrycode::countrycode(elderly_pop$country, "country.name","iso3c")
+elderly_pop$iso3c[elderly_pop$country == "Channel Islands"] <- "CHI"
+elderly_pop$iso3c[elderly_pop$country == "Eswatini"] <- "SWZ"
+elderly_pop$iso3c[elderly_pop$country == "Micronesia"] <- "FSM"
+
+elderly_pop <- as.data.frame(elderly_pop)
+usethis::use_data(elderly_pop, overwrite = TRUE)
+
 # Income Group
 # ------------------------------------------------------------------------------
 income_group <- demog %>%
@@ -79,6 +104,18 @@ country_specific_healthcare_capacity <- hosp_beds_by_country %>%
   mutate(ICU_beds = hosp_beds * (ICU_median / 100)) %>%
   select(-ICU_median) %>%
   filter(hosp_beds > 0) # remove Mali result which is -ve - need to sort this
+
+# https://www.paho.org/hq/dmdocuments/2012/2012-hia-frenchguiana.pdf
+# http://www.dortek.com/project/chu-hospital-martinique/
+# https://www.wikiwand.com/en/COVID-19_pandemic_in_French_Guiana#/Preventive_measures
+# https://www.thedailyherald.sx/islands/ars-ramps-up-supply-of-beds-ventilators-for-guadeloupe-st-martin-and-st-barths
+country_specific_healthcare_capacity <- rbind(country_specific_healthcare_capacity,
+                                              data.frame("country"=c("French Guiana","Guadeloupe","Martinique"),
+                                                         "income_group"=c(NA,NA,NA),
+                                                         "hosp_beds"=c(2.7,5.5,4.1),
+                                                         "ICU_beds"=c(0.1272256,0.1249603,0.1812053)))
+
+
 usethis::use_data(country_specific_healthcare_capacity, overwrite = TRUE)
 
 income_strata_healthcare_capacity <- income %>%

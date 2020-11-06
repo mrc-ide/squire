@@ -1,3 +1,17 @@
+# squire 0.5.0
+
+## 0.5.0 Major
+
+* Parameter Updates. See parameters vignette for update.
+* `triggering` function for doing `projections` with model state triggered R0 changes 
+* Time-varying durations of ICU and hospital stay
+
+## 0.5.0 Minor
+
+* `projections` allows for different args to be passed to each replicate
+* `projections` allows for additional user model args to be passed
+
+
 # squire 0.4.34
 
 * `pmcmc` argument `treated_deaths_only` will use deaths from treatment in likelihood

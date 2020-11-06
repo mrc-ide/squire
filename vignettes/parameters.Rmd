@@ -2,7 +2,7 @@
 title: "Model Parameters"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{parameters}
+  %\VignetteIndexEntry{Model Parameters}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-The parameter table below summarises the current best estimates incorporated in `squire`. These will be updated when new information becomes available. 
+The parameter table below summarises the current best estimates incorporated in `squire` as of v0.5. These will be updated when new information becomes available. 
 
 | **Parameter** | **Value** | **Reference** |
 | --- | --- | --- |
@@ -23,37 +23,37 @@ The parameter table below summarises the current best estimates incorporated in 
 | Generation Time | 6.75 days | [Report 9](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-9-impact-of-npis-on-covid-19/) |
 | Mean Duration in I\_MILD | 2.1 days | Incorporates 0.5 days of infectiousness prior to symptoms; with parameters below ~95% of all infections are mild. In combination with mean duration in I\_CASE this gives a mean generation time as above |
 | Mean Duration in I\_CASE | 4.5 days | Mean onset-to-admission of 4 days from UK data. Includes 0.5 days of infectiousness prior to symptom onset |
-| Mean Duration of Hospitalisation for non-critical Cases (I\_HOSP) if survive | 9.5 days | Based on unpublished UK data |
-| Mean Duration of Hospitalisation for non-critical Cases (I\_HOSP) if die | 7.6 days | Based on unpublished UK data |
-| Mean duration of Critical Care (I\_ICU) if survive | 11.3 days | Based on [UK data](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports) adjusted for censoring |
-| Mean duration of Critical Care (I\_ICU) if die | 10.1 days | Based on [UK data](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports) |
-| Mean duration of Stepdown post ICU (I\_Rec) | 3.4 days | Based on unpublished UK data |
+| Mean Duration of Hospitalisation for non-critical Cases (I\_HOSP) if survive | 9 days | Based on review of non-ICU stay, see [Hogan et al.](medrxiv) |
+| Mean Duration of Hospitalisation for non-critical Cases (I\_HOSP) if die | 9 days | Based on review of non-ICU stay, see [Hogan et al.](medrxiv) |
+| Mean duration of Critical Care (I\_ICU) if survive | 15.3 days | Based on [ISARIC Clinical Data Report](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports) adjusted for censoring |
+| Mean duration of Critical Care (I\_ICU) if die | 11.5 days | Based on [ISARIC Clinical Data Report](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports) adjusted for censoring  |
+| Mean duration of Stepdown post ICU (I\_Rec) | 3 days | Based on unpublished UK data |
 | Mean duration of hospitalisation if require ICU but do not receive it | 1 day | Working assumption |
-| Probability of dying in critical care | 50% | Based on [UK data](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports) |
+| Probability of dying in critical care | 50% | Based on on [ISARIC Clinical Data Report](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports), [Salje et al.](http://dx.doi.org/10.1126/science.abc3517) and [Report 34](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-34-ifr/) |
 | Probability of death if require critical care but do not receive it | 95% | Working assumption based on expert clinical opinion |
 | Probability of death if require hospitalisation but do not receive it | 60% | Working assumption based on expert clinical opinion |
-| Multiplier of duration of stay for LIC and LMIC settings compared to HIC | 50% | Working assumption based on expert clinical opinion |
+
 
 ### Age-Specific Parameters
 
-| **Age-Group** | **Proportion of Infections Hospitalised** | **Proportion of hospitalised cases requiring critical care** | **Proportion of non-critical care cases dying** |
-| --- | --- | --- | --- |
-| 0 to 4 | 0.001 | 0.050 | 0.013 |
-| 5 to 9 | 0.001 | 0.050 | 0.013 |
-| 10 to 14 | 0.001 | 0.050 | 0.013 |
-| 15 to 19 | 0.002 | 0.050 | 0.013 |
-| 20 to 24 | 0.005 | 0.050 | 0.013 |
-| 25 to 29 | 0.010 | 0.050 | 0.013 |
-| 30 to 34 | 0.016 | 0.050 | 0.013 |
-| 35 to 39 | 0.023 | 0.053 | 0.013 |
-| 40 to 44 | 0.029 | 0.060 | 0.015 |
-| 45 to 49 | 0.039 | 0.075 | 0.019 |
-| 50 to 54 | 0.058 | 0.104 | 0.027 |
-| 55 to 59 | 0.072 | 0.149 | 0.042 |
-| 60 to 64 | 0.102 | 0.224 | 0.069 |
-| 65 to 69 | 0.117 | 0.307 | 0.105 |
-| 70 to 74 | 0.146 | 0.386 | 0.149 |
-| 75 to 79 | 0.177 | 0.461 | 0.203 |
-| 80+ | 0.180 | 0.709 | 0.580 |
-| Source | [Verity et al. 2020](https://www.thelancet.com/pdfs/journals/laninf/PIIS1473-3099(20)30243-7.pdf) corrected for non-uniform attack rate in China (see [Report 12](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-12-global-impact-covid-19/)) | Adjusted from IFR distributional shape in [Verity et al. 2020](https://www.thelancet.com/pdfs/journals/laninf/PIIS1473-3099(20)30243-7.pdf) to give an overall proportion of cases requiring critical care of ~30% to match [UK data](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports) | Calculated from IFR in [Verity et al. 2020](https://www.thelancet.com/pdfs/journals/laninf/PIIS1473-3099(20)30243-7.pdf) corrected for non-uniform attack rate in China (see [Report 12](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-12-global-impact-covid-19/)) given the 50% fatality rate in critical care. |
+| **Age-Group** | **Proportion of Infections Hospitalised** | **Proportion of hospitalised cases requiring critical care** | **Proportion of non-critical care cases dying** | **Proportion of critical care cases dying** |
+| --- | --- | --- | --- | --- |
+| 0 to 4 | 0.001 | 0.181 | 0.013 | 0.227 |
+| 5 to 9 | 0.001 | 0.181 | 0.014 | 0.252 |
+| 10 to 14 | 0.002 | 0.181 | 0.016 | 0.281 |
+| 15 to 19 | 0.002 | 0.137 | 0.016 | 0.413 |
+| 20 to 24 | 0.003 | 0.122 | 0.018 | 0.518 |
+| 25 to 29 | 0.005 | 0.123 | 0.020 | 0.573 |
+| 30 to 34 | 0.007 | 0.136 | 0.023 | 0.576 |
+| 35 to 39 | 0.009 | 0.161 | 0.026 | 0.543 |
+| 40 to 44 | 0.013 | 0.197 | 0.030 | 0.494 |
+| 45 to 49 | 0.018 | 0.242 | 0.036 | 0.447 |
+| 50 to 54 | 0.025 | 0.289 | 0.042 | 0.417 |
+| 55 to 59 | 0.036 | 0.327 | 0.050 | 0.411 |
+| 60 to 64 | 0.050 | 0.337 | 0.056 | 0.443 |
+| 65 to 69 | 0.071 | 0.309 | 0.060 | 0.539 |
+| 70 to 74 | 0.100 | 0.244 | 0.123 | 0.570 |
+| 75 to 79 | 0.140 | 0.160 | 0.184 | 0.643 |
+|      80+ | 0.233 | 0.057 | 0.341 | 0.993 |
+| Source | [Salje et al.](http://dx.doi.org/10.1126/science.abc3517) | [Salje et al.](http://dx.doi.org/10.1126/science.abc3517) | Calculated from IFR in [Report 34](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-34-ifr/) adjusted for ISARIC reports of proportion of hospital deaths that occur in ICU | Calculated from IFR in [Report 34](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-34-ifr/) adjusted for ISARIC reports of proportion of hospital deaths that occur in ICU |
 <br>

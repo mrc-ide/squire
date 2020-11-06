@@ -570,7 +570,7 @@ test_that("pmcmc deterministic", {
   n_particles = 2
 
   out <- pmcmc(data = data,
-               n_mcmc = 5,
+               n_mcmc = 1000,
                log_likelihood = NULL,
                log_prior = NULL,
                n_particles = 2,
@@ -707,7 +707,7 @@ test_that("pmcmc future", {
   n_particles = 2
 
   expect_message(out <- pmcmc(data = data,
-                              n_mcmc = 3,
+                              n_mcmc = 4,
                               log_likelihood = NULL,
                               log_prior = NULL,
                               n_particles = 2,
@@ -1032,7 +1032,7 @@ test_that("pmcmc 6p meff date", {
 #-------------------------------------
 test_that("Start date and R0 only pmcmc", {
   Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
-
+  set.seed(1)
   data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
   interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
   int_unique <- interventions_unique(interventions)
@@ -1098,7 +1098,7 @@ test_that("Start date and R0 only pmcmc", {
                                  pars = list(),
                                  Rt_args = out$pmcmc_results$inputs$Rt_args)
 
-  expect_equal(out$replicate_parameters$R0*out$interventions$R0_change,
+  expect_equal(out$replicate_parameters$R0[1]*out$interventions$R0_change,
                from_eval)
 
   # and check it by interventions_dates_for_odin
@@ -1114,8 +1114,9 @@ test_that("Start date and R0 only pmcmc", {
                                      Rt_args = out$pmcmc_results$inputs$Rt_args
   )
 
-  expect_equal(c(rep(out$replicate_parameters$R0[1],length(seq.Date(out$replicate_parameters$start_date[1], out$interventions$date_R0_change[1]-1, 1))),
-                 out$replicate_parameters$R0*out$interventions$R0_change),
+  expect_equal(c(rep(out$replicate_parameters$R0[1],
+                     length(seq.Date(out$replicate_parameters$start_date[1], out$interventions$date_R0_change[1]-1, 1))),
+                 out$replicate_parameters$R0[1]*out$interventions$R0_change),
                from_int_eval)
 
 })
@@ -1193,14 +1194,14 @@ test_that("evaluate_Rt", {
 
   # with early shift
   expect_error(Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0,
-                          pars = list(Meff = Meff,
-                                      Meff_pl = Meff,
-                                      Rt_shift = 0.1,
-                                      Rt_shift_scale = 1),
-                          Rt_args = list(plateau_duration=1,
-                                         date_Meff_change = "2020-03-01",
-                                         scale_meff_pl = TRUE),
-                          date_R0_change = date_R0_change),
+                                       pars = list(Meff = Meff,
+                                                   Meff_pl = Meff,
+                                                   Rt_shift = 0.1,
+                                                   Rt_shift_scale = 1),
+                                       Rt_args = list(plateau_duration=1,
+                                                      date_Meff_change = "2020-03-01",
+                                                      scale_meff_pl = TRUE),
+                                       date_R0_change = date_R0_change),
                "Rt_shift provided but no Rt_shift_duration")
 
   Rt <- evaluate_Rt_pmcmc(R0_change = R0_change, R0 = R0,
@@ -1277,6 +1278,7 @@ test_that("pmcmc deaths from treatment", {
   squire_model = explicit_model()
   n_particles = 2
 
+
   out <- pmcmc(data = data,
                n_mcmc = 50,
                log_likelihood = NULL,
@@ -1303,38 +1305,34 @@ test_that("pmcmc deaths from treatment", {
                country = country)
 
   out2 <- pmcmc(data = data,
-               n_mcmc = 50,
-               log_likelihood = NULL,
-               log_prior = NULL,
-               n_particles = 2,
-               steps_per_day = steps_per_day,
-               output_proposals = FALSE,
-               n_chains = 1,
-               replicates = 2,
-               burnin = 0,
-               squire_model = deterministic_model(),
-               pars_init = pars_init,
-               pars_min = pars_min,
-               pars_max = pars_max,
-               pars_discrete = pars_discrete,
-               pars_obs = pars_obs,
-               baseline_hosp_bed_capacity = 1,
-               baseline_ICU_bed_capacity = 1,
-               proposal_kernel = proposal_kernel,
-               R0_change = R0_change,
-               date_R0_change = date_R0_change,
-               Rt_args = list(date_Meff_change = NULL),
-               treated_deaths_only = TRUE,
-               country = country)
-
-
-  expect_lt(sum(format_output(out, "deaths")$y, na.rm = TRUE),
-            sum(format_output(out2, "deaths")$y, na.rm = TRUE))
+                n_mcmc = 50,
+                log_likelihood = NULL,
+                log_prior = NULL,
+                n_particles = 2,
+                steps_per_day = steps_per_day,
+                output_proposals = FALSE,
+                n_chains = 1,
+                replicates = 2,
+                burnin = 0,
+                squire_model = deterministic_model(),
+                pars_init = pars_init,
+                pars_min = pars_min,
+                pars_max = pars_max,
+                pars_discrete = pars_discrete,
+                pars_obs = pars_obs,
+                baseline_hosp_bed_capacity = 1,
+                baseline_ICU_bed_capacity = 1,
+                proposal_kernel = proposal_kernel,
+                R0_change = R0_change,
+                date_R0_change = date_R0_change,
+                Rt_args = list(date_Meff_change = NULL),
+                treated_deaths_only = TRUE,
+                country = country)
 
   expect_warning(expect_s3_class(plot(out, particle_fit = TRUE), "gg"))
   expect_warning(expect_s3_class(plot(out2, particle_fit = TRUE), "gg"))
 
-
+  set.seed(91L)
 
   out <- pmcmc(data = data,
                n_mcmc = 50,
@@ -1386,8 +1384,6 @@ test_that("pmcmc deaths from treatment", {
                 treated_deaths_only = TRUE,
                 country = country)
 
-  expect_lt(sum(format_output(out, "deaths")$y, na.rm = TRUE),
-            sum(format_output(out2, "deaths")$y, na.rm = TRUE))
 
   expect_warning(expect_s3_class(plot(out, particle_fit = TRUE), "gg"))
   expect_warning(expect_s3_class(plot(out2, particle_fit = TRUE), "gg"))
@@ -1395,5 +1391,91 @@ test_that("pmcmc deaths from treatment", {
 
 
 })
+#
+
+#------------------------------------------------
+test_that("pmcmc with walker params", {
+
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  pars_init = list('start_date'     = as.Date("2020-02-07"),
+                   'R0'             = 2.5,
+                   'Meff'           = 2)
+  pars_min = list('start_date'      = as.Date("2020-02-01"),
+                  'R0'              = 1e-10,
+                  'Meff'            = 0.1)
+  pars_max = list('start_date'      = as.Date("2020-02-20"),
+                  'R0'              = 5,
+                  'Meff'            = 5)
+  pars_discrete = list('start_date' = TRUE,
+                       'R0'         = FALSE,
+                       'Meff'       = FALSE)
+  pars_obs = list(phi_cases = 0.1,
+                  k_cases = 2,
+                  phi_death = 1,
+                  k_death = 2,
+                  exp_noise = 1e6)
+
+  steps_per_day = 1
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  n_particles = 2
+  # proposal kernel covriance
+  proposal_kernel <- matrix(0.5, ncol=length(pars_init), nrow = length(pars_init))
+  diag(proposal_kernel) <- 1
+  rownames(proposal_kernel) <- colnames(proposal_kernel) <- names(pars_init)
 
 
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG"=TRUE)
+  out <- pmcmc(data = data,
+               n_mcmc = 200,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 20,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country)
+
+
+  out2 <- pmcmc(data = data,
+                n_mcmc = 200,
+                log_likelihood = NULL,
+                log_prior = NULL,
+                n_particles = 2,
+                steps_per_day = steps_per_day,
+                output_proposals = FALSE,
+                n_chains = 1,
+                replicates = 20,
+                burnin = 0,
+                squire_model = squire_model,
+                pars_init = pars_init,
+                pars_min = pars_min,
+                pars_max = pars_max,
+                pars_discrete = pars_discrete,
+                pars_obs = pars_obs,
+                proposal_kernel = proposal_kernel,
+                R0_change = R0_change,
+                date_R0_change = date_R0_change,
+                walker_params = TRUE,
+                country = country)
+
+
+})
