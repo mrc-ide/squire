@@ -89,3 +89,16 @@ test_that("ICU and hosp bed direct work", {
   expect_equal(out, 30211L)
 
 })
+
+
+test_that("durations", {
+
+  expect_true(is.list(squire:::default_durations()))
+
+  expect_true(all(c("prob_severe", "prob_severe_death_treatment") %in%
+                    names(squire:::default_probs())))
+
+  expect_true(all(c("dur_rec", "dur_get_ox_survive") %in%
+                    names(squire:::default_durations())))
+
+})
