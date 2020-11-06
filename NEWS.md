@@ -1,3 +1,7 @@
+# squire 0.5.1
+
+* `projections` typo
+
 # squire 0.5.0
 
 ## 0.5.0 Major
