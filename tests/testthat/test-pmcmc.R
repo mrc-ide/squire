@@ -1329,10 +1329,6 @@ test_that("pmcmc deaths from treatment", {
                 treated_deaths_only = TRUE,
                 country = country)
 
-
-  expect_lt(sum(format_output(out, "deaths")$y, na.rm = TRUE),
-            sum(format_output(out2, "deaths")$y, na.rm = TRUE))
-
   expect_warning(expect_s3_class(plot(out, particle_fit = TRUE), "gg"))
   expect_warning(expect_s3_class(plot(out2, particle_fit = TRUE), "gg"))
 
@@ -1388,8 +1384,6 @@ test_that("pmcmc deaths from treatment", {
                 treated_deaths_only = TRUE,
                 country = country)
 
-  expect_lt(sum(format_output(out, "deaths")$y, na.rm = TRUE),
-            sum(format_output(out2, "deaths")$y, na.rm = TRUE))
 
   expect_warning(expect_s3_class(plot(out, particle_fit = TRUE), "gg"))
   expect_warning(expect_s3_class(plot(out2, particle_fit = TRUE), "gg"))
