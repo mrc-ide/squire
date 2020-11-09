@@ -194,14 +194,14 @@ get_hosp_bed_capacity <- function(country = NULL) {
 #' @param dur_not_get_ox_die Mean duration without  oxygen given death.
 #'  Default = 4.5
 #' @param dur_get_mv_survive Mean duration of ventilation given survive.
-#'   Default = 15.3
+#'   Default = 14.8
 #' @param tt_dur_get_mv_survive Times at which dur_get_mv_survive changes
 #'   (Default = 0 = doesn't change)
-#' @param dur_get_mv_die Mean duration of ventilation given death. Default = 11.3
+#' @param dur_get_mv_die Mean duration of ventilation given death. Default = 11.1
 #' @param tt_dur_get_mv_die Times at which dur_get_mv_die changes
 #'   (Default = 0 = doesn't change)
 #' @param dur_not_get_mv_survive Mean duration without ventilation given
-#'   survive. Default = 7.65
+#'   survive. Default = 7.4
 #' @param dur_not_get_mv_die Mean duration without ventilation given
 #'   death. Default = 1
 #' @param dur_rec Duration of recovery after coming off ventilation. Default = 3
