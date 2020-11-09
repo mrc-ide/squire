@@ -1,6 +1,7 @@
 # squire 0.5.1
 
-* `projections` typo
+* `projections` bug fixed for setting time varying durations
+* Taiwan healthcare capacity added 
 
 # squire 0.5.0
 
