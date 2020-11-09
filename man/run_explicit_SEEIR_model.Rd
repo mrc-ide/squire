@@ -150,18 +150,18 @@ Default = 4.5}
 Default = 4.5}
 
 \item{dur_get_mv_survive}{Mean duration of ventilation given survive.
-Default = 15.3}
+Default = 14.8}
 
 \item{tt_dur_get_mv_survive}{Times at which dur_get_mv_survive changes
 (Default = 0 = doesn't change)}
 
-\item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 11.3}
+\item{dur_get_mv_die}{Mean duration of ventilation given death. Default = 11.1}
 
 \item{tt_dur_get_mv_die}{Times at which dur_get_mv_die changes
 (Default = 0 = doesn't change)}
 
 \item{dur_not_get_mv_survive}{Mean duration without ventilation given
-survive. Default = 7.65}
+survive. Default = 7.4}
 
 \item{dur_not_get_mv_die}{Mean duration without ventilation given
 death. Default = 1}

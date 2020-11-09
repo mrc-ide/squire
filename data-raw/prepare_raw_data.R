@@ -85,6 +85,9 @@ usethis::use_data(elderly_pop, overwrite = TRUE)
 income_group <- demog %>%
   select(Region..subregion..country.or.area.., income_group) %>%
   rename(country = Region..subregion..country.or.area..)
+
+# few extra additions
+income_group$income_group[income_group$country == "China, Taiwan Province of China"] <- "High income"
 usethis::use_data(income_group, overwrite = TRUE)
 
 # Bed Capacity

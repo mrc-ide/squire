@@ -552,10 +552,10 @@ conduct_replicate <- function(x,
   r$model$set_user(tt_dur_get_ox_die = 0)
   r$model$set_user(tt_dur_get_mv_survive = 0)
   r$model$set_user(tt_dur_get_ox_survive = 0)
-  r$model$set_user(gamma_dur_get_mv_die = finals[[x]]$gamma_dur_get_mv_die)
-  r$model$set_user(gamma_dur_get_ox_die = finals[[x]]$gamma_dur_get_ox_die)
-  r$model$set_user(gamma_dur_get_mv_survive = finals[[x]]$gamma_dur_get_mv_survive)
-  r$model$set_user(gamma_dur_get_ox_survive = finals[[x]]$gamma_dur_get_ox_survive)
+  r$model$set_user(gamma_get_mv_die = finals[[x]]$gamma_get_mv_die)
+  r$model$set_user(gamma_get_ox_die = finals[[x]]$gamma_get_ox_die)
+  r$model$set_user(gamma_get_mv_survive = finals[[x]]$gamma_get_mv_survive)
+  r$model$set_user(gamma_get_ox_survive = finals[[x]]$gamma_get_ox_survive)
 
   # and update any custom model user args
   if (!is.null(model_user_args)) {

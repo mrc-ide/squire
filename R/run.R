@@ -45,9 +45,9 @@ probs <- default_probs()
 #'    \item{dur_get_ox_die = 9}
 #'    \item{dur_not_get_ox_survive = 9 * 0.5}
 #'    \item{dur_not_get_ox_die = 9 * 0.5}
-#'    \item{dur_get_mv_survive = 15.3}
-#'    \item{dur_get_mv_die = 11.5}
-#'    \item{dur_not_get_mv_survive = 15.3 * 0.5}
+#'    \item{dur_get_mv_survive = 14.8}
+#'    \item{dur_get_mv_die = 11.1}
+#'    \item{dur_not_get_mv_survive = 14.8 * 0.5}
 #'    \item{dur_not_get_mv_die = 1}
 #'    \item{dur_rec = 3}
 #' }
@@ -63,9 +63,9 @@ default_durations <- function() {
     dur_get_ox_die = 9,
     dur_not_get_ox_survive = 9 * 0.5,
     dur_not_get_ox_die = 9 * 0.5,
-    dur_get_mv_survive = 15.3,
-    dur_get_mv_die = 11.5,
-    dur_not_get_mv_survive = 15.3 * 0.5,
+    dur_get_mv_survive = 14.8,
+    dur_get_mv_die = 11.1,
+    dur_not_get_mv_survive = 14.8 * 0.5,
     dur_not_get_mv_die = 1,
     dur_rec = 3
   )
