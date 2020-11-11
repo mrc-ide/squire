@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.34</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.2</span>
       </span>
     </div>
 
@@ -124,40 +124,45 @@
     </div>
 
     <pre class="usage"><span class='fu'>parameters_explicit_SEEIR</span>(
-  country = <span class='kw'>NULL</span>,
-  population = <span class='kw'>NULL</span>,
-  tt_contact_matrix = <span class='fl'>0</span>,
-  contact_matrix_set = <span class='kw'>NULL</span>,
-  R0 = <span class='fl'>3</span>,
-  tt_R0 = <span class='fl'>0</span>,
-  beta_set = <span class='kw'>NULL</span>,
-  time_period = <span class='fl'>365</span>,
-  dt = <span class='fl'>0.1</span>,
-  init = <span class='kw'>NULL</span>,
-  seeding_cases = <span class='kw'>NULL</span>,
-  prob_hosp = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_hosp</span>,
-  prob_severe = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_severe</span>,
-  prob_non_severe_death_treatment = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_non_severe_death_treatment</span>,
-  prob_non_severe_death_no_treatment = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_non_severe_death_no_treatment</span>,
-  prob_severe_death_treatment = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_severe_death_treatment</span>,
-  prob_severe_death_no_treatment = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>prob_severe_death_no_treatment</span>,
-  p_dist = <span class='kw'>probs</span><span class='op'>$</span><span class='kw'>p_dist</span>,
-  dur_E = <span class='fl'>4.6</span>,
-  dur_IMild = <span class='fl'>2.1</span>,
-  dur_ICase = <span class='fl'>4.5</span>,
-  dur_get_ox_survive = <span class='fl'>9.5</span>,
-  dur_get_ox_die = <span class='fl'>7.6</span>,
-  dur_not_get_ox_survive = <span class='fl'>9.5</span> <span class='op'>*</span> <span class='fl'>0.5</span>,
-  dur_not_get_ox_die = <span class='fl'>7.6</span> <span class='op'>*</span> <span class='fl'>0.5</span>,
-  dur_get_mv_survive = <span class='fl'>11.3</span>,
-  dur_get_mv_die = <span class='fl'>10.1</span>,
-  dur_not_get_mv_survive = <span class='fl'>11.3</span> <span class='op'>*</span> <span class='fl'>0.5</span>,
-  dur_not_get_mv_die = <span class='fl'>1</span>,
-  dur_rec = <span class='fl'>3.4</span>,
-  hosp_bed_capacity = <span class='kw'>NULL</span>,
-  ICU_bed_capacity = <span class='kw'>NULL</span>,
-  tt_hosp_beds = <span class='fl'>0</span>,
-  tt_ICU_beds = <span class='fl'>0</span>
+  <span class='kw'>country</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tt_contact_matrix</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>tt_R0</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>beta_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>time_period</span> <span class='kw'>=</span> <span class='fl'>365</span>,
+  <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='kw'>init</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>seeding_cases</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_hosp</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_severe</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_non_severe_death_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_non_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_severe_death_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>p_dist</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>p_dist</span>,
+  <span class='kw'>walker_params</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>dur_E</span> <span class='kw'>=</span> <span class='fl'>4.6</span>,
+  <span class='kw'>dur_IMild</span> <span class='kw'>=</span> <span class='fl'>2.1</span>,
+  <span class='kw'>dur_ICase</span> <span class='kw'>=</span> <span class='fl'>4.5</span>,
+  <span class='kw'>dur_get_ox_survive</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tt_dur_get_ox_survive</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>dur_get_ox_die</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tt_dur_get_ox_die</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>dur_not_get_ox_survive</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>dur_not_get_ox_die</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>dur_get_mv_survive</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tt_dur_get_mv_survive</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>dur_get_mv_die</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tt_dur_get_mv_die</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>dur_not_get_mv_survive</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>dur_not_get_mv_die</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>dur_rec</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tt_hosp_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>tt_ICU_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -215,48 +220,62 @@ Default = NULL, which causes beta to be estimated from R0</p></td>
     </tr>
     <tr>
       <th>prob_hosp</th>
-      <td><p>probability of hospitalisation by age.
-Default = c(0.001127564, 0.000960857, 0.001774408, 0.003628171,
-0.008100662, 0.015590734, 0.024597885, 0.035377529,
-0.04385549, 0.058495518, 0.08747709, 0.109730508,
-0.153943118, 0.177242143, 0.221362219, 0.267628264)</p></td>
+      <td><p>Probability of hospitalisation by age.
+Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/c.html'>c(0.000840764, 0.001182411, 0.001662887, 0.002338607,
+0.003288907, 0.004625365, 0.006504897, 0.009148183, 0.012865577,
+0.018093546, 0.025445917, 0.035785947, 0.050327683, 0.0707785,
+0.099539573, 0.1399878, 0.233470395)</a></code></p></td>
     </tr>
     <tr>
       <th>prob_severe</th>
       <td><p>Probability of developing severe symptoms by age.
-Default = c(3.73755e-05, 3.18497e-05, 5.88166e-05, 0.000120264,
-0.000268514, 0.000516788, 0.00081535, 0.001242525,
-0.001729275, 0.002880196, 0.00598205, 0.010821894,
-0.022736324, 0.035911156, 0.056362032, 0.081467057)</p></td>
+Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/c.html'>c(0.000840764, 0.001182411, 0.001662887, 0.002338607,
+0.003288907, 0.004625365, 0.006504897, 0.009148183, 0.012865577,
+0.018093546, 0.025445917, 0.035785947, 0.050327683, 0.0707785,
+0.099539573, 0.1399878, 0.233470395)</a></code></p></td>
     </tr>
     <tr>
       <th>prob_non_severe_death_treatment</th>
       <td><p>Probability of death from non severe
-treated infection.
-Default = c(0.0125702, 0.0125702, 0.0125702, 0.0125702,
-0.0125702, 0.0125702, 0.0125702, 0.013361147,
-0.015104687, 0.019164124, 0.027477519, 0.041762108,
-0.068531658, 0.105302319, 0.149305732, 0.20349534)</p></td>
+treated infection. Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/c.html'>c(0.181354223, 0.181354223, 0.181354223, 0.137454906,
+0.121938236, 0.122775613, 0.136057441, 0.160922182, 0.196987378,
+0.242011054, 0.289368845, 0.326537862, 0.337229819, 0.309082553,
+0.243794865, 0.160480254, 0.057084366)</a></code></p></td>
     </tr>
     <tr>
       <th>prob_non_severe_death_no_treatment</th>
       <td><p>Probability of death in non severe
-hospital inections that aren't treated</p></td>
+hospital inections that aren't treated. Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/rep.html'>rep(0.5, 17)</a></code></p></td>
     </tr>
     <tr>
       <th>prob_severe_death_treatment</th>
       <td><p>Probability of death from severe infection
-that is treated. Default = rep(0.5, 16)</p></td>
+that is treated. Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/c.html'>c(0.226668959, 0.252420241, 0.281097009, 0.413005389,
+0.518451493, 0.573413613, 0.576222065, 0.54253573, 0.493557696,
+0.447376527, 0.416666608, 0.411186639, 0.443382594, 0.538718871,
+0.570434076, 0.643352843, 0.992620047)</a></code></p></td>
     </tr>
     <tr>
       <th>prob_severe_death_no_treatment</th>
       <td><p>Probability of death from severe infection
-that is not treated. Default = rep(0.95, 16)</p></td>
+that is not treated. Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/rep.html'>rep(0.95, 17)</a></code></p></td>
     </tr>
     <tr>
       <th>p_dist</th>
       <td><p>Preferentiality of age group receiving treatment relative to
 other age groups when demand exceeds healthcare capacity.</p></td>
+    </tr>
+    <tr>
+      <th>walker_params</th>
+      <td><p>Boolean for using parameters in Walker et al. Default = FALSE,
+which uses parameter update as of November 2020. For full information see
+parameters vignette</p></td>
     </tr>
     <tr>
       <th>dur_E</th>
@@ -273,35 +292,55 @@ Default = 4.5</p></td>
     </tr>
     <tr>
       <th>dur_get_ox_survive</th>
-      <td><p>Mean duration of oxygen given survive. Default = 5</p></td>
+      <td><p>Mean duration of oxygen given survive. Default = 9</p></td>
+    </tr>
+    <tr>
+      <th>tt_dur_get_ox_survive</th>
+      <td><p>Times at which dur_get_ox_survive changes
+(Default = 0 = doesn't change)</p></td>
     </tr>
     <tr>
       <th>dur_get_ox_die</th>
-      <td><p>Mean duration of oxygen given death. Default = 5</p></td>
+      <td><p>Mean duration of oxygen given death. Default = 9</p></td>
+    </tr>
+    <tr>
+      <th>tt_dur_get_ox_die</th>
+      <td><p>Times at which dur_get_ox_die changes
+(Default = 0 = doesn't change)</p></td>
     </tr>
     <tr>
       <th>dur_not_get_ox_survive</th>
       <td><p>Mean duration without oxygen given survive.
-Default = 5</p></td>
+Default = 4.5</p></td>
     </tr>
     <tr>
       <th>dur_not_get_ox_die</th>
       <td><p>Mean duration without  oxygen given death.
-Default = 5</p></td>
+Default = 4.5</p></td>
     </tr>
     <tr>
       <th>dur_get_mv_survive</th>
       <td><p>Mean duration of ventilation given survive.
-Default = 7.3</p></td>
+Default = 14.8</p></td>
+    </tr>
+    <tr>
+      <th>tt_dur_get_mv_survive</th>
+      <td><p>Times at which dur_get_mv_survive changes
+(Default = 0 = doesn't change)</p></td>
     </tr>
     <tr>
       <th>dur_get_mv_die</th>
-      <td><p>Mean duration of ventilation given death. Default = 6</p></td>
+      <td><p>Mean duration of ventilation given death. Default = 11.1</p></td>
+    </tr>
+    <tr>
+      <th>tt_dur_get_mv_die</th>
+      <td><p>Times at which dur_get_mv_die changes
+(Default = 0 = doesn't change)</p></td>
     </tr>
     <tr>
       <th>dur_not_get_mv_survive</th>
       <td><p>Mean duration without ventilation given
-survive. Default = 7.3</p></td>
+survive. Default = 7.4</p></td>
     </tr>
     <tr>
       <th>dur_not_get_mv_die</th>
@@ -310,7 +349,7 @@ death. Default = 1</p></td>
     </tr>
     <tr>
       <th>dur_rec</th>
-      <td><p>Duration of recovery after coming off ventilation. Default = 2</p></td>
+      <td><p>Duration of recovery after coming off ventilation. Default = 3</p></td>
     </tr>
     <tr>
       <th>hosp_bed_capacity</th>
@@ -336,6 +375,21 @@ death. Default = 1</p></td>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>All durations are in days.</p>
+    <h2 class="hasAnchor" id="parameter-updates"><a class="anchor" href="#parameter-updates"></a>Parameter Updates</h2>
+
+    
+
+
+<p>Parameters detailing the age-dependent probability of disease
+severity and durations of hospital durations have been updated in v0.5.0
+of <code>squire</code> to reflect the changing understanding of COVID-19 transmission.
+Parameter arguments are by default equal to <code>NULL</code>, which
+causes the new updated parameters specified in <code><a href='default_probs.html'>default_probs</a></code>
+and <code><a href='default_durations.html'>default_durations</a></code> to be used. If any provided parameters
+are not <code>NULL</code>, these will be used. In order to ease previous fits and
+code, function argument <code>walker_params</code> will use the parameters described
+in <a href='https://science.sciencemag.org/content/369/6502/413'>Walker et al. Science. 2020</a>
+which can be viewed within the function <code><a href='parse_country_severity.html'>parse_country_severity</a></code></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -352,7 +406,7 @@ death. Default = 1</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

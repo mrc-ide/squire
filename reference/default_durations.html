@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>squire simulation print — print.squire_simulation • squire</title>
+<title>Return the default hospital durations for modelling — default_durations • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="squire simulation print — print.squire_simulation" />
-<meta property="og:description" content="squire simulation print" />
+<meta property="og:title" content="Return the default hospital durations for modelling — default_durations" />
+<meta property="og:description" content="Return the default hospital durations for modelling" />
 
 
 
@@ -114,30 +114,39 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>squire simulation print</h1>
+    <h1>Return the default hospital durations for modelling</h1>
     
-    <div class="hidden name"><code>print.squire_simulation.Rd</code></div>
+    <div class="hidden name"><code>default_durations.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>squire simulation print</p>
+    <p>Return the default hospital durations for modelling</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for squire_simulation</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>default_durations</span>()</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>x</th>
-      <td><p>An iccm_simulation object</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>additional arguments affecting the summary produced.</p></td>
-    </tr>
-    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>List of default durations</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    
+<ul>
+<li><p>tt_dur_get_ox_survive = 0</p></li>
+<li><p>tt_dur_get_mv_survive = 0</p></li>
+<li><p>tt_dur_get_ox_die = 0</p></li>
+<li><p>tt_dur_get_mv_die = 0</p></li>
+<li><p>dur_get_ox_survive = 9</p></li>
+<li><p>dur_get_ox_die = 9</p></li>
+<li><p>dur_not_get_ox_survive = 9 * 0.5</p></li>
+<li><p>dur_not_get_ox_die = 9 * 0.5</p></li>
+<li><p>dur_get_mv_survive = 14.8</p></li>
+<li><p>dur_get_mv_die = 11.1</p></li>
+<li><p>dur_not_get_mv_survive = 14.8 * 0.5</p></li>
+<li><p>dur_not_get_mv_die = 1</p></li>
+<li><p>dur_rec = 3</p></li>
+</ul>
 
 
   </div>

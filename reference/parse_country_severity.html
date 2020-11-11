@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>squire simulation print — print.squire_simulation • squire</title>
+<title>Parse country severity parameters — parse_country_severity • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="squire simulation print — print.squire_simulation" />
-<meta property="og:description" content="squire simulation print" />
+<meta property="og:title" content="Parse country severity parameters — parse_country_severity" />
+<meta property="og:description" content="Parse country severity parameters" />
 
 
 
@@ -114,28 +114,89 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>squire simulation print</h1>
+    <h1>Parse country severity parameters</h1>
     
-    <div class="hidden name"><code>print.squire_simulation.Rd</code></div>
+    <div class="hidden name"><code>parse_country_severity.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>squire simulation print</p>
+    <p>Parse country severity parameters</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for squire_simulation</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>parse_country_severity</span>(
+  <span class='kw'>country</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_hosp</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_severe</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_non_severe_death_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_severe_death_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_non_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prob_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>walker_params</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>An iccm_simulation object</p></td>
+      <th>country</th>
+      <td><p>Character for country beign simulated. WIll be used to
+generate <code>population</code> and <code>contact_matrix_set</code> if
+unprovided. Either <code>country</code> or <code>population</code> and
+<code>contact_matrix_set</code> must be provided.</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>additional arguments affecting the summary produced.</p></td>
+      <th>prob_hosp</th>
+      <td><p>Probability of hospitalisation by age.
+Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/c.html'>c(0.000840764, 0.001182411, 0.001662887, 0.002338607,
+0.003288907, 0.004625365, 0.006504897, 0.009148183, 0.012865577,
+0.018093546, 0.025445917, 0.035785947, 0.050327683, 0.0707785,
+0.099539573, 0.1399878, 0.233470395)</a></code></p></td>
+    </tr>
+    <tr>
+      <th>prob_severe</th>
+      <td><p>Probability of developing severe symptoms by age.
+Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/c.html'>c(0.000840764, 0.001182411, 0.001662887, 0.002338607,
+0.003288907, 0.004625365, 0.006504897, 0.009148183, 0.012865577,
+0.018093546, 0.025445917, 0.035785947, 0.050327683, 0.0707785,
+0.099539573, 0.1399878, 0.233470395)</a></code></p></td>
+    </tr>
+    <tr>
+      <th>prob_non_severe_death_treatment</th>
+      <td><p>Probability of death from non severe
+treated infection. Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/c.html'>c(0.181354223, 0.181354223, 0.181354223, 0.137454906,
+0.121938236, 0.122775613, 0.136057441, 0.160922182, 0.196987378,
+0.242011054, 0.289368845, 0.326537862, 0.337229819, 0.309082553,
+0.243794865, 0.160480254, 0.057084366)</a></code></p></td>
+    </tr>
+    <tr>
+      <th>prob_severe_death_treatment</th>
+      <td><p>Probability of death from severe infection
+that is treated. Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/c.html'>c(0.226668959, 0.252420241, 0.281097009, 0.413005389,
+0.518451493, 0.573413613, 0.576222065, 0.54253573, 0.493557696,
+0.447376527, 0.416666608, 0.411186639, 0.443382594, 0.538718871,
+0.570434076, 0.643352843, 0.992620047)</a></code></p></td>
+    </tr>
+    <tr>
+      <th>prob_non_severe_death_no_treatment</th>
+      <td><p>Probability of death in non severe
+hospital inections that aren't treated. Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/rep.html'>rep(0.5, 17)</a></code></p></td>
+    </tr>
+    <tr>
+      <th>prob_severe_death_no_treatment</th>
+      <td><p>Probability of death from severe infection
+that is not treated. Default, NULL, will use
+<code><a href='https://rdrr.io/r/base/rep.html'>rep(0.95, 17)</a></code></p></td>
+    </tr>
+    <tr>
+      <th>walker_params</th>
+      <td><p>Boolean for using parameters in Walker et al. Default = FALSE,
+which uses parameter update as of November 2020. For full information see
+parameters vignette</p></td>
     </tr>
     </table>
 

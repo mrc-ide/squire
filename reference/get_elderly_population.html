@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>squire simulation print — print.squire_simulation • squire</title>
+<title>Get elderly population data (5 year age-breakdown for 80-84, 85-89 and 90+) — get_elderly_population • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="squire simulation print — print.squire_simulation" />
-<meta property="og:description" content="squire simulation print" />
+<meta property="og:title" content="Get elderly population data (5 year age-breakdown for 80-84, 85-89 and 90+) — get_elderly_population" />
+<meta property="og:description" content="Get elderly population data (5 year age-breakdown for 80-84, 85-89 and 90+)" />
 
 
 
@@ -114,31 +114,38 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>squire simulation print</h1>
+    <h1>Get elderly population data (5 year age-breakdown for 80-84, 85-89 and 90+)</h1>
     
-    <div class="hidden name"><code>print.squire_simulation.Rd</code></div>
+    <div class="hidden name"><code>get_elderly_population.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>squire simulation print</p>
+    <p>Get elderly population data (5 year age-breakdown for 80-84, 85-89 and 90+)</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for squire_simulation</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>get_elderly_population</span>(<span class='kw'>country</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>iso3c</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>simple_SEIR</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>An iccm_simulation object</p></td>
+      <th>country</th>
+      <td><p>Country name</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>additional arguments affecting the summary produced.</p></td>
+      <th>iso3c</th>
+      <td><p>ISO 3C Country Code</p></td>
+    </tr>
+    <tr>
+      <th>simple_SEIR</th>
+      <td><p>Logical. Is the population for the <code>simple_SEIR</code>.
+Default = FALSE</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Population data.frame</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>squire simulation print — print.squire_simulation • squire</title>
+<title>Project lockdowns based on triggering — trigger_projections • squire</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="squire simulation print — print.squire_simulation" />
-<meta property="og:description" content="squire simulation print" />
+<meta property="og:title" content="Project lockdowns based on triggering — trigger_projections" />
+<meta property="og:description" content="Project lockdowns based on triggering" />
 
 
 
@@ -114,28 +114,58 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>squire simulation print</h1>
+    <h1>Project lockdowns based on triggering</h1>
     
-    <div class="hidden name"><code>print.squire_simulation.Rd</code></div>
+    <div class="hidden name"><code>trigger_projections.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>squire simulation print</p>
+    <p>Project lockdowns based on triggering</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for squire_simulation</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>trigger_projections</span>(
+  <span class='no'>out</span>,
+  <span class='kw'>trigger_metric</span> <span class='kw'>=</span> <span class='st'>"deaths"</span>,
+  <span class='kw'>trigger_value</span> <span class='kw'>=</span> <span class='fl'>150</span>,
+  <span class='kw'>R0_lockdowns</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>, <span class='fl'>0.5</span>),
+  <span class='kw'>lockdown_lengths</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>28</span>, <span class='fl'>42</span>, <span class='fl'>28</span>, <span class='fl'>42</span>),
+  <span class='kw'>max_lockdowns</span> <span class='kw'>=</span> <span class='fl'>4</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>931L</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>An iccm_simulation object</p></td>
+      <th>out</th>
+      <td><p>Output of <code><a href='pmcmc.html'>pmcmc</a></code> or <code><a href='calibrate.html'>calibrate</a></code></p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>additional arguments affecting the summary produced.</p></td>
+      <th>trigger_metric</th>
+      <td><p>Name of model output to tigger by. Must be one accepted
+by <code>format_output</code></p></td>
+    </tr>
+    <tr>
+      <th>trigger_value</th>
+      <td><p>Value of <code>trigger_metric</code> at which triggering occurs</p></td>
+    </tr>
+    <tr>
+      <th>R0_lockdowns</th>
+      <td><p>Vector of R0 values to be used for each lockdown.
+<code>Default = c(0.5, 0.5, 0.5, 0.5)</code></p></td>
+    </tr>
+    <tr>
+      <th>lockdown_lengths</th>
+      <td><p>Vector of lengths of each lockdown in days.
+<code>Default = c(28, 42, 28, 42)</code></p></td>
+    </tr>
+    <tr>
+      <th>max_lockdowns</th>
+      <td><p>Maximum number of lockdowns. <code>Default = 4</code></p></td>
+    </tr>
+    <tr>
+      <th>seed</th>
+      <td><p>RNG seed to be used. <code>Default = 931L</code></p></td>
     </tr>
     </table>
 

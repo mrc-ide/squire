@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Provide projections from calibrated simulations by changing RO, contact
-matrices or bed availability. — projections • squire</title>
+<title>Handles simulating replicates within <code>projections</code> — conduct_replicate • squire</title>
 
 
 <!-- jquery -->
@@ -40,10 +39,8 @@ matrices or bed availability. — projections • squire</title>
 
 
 
-<meta property="og:title" content="Provide projections from calibrated simulations by changing RO, contact
-matrices or bed availability. — projections" />
-<meta property="og:description" content="This extends previous projections as you can pass in lists of each argument
-that then get passed to each simulation replicate." />
+<meta property="og:title" content="Handles simulating replicates within <code>projections</code> — conduct_replicate" />
+<meta property="og:description" content="Handles simulating replicates within projections" />
 
 
 
@@ -117,33 +114,31 @@ that then get passed to each simulation replicate." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Provide projections from calibrated simulations by changing RO, contact
-matrices or bed availability.</h1>
+    <h1>Handles simulating replicates within <code>projections</code></h1>
     
-    <div class="hidden name"><code>projections.Rd</code></div>
+    <div class="hidden name"><code>conduct_replicate.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This extends previous <code>projections</code> as you can pass in lists of each argument
-that then get passed to each simulation replicate.</p>
+    <p>Handles simulating replicates within <code>projections</code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>projections</span>(
-  <span class='no'>r</span>,
-  <span class='kw'>time_period</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+    <pre class="usage"><span class='fu'>conduct_replicate</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>r</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>t_steps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>R0</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_R0</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>tt_R0</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>contact_matrix_set_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_contact_matrix</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>tt_contact_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>hosp_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_hosp_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>tt_hosp_beds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>ICU_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_ICU_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>to_be_run</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>tt_ICU_beds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>model_user_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
@@ -151,14 +146,16 @@ that then get passed to each simulation replicate.</p>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>r</th>
-      <td><p>Calibrated <code>{squire_simulation}</code> object.</p></td>
+      <th>x</th>
+      <td><p>Simulation replicate number</p></td>
     </tr>
     <tr>
-      <th>time_period</th>
-      <td><p>How many days is the projection. Deafult = NULL, which will
-carry the projection forward from t = 0 in the calibration (i.e. the number
-of days set in calibrate using forecast)</p></td>
+      <th>r</th>
+      <td><p>Output of <code>pmcmc</code> or <code>calibrate</code></p></td>
+    </tr>
+    <tr>
+      <th>t_steps</th>
+      <td><p>List of time steps to be run for each replicate</p></td>
     </tr>
     <tr>
       <th>R0</th>
@@ -235,11 +232,6 @@ if provided.</p></td>
       <td><p>Change time points for ICU_bed_capacity</p></td>
     </tr>
     <tr>
-      <th>to_be_run</th>
-      <td><p>List of logicals for whether each replicate should be run.
-Default = TRUE, which causes all replictes to be run.</p></td>
-    </tr>
-    <tr>
       <th>model_user_args</th>
       <td><p>List of other parameters to be passed to the model to
   be run. Default = NULL. An example would be:</p>
@@ -261,15 +253,6 @@ Default = TRUE, which causes all replictes to be run.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>The user can specify changes to R0, contact matrices and bed
-provision, which will come into effect from the current day in the calibration.
-These changes can either set these to be specific values or change them
-relative to their values in the original simulation. If no change is
-requested, the simulation will use parameters chosen for the calibration run.
-This extends previous versions of <code>projections</code> as you can now pass in
-lists of each argument that then get passed to each simulation replicate.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

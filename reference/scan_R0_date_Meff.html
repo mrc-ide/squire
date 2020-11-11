@@ -74,7 +74,7 @@ this up." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.34</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.2</span>
       </span>
     </div>
 
@@ -128,27 +128,27 @@ this up.</p>
     </div>
 
     <pre class="usage"><span class='fu'>scan_R0_date_Meff</span>(
-  <span class='kw'>R0_min</span>,
-  <span class='kw'>R0_max</span>,
-  <span class='kw'>R0_step</span>,
-  <span class='kw'>first_start_date</span>,
-  <span class='kw'>last_start_date</span>,
-  <span class='kw'>day_step</span>,
-  <span class='kw'>Meff_min</span>,
-  <span class='kw'>Meff_max</span>,
-  <span class='kw'>Meff_step</span>,
-  <span class='kw'>data</span>,
-  <span class='kw'>model_params</span>,
-  Rt_func = <span class='fu'>function</span>(<span class='kw'>R0_change</span>, <span class='kw'>R0</span>, <span class='kw'>Meff</span>) {     <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='kw'>R0</span>) <span class='op'>-</span> <span class='kw'>Meff</span> <span class='op'>*</span> (<span class='fl'>1</span> <span class='op'>-</span> <span class='kw'>R0_change</span>)) },
-  R0_prior = <span class='kw'>NULL</span>,
-  R0_change = <span class='kw'>NULL</span>,
-  date_R0_change = <span class='kw'>NULL</span>,
-  date_contact_matrix_set_change = <span class='kw'>NULL</span>,
-  date_ICU_bed_capacity_change = <span class='kw'>NULL</span>,
-  date_hosp_bed_capacity_change = <span class='kw'>NULL</span>,
-  squire_model = <span class='fu'>explicit_SEIR</span>(),
-  pars_obs = <span class='kw'>NULL</span>,
-  n_particles = <span class='fl'>100</span>
+  <span class='no'>R0_min</span>,
+  <span class='no'>R0_max</span>,
+  <span class='no'>R0_step</span>,
+  <span class='no'>first_start_date</span>,
+  <span class='no'>last_start_date</span>,
+  <span class='no'>day_step</span>,
+  <span class='no'>Meff_min</span>,
+  <span class='no'>Meff_max</span>,
+  <span class='no'>Meff_step</span>,
+  <span class='no'>data</span>,
+  <span class='no'>model_params</span>,
+  <span class='kw'>Rt_func</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>R0_change</span>, <span class='no'>R0</span>, <span class='no'>Meff</span>) {     <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>R0</span>) - <span class='no'>Meff</span> * (<span class='fl'>1</span> - <span class='no'>R0_change</span>)) },
+  <span class='kw'>R0_prior</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>date_R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>date_contact_matrix_set_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>date_ICU_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>date_hosp_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>squire_model</span> <span class='kw'>=</span> <span class='fu'>explicit_SEIR</span>(),
+  <span class='kw'>pars_obs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>n_particles</span> <span class='kw'>=</span> <span class='fl'>100</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -274,7 +274,7 @@ Defaut = NULL, i.e. no change</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
