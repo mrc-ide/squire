@@ -26,6 +26,7 @@ jobs:
           install.packages("ps")
           remotes::install_deps(dependencies = TRUE)
           remotes::install_dev("pkgdown")
+          Sys.setenv("CI" = FALSE)
         shell: Rscript {0}
 
       - name: Install package
