@@ -1,5 +1,6 @@
 #' Return the default probabilities for modelling
 #' @return list of default probabilities
+#' @export
 default_probs <- function() {
   prob_hosp <- c(
     0.000840764, 0.001182411, 0.001662887, 0.002338607, 0.003288907,
@@ -33,7 +34,7 @@ probs <- default_probs()
 
 #' Return the default hospital durations for modelling
 #' @return List of default durations
-#'
+#' @export
 #' @details
 #'
 #' \itemize{
@@ -50,6 +51,9 @@ probs <- default_probs()
 #'    \item{dur_not_get_mv_survive = 14.8 * 0.5}
 #'    \item{dur_not_get_mv_die = 1}
 #'    \item{dur_rec = 3}
+#'    \item{dur_E = 4.6}
+#'    \item{dur_IMild = 2.1}
+#'    \item{dur_ICase = 4.5}
 #' }
 #'
 default_durations <- function() {
@@ -67,7 +71,10 @@ default_durations <- function() {
     dur_get_mv_die = 11.1,
     dur_not_get_mv_survive = 14.8 * 0.5,
     dur_not_get_mv_die = 1,
-    dur_rec = 3
+    dur_rec = 3,
+    dur_E  = 4.6,
+    dur_IMild = 2.1,
+    dur_ICase = 4.5
   )
 
 }
@@ -207,9 +214,9 @@ run_explicit_SEEIR_model <- function(
   walker_params = FALSE,
 
   # durations
-  dur_E  = 4.6,
-  dur_IMild = 2.1,
-  dur_ICase = 4.5,
+  dur_E  = NULL,
+  dur_IMild = NULL,
+  dur_ICase = NULL,
 
   dur_get_ox_survive = NULL,
   tt_dur_get_ox_survive = 0,

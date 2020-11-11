@@ -27,5 +27,8 @@ Return the default hospital durations for modelling
    \item{dur_not_get_mv_survive = 14.8 * 0.5}
    \item{dur_not_get_mv_die = 1}
    \item{dur_rec = 3}
+   \item{dur_E = 4.6}
+   \item{dur_IMild = 2.1}
+   \item{dur_ICase = 4.5}
 }
 }
