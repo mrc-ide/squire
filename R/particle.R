@@ -694,6 +694,7 @@ run_deterministic_comparison <- function(data,
   # get deaths for comparison
   Ds <- diff(rowSums(out[,index$D]))
   Ds <- Ds[data$day_end[-1]]
+  Ds[Ds < 0] <- 0
   deaths <- data$deaths[-1]
 
   # calculate ll

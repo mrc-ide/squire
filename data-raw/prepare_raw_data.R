@@ -18,7 +18,7 @@ population <- demog %>%
   tidyr::pivot_longer(cols = -country, names_to = "age_group", values_to = "n",
                       names_prefix = "X") %>%
   dplyr::mutate(age_group = stringr::str_replace(age_group, "[.]", "-"),
-                n = n * 1000)
+                n = round(n * 1000))
 
 population$age_group <- factor(population$age_group, levels = c("0-4",
                                                                 "5-9",

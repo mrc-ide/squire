@@ -1,7 +1,13 @@
+# squire 0.5.2
+
+* `Parameters` vignette updated to include new parameters
+* `run_deterministic_comparison` bug fix for when transmission is eliminated 
+
 # squire 0.5.1
 
 * `projections` bug fixed for setting time varying durations
 * Taiwan healthcare capacity added 
+* `default_durations` updated for incorrect hospital durations
 
 # squire 0.5.0
 

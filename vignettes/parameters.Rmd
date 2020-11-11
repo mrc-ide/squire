@@ -19,20 +19,20 @@ The parameter table below summarises the current best estimates incorporated in 
 | **Parameter** | **Value** | **Reference** |
 | --- | --- | --- |
 | Basic reproductive number, R0 | 3.0 | Estimate from Europe, [Flaxman et al](https://www.nature.com/articles/s41586-020-2405-7) |
-| Mean Incubation Period | 4.6 days | [Report 9](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-9-impact-of-npis-on-covid-19/); [Linton et al.](https://www.medrxiv.org/content/medrxiv/early/2020/01/28/2020.01.26.20018754.full.pdf); [Li et al.](https://www.nejm.org/doi/full/10.1056/NEJMoa2001316) The last 0.5 days are included in the I_MILD and I_CASE states to capture pre-symptomatic infectivity |
-| Generation Time | 6.75 days | [Report 9](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-9-impact-of-npis-on-covid-19/) |
+| Mean Incubation Period | 4.6 days | Estimated to be 5.1 days ([Linton et al.](https://www.medrxiv.org/content/medrxiv/early/2020/01/28/2020.01.26.20018754.full.pdf); [Li et al.](https://www.nejm.org/doi/full/10.1056/NEJMoa2001316) The last 0.5 days are included in the I_MILD and I_CASE states to capture pre-symptomatic infectivity |
+| Generation Time | 6.75 days | [Bi et al](https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30287-5/fulltext) |
 | Mean Duration in I\_MILD | 2.1 days | Incorporates 0.5 days of infectiousness prior to symptoms; with parameters below ~95% of all infections are mild. In combination with mean duration in I\_CASE this gives a mean generation time as above |
-| Mean Duration in I\_CASE | 4.5 days | Mean onset-to-admission of 4 days from UK data. Includes 0.5 days of infectiousness prior to symptom onset |
-| Mean Duration of Hospitalisation for non-critical Cases (I\_HOSP) if survive | 9 days | Based on review of non-ICU stay, see [Hogan et al.](medrxiv) |
-| Mean Duration of Hospitalisation for non-critical Cases (I\_HOSP) if die | 9 days | Based on review of non-ICU stay, see [Hogan et al.](medrxiv) |
-| Mean duration of Critical Care (I\_ICU) if survive | 14.8 days | Based on [ISARIC Clinical Data Report](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports) adjusted for censoring |
-| Mean duration of Critical Care (I\_ICU) if die | 11.1 days | Based on [ISARIC Clinical Data Report](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports) adjusted for censoring  |
-| Mean duration of Stepdown post ICU (I\_Rec) | 3 days | Based on unpublished UK data |
+| Mean Duration in I\_CASE | 4.5 days | Mean onset-to-admission of 4 days. Values in the literature range from 1.2 to 12 days. Includes 0.5 days of infectiousness prior to symptom onset |
+| Mean Duration of Hospitalisation for non-critical Cases (I\_HOSP) if survive | 9 days | Median value from five studies ([Sreevalsan-Nair et al.](https://www.medrxiv.org/content/10.1101/2020.04.17.20069724v4), [Haw et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7506175/), [Hawryluk et al.](https://www.medrxiv.org/content/10.1101/2020.07.15.20154617v2), [Oliveira et al.](https://www.medrxiv.org/content/10.1101/2020.08.25.20181909v1), South African COVID-19 Modelling Consortium). Range from 8-15 days.  |
+| Mean Duration of Hospitalisation for non-critical Cases (I\_HOSP) if die | 9 days | As above |
+| Mean duration of Critical Care (I\_ICU) if survive | 14.8 days | Mean duration in ICU of 13.3 days [Pritchard et al.](https://www.medrxiv.org/content/10.1101/2020.07.17.20155218v4.full). Ratio of duration in critical care if die: duration in critical care if survive of 0.75 and 60.1% probability of survival in ICU ([ICNARC report](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports), from UK data, 16 October 2020)  |
+| Mean duration of Critical Care (I\_ICU) if die | 11.1 days | Mean duration in ICU of 13.3 days [Pritchard et al.](https://www.medrxiv.org/content/10.1101/2020.07.17.20155218v4.full). Ratio of duration in critical care if die: duration in critical care if survive of 0.75 and 60.1% probability of survival in ICU ([ICNARC report](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports), from UK data, 16 October 2020)  |
+| Mean duration of Stepdown post ICU (I\_Rec) | 3 days | Working assumption based on unpublished UK data |
 | Mean duration of hospitalisation if require ICU but do not receive it and die | 1 day | Working assumption |
 | Mean duration of hospitalisation if require ICU but do not receive it and survive | 7.4 days | Working assumption (Half duration of ICU and survive) |
 | Mean duration of hospitalisation if require Oxygen but do not receive it and die | 4.5 days | Working assumption (Half duration of Oxygen and die) |
 | Mean duration of hospitalisation if require Oxygen but do not receive it and survive | 4.5 days | Working assumption (Half duration of ICU and survive) |
-| Probability of dying in critical care | 50% | Based on on [ISARIC Clinical Data Report](https://www.icnarc.org/Our-Audit/Audits/Cmp/Reports), [Salje et al.](http://dx.doi.org/10.1126/science.abc3517) and [Report 34](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-34-ifr/) |
+| Probability of dying in critical care | 50% | Based on on [ISARIC Clinical Data Report] [Salje et al.](http://dx.doi.org/10.1126/science.abc3517) and [Report 34](https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-34-ifr/) |
 | Probability of death if require critical care but do not receive it | 95% | Working assumption based on expert clinical opinion |
 | Probability of death if require hospitalisation but do not receive it | 60% | Working assumption based on expert clinical opinion |
 
