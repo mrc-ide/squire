@@ -123,50 +123,50 @@
     <p>Run the explicit SEEIR model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>run_explicit_SEEIR_model</span>(
-  <span class='kw'>country</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_contact_matrix</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>contact_matrix_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>tt_R0</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>beta_set</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>time_period</span> <span class='kw'>=</span> <span class='fl'>365</span>,
-  <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
-  <span class='kw'>day_return</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>init</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>1e+08</span>),
-  <span class='kw'>prob_hosp</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>prob_severe</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>prob_non_severe_death_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>prob_non_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>prob_severe_death_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>prob_severe_death_no_treatment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>p_dist</span> <span class='kw'>=</span> <span class='no'>probs</span>$<span class='no'>p_dist</span>,
-  <span class='kw'>walker_params</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>dur_E</span> <span class='kw'>=</span> <span class='fl'>4.6</span>,
-  <span class='kw'>dur_IMild</span> <span class='kw'>=</span> <span class='fl'>2.1</span>,
-  <span class='kw'>dur_ICase</span> <span class='kw'>=</span> <span class='fl'>4.5</span>,
-  <span class='kw'>dur_get_ox_survive</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_dur_get_ox_survive</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>dur_get_ox_die</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_dur_get_ox_die</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>dur_not_get_ox_survive</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>dur_not_get_ox_die</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>dur_get_mv_survive</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_dur_get_mv_survive</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>dur_get_mv_die</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_dur_get_mv_die</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>dur_not_get_mv_survive</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>dur_not_get_mv_die</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>dur_rec</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>hosp_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ICU_bed_capacity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tt_hosp_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>tt_ICU_beds</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>seeding_cases</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>run_explicit_SEEIR_model</span><span class='op'>(</span>
+  country <span class='op'>=</span> <span class='cn'>NULL</span>,
+  population <span class='op'>=</span> <span class='cn'>NULL</span>,
+  tt_contact_matrix <span class='op'>=</span> <span class='fl'>0</span>,
+  contact_matrix_set <span class='op'>=</span> <span class='cn'>NULL</span>,
+  R0 <span class='op'>=</span> <span class='fl'>3</span>,
+  tt_R0 <span class='op'>=</span> <span class='fl'>0</span>,
+  beta_set <span class='op'>=</span> <span class='cn'>NULL</span>,
+  time_period <span class='op'>=</span> <span class='fl'>365</span>,
+  dt <span class='op'>=</span> <span class='fl'>0.1</span>,
+  day_return <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  replicates <span class='op'>=</span> <span class='fl'>10</span>,
+  init <span class='op'>=</span> <span class='cn'>NULL</span>,
+  seed <span class='op'>=</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>1e+08</span><span class='op'>)</span>,
+  prob_hosp <span class='op'>=</span> <span class='cn'>NULL</span>,
+  prob_severe <span class='op'>=</span> <span class='cn'>NULL</span>,
+  prob_non_severe_death_treatment <span class='op'>=</span> <span class='cn'>NULL</span>,
+  prob_non_severe_death_no_treatment <span class='op'>=</span> <span class='cn'>NULL</span>,
+  prob_severe_death_treatment <span class='op'>=</span> <span class='cn'>NULL</span>,
+  prob_severe_death_no_treatment <span class='op'>=</span> <span class='cn'>NULL</span>,
+  p_dist <span class='op'>=</span> <span class='va'>probs</span><span class='op'>$</span><span class='va'>p_dist</span>,
+  walker_params <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  dur_E <span class='op'>=</span> <span class='fl'>4.6</span>,
+  dur_IMild <span class='op'>=</span> <span class='fl'>2.1</span>,
+  dur_ICase <span class='op'>=</span> <span class='fl'>4.5</span>,
+  dur_get_ox_survive <span class='op'>=</span> <span class='cn'>NULL</span>,
+  tt_dur_get_ox_survive <span class='op'>=</span> <span class='fl'>0</span>,
+  dur_get_ox_die <span class='op'>=</span> <span class='cn'>NULL</span>,
+  tt_dur_get_ox_die <span class='op'>=</span> <span class='fl'>0</span>,
+  dur_not_get_ox_survive <span class='op'>=</span> <span class='cn'>NULL</span>,
+  dur_not_get_ox_die <span class='op'>=</span> <span class='cn'>NULL</span>,
+  dur_get_mv_survive <span class='op'>=</span> <span class='cn'>NULL</span>,
+  tt_dur_get_mv_survive <span class='op'>=</span> <span class='fl'>0</span>,
+  dur_get_mv_die <span class='op'>=</span> <span class='cn'>NULL</span>,
+  tt_dur_get_mv_die <span class='op'>=</span> <span class='fl'>0</span>,
+  dur_not_get_mv_survive <span class='op'>=</span> <span class='cn'>NULL</span>,
+  dur_not_get_mv_die <span class='op'>=</span> <span class='cn'>NULL</span>,
+  dur_rec <span class='op'>=</span> <span class='cn'>NULL</span>,
+  hosp_bed_capacity <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ICU_bed_capacity <span class='op'>=</span> <span class='cn'>NULL</span>,
+  tt_hosp_beds <span class='op'>=</span> <span class='fl'>0</span>,
+  tt_ICU_beds <span class='op'>=</span> <span class='fl'>0</span>,
+  seeding_cases <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -408,12 +408,13 @@ in <a href='https://science.sciencemag.org/content/369/6502/413'>Walker et al. S
 which can be viewed within the function <code><a href='parse_country_severity.html'>parse_country_severity</a></code></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='no'>pop</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_population.html'>get_population</a></span>(<span class='st'>"Afghanistan"</span>)
-<span class='no'>m1</span> <span class='kw'>&lt;-</span> <span class='fu'>run_explicit_SEEIR_model</span>(<span class='kw'>R0</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-<span class='kw'>population</span> <span class='kw'>=</span> <span class='no'>pop</span>$<span class='no'>n</span>, <span class='kw'>dt</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-<span class='kw'>contact_matrix_set</span><span class='kw'>=</span><span class='no'>contact_matrices</span><span class='kw'>[[</span><span class='fl'>1</span>]])
-}</div></pre>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>pop</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_population.html'>get_population</a></span><span class='op'>(</span><span class='st'>"Afghanistan"</span><span class='op'>)</span>
+<span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'>run_explicit_SEEIR_model</span><span class='op'>(</span>R0 <span class='op'>=</span> <span class='fl'>2</span>,
+population <span class='op'>=</span> <span class='va'>pop</span><span class='op'>$</span><span class='va'>n</span>, dt <span class='op'>=</span> <span class='fl'>1</span>,
+contact_matrix_set<span class='op'>=</span><span class='va'>contact_matrices</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -429,7 +430,7 @@ which can be viewed within the function <code><a href='parse_country_severity.ht
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

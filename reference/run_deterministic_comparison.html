@@ -123,17 +123,17 @@
     <p>Create a deterministic model and compare to data</p>
     </div>
 
-    <pre class="usage"><span class='fu'>run_deterministic_comparison</span>(
-  <span class='no'>data</span>,
-  <span class='no'>squire_model</span>,
-  <span class='no'>model_params</span>,
-  <span class='kw'>model_start_date</span> <span class='kw'>=</span> <span class='st'>"2020-02-02"</span>,
-  <span class='kw'>obs_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>phi_cases</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>k_cases</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>phi_death</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>k_death</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>exp_noise</span>
-    <span class='kw'>=</span> <span class='fl'>1e+06</span>),
-  <span class='kw'>forecast_days</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>save_history</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>return</span> <span class='kw'>=</span> <span class='st'>"ll"</span>
-)</pre>
+    <pre class="usage"><span class='fu'>run_deterministic_comparison</span><span class='op'>(</span>
+  <span class='va'>data</span>,
+  <span class='va'>squire_model</span>,
+  <span class='va'>model_params</span>,
+  model_start_date <span class='op'>=</span> <span class='st'>"2020-02-02"</span>,
+  obs_params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>phi_cases <span class='op'>=</span> <span class='fl'>0.1</span>, k_cases <span class='op'>=</span> <span class='fl'>2</span>, phi_death <span class='op'>=</span> <span class='fl'>1</span>, k_death <span class='op'>=</span> <span class='fl'>2</span>, exp_noise
+    <span class='op'>=</span> <span class='fl'>1e+06</span><span class='op'>)</span>,
+  forecast_days <span class='op'>=</span> <span class='fl'>0</span>,
+  save_history <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  return <span class='op'>=</span> <span class='st'>"ll"</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -194,7 +194,7 @@ the entire output, 'll' gives the log-likelihood</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

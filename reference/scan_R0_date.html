@@ -127,26 +127,26 @@ This is parallelised, first run <code>plan(multiprocess)</code> to set
 this up.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>scan_R0_date</span>(
-  <span class='no'>R0_min</span>,
-  <span class='no'>R0_max</span>,
-  <span class='no'>R0_step</span>,
-  <span class='no'>first_start_date</span>,
-  <span class='no'>last_start_date</span>,
-  <span class='no'>day_step</span>,
-  <span class='no'>data</span>,
-  <span class='no'>model_params</span>,
-  <span class='kw'>Rt_func</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>R0_change</span>, <span class='no'>R0</span>, <span class='no'>Meff</span>) {     <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>R0</span>) - <span class='no'>Meff</span> * (<span class='fl'>1</span> - <span class='no'>R0_change</span>)) },
-  <span class='kw'>R0_prior</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>date_R0_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>date_contact_matrix_set_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>date_ICU_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>date_hosp_bed_capacity_change</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>squire_model</span> <span class='kw'>=</span> <span class='fu'>explicit_SEIR</span>(),
-  <span class='kw'>pars_obs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>n_particles</span> <span class='kw'>=</span> <span class='fl'>100</span>
-)</pre>
+    <pre class="usage"><span class='fu'>scan_R0_date</span><span class='op'>(</span>
+  <span class='va'>R0_min</span>,
+  <span class='va'>R0_max</span>,
+  <span class='va'>R0_step</span>,
+  <span class='va'>first_start_date</span>,
+  <span class='va'>last_start_date</span>,
+  <span class='va'>day_step</span>,
+  <span class='va'>data</span>,
+  <span class='va'>model_params</span>,
+  Rt_func <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>R0_change</span>, <span class='va'>R0</span>, <span class='va'>Meff</span><span class='op'>)</span> <span class='op'>{</span>     <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>R0</span><span class='op'>)</span> <span class='op'>-</span> <span class='va'>Meff</span> <span class='op'>*</span> <span class='op'>(</span><span class='fl'>1</span> <span class='op'>-</span> <span class='va'>R0_change</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>}</span>,
+  R0_prior <span class='op'>=</span> <span class='cn'>NULL</span>,
+  R0_change <span class='op'>=</span> <span class='cn'>NULL</span>,
+  date_R0_change <span class='op'>=</span> <span class='cn'>NULL</span>,
+  date_contact_matrix_set_change <span class='op'>=</span> <span class='cn'>NULL</span>,
+  date_ICU_bed_capacity_change <span class='op'>=</span> <span class='cn'>NULL</span>,
+  date_hosp_bed_capacity_change <span class='op'>=</span> <span class='cn'>NULL</span>,
+  squire_model <span class='op'>=</span> <span class='fu'>explicit_SEIR</span><span class='op'>(</span><span class='op'>)</span>,
+  pars_obs <span class='op'>=</span> <span class='cn'>NULL</span>,
+  n_particles <span class='op'>=</span> <span class='fl'>100</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -259,7 +259,7 @@ Defaut = NULL, i.e. no change</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
