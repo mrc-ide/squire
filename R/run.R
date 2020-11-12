@@ -490,37 +490,22 @@ run_deterministic_SEIR_model <- function(
   # coerce to array
   results <- array(results, dim = c(dim(results),1), dimnames = dimnames(results))
 
-  # Summarise inputs
-  parameters <- args
-  parameters$population <- pars$population
+  # Summarise inputs with correct names
+  parameters <- pars
+  parameters$seeding_cases <- pars$E1_0
   parameters$hosp_bed_capacity <- pars$hosp_beds
   parameters$ICU_bed_capacity <- pars$ICU_beds
-  parameters$beta_set <- pars$beta_set
-  parameters$seeding_cases <- pars$E1_0
-  parameters$contact_matrix_set <- pars$contact_matrix_set
 
-  # Severity inputs
-  parameters$prob_hosp <- pars$prob_hosp
-  parameters$prob_severe <- pars$prob_severe
-  parameters$prob_non_severe_death_treatment <- pars$prob_non_severe_death_treatment
-  parameters$prob_severe_death_treatment <- pars$prob_severe_death_treatment
-  parameters$prob_non_severe_death_no_treatment <- pars$prob_non_severe_death_no_treatment
-  parameters$prob_severe_death_no_treatment <- pars$prob_severe_death_no_treatment
-
-  # Hospitalisation duration inputs
-  parameters$dur_get_ox_survive <- pars$dur_get_ox_survive
-  parameters$tt_dur_get_ox_survive <- pars$tt_dur_get_ox_survive
-  parameters$dur_get_ox_die <- pars$dur_get_ox_die
-  parameters$tt_dur_get_ox_die <- pars$tt_dur_get_ox_die
-  parameters$dur_not_get_ox_survive <- pars$dur_not_get_ox_survive
-  parameters$dur_not_get_ox_die <- pars$dur_not_get_ox_die
-  parameters$dur_get_mv_survive <- pars$dur_get_mv_survive
-  parameters$tt_dur_get_mv_survive <- pars$tt_dur_get_mv_survive
-  parameters$dur_get_mv_die <- pars$dur_get_mv_die
-  parameters$tt_dur_get_mv_die <- pars$tt_dur_get_mv_die
-  parameters$dur_not_get_mv_survive <- pars$dur_not_get_mv_survive
-  parameters$dur_not_get_mv_die <- pars$dur_not_get_mv_die
-  parameters$dur_rec <- pars$dur_rec
+  # and add any initial args that were used in the generation
+  parameters$country <- args$country
+  parameters$tt_contact_matrix <- args$tt_contact_matrix
+  parameters$R0 <- args$R0
+  parameters$tt_R0 <- args$tt_R0
+  parameters$day_return <- args$day_return
+  parameters$replicates <- args$replicates
+  parameters$seed <- args$seed
+  parameters$init <- args$init
+  parameters$walker_params <- args$walker_params
 
   out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
