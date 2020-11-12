@@ -247,9 +247,9 @@ parameters_explicit_SEEIR <- function(
   walker_params = FALSE,
 
   # durations
-  dur_E  = 4.6,
-  dur_IMild = 2.1,
-  dur_ICase = 4.5,
+  dur_E  = NULL,
+  dur_IMild = NULL,
+  dur_ICase = NULL,
 
   dur_get_ox_survive = NULL,
   tt_dur_get_ox_survive = NULL,
@@ -305,7 +305,7 @@ parameters_explicit_SEEIR <- function(
   prob_severe_death_no_treatment <- severity_params$prob_severe_death_no_treatment
 
   # Handle duration of hospitalisation parameters
-  hosp_duration_params <- parse_hospital_duration(dur_get_ox_survive = dur_get_ox_survive,
+  duration_params <- parse_durations(dur_get_ox_survive = dur_get_ox_survive,
                                                   tt_dur_get_ox_survive = tt_dur_get_ox_survive,
                                                   dur_get_ox_die = dur_get_ox_die,
                                                   tt_dur_get_ox_die = tt_dur_get_ox_die,
@@ -320,19 +320,22 @@ parameters_explicit_SEEIR <- function(
                                                   dur_rec = dur_rec,
                                                   walker_params = walker_params)
 
-  dur_get_ox_survive <- hosp_duration_params$dur_get_ox_survive
-  tt_dur_get_ox_survive <- hosp_duration_params$tt_dur_get_ox_survive
-  dur_get_ox_die <- hosp_duration_params$dur_get_ox_die
-  tt_dur_get_ox_die <- hosp_duration_params$tt_dur_get_ox_die
-  dur_not_get_ox_survive <- hosp_duration_params$dur_not_get_ox_survive
-  dur_not_get_ox_die <- hosp_duration_params$dur_not_get_ox_die
-  dur_get_mv_survive <- hosp_duration_params$dur_get_mv_survive
-  tt_dur_get_mv_survive <- hosp_duration_params$tt_dur_get_mv_survive
-  dur_get_mv_die <- hosp_duration_params$dur_get_mv_die
-  tt_dur_get_mv_die <- hosp_duration_params$tt_dur_get_mv_die
-  dur_not_get_mv_survive <- hosp_duration_params$dur_not_get_mv_survive
-  dur_not_get_mv_die <- hosp_duration_params$dur_not_get_mv_die
-  dur_rec <- hosp_duration_params$dur_rec
+  dur_get_ox_survive <- duration_params$dur_get_ox_survive
+  tt_dur_get_ox_survive <- duration_params$tt_dur_get_ox_survive
+  dur_get_ox_die <- duration_params$dur_get_ox_die
+  tt_dur_get_ox_die <- duration_params$tt_dur_get_ox_die
+  dur_not_get_ox_survive <- duration_params$dur_not_get_ox_survive
+  dur_not_get_ox_die <- duration_params$dur_not_get_ox_die
+  dur_get_mv_survive <- duration_params$dur_get_mv_survive
+  tt_dur_get_mv_survive <- duration_params$tt_dur_get_mv_survive
+  dur_get_mv_die <- duration_params$dur_get_mv_die
+  tt_dur_get_mv_die <- duration_params$tt_dur_get_mv_die
+  dur_not_get_mv_survive <- duration_params$dur_not_get_mv_survive
+  dur_not_get_mv_die <- duration_params$dur_not_get_mv_die
+  dur_rec <- duration_params$dur_rec
+  dur_E <- duration_params$dur_E
+  dur_IMild <- duration_params$dur_IMild
+  dur_ICase <- duration_params$dur_ICase
 
   # Standardise contact matrix set
   if(is.matrix(contact_matrix_set)){

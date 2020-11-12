@@ -1,3 +1,9 @@
+# squire 0.5.3
+
+* `default_durations` contains all durations
+* `default_durations` and `default_probs` now exported for ease
+* `run_deterministic_SEIR_model` has odin pars exported now
+
 # squire 0.5.2
 
 * `Parameters` vignette updated to include new parameters

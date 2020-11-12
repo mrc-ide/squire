@@ -38,10 +38,10 @@ test_that("parse_country_severity works", {
   expect_type(out3, "list")
 })
 
-test_that("parse_hospital_duration works", {
-  out <- parse_country_severity(walker_params = FALSE)
+test_that("parse_duration works", {
+  out <- parse_durations(walker_params = FALSE)
   expect_type(out, "list")
-  out2 <- parse_country_severity(walker_params = TRUE)
+  out2 <- parse_durations(walker_params = TRUE)
   expect_type(out2, "list")
 })
 

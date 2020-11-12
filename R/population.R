@@ -261,12 +261,12 @@ parse_country_severity <- function(country = NULL,
       prob_severe_death_treatment <- probs$prob_severe_death_treatment
     }
     ret <- list(country = country,
-                  prob_hosp = prob_hosp,
-                  prob_severe = prob_severe,
-                  prob_non_severe_death_treatment = prob_non_severe_death_treatment,
-                  prob_severe_death_treatment = prob_severe_death_treatment,
-                  prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
-                  prob_severe_death_no_treatment = prob_severe_death_no_treatment)
+                prob_hosp = prob_hosp,
+                prob_severe = prob_severe,
+                prob_non_severe_death_treatment = prob_non_severe_death_treatment,
+                prob_severe_death_treatment = prob_severe_death_treatment,
+                prob_non_severe_death_no_treatment = prob_non_severe_death_no_treatment,
+                prob_severe_death_no_treatment = prob_severe_death_no_treatment)
   }
 
   # If country is specified, check valid and then adjust default probs based on demography
@@ -312,20 +312,23 @@ parse_country_severity <- function(country = NULL,
 
 
 #' @noRd
-parse_hospital_duration <- function(dur_get_ox_survive = NULL,
-                                    tt_dur_get_ox_survive = NULL,
-                                    dur_get_ox_die = NULL,
-                                    tt_dur_get_ox_die = NULL,
-                                    dur_not_get_ox_survive = NULL,
-                                    dur_not_get_ox_die = NULL,
-                                    dur_get_mv_survive = NULL,
-                                    tt_dur_get_mv_survive = NULL,
-                                    dur_get_mv_die = NULL,
-                                    tt_dur_get_mv_die = NULL,
-                                    dur_not_get_mv_survive = NULL,
-                                    dur_not_get_mv_die = NULL,
-                                    dur_rec = NULL,
-                                    walker_params = FALSE) {
+parse_durations <- function(dur_get_ox_survive = NULL,
+                            tt_dur_get_ox_survive = NULL,
+                            dur_get_ox_die = NULL,
+                            tt_dur_get_ox_die = NULL,
+                            dur_not_get_ox_survive = NULL,
+                            dur_not_get_ox_die = NULL,
+                            dur_get_mv_survive = NULL,
+                            tt_dur_get_mv_survive = NULL,
+                            dur_get_mv_die = NULL,
+                            tt_dur_get_mv_die = NULL,
+                            dur_not_get_mv_survive = NULL,
+                            dur_not_get_mv_die = NULL,
+                            dur_rec = NULL,
+                            dur_E = NULL,
+                            dur_IMild = NULL,
+                            dur_ICase = NULL,
+                            walker_params = FALSE) {
 
   # If walker_params == TRUE, use the original squire parameters described in Walker et al.
   assert_logical(walker_params)
@@ -369,6 +372,16 @@ parse_hospital_duration <- function(dur_get_ox_survive = NULL,
     if (is.null(dur_rec)) {
       dur_rec <- 3.4
     }
+    if (is.null(dur_E)) {
+      dur_E <- 4.6
+    }
+    if (is.null(dur_IMild)) {
+      dur_IMild <- 2.1
+    }
+    if (is.null(dur_ICase)) {
+      dur_ICase <- 4.5
+    }
+
   } else {
     if (is.null(tt_dur_get_ox_survive)) {
       tt_dur_get_ox_survive <- durations$tt_dur_get_ox_survive
@@ -409,6 +422,16 @@ parse_hospital_duration <- function(dur_get_ox_survive = NULL,
     if (is.null(dur_rec)) {
       dur_rec <- durations$dur_rec
     }
+    if (is.null(dur_E)) {
+      dur_E <- durations$dur_E
+    }
+    if (is.null(dur_IMild)) {
+      dur_IMild <- durations$dur_IMild
+    }
+    if (is.null(dur_ICase)) {
+      dur_ICase <- durations$dur_ICase
+    }
+
   }
 
   ret <- list(tt_dur_get_ox_survive = tt_dur_get_ox_survive,
@@ -423,7 +446,10 @@ parse_hospital_duration <- function(dur_get_ox_survive = NULL,
               dur_get_mv_die = dur_get_mv_die,
               dur_not_get_mv_survive = dur_not_get_mv_survive,
               dur_not_get_mv_die = dur_not_get_mv_die,
-              dur_rec = dur_rec)
+              dur_rec = dur_rec,
+              dur_E  = dur_E,
+              dur_IMild = dur_IMild,
+              dur_ICase = dur_ICase)
   return(ret)
 
 }

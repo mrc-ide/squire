@@ -1,5 +1,6 @@
 #' Return the default probabilities for modelling
 #' @return list of default probabilities
+#' @export
 default_probs <- function() {
   prob_hosp <- c(
     0.000840764, 0.001182411, 0.001662887, 0.002338607, 0.003288907,
@@ -33,7 +34,7 @@ probs <- default_probs()
 
 #' Return the default hospital durations for modelling
 #' @return List of default durations
-#'
+#' @export
 #' @details
 #'
 #' \itemize{
@@ -50,6 +51,9 @@ probs <- default_probs()
 #'    \item{dur_not_get_mv_survive = 14.8 * 0.5}
 #'    \item{dur_not_get_mv_die = 1}
 #'    \item{dur_rec = 3}
+#'    \item{dur_E = 4.6}
+#'    \item{dur_IMild = 2.1}
+#'    \item{dur_ICase = 4.5}
 #' }
 #'
 default_durations <- function() {
@@ -67,7 +71,10 @@ default_durations <- function() {
     dur_get_mv_die = 11.1,
     dur_not_get_mv_survive = 14.8 * 0.5,
     dur_not_get_mv_die = 1,
-    dur_rec = 3
+    dur_rec = 3,
+    dur_E  = 4.6,
+    dur_IMild = 2.1,
+    dur_ICase = 4.5
   )
 
 }
@@ -207,9 +214,9 @@ run_explicit_SEEIR_model <- function(
   walker_params = FALSE,
 
   # durations
-  dur_E  = 4.6,
-  dur_IMild = 2.1,
-  dur_ICase = 4.5,
+  dur_E  = NULL,
+  dur_IMild = NULL,
+  dur_ICase = NULL,
 
   dur_get_ox_survive = NULL,
   tt_dur_get_ox_survive = 0,
@@ -483,37 +490,22 @@ run_deterministic_SEIR_model <- function(
   # coerce to array
   results <- array(results, dim = c(dim(results),1), dimnames = dimnames(results))
 
-  # Summarise inputs
-  parameters <- args
-  parameters$population <- pars$population
+  # Summarise inputs with correct names
+  parameters <- pars
+  parameters$seeding_cases <- pars$E1_0
   parameters$hosp_bed_capacity <- pars$hosp_beds
   parameters$ICU_bed_capacity <- pars$ICU_beds
-  parameters$beta_set <- pars$beta_set
-  parameters$seeding_cases <- pars$E1_0
-  parameters$contact_matrix_set <- pars$contact_matrix_set
 
-  # Severity inputs
-  parameters$prob_hosp <- pars$prob_hosp
-  parameters$prob_severe <- pars$prob_severe
-  parameters$prob_non_severe_death_treatment <- pars$prob_non_severe_death_treatment
-  parameters$prob_severe_death_treatment <- pars$prob_severe_death_treatment
-  parameters$prob_non_severe_death_no_treatment <- pars$prob_non_severe_death_no_treatment
-  parameters$prob_severe_death_no_treatment <- pars$prob_severe_death_no_treatment
-
-  # Hospitalisation duration inputs
-  parameters$dur_get_ox_survive <- pars$dur_get_ox_survive
-  parameters$tt_dur_get_ox_survive <- pars$tt_dur_get_ox_survive
-  parameters$dur_get_ox_die <- pars$dur_get_ox_die
-  parameters$tt_dur_get_ox_die <- pars$tt_dur_get_ox_die
-  parameters$dur_not_get_ox_survive <- pars$dur_not_get_ox_survive
-  parameters$dur_not_get_ox_die <- pars$dur_not_get_ox_die
-  parameters$dur_get_mv_survive <- pars$dur_get_mv_survive
-  parameters$tt_dur_get_mv_survive <- pars$tt_dur_get_mv_survive
-  parameters$dur_get_mv_die <- pars$dur_get_mv_die
-  parameters$tt_dur_get_mv_die <- pars$tt_dur_get_mv_die
-  parameters$dur_not_get_mv_survive <- pars$dur_not_get_mv_survive
-  parameters$dur_not_get_mv_die <- pars$dur_not_get_mv_die
-  parameters$dur_rec <- pars$dur_rec
+  # and add any initial args that were used in the generation
+  parameters$country <- args$country
+  parameters$tt_contact_matrix <- args$tt_contact_matrix
+  parameters$R0 <- args$R0
+  parameters$tt_R0 <- args$tt_R0
+  parameters$day_return <- args$day_return
+  parameters$replicates <- args$replicates
+  parameters$seed <- args$seed
+  parameters$init <- args$init
+  parameters$walker_params <- args$walker_params
 
   out <- list(output = results, parameters = parameters, model = mod)
   out <- structure(out, class = "squire_simulation")
