@@ -240,8 +240,8 @@ pmcmc <- function(data,
 
   # check proposal kernel
   assert_matrix(proposal_kernel)
-  assert_eq(colnames(proposal_kernel), names(pars_init[[1]]))
-  assert_eq(rownames(proposal_kernel), names(pars_init[[1]]))
+  assert_eq(colnames(proposal_kernel), names(pars_init[[1]][-1]))
+  assert_eq(rownames(proposal_kernel), names(pars_init[[1]][-1]))
 
   # check likelihood items
   if ( !(is.null(log_likelihood) | inherits(log_likelihood, "function")) ) {
@@ -743,14 +743,41 @@ run_mcmc_chain <- function(inputs,
   scaling_factor <- 1
   for(iter in seq_len(n_mcmc) + 1L) {
 
-    prop_pars <- propose_parameters(curr_pars,
-                                    proposal_kernel * scaling_factor,
-                                    unlist(pars_discrete),
-                                    unlist(pars_min),
-                                    unlist(pars_max))
+    # discrete parameter (start_date) update first
+    current_start_date <- curr_pars["start_date"]
+    prop_pars <- curr_pars # return to this
+    prop_pars.squire <- as.list(prop_pars) # return to this
+    gibbs_post <- vector(mode = "numeric", length = 11)
+    for (i in 1:11) {
+      gibbs_start_date <- current_start_date - 6 + i
+      prop_pars[["start_date"]] <- gibbs_start_date
+      prop_lprior <- calc_lprior(pars = prop_pars)
+      if(is.infinite(prop_lprior)) {
+        gibbs_post[i] <- -Inf # check this or maybe just very small number
+      } else {
+        prop_pars.squire[["start_date"]] <- offset_to_start_date(first_data_date, gibbs_start_date)
+        p_filter_est <- calc_ll(pars = prop_pars.squire)
+        prop_ll <- p_filter_est$log_likelihood
+        # prop_ss <- p_filter_est$sample_state ignoring now as feasibly each MCMC row might have two states due to the blocking
+        prop_lpost <- prop_lprior + prop_ll
+        gibbs_post[i] <- prop_lpost
+      }
+    }
+    best <- max(gibbs_post)
+    probs <- exp(gibbs_post - best)
+    probs <- probs/sum(probs)
+    new_start_date <- current_start_date - 6 + sample(1:11, 1, prob = probs)
+    curr_pars["start_date"] <- new_start_date
 
-    prop_for_eval <- prop_pars$for_eval
-    prop_for_chain <- prop_pars$for_chain
+    # then continuous parameter updates
+    prop_pars <- propose_parameters(curr_pars[-1], # remove start date - return to this with a better way
+                                    proposal_kernel * scaling_factor,
+                                    unlist(pars_discrete)[-1],
+                                    unlist(pars_min)[-1],
+                                    unlist(pars_max)[-1])
+
+    prop_for_eval <- c(curr_pars["start_date"], prop_pars$for_eval) # these should be identical now
+    prop_for_chain <- c(curr_pars["start_date"], prop_pars$for_chain) # these should be identical now
 
     ## calculate proposed prior / lhood / posterior
     prop_lprior <- calc_lprior(pars = prop_for_eval)
@@ -785,10 +812,10 @@ run_mcmc_chain <- function(inputs,
     if (iter >= start_adaptation) {
       timing_cov <- iter - start_adaptation + 1 # iteration relative to when covariance adaptation started
       if (iter == start_adaptation) {
-        previous_mu <- matrix(colMeans(res[1:iter, seq_along(curr_pars)]), nrow = 1)
-        current_parameters <- matrix(curr_pars, nrow = 1)
+        previous_mu <- matrix(colMeans(res[1:iter, seq_along(curr_pars[-1])]), nrow = 1)
+        current_parameters <- matrix(curr_pars[-1], nrow = 1)
         temp <- jc_prop_update(acceptances[iter], timing_cov, scaling_factor, previous_mu,
-                               curr_pars, proposal_kernel, required_acceptance_ratio)
+                               curr_pars[-1], proposal_kernel, required_acceptance_ratio)
         scaling_factor <- temp$scaling_factor
         proposal_kernel <- temp$covariance_matrix
         previous_mu <- temp$mu
@@ -798,7 +825,7 @@ run_mcmc_chain <- function(inputs,
 
       } else {
         temp <- jc_prop_update(acceptances[iter], timing_cov, scaling_factor, previous_mu,
-                               curr_pars, proposal_kernel, required_acceptance_ratio)
+                               curr_pars[-1], proposal_kernel, required_acceptance_ratio)
         scaling_factor <- temp$scaling_factor
         proposal_kernel <- temp$covariance_matrix
         previous_mu <- temp$mu
@@ -1174,6 +1201,9 @@ evaluate_Rt_pmcmc <- function(R0_change,
 # proposal for MCMC
 propose_parameters <- function(pars, proposal_kernel, pars_discrete, pars_min, pars_max) {
 
+  assert_same_length(sum(pars_discrete == FALSE), length(pars))
+  assert_same_length(sum(pars_discrete == FALSE), dim(proposal_kernel)[1])
+
   ## proposed jumps are normal with mean pars and sd as input for parameter
   proposed <- pars + drop(rmvnorm(n = 1,  sigma = proposal_kernel))
   for_chain <- reflect_proposal(x = proposed,
@@ -1182,7 +1212,7 @@ propose_parameters <- function(pars, proposal_kernel, pars_discrete, pars_min, p
 
   # discretise if necessary
   for_eval <- proposed
-  for_eval[pars_discrete] <- round(for_eval[pars_discrete])
+  #for_eval[pars_discrete] <- round(for_eval[pars_discrete])
   for_eval <- reflect_proposal(x = for_eval,
                                floor = pars_min,
                                cap = pars_max)
