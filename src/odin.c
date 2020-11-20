@@ -6231,7 +6231,7 @@ void user_check_values(SEXP value, double min, double max,
 SEXP user_list_element(SEXP list, const char *name) {
   SEXP ret = R_NilValue, names = getAttrib(list, R_NamesSymbol);
   for (int i = 0; i < length(list); ++i) {
-    if(strcmp(CHAR(STRING_ELT(names, i)), name) == 0) {
+    if (strcmp(CHAR(STRING_ELT(names, i)), name) == 0) {
       ret = VECTOR_ELT(list, i);
       break;
     }
