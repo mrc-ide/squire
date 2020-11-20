@@ -1,3 +1,8 @@
+# squire 0.5.4
+
+* `beta_est` accepts apothecary models
+* Updated json odin files that weren't compiled correctly
+
 # squire 0.5.3
 
 * `default_durations` contains all durations
