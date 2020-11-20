@@ -506,7 +506,8 @@ pmcmc <- function(data,
       pars_discrete = pars_discrete,
       pars_min = pars_min,
       pars_max = pars_max,
-      .progress = TRUE)
+      .progress = TRUE,
+      .options = furrr::furrr_options(seed = NULL))
 
   }
 

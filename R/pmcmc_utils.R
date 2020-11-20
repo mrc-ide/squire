@@ -114,7 +114,8 @@ sample_pmcmc <- function(pmcmc_results,
       interventions = pmcmc_results$inputs$interventions,
       Rt_args = pmcmc_results$inputs$Rt_args,
       return = "full",
-      .progress = TRUE
+      .progress = TRUE,
+      .options = furrr::furrr_options(seed = NULL)
     )
   }
 

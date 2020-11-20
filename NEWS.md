@@ -1,3 +1,39 @@
+# squire 0.5.4
+
+* `beta_est` accepts apothecary models
+* Updated json odin files that weren't compiled correctly
+
+# squire 0.5.3
+
+* `default_durations` contains all durations
+* `default_durations` and `default_probs` now exported for ease
+* `run_deterministic_SEIR_model` has odin pars exported now
+
+# squire 0.5.2
+
+* `Parameters` vignette updated to include new parameters
+* `run_deterministic_comparison` bug fix for when transmission is eliminated 
+
+# squire 0.5.1
+
+* `projections` bug fixed for setting time varying durations
+* Taiwan healthcare capacity added 
+* `default_durations` updated for incorrect hospital durations
+
+# squire 0.5.0
+
+## 0.5.0 Major
+
+* Parameter Updates. See parameters vignette for update.
+* `triggering` function for doing `projections` with model state triggered R0 changes 
+* Time-varying durations of ICU and hospital stay
+
+## 0.5.0 Minor
+
+* `projections` allows for different args to be passed to each replicate
+* `projections` allows for additional user model args to be passed
+
+
 # squire 0.4.34
 
 * `pmcmc` argument `treated_deaths_only` will use deaths from treatment in likelihood

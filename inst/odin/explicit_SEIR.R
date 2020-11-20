@@ -13,20 +13,42 @@ gamma_IMild <- user() # rate of progression from mild infection to recovery
 gamma_ICase <- user() # rate of progression from symptom onset to requiring hospitalisation
 
 # rate of progression through requiring oxygen compartment conditional on getting oxygen and surviving
-gamma_get_ox_survive <- user()
-# rate of progression through requiring oxygen compartment conditional on getting oxygen and dying
-gamma_get_ox_die <- user()
+gamma_get_ox_survive[] <- user()
+tt_dur_get_ox_survive[] <- user()
+dim(tt_dur_get_ox_survive) <- user()
+dim(gamma_get_ox_survive) <- length(tt_dur_get_ox_survive)
+gamma_get_ox_survive_i <- interpolate(tt_dur_get_ox_survive, gamma_get_ox_survive, "constant")
+
+# rate of progression through requiring oxygen compartment conditional on getting oxygen and surviving
+gamma_get_ox_die[] <- user()
+tt_dur_get_ox_die[] <- user()
+dim(tt_dur_get_ox_die) <- user()
+dim(gamma_get_ox_die) <- length(tt_dur_get_ox_die)
+gamma_get_ox_die_i <- interpolate(tt_dur_get_ox_die, gamma_get_ox_die, "constant")
+
 # rate of progression through requiring oxygen compartment conditional on not getting oxygen and surviving
 gamma_not_get_ox_survive <- user()
+
 # rate of progression through requiring oxygen compartment conditional on not getting oxygen and dying
 gamma_not_get_ox_die <- user()
 
-# rate of progression through requiring mechanical ventilation compartment conditional on getting ventilation and surviving
-gamma_get_mv_survive <- user()
 # rate of progression through requiring mechanical ventilation compartment conditional on getting ventilation and dying
-gamma_get_mv_die <- user()
+gamma_get_mv_die[] <- user()
+tt_dur_get_mv_die[] <- user()
+dim(tt_dur_get_mv_die) <- user()
+dim(gamma_get_mv_die) <- length(tt_dur_get_mv_die)
+gamma_get_mv_die_i <- interpolate(tt_dur_get_mv_die, gamma_get_mv_die, "constant")
+
+# rate of progression through requiring mechanical ventilation compartment conditional on getting ventilation and surviving
+gamma_get_mv_survive[] <- user()
+tt_dur_get_mv_survive[] <- user()
+dim(tt_dur_get_mv_survive) <- user()
+dim(gamma_get_mv_survive) <- length(tt_dur_get_mv_survive)
+gamma_get_mv_survive_i <- interpolate(tt_dur_get_mv_survive, gamma_get_mv_survive, "constant")
+
 # rate of progression through requiring mechanical ventilation compartment conditional on not getting ventilation and surviving
 gamma_not_get_mv_survive <- user()
+
 # rate of progression through requiring mechanical ventilation compartment conditional on not getting ventilation and dying
 gamma_not_get_mv_die <- user()
 
@@ -99,26 +121,26 @@ p_ICase1_ICase2 <- 1 - exp(-gamma_ICase * dt) # Delay between symptom onset and 
 p_ICase2_Hosp <- 1 - exp(-gamma_ICase * dt) # Progression to requiring hospitalisation. Number split between I_Oxygen and I_MV
 
 # Transition Probabilities for Those Requiring Oxygen -> Recovery
-p_IOxGetLive1_IOxGetLive2 <- 1 - exp(-gamma_get_ox_survive * dt) # Progression through requiring oxygen and receiving it -> Recovery
-p_IOxGetLive2_R <- 1 - exp(-gamma_get_ox_survive * dt) # Progression through requiring oxygen and recieving it -> Recovery
+p_IOxGetLive1_IOxGetLive2 <- 1 - exp(-gamma_get_ox_survive_i * dt) # Progression through requiring oxygen and receiving it -> Recovery
+p_IOxGetLive2_R <- 1 - exp(-gamma_get_ox_survive_i * dt) # Progression through requiring oxygen and recieving it -> Recovery
 p_IOxNotGetLive1_IOxNotGetLive2 <- 1 - exp(-gamma_not_get_ox_survive * dt) # Progression through requiring oxygen and not receiving it -> Recovery
 p_IOxNotGetLive2_R <- 1 - exp(-gamma_not_get_ox_survive * dt) # Progression through requiring oxygen and not receiving it -> Recovery
 
 # Transition Probabilities for Those Requiring Oxygen -> Death
-p_IOxGetDie1_IOxGetDie2 <- 1 - exp(-gamma_get_ox_die * dt) # Progression through requiring oxygen and receiving it -> Death
-p_IOxGetDie2_D <- 1 - exp(-gamma_get_ox_die * dt) # Progression through requiring oxygen and receiving it -> Death
+p_IOxGetDie1_IOxGetDie2 <- 1 - exp(-gamma_get_ox_die_i * dt) # Progression through requiring oxygen and receiving it -> Death
+p_IOxGetDie2_D <- 1 - exp(-gamma_get_ox_die_i * dt) # Progression through requiring oxygen and receiving it -> Death
 p_IOxNotGetDie1_IOxNotGetDie2 <- 1 - exp(-gamma_not_get_ox_die * dt) # Progression through requiring oxygen and not receiving it -> Death
 p_IOxNotGetDie2_D <- 1 - exp(-gamma_not_get_ox_die * dt) # Progression through requiring oxygen and not receiving it -> Death
 
 # Transition Probabilities for Those Requiring Mechanical Ventilation -> Recovery
-p_IMVGetLive1_IMVGetLive2 <- 1 - exp(-gamma_get_mv_survive * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
-p_IMVGetLive2_Rec <- 1 - exp(-gamma_get_mv_survive * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
+p_IMVGetLive1_IMVGetLive2 <- 1 - exp(-gamma_get_mv_survive_i * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
+p_IMVGetLive2_Rec <- 1 - exp(-gamma_get_mv_survive_i * dt) # Progression through requiring mechanical ventilation and recieving it -> ICU recovery
 p_IMVNotGetLive1_IMVNotGetLive2 <- 1 - exp(-gamma_not_get_mv_survive * dt) # Progression through requiring mechanical ventilation and not recieving it -> Recovery
 p_IMVNotGetLive2_R <- 1 - exp(-gamma_not_get_mv_survive * dt) # Progression through requiring mechanical ventilation and not recieving it -> Recovery
 
 # Transition Probabilities for Those Requiring Mechanical Ventilation -> Death
-p_IMVGetDie1_IMVGetDie2 <- 1 - exp(-gamma_get_mv_die * dt) # Progression through requiring mechanical ventilation and receving it -> Death
-p_IMVGetDie2_D <- 1 - exp(-gamma_get_mv_die * dt) # Progression through requiring mechanical ventilation and receving it -> Death
+p_IMVGetDie1_IMVGetDie2 <- 1 - exp(-gamma_get_mv_die_i * dt) # Progression through requiring mechanical ventilation and receving it -> Death
+p_IMVGetDie2_D <- 1 - exp(-gamma_get_mv_die_i * dt) # Progression through requiring mechanical ventilation and receving it -> Death
 p_IMVNotGetDie1_IMVNotGetDie2 <- 1 - exp(-gamma_not_get_mv_die * dt) # Progression through requiring mechanical ventilation and not receving it -> Death
 p_IMVNotGetDie2_D <- 1 - exp(-gamma_not_get_mv_die * dt) # Progression through requiring mechanical ventilation and not receving it -> Death
 

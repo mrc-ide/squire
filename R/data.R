@@ -14,6 +14,14 @@
 # #' @source \url{https://population.un.org/wpp/}
 "population"
 
+#' Elderly Population
+#'
+#' Population of 80-84, 85-89 and 90+ by age group and country
+#'
+#' @format A data.frame
+# #' @source \url{https://population.un.org/wpp/}
+"elderly_pop"
+
 #' Country specific healthcare capacity
 #'
 #' Hospital and ICU beds per 1000 pop for various countries
