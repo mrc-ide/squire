@@ -85,7 +85,7 @@ names(pars_init_rw) <- names(pars_min_rw) <- names(pars_max_rw) <- names(pars_di
 
 
 # PMCMC Prior Bounds, Initial Parameters and Observation Model Parameters
-n_chains <- 4
+n_chains <- 1
 if (n_chains == 1) {
   pars_init <- list('start_date' = can_parms$start_date,
                     'R0' = can_parms$R0,
@@ -187,10 +187,11 @@ logprior <- function(pars){
 }
 
 # Extracting Relevant Mobility Data and Creating R0_change & date_R0_change Objects
-suppressWarnings(future::plan(future::multiprocess()))
+# suppressWarnings(future::plan(future::multiprocess()))
+Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
 
 tic()
-n_mcmc <- 30000
+n_mcmc <- 40000
 replicates <- 1000
 pmcmc_res <- squire::pmcmc(data = data,
                            n_mcmc = n_mcmc,
@@ -230,6 +231,8 @@ pmcmc_res <- readRDS("bloop.rds")
 
 mcmc_chain <- pmcmc_res$pmcmc_results$results#[2000:10000, ]
 plot(mcmc_chain[, 1], type = "l")
+hist(mcmc_chain[, 1])
+
 plot(mcmc_chain[, 5], type = "l")
 
 out <- pmcmc_res$output
