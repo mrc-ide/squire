@@ -16,3 +16,4 @@ det_check
 ^.*\.covrignore$
 ^cluster$
 ^doc$
+^LICENSE\.md$
