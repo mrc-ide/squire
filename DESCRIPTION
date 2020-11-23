@@ -9,7 +9,6 @@ Authors@R: c(
   person("Peter", "Winskill", email = "p.winskill@imperial.ac.uk", role = c("aut")),
   person("Giovanni", "Charles", email = "giovanni.charles10@imperial.ac.uk", role = c("aut")),
   person("Imperial College of Science, Technology and Medicine", role = "cph"))
-  )                
 Description: An extended model of the SEIR model used in the Imperial College
   London Report into the global impact of COVID-19 and strategies for mitigation
   and suppression (https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-12-global-impact-covid-19/).
