@@ -206,7 +206,7 @@ test_that("sample_grid_scan works", {
                                        unused_user_action = "ignore")
   # check length based on model and dates
   days_between <- length( min(as.Date(res$param_grid$start_date)) : as.Date(tail(rownames(res$trajectories[,,1]),1)))
-  expect_equal(dim(res$trajectories), c(days_between, length(model$initial()), n_sample_pairs))
+  expect_equal(dim(res$trajectories), c(days_between, length(model$initial(0)), n_sample_pairs))
 
 
   res <- sample_grid_scan(scan_results = scan_results,

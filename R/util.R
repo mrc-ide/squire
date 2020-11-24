@@ -20,9 +20,8 @@ squire_file <- function(path) {
 ## Index locations of outputs in odin model
 #' @noRd
 odin_index <- function(model) {
-  n_out <- environment(model$initialize)$private$n_out %||% 0
-  n_state <- length(model$initial(0))
-  model$transform_variables(seq_len(1L + n_state + n_out))
+  len <- length(model$.__enclos_env__$private$ynames)
+  model$transform_variables(seq_len(len))
 }
 
 
@@ -51,4 +50,11 @@ odin_sv <- function(state, replicates, nt, reduce_age = TRUE) {
       state[, , x]
     }, FUN.VALUE = rep(double(nt), dim(state)[2])))
   }
+}
+
+odin_is_discrete <- function(x) {
+  ## This could be determined by parsing the IR
+  ##   odin::odin_ir(x, TRUE)$features$discrete
+  ## but faster would be to do this:
+  "step" %in% names(formals(x$run))
 }

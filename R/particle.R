@@ -160,7 +160,7 @@ particle_filter <- function(data, model, compare, n_particles,
   }
 
   # which indexes are the initials
-  i_state <- seq_along(model$initial()) + 1L
+  i_state <- seq_along(model$initial(0)) + 1L
 
   ## ---------------------------------------------------------------------------
   ## Initial Step

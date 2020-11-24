@@ -271,7 +271,6 @@ projections <- function(r,
 
   # odin model keys
   index <- odin_index(r$model)
-  initials <- seq_along(r$model$initial()) + 1L
   ds <- dim(r$output)
 
   # what state time point do we want
@@ -301,7 +300,7 @@ projections <- function(r,
     t_start <- r$output[which((r$output[,"time",1]==0)),1,1]+t_diff
     t_initial <- unique(stats::na.omit(r$output[1,1,]))
 
-    if (r$model$.__enclos_env__$private$discrete) {
+    if (odin_is_discrete(r$model)) {
       t_steps <- lapply(t_steps, function(x) {
         seq(t_start, t_start - t_diff + time_period/r$parameters$dt, t_diff)
       })
@@ -366,7 +365,7 @@ projections <- function(r,
   # step handling for stochastic
   for(i in seq_len(ds[3])) {
     if (to_be_run[[i]]) {
-      if(r$model$.__enclos_env__$private$discrete) {
+      if(odin_is_discrete(r$model)) {
         if(diff(tail(r$output[,1,1],2)) != 1) {
           r$output[which(r$output[,1,1] %in% t_steps[[i]]), -1, i] <- out[[i]][-1, -1, 1]
         } else {
@@ -424,7 +423,6 @@ conduct_replicate <- function(x,
 
   # odin model keys
   index <- odin_index(r$model)
-  initials <- seq_along(r$model$initial()) + 1L
   ds <- dim(r$output)
 
   # what state time point do we want
@@ -521,7 +519,7 @@ conduct_replicate <- function(x,
   dt_step <- r$parameters$dt
 
   # step handling for stochastic
-  if(r$model$.__enclos_env__$private$discrete) {
+  if(odin_is_discrete(r$model)) {
     if(diff(tail(r$output[,1,1],2)) != 1) {
       step <- c(0,round(seq_len(length(t_steps[[x]]))/r$parameters$dt))
     } else {
@@ -563,6 +561,7 @@ conduct_replicate <- function(x,
   }
 
   # run the model
+  initials <- seq_along(r$model$initial(0)) + 1L
   get <- r$model$run(step,
                      y = as.numeric(r$output[state_pos[x], initials, x, drop=TRUE]),
                      use_names = TRUE,
