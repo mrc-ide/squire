@@ -1,3 +1,7 @@
+# squire 0.5.8
+
+* Updated to use odin 1.1.0
+
 # squire 0.5.6
 
 * `pmcmc(..., gibbs_sampling = TRUE)` implements Gibbs sampler
