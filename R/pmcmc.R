@@ -40,6 +40,8 @@
 #' @param forecast Number of days to forecast forward. Default = 0
 #' @param required_acceptance_ratio Desired MCMC acceptance ratio
 #' @param start_adaptation Iteration number to begin RM optimisation of scaling factor at
+#' @param gibbs_sampling Whether or not to use the Gibbs Sampler for start_date
+#' @param gibbs_days Number of days either side of the start_date parameter to evaluate likelihood at
 #' @param ... Further aguments for the model parameter function. If using the
 #'   \code{\link{explicit_model}} (default) this will be
 #'   \code{parameters_explicit_SEEIR}.
