@@ -102,3 +102,12 @@ test_that("durations", {
                     names(squire:::default_durations())))
 
 })
+
+
+
+test_that("population n are all integers", {
+
+  int_log <- vapply(population$n, is.integer, logical(1))
+  expect_true(sum(int_log) == length(population$n))
+
+})

@@ -1,3 +1,7 @@
+# squire 0.5.5
+
+* `population$n` are all integer class
+
 # squire 0.5.4
 
 * `beta_est` accepts apothecary models
