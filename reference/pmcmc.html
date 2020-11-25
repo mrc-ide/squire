@@ -102,7 +102,7 @@ the squire_model framework." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.6</span>
       </span>
     </div>
 
@@ -225,6 +225,8 @@ the <code>squire_model</code> framework.</p>
   forecast <span class='op'>=</span> <span class='fl'>0</span>,
   required_acceptance_ratio <span class='op'>=</span> <span class='fl'>0.23</span>,
   start_adaptation <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='va'>n_mcmc</span><span class='op'>/</span><span class='fl'>2</span><span class='op'>)</span>,
+  gibbs_sampling <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  gibbs_days <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -419,6 +421,14 @@ to select parameter set. For each parmater set sampled, run particle filter with
     <tr>
       <th>start_adaptation</th>
       <td><p>Iteration number to begin RM optimisation of scaling factor at</p></td>
+    </tr>
+    <tr>
+      <th>gibbs_sampling</th>
+      <td><p>Whether or not to use the Gibbs Sampler for start_date</p></td>
+    </tr>
+    <tr>
+      <th>gibbs_days</th>
+      <td><p>Number of days either side of the start_date parameter to evaluate likelihood at</p></td>
     </tr>
     <tr>
       <th>...</th>
