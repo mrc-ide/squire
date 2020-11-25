@@ -46,6 +46,8 @@ pmcmc(
   forecast = 0,
   required_acceptance_ratio = 0.23,
   start_adaptation = round(n_mcmc/2),
+  gibbs_sampling = FALSE,
+  gibbs_days = NULL,
   ...
 )
 }
@@ -166,6 +168,10 @@ to select parameter set. For each parmater set sampled, run particle filter with
 \item{required_acceptance_ratio}{Desired MCMC acceptance ratio}
 
 \item{start_adaptation}{Iteration number to begin RM optimisation of scaling factor at}
+
+\item{gibbs_sampling}{Whether or not to use the Gibbs Sampler for start_date}
+
+\item{gibbs_days}{Number of days either side of the start_date parameter to evaluate likelihood at}
 
 \item{...}{Further aguments for the model parameter function. If using the
 \code{\link{explicit_model}} (default) this will be

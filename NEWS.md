@@ -1,3 +1,7 @@
+# squire 0.5.6
+
+* `pmcmc(..., gibbs_sampling = TRUE)` implements Gibbs sampler
+
 # squire 0.5.5
 
 * `population$n` are all integer class

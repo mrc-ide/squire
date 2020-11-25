@@ -1,7 +1,7 @@
 Package: squire
 Type: Package
 Title: SEIR transmission model of COVID-19
-Version: 0.5.5
+Version: 0.5.6
 Authors@R: c(
   person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut", "cre")),
   person("Patrick", "Walker", email = "patrick.walker06@imperial.ac.uk", role = c("aut")),
@@ -22,7 +22,8 @@ Suggests:
     readxl,
     knitr,
     odin.js,
-    rmarkdown
+    rmarkdown,
+    mockery
 RoxygenNote: 7.1.1
 Imports: 
     odin (>= 1.0.5), 
