@@ -100,6 +100,42 @@ test_that("pmcmc fitting works", {
   expect_warning(expect_s3_class(plot(out, what = "deaths", particle_fit = TRUE), "gg"))
   expect_error(plot(out, what = "rubbish", particle_fit = TRUE),"must be one of")
 
+  set.seed(95L)
+  out <- pmcmc(data = data,
+               n_mcmc = 50,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 2,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               Rt_args = list(date_Meff_change = NULL),
+               country = country,
+               start_adaptation = 20,
+               gibbs_sampling = TRUE,
+               gibbs_days = 3)
+
+  expect_named(out, c("output", "parameters", "model", "replicate_parameters", "pmcmc_results", "interventions"))
+  expect_warning(expect_s3_class(plot(out, what = "cases", particle_fit = TRUE), "gg"))
+  expect_warning(expect_s3_class(plot(out, what = "deaths", particle_fit = TRUE), "gg"))
+  expect_error(plot(out, what = "rubbish", particle_fit = TRUE),"must be one of")
+
+  # proposal kernel covriance
+  proposal_kernel <- matrix(0.5, ncol=length(pars_init), nrow = length(pars_init))
+  diag(proposal_kernel) <- 1
+  rownames(proposal_kernel) <- colnames(proposal_kernel) <- names(pars_init)
+
   # DATE CHECKS DATE_R0
   expect_error(
     out <- pmcmc(data = data,
