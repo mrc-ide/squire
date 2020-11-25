@@ -474,7 +474,7 @@ pmcmc <- function(data,
     if (is.null(gibbs_days)) {
       stop("if gibbs_sampling == TRUE, gibbs_days must be specified")
     }
-    squire:::assert_int(gibbs_days)
+    assert_int(gibbs_days)
 
     # create our gibbs run func wrapper
     run_mcmc_func <- function(...) {

@@ -69,3 +69,39 @@ test_that("best_est works for both models", {
   expect_true(beta - 0.1254887 < 0.001)
 
 })
+
+
+test_that("best_est works for apothecary", {
+
+  mod_exp <- explicit_model()
+  class(mod_exp) <- c("apothecary_model", "squire_model")
+  model_params <- mod_exp$parameter_func("Angola")
+  model_params$gamma_IAsymp <- 1
+  model_params$gamma_IMild <- 2
+  model_params$gamma_ICase <- 3
+  model_params$rel_inf_asymp <- 4
+  model_params$rel_inf_mild <- 5
+  model_params$prob_asymp <- 6
+  model_params$prob_hosp <- 7
+  mat <- process_contact_matrix_scaled_age(model_params$contact_matrix_set[[1]],
+                                           model_params$population)
+
+  # mock out the function as we don't have it
+  mod_exp$generate_beta_func <- mockery::mock()
+
+  beta <- beta_est(squire_model = mod_exp,
+                   model_params = model_params,
+                   R0 = 3)
+  mockery::expect_args(mod_exp$generate_beta_func,
+                       n = 1,
+                       dur_IAsymp = 1/model_params$gamma_IAsymp,
+                       dur_IMild = 1/model_params$gamma_IMild,
+                       dur_ICase = 2/model_params$gamma_ICase,
+                       rel_inf_asymp = model_params$rel_inf_asymp,
+                       rel_inf_mild = model_params$rel_inf_mild,
+                       prob_asymp = model_params$prob_asymp,
+                       prob_hosp = model_params$prob_hosp,
+                       mixing_matrix = mat,
+                       R0 = 3)
+
+})
