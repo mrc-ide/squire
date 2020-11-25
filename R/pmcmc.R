@@ -163,6 +163,8 @@ pmcmc <- function(data,
                   forecast = 0,
                   required_acceptance_ratio = 0.23,
                   start_adaptation = round(n_mcmc/2),
+                  gibbs_sampling = FALSE,
+                  gibbs_days = NULL,
                   ...
 ) {
 
@@ -240,8 +242,13 @@ pmcmc <- function(data,
 
   # check proposal kernel
   assert_matrix(proposal_kernel)
-  assert_eq(colnames(proposal_kernel), names(pars_init[[1]][-1]))
-  assert_eq(rownames(proposal_kernel), names(pars_init[[1]][-1]))
+  if (gibbs_sampling) {
+    assert_eq(colnames(proposal_kernel), names(pars_init[[1]][-1]))
+    assert_eq(rownames(proposal_kernel), names(pars_init[[1]][-1]))
+  } else {
+    assert_eq(colnames(proposal_kernel), names(pars_init[[1]]))
+    assert_eq(rownames(proposal_kernel), names(pars_init[[1]]))
+  }
 
   # check likelihood items
   if ( !(is.null(log_likelihood) | inherits(log_likelihood, "function")) ) {
@@ -457,6 +464,26 @@ pmcmc <- function(data,
   }
 
   #----------------
+  # create mcmc run functions depending on whether Gibbs Sampling
+  #----------------
+
+  if(gibbs_sampling) {
+    # checking gibbs days is specified and is an integer
+    if (is.null(gibbs_days)) {
+      stop("if gibbs_sampling == TRUE, gibbs_days must be specified")
+    }
+    squire:::assert_int(gibbs_days)
+
+    # create our gibbs run func wrapper
+    run_mcmc_func <- function(...) {
+      force(gibbs_days)
+      run_mcmc_chain_gibbs(..., gibbs_days = gibbs_days)
+    }
+  } else {
+    run_mcmc_func <- run_mcmc_chain
+  }
+
+  #----------------
   # proposals
   #----------------
 
@@ -476,7 +503,7 @@ pmcmc <- function(data,
     chains <- purrr::pmap(
       .l =  list(n_mcmc = rep(n_mcmc, n_chains),
                  curr_pars = pars_init),
-      .f = run_mcmc_chain,
+      .f = run_mcmc_func,
       inputs = inputs,
       calc_lprior = calc_lprior,
       calc_ll = calc_ll,
@@ -494,7 +521,7 @@ pmcmc <- function(data,
     chains <- furrr::future_pmap(
       .l =  list(n_mcmc = rep(n_mcmc, n_chains),
                  curr_pars = pars_init),
-      .f = run_mcmc_chain,
+      .f = run_mcmc_func,
       inputs = inputs,
       calc_lprior = calc_lprior,
       calc_ll = calc_ll,
@@ -621,7 +648,6 @@ pmcmc <- function(data,
   return(r)
 }
 
-
 #' Run a single pMCMC chain
 #'
 #' Helper function to run the particle filter with a
@@ -744,13 +770,244 @@ run_mcmc_chain <- function(inputs,
   scaling_factor <- 1
   for(iter in seq_len(n_mcmc) + 1L) {
 
+    prop_pars <- propose_parameters(curr_pars,
+                                    proposal_kernel * scaling_factor,
+                                    unlist(pars_discrete),
+                                    unlist(pars_min),
+                                    unlist(pars_max))
+
+    prop_for_eval <- prop_pars$for_eval
+    prop_for_chain <- prop_pars$for_chain
+
+    ## calculate proposed prior / lhood / posterior
+    prop_lprior <- calc_lprior(pars = prop_for_eval)
+    prop_pars.squire <- as.list(prop_for_eval)
+    prop_pars.squire[["start_date"]] <- offset_to_start_date(first_data_date, prop_for_eval[["start_date"]]) # convert to date
+    p_filter_est <- calc_ll(pars = prop_pars.squire)
+    prop_ll <- p_filter_est$log_likelihood
+    prop_ss <- p_filter_est$sample_state
+    prop_lpost <- prop_lprior + prop_ll
+
+    # calculate probability of acceptance
+    accept_prob <- exp(prop_lpost - curr_lpost)
+
+    if(runif(1) < accept_prob) { # MH step
+      # update parameters and calculated likelihoods
+      curr_pars <- prop_for_chain
+      curr_lprior <- prop_lprior
+      curr_ll <- prop_ll
+      curr_lpost <- prop_lpost
+      curr_ss <- prop_ss
+      acceptances[iter] <- 1
+    }
+
+    # record results
+    res[iter, ] <- c(curr_pars,
+                     curr_lprior,
+                     curr_ll,
+                     curr_lpost)
+    states[iter, ] <- curr_ss
+
+    # adapt and update covariance matrix
+    if (iter >= start_adaptation) {
+      timing_cov <- iter - start_adaptation + 1 # iteration relative to when covariance adaptation started
+      if (iter == start_adaptation) {
+        previous_mu <- matrix(colMeans(res[1:iter, seq_along(curr_pars)]), nrow = 1)
+        current_parameters <- matrix(curr_pars, nrow = 1)
+        temp <- jc_prop_update(acceptances[iter], timing_cov, scaling_factor, previous_mu,
+                               curr_pars, proposal_kernel, required_acceptance_ratio)
+        scaling_factor <- temp$scaling_factor
+        proposal_kernel <- temp$covariance_matrix
+        previous_mu <- temp$mu
+
+        covariance_matrix_storage[[timing_cov]] <- proposal_kernel
+        scaling_factor_storage[[timing_cov]] <- scaling_factor
+
+      } else {
+        temp <- jc_prop_update(acceptances[iter], timing_cov, scaling_factor, previous_mu,
+                               curr_pars, proposal_kernel, required_acceptance_ratio)
+        scaling_factor <- temp$scaling_factor
+        proposal_kernel <- temp$covariance_matrix
+        previous_mu <- temp$mu
+
+        covariance_matrix_storage[[timing_cov]] <- proposal_kernel
+        scaling_factor_storage[[timing_cov]] <- scaling_factor
+      }
+    }
+
+    if(output_proposals) {
+      proposals[iter, ] <- c(prop_for_chain,
+                             prop_lprior,
+                             prop_ll,
+                             prop_lpost,
+                             min(accept_prob, 1))
+    }
+
+    if (iter %% 100 == 0) {
+      print(c(round(scaling_factor, 3), round(sum(acceptances, na.rm = TRUE)/iter, 3), round(iter, 1)))
+    }
+  }
+
+  res <- as.data.frame(res)
+
+  coda_res <- coda::as.mcmc(res)
+  rejection_rate <- coda::rejectionRate(coda_res)
+  ess <- coda::effectiveSize(coda_res)
+
+  # res$start_date <- offset_to_start_date(first_data_date, res$start_date)
+
+  out <- list('inputs' = inputs,
+              'results' = as.data.frame(res),
+              'states' = states,
+              'acceptance_rate' = 1-rejection_rate,
+              "ess" = ess,
+              "scaling_factor" = scaling_factor_storage,
+              "covariance_matrix" = covariance_matrix_storage,
+              "acceptance_ratio" = mean(acceptances),
+              "acceptances" = acceptances)
+
+  if(output_proposals) {
+    proposals <- as.data.frame(proposals)
+    proposals$start_date <- offset_to_start_date(first_data_date, proposals$start_date)
+    out$proposals <- proposals
+  }
+
+  out
+
+}
+
+
+#' Run a single pMCMC chain
+#'
+#' Helper function to run the particle filter with a
+#' new R0 and start date for given interventions within the pmcmc
+#'
+#' @importFrom stats cov
+#' @noRd
+run_mcmc_chain_gibbs <- function(inputs,
+                                 curr_pars,
+                                 calc_lprior,
+                                 calc_ll,
+                                 n_mcmc,
+                                 first_data_date,
+                                 output_proposals,
+                                 required_acceptance_ratio,
+                                 start_adaptation,
+                                 proposal_kernel,
+                                 pars_discrete,
+                                 pars_min,
+                                 pars_max,
+                                 gibbs_days) {
+
+
+  #----------------
+  # Set initial state
+  #----------------
+
+  # run particle filter on initial parameters
+  p_filter_est <- calc_ll(pars = curr_pars)
+
+  # NB, squire originally set up to deal with date format triggering
+  # however, proposal and log prior set up to deal with numerics, need to change
+  curr_pars[["start_date"]] <- -(start_date_to_offset(first_data_date, curr_pars[["start_date"]]))
+  curr_pars <- unlist(curr_pars)
+
+  ## calculate initial prior
+  curr_lprior <- calc_lprior(pars = curr_pars)
+
+  #----------------..
+  # assertions and checks on log_prior and log_likelihood functions
+  #----------------..
+  if(length(curr_lprior) > 1) {
+    stop('log_prior must return a single numeric representing the log prior')
+  }
+  if(is.infinite(curr_lprior)) {
+    stop('initial parameters are not compatible with supplied prior')
+  }
+  if(length(p_filter_est) != 2) {
+    stop('log_likelihood function must return a list containing elements log_likelihood and sample_state')
+  }
+  if(!setequal(names(p_filter_est), c('log_likelihood', 'sample_state'))) {
+    stop('log_likelihood function must return a list containing elements log_likelihood and sample_state')
+  }
+  if(length(p_filter_est$log_likelihood) > 1) {
+    stop('log_likelihood must be a single numeric representing the estimated log likelihood')
+  }
+  assert_neg(x = p_filter_est$log_likelihood,
+             message1 = 'log_likelihood must be negative or zero')
+
+  #----------------..
+  # Create objects to store outputs
+  #----------------..
+  # extract loglikelihood estimate and sample state
+  # calculate posterior
+  curr_ll <- p_filter_est$log_likelihood
+  curr_lpost <- curr_lprior + curr_ll
+  curr_ss <- p_filter_est$sample_state
+
+  # initialise output arrays
+  res_init <- c(curr_pars,
+                'log_prior' = curr_lprior,
+                'log_likelihood' = curr_ll,
+                'log_posterior' = curr_lpost)
+  res <- matrix(data = NA,
+                nrow = n_mcmc + 1L,
+                ncol = length(res_init),
+                dimnames = list(NULL, names(res_init)))
+  states <- matrix(data = NA,
+                   nrow = n_mcmc + 1L,
+                   ncol = length(curr_ss))
+
+  # New storage arrays for Robbins-Munro optimisation
+
+  # storage for acceptances over time
+  acceptances <- vector(mode = "numeric", length = n_mcmc) # tracks acceptances over time
+
+  # storage for covariance matrices over time - only properly initalised if we're actually adapting
+  # i.e. in instances where start_adaptation < n_mcmc
+  if (n_mcmc - start_adaptation <= 0) {
+    covariance_matrix_storage <- vector(mode = "list", length = 1)
+  } else {
+    covariance_matrix_storage <- vector(mode = "list", length = (n_mcmc - start_adaptation + 1))
+  }
+
+  # storage for scaling factor over time - only properly initalised if we're actually adapting
+  # i.e. in instances where start_adaptation < n_mcmc
+  if (n_mcmc - start_adaptation <= 0) {
+    scaling_factor_storage <- vector(mode = "numeric", length = 1)
+  } else {
+    scaling_factor_storage <- vector(mode = "numeric", length = (n_mcmc - start_adaptation + 1))
+  }
+
+  if(output_proposals) {
+    proposals <- matrix(data = NA,
+                        nrow = n_mcmc + 1L,
+                        ncol = length(res_init) + 1L,
+                        dimnames = list(NULL, c(names(res_init), 'accept_prob')))
+  }
+
+  ## record initial results
+  res[1, ] <- res_init
+  states[1, ] <- curr_ss
+
+  # negative here because we are working backwards in time
+  pars_min[["start_date"]] <- -(start_date_to_offset(first_data_date, pars_min[["start_date"]]))
+  pars_max[["start_date"]] <- -(start_date_to_offset(first_data_date, pars_max[["start_date"]]))
+
+  #----------------
+  # main pmcmc loop
+  #----------------
+  scaling_factor <- 1
+  for(iter in seq_len(n_mcmc) + 1L) {
+
     # discrete parameter (start_date) update first
     current_start_date <- curr_pars["start_date"]
     prop_pars <- curr_pars # return to this
     prop_pars.squire <- as.list(prop_pars) # return to this
-    gibbs_post <- vector(mode = "numeric", length = 11)
-    for (i in 1:11) {
-      gibbs_start_date <- current_start_date - 6 + i
+    total_days <- 2 * gibbs_days + 1
+    gibbs_post <- vector(mode = "numeric", length = total_days)
+    for (i in 1:total_days) {
+      gibbs_start_date <- current_start_date - gibbs_days + i - 1
       prop_pars[["start_date"]] <- gibbs_start_date
       prop_lprior <- calc_lprior(pars = prop_pars)
       if(is.infinite(prop_lprior)) {
@@ -767,7 +1024,7 @@ run_mcmc_chain <- function(inputs,
     best <- max(gibbs_post)
     probs <- exp(gibbs_post - best)
     probs <- probs/sum(probs)
-    new_start_date <- current_start_date - 6 + sample(1:11, 1, prob = probs)
+    new_start_date <- current_start_date - gibbs_days + sample(1:total_days, 1, prob = probs) - 1
     curr_pars["start_date"] <- new_start_date
 
     # then continuous parameter updates
