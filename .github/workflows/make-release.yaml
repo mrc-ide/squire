@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - master
+      - release-on-merge
 
 name: make-release
 
