@@ -44,5 +44,5 @@ Depends: R (>= 3.1.0)
 VignetteBuilder: knitr
 Remotes:
     mrc-ide/dde,
-    mrc-ide/odin@mrc-1758,
+    mrc-ide/odin,
     mrc-ide/odin.js
