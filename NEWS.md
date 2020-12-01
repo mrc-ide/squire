@@ -1,3 +1,12 @@
+# squire 0.5.8
+
+* Updated to use odin 1.1.0
+* `odin_is_discrete` new unexported function
+
+# squire 0.5.7
+
+* Github actions included for automatic release tagging
+
 # squire 0.5.6
 
 * `pmcmc(..., gibbs_sampling = TRUE)` implements Gibbs sampler

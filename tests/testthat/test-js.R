@@ -1,7 +1,7 @@
 context("js")
 
 test_that("js and R versions agree for basic model", {
-
+  skip_if_not_installed("odin.js")
 
 
   pop <- get_population("Afghanistan")

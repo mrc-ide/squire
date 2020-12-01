@@ -110,7 +110,10 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
             "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
 
   ## Check they are available if simple model
-  if(grepl("simple", x$model$ir[2])) {
+
+  is_simple <- grepl("simple", odin::odin_ir(x$model, TRUE)$config$base)
+
+  if(is_simple) {
     if(sum(!(var_select %in% c("S", "E", "I", "R", "n_EI")) > 0)) {
       stop("Selected variable are not all present in output. Variables must be one of:\n\n",
            "S, E, I, R, n_EI")
@@ -121,7 +124,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   # ----------------------------------------------------------------------------
 
   # is this output without n_E2_I
-  if(!any(grepl("n_E2_I",colnames(x$output))) && !grepl("simple", x$model$ir[2])) {
+  if(!any(grepl("n_E2_I",colnames(x$output))) && !is_simple) {
 
     index$n_E2_I <- seq(tail(unlist(index),1)+1, tail(unlist(index),1)+length(index$S),1)
     dimnms <- dimnames(x$output)
@@ -136,7 +139,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   }
 
   # is this output without delta_D
-  if(!any(grepl("delta_D",colnames(x$output))) && !grepl("simple", x$model$ir[2])) {
+  if(!any(grepl("delta_D",colnames(x$output))) && !is_simple) {
 
     index$delta_D <- seq(tail(unlist(index),1)+1, tail(unlist(index),1)+length(index$S),1)
     dimnms <- dimnames(x$output)
@@ -157,7 +160,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   # Generate hospital incidence at each timestep from the cumulative hospital incidence
   # backwards compatible
   if ("cum_hosp_inc" %in% names(index)) {
-  if(!grepl("simple", x$model$ir[2])) {
+  if(!is_simple) {
 
   for(i in seq_along(x$parameters$population)) {
     collect <- vapply(1:x$parameters$replicates, function(j) {
@@ -181,7 +184,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   }
 
   if ("D_not_get" %in% names(index)) {
-    if(!grepl("simple", x$model$ir[2])) {
+    if(!is_simple) {
 
       # Generate D get incidence at each timestep from the cumulative
       for(i in seq_along(x$parameters$population)) {
@@ -206,8 +209,8 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
     }
 
   # are the steps not 1 apart? if so we need to sum the incident variables (infecions/deaths)
-  if(!grepl("simple", x$model$ir[2])) {
-  if (x$parameters$day_return || !x$model$.__enclos_env__$private$discrete) {
+  if(!is_simple) {
+  if (x$parameters$day_return || !odin_is_discrete(x$model)) {
 
     # assign the infections
     for(i in seq_along(x$parameters$population)) {
