@@ -52,6 +52,8 @@ odin_sv <- function(state, replicates, nt, reduce_age = TRUE) {
   }
 }
 
+# Evaluates if odin model is discrete
+#' @noRd
 odin_is_discrete <- function(x) {
   ## This could be determined by parsing the IR
   ##   odin::odin_ir(x, TRUE)$features$discrete
