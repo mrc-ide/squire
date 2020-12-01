@@ -31,7 +31,7 @@ The parameter table below summarises the current best estimates incorporated in 
 | Mean duration of hospitalisation if require ICU but do not receive it and die | 1 day | Working assumption |
 | Mean duration of hospitalisation if require ICU but do not receive it and survive | 7.4 days | Working assumption (Half duration of ICU and survive) |
 | Mean duration of hospitalisation if require Oxygen but do not receive it and die | 4.5 days | Working assumption (Half duration of Oxygen and die) |
-| Mean duration of hospitalisation if require Oxygen but do not receive it and survive | 4.5 days | Working assumption (Half duration of ICU and survive) |
+| Mean duration of hospitalisation if require Oxygen but do not receive it and survive | 4.5 days | Working assumption (Half duration of Oxygen and survive) |
 | Probability of death if require critical care but do not receive it | 95% | Working assumption based on expert clinical opinion |
 | Probability of death if require hospitalisation but do not receive it | 60% | Working assumption based on expert clinical opinion |
 
