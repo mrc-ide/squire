@@ -116,7 +116,7 @@ p_dist[] <- user() # distributing infections in given age class to available hos
 ##------------------------------------------------------------------------------
 
 # Susceptibles, Latent and Infections Prior to Hospitalisation
-deriv(S[]) <- -S[i] * lambda[i] + (gamma_R * R2[i])
+deriv(S[]) <- (-S[i] * lambda[i]) + (gamma_R * R2[i])
 deriv(E1[]) <- lambda[i] * S[i] - gamma_E * E1[i]
 deriv(E2[]) <- gamma_E * E1[i] - gamma_E * E2[i]
 deriv(IMild[]) <- gamma_E * E2[i] * (1 - prob_hosp[i]) - gamma_IMild * IMild[i]
@@ -174,6 +174,8 @@ deriv(R1[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox
 deriv(R2[]) <- gamma_R * R1[i] - gamma_R * R2[i]
 deriv(D[]) <- (gamma_get_ox_die_i * IOxGetDie2[i]) + (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_get_mv_die_i * IMVGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
 
+# cumulatives
+deriv(cum_infs[]) <- gamma_E * E2[i]
 deriv(D_get[]) <- (gamma_get_ox_die_i * IOxGetDie2[i]) + (gamma_get_mv_die_i * IMVGetDie2[i])
 deriv(D_not_get[]) <- (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
 
@@ -211,6 +213,7 @@ initial(IRec2[]) <- IRec2_0[i]
 initial(R1[]) <- R1_0[i]
 initial(R2[]) <- R2_0[i]
 initial(D[]) <- D_0[i]
+initial(cum_infs[]) <- 0
 initial(D_get[]) <- 0
 initial(D_not_get[]) <- 0
 
@@ -276,6 +279,7 @@ dim(R2) <- N_age
 dim(D) <- N_age
 dim(D_get) <- N_age
 dim(D_not_get) <- N_age
+dim(cum_infs) <- N_age
 
 # For the Initial Values
 dim(S_0) <- N_age

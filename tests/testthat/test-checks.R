@@ -54,7 +54,7 @@ test_that("init explicit checks", {
                      "IOxNotGetLive2","IOxNotGetDie1","IOxNotGetDie2","IMVGetLive1",
                      "IMVGetLive2","IMVGetDie1","IMVGetDie2","IMVNotGetLive1",
                      "IMVNotGetLive2","IMVNotGetDie1","IMVNotGetDie2","IRec1",
-                     "IRec2","R","D"))
+                     "IRec2","R1","R2","D"))
   expect_error(init_check_explicit(1:2, 1:17, 20), "init should be a data.frame with columns:")
   bad <- data.frame(x = 1:10)
   expect_error(init_check_explicit(bad, 1:17, 20), "S, E1, E2, ICase1, ICase2, IOxGetLive1, IOxGetLive2")
