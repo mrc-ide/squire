@@ -325,6 +325,7 @@ parse_durations <- function(dur_get_ox_survive = NULL,
                             dur_not_get_mv_survive = NULL,
                             dur_not_get_mv_die = NULL,
                             dur_rec = NULL,
+                            dur_R = NULL,
                             dur_E = NULL,
                             dur_IMild = NULL,
                             dur_ICase = NULL,
@@ -371,6 +372,9 @@ parse_durations <- function(dur_get_ox_survive = NULL,
     }
     if (is.null(dur_rec)) {
       dur_rec <- 3.4
+    }
+    if (is.null(dur_R)) {
+      dur_R <- Inf
     }
     if (is.null(dur_E)) {
       dur_E <- 4.6
@@ -422,6 +426,9 @@ parse_durations <- function(dur_get_ox_survive = NULL,
     if (is.null(dur_rec)) {
       dur_rec <- durations$dur_rec
     }
+    if (is.null(dur_R)) {
+      dur_R <- durations$dur_R
+    }
     if (is.null(dur_E)) {
       dur_E <- durations$dur_E
     }
@@ -447,6 +454,7 @@ parse_durations <- function(dur_get_ox_survive = NULL,
               dur_not_get_mv_survive = dur_not_get_mv_survive,
               dur_not_get_mv_die = dur_not_get_mv_die,
               dur_rec = dur_rec,
+              dur_R = dur_R,
               dur_E  = dur_E,
               dur_IMild = dur_IMild,
               dur_ICase = dur_ICase)

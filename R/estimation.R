@@ -978,7 +978,7 @@ plot_sample_grid_search <- function(x, what = "deaths") {
             "IOxGetDie1", "IOxGetDie2", "IOxNotGetLive1", "IOxNotGetLive2",
             "IOxNotGetDie1", "IOxNotGetDie2", "IMVGetLive1", "IMVGetLive2",
             "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
-            "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
+            "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R1", "R2", "D")])
     ylab <- "Cumulative Cases"
     xlab <- "Date"
     particles <- vapply(seq_len(dim(x$output)[3]), function(y) {

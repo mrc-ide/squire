@@ -107,7 +107,7 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
             "IOxGetDie1", "IOxGetDie2", "IOxNotGetLive1", "IOxNotGetLive2",
             "IOxNotGetDie1", "IOxNotGetDie2", "IMVGetLive1", "IMVGetLive2",
             "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
-            "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
+            "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R1", "R2","D")])
 
   ## Check they are available if simple model
 
