@@ -45,6 +45,8 @@
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -72,7 +74,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
       </span>
     </div>
 
@@ -80,7 +82,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home"></span>
+    <span class="fas fa-home"></span>
      
   </a>
 </li>
@@ -97,7 +99,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/mrc-ide/squire">
-    <span class="fa fa-github"></span>
+    <span class="fas fa-github"></span>
      
   </a>
 </li>
@@ -159,6 +161,7 @@
   dur_not_get_mv_survive <span class='op'>=</span> <span class='cn'>NULL</span>,
   dur_not_get_mv_die <span class='op'>=</span> <span class='cn'>NULL</span>,
   dur_rec <span class='op'>=</span> <span class='cn'>NULL</span>,
+  dur_R <span class='op'>=</span> <span class='cn'>NULL</span>,
   hosp_bed_capacity <span class='op'>=</span> <span class='cn'>NULL</span>,
   ICU_bed_capacity <span class='op'>=</span> <span class='cn'>NULL</span>,
   tt_hosp_beds <span class='op'>=</span> <span class='fl'>0</span>,
@@ -350,6 +353,10 @@ death. Default = 1</p></td>
     <tr>
       <th>dur_rec</th>
       <td><p>Duration of recovery after coming off ventilation. Default = 3</p></td>
+    </tr>
+    <tr>
+      <th>dur_R</th>
+      <td><p>Mean duration of immunity (days). Default = Inf</p></td>
     </tr>
     <tr>
       <th>hosp_bed_capacity</th>
