@@ -98,16 +98,16 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
   all_names_simp <- gsub("\\[.*?]", "", all_names)
 
   # Multi/Single Compartment Variables
-  single_compartments <- c("S", "IMild", "R", "D", "n_E2_I",
+  single_compartments <- c("S", "IMild", "D", "n_E2_I",
                            "n_E2_ICase1", "n_E2_IMild", "delta_D")
   multi_compartments <- c("E", "ICase", "IOxGetLive", "IOxGetDie", "IOxNotGetLive", "IOxNotGetDie",
-                          "IMVGetLive", "IMVGetDie", "IMVNotGetLive", "IMVNotGetDie", "IRec")
+                          "IMVGetLive", "IMVGetDie", "IMVNotGetLive", "IMVNotGetDie", "IRec", "R")
   all_case_compartments <- unlist(
     index[c("IMild", "ICase1", "ICase2", "IOxGetLive1", "IOxGetLive2",
             "IOxGetDie1", "IOxGetDie2", "IOxNotGetLive1", "IOxNotGetLive2",
             "IOxNotGetDie1", "IOxNotGetDie2", "IMVGetLive1", "IMVGetLive2",
             "IMVGetDie1", "IMVGetDie2", "IMVNotGetLive1", "IMVNotGetLive2",
-            "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R", "D")])
+            "IMVNotGetDie1", "IMVNotGetDie2", "IRec1", "IRec2", "R1", "R2","D")])
 
   ## Check they are available if simple model
 
@@ -215,9 +215,9 @@ format_output <- function(x, var_select = NULL, reduce_age = TRUE,
     # assign the infections
     for(i in seq_along(x$parameters$population)) {
       collect <- vapply(1:x$parameters$replicates, function(j) {
-        pos <- seq(i,length(all_case_compartments), by = length(x$parameters$population))
-        pos <- all_case_compartments[pos]
-        diff(rowSums(x$output[,pos,j]))
+        pos <- seq(i,length(index$cum_infs), by = length(x$parameters$population))
+        pos <- index$cum_infs[pos]
+        diff(x$output[,pos,j])
       }, FUN.VALUE = numeric(nt-1))
       x$output[1+seq_len(nt-1),index$n_E2_I[i],] <- collect
     }

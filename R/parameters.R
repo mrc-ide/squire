@@ -180,6 +180,7 @@ get_hosp_bed_capacity <- function(country = NULL) {
 #' @param p_dist Preferentiality of age group receiving treatment relative to
 #'   other age groups when demand exceeds healthcare capacity.
 #' @param dur_E Mean duration of incubation period (days). Default = 4.6
+#' @param dur_R Mean duration of immunity (days). Default = Inf
 #' @param dur_IMild Mean duration of mild infection (days). Default = 2.1
 #' @param dur_ICase Mean duration from symptom onset to hospitil admission (days).
 #'   Default = 4.5
@@ -270,6 +271,7 @@ parameters_explicit_SEEIR <- function(
   dur_not_get_mv_die = NULL,
 
   dur_rec = NULL,
+  dur_R = NULL,
 
   # health system capacity
   hosp_bed_capacity = NULL,
@@ -305,20 +307,22 @@ parameters_explicit_SEEIR <- function(
   prob_severe_death_no_treatment <- severity_params$prob_severe_death_no_treatment
 
   # Handle duration of hospitalisation parameters
-  duration_params <- parse_durations(dur_get_ox_survive = dur_get_ox_survive,
-                                                  tt_dur_get_ox_survive = tt_dur_get_ox_survive,
-                                                  dur_get_ox_die = dur_get_ox_die,
-                                                  tt_dur_get_ox_die = tt_dur_get_ox_die,
-                                                  dur_not_get_ox_survive = dur_not_get_ox_survive,
-                                                  dur_not_get_ox_die = dur_not_get_ox_die,
-                                                  dur_get_mv_survive = dur_get_mv_survive,
-                                                  tt_dur_get_mv_survive = tt_dur_get_mv_survive,
-                                                  dur_get_mv_die = dur_get_mv_die,
-                                                  tt_dur_get_mv_die = tt_dur_get_mv_die,
-                                                  dur_not_get_mv_survive = dur_not_get_mv_survive,
-                                                  dur_not_get_mv_die = dur_not_get_mv_die,
-                                                  dur_rec = dur_rec,
-                                                  walker_params = walker_params)
+  duration_params <- parse_durations(
+    dur_get_ox_survive = dur_get_ox_survive,
+    tt_dur_get_ox_survive = tt_dur_get_ox_survive,
+    dur_get_ox_die = dur_get_ox_die,
+    tt_dur_get_ox_die = tt_dur_get_ox_die,
+    dur_not_get_ox_survive = dur_not_get_ox_survive,
+    dur_not_get_ox_die = dur_not_get_ox_die,
+    dur_get_mv_survive = dur_get_mv_survive,
+    tt_dur_get_mv_survive = tt_dur_get_mv_survive,
+    dur_get_mv_die = dur_get_mv_die,
+    tt_dur_get_mv_die = tt_dur_get_mv_die,
+    dur_not_get_mv_survive = dur_not_get_mv_survive,
+    dur_not_get_mv_die = dur_not_get_mv_die,
+    dur_rec = dur_rec,
+    dur_R = dur_R,
+    walker_params = walker_params)
 
   dur_get_ox_survive <- duration_params$dur_get_ox_survive
   tt_dur_get_ox_survive <- duration_params$tt_dur_get_ox_survive
@@ -333,6 +337,7 @@ parameters_explicit_SEEIR <- function(
   dur_not_get_mv_survive <- duration_params$dur_not_get_mv_survive
   dur_not_get_mv_die <- duration_params$dur_not_get_mv_die
   dur_rec <- duration_params$dur_rec
+  dur_R <- duration_params$dur_R
   dur_E <- duration_params$dur_E
   dur_IMild <- duration_params$dur_IMild
   dur_ICase <- duration_params$dur_ICase
@@ -470,6 +475,7 @@ parameters_explicit_SEEIR <- function(
   gamma_not_get_mv_survive = 2 * 1/dur_not_get_mv_survive
   gamma_not_get_mv_die = 2 * 1/dur_not_get_mv_die
   gamma_rec = 2 * 1/dur_rec
+  gamma_R = 2 * 1/dur_R
 
   if (is.null(beta_set)) {
     baseline_matrix <- process_contact_matrix_scaled_age(contact_matrix_set[[1]], population)
@@ -509,7 +515,8 @@ parameters_explicit_SEEIR <- function(
                IMVNotGetDie2_0 = mod_init$IMVNotGetDie2,
                IRec1_0 = mod_init$IRec1,
                IRec2_0 = mod_init$IRec2,
-               R_0 = mod_init$R,
+               R1_0 = mod_init$R1,
+               R2_0 = mod_init$R2,
                D_0 = mod_init$D,
                gamma_E = gamma_E,
                gamma_IMild = gamma_IMild,
@@ -523,6 +530,7 @@ parameters_explicit_SEEIR <- function(
                gamma_not_get_mv_survive = gamma_not_get_mv_survive,
                gamma_not_get_mv_die = gamma_not_get_mv_die,
                gamma_rec = gamma_rec,
+               gamma_R = gamma_R,
                prob_hosp = prob_hosp,
                prob_severe = prob_severe,
                prob_non_severe_death_treatment = prob_non_severe_death_treatment,

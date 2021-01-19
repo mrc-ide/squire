@@ -1,3 +1,7 @@
+# squire 0.6.0
+
+* Waning added to squire
+
 # squire 0.5.8
 
 * Updated to use odin 1.1.0

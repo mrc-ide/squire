@@ -32,7 +32,8 @@ test_that("js and R versions agree for basic model", {
     IMVNotGetDie2 = 0,
     IRec1 = 0,
     IRec2 = 0,
-    R = 0,
+    R1 = 0,
+    R2 = 0,
     D = 0
   )
 

@@ -42,6 +42,7 @@ run_explicit_SEEIR_model(
   dur_not_get_mv_survive = NULL,
   dur_not_get_mv_die = NULL,
   dur_rec = NULL,
+  dur_R = NULL,
   hosp_bed_capacity = NULL,
   ICU_bed_capacity = NULL,
   tt_hosp_beds = 0,
@@ -167,6 +168,8 @@ survive. Default = 7.4}
 death. Default = 1}
 
 \item{dur_rec}{Duration of recovery after coming off ventilation. Default = 3}
+
+\item{dur_R}{Mean duration of immunity (days). Default = Inf}
 
 \item{hosp_bed_capacity}{General bed capacity. Can be single number or vector if capacity time-varies.}
 

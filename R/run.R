@@ -51,6 +51,7 @@ probs <- default_probs()
 #'    \item{dur_not_get_mv_survive = 14.8 * 0.5}
 #'    \item{dur_not_get_mv_die = 1}
 #'    \item{dur_rec = 3}
+#'    \item{dur_R = Inf}
 #'    \item{dur_E = 4.6}
 #'    \item{dur_IMild = 2.1}
 #'    \item{dur_ICase = 4.5}
@@ -72,6 +73,7 @@ default_durations <- function() {
     dur_not_get_mv_survive = 14.8 * 0.5,
     dur_not_get_mv_die = 1,
     dur_rec = 3,
+    dur_R = Inf,
     dur_E  = 4.6,
     dur_IMild = 2.1,
     dur_ICase = 4.5
@@ -237,6 +239,7 @@ run_explicit_SEEIR_model <- function(
   dur_not_get_mv_die = NULL,
 
   dur_rec = NULL,
+  dur_R = NULL,
 
   # health system capacity
   hosp_bed_capacity = NULL,
@@ -284,6 +287,7 @@ run_explicit_SEEIR_model <- function(
                                     dur_not_get_mv_survive=dur_not_get_mv_survive,
                                     dur_not_get_mv_die=dur_not_get_mv_die,
                                     dur_rec=dur_rec,
+                                    dur_R=dur_R,
                                     hosp_bed_capacity=hosp_bed_capacity,
                                     ICU_bed_capacity=ICU_bed_capacity,
                                     tt_hosp_beds=tt_hosp_beds,
@@ -399,6 +403,7 @@ run_deterministic_SEIR_model <- function(
   dur_not_get_mv_die = NULL,
 
   dur_rec = NULL,
+  dur_R = NULL,
 
   # health system capacity
   hosp_bed_capacity = NULL,
@@ -449,6 +454,7 @@ run_deterministic_SEIR_model <- function(
                                     dur_not_get_mv_survive=dur_not_get_mv_survive,
                                     dur_not_get_mv_die=dur_not_get_mv_die,
                                     dur_rec=dur_rec,
+                                    dur_R=dur_R,
                                     hosp_bed_capacity=hosp_bed_capacity,
                                     ICU_bed_capacity=ICU_bed_capacity,
                                     tt_hosp_beds=tt_hosp_beds*dt,

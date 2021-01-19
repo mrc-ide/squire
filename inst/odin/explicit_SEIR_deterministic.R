@@ -98,6 +98,9 @@ gamma_not_get_mv_die <- user()
 # rate of progression through post-ICU recovery compartment
 gamma_rec <- user()
 
+# rate of immunity waning
+gamma_R <- user()
+
 # Probabilities
 prob_hosp[] <- user() # probability of requiring hospitalisation by age
 prob_severe[] <- user() # probability of severe disease (requiring mechanical ventilation) by age
@@ -113,7 +116,7 @@ p_dist[] <- user() # distributing infections in given age class to available hos
 ##------------------------------------------------------------------------------
 
 # Susceptibles, Latent and Infections Prior to Hospitalisation
-deriv(S[]) <- -S[i] * lambda[i]
+deriv(S[]) <- (-S[i] * lambda[i]) + (gamma_R * R2[i])
 deriv(E1[]) <- lambda[i] * S[i] - gamma_E * E1[i]
 deriv(E2[]) <- gamma_E * E1[i] - gamma_E * E2[i]
 deriv(IMild[]) <- gamma_E * E2[i] * (1 - prob_hosp[i]) - gamma_IMild * IMild[i]
@@ -167,9 +170,12 @@ deriv(IOxNotGetDie1[]) <- (number_requiring_Ox[i] - number_get_Ox[i]) * prob_non
 deriv(IOxNotGetDie2[]) <- gamma_not_get_ox_die * IOxNotGetDie1[i] -  gamma_not_get_ox_die * IOxNotGetDie2[i]
 
 # Recoveries and Deaths
-deriv(R[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox_survive_i * IOxGetLive2[i]) + (gamma_not_get_ox_survive * IOxNotGetLive2[i]) + (gamma_not_get_mv_survive * IMVNotGetLive2[i])
+deriv(R1[]) <- (gamma_rec * IRec2[i]) + (gamma_IMild * IMild[i]) + (gamma_get_ox_survive_i * IOxGetLive2[i]) + (gamma_not_get_ox_survive * IOxNotGetLive2[i]) + (gamma_not_get_mv_survive * IMVNotGetLive2[i]) - (gamma_R * R1[i])
+deriv(R2[]) <- gamma_R * R1[i] - gamma_R * R2[i]
 deriv(D[]) <- (gamma_get_ox_die_i * IOxGetDie2[i]) + (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_get_mv_die_i * IMVGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
 
+# cumulatives
+deriv(cum_infs[]) <- gamma_E * E2[i]
 deriv(D_get[]) <- (gamma_get_ox_die_i * IOxGetDie2[i]) + (gamma_get_mv_die_i * IMVGetDie2[i])
 deriv(D_not_get[]) <- (gamma_not_get_ox_die * IOxNotGetDie2[i]) + (gamma_not_get_mv_die * IMVNotGetDie2[i])
 
@@ -204,8 +210,10 @@ initial(IMVNotGetDie1[]) <- IMVNotGetDie1_0[i]
 initial(IMVNotGetDie2[]) <- IMVNotGetDie2_0[i]
 initial(IRec1[]) <- IRec1_0[i]
 initial(IRec2[]) <- IRec2_0[i]
-initial(R[]) <- R_0[i]
+initial(R1[]) <- R1_0[i]
+initial(R2[]) <- R2_0[i]
 initial(D[]) <- D_0[i]
+initial(cum_infs[]) <- 0
 initial(D_get[]) <- 0
 initial(D_not_get[]) <- 0
 
@@ -234,7 +242,8 @@ IMVNotGetDie1_0[] <- user()
 IMVNotGetDie2_0[] <- user()
 IRec1_0[] <- user()
 IRec2_0[] <- user()
-R_0[] <- user()
+R1_0[] <- user()
+R2_0[] <- user()
 D_0[] <- user()
 
 ##Dimensions of the different "vectors" used
@@ -265,10 +274,12 @@ dim(IMVNotGetDie1) <- N_age
 dim(IMVNotGetDie2) <- N_age
 dim(IRec1) <- N_age
 dim(IRec2) <- N_age
-dim(R) <- N_age
+dim(R1) <- N_age
+dim(R2) <- N_age
 dim(D) <- N_age
 dim(D_get) <- N_age
 dim(D_not_get) <- N_age
+dim(cum_infs) <- N_age
 
 # For the Initial Values
 dim(S_0) <- N_age
@@ -295,7 +306,8 @@ dim(IMVNotGetDie1_0) <- N_age
 dim(IMVNotGetDie2_0) <- N_age
 dim(IRec1_0) <- N_age
 dim(IRec2_0) <- N_age
-dim(R_0) <- N_age
+dim(R1_0) <- N_age
+dim(R2_0) <- N_age
 dim(D_0) <- N_age
 
 # Severity Parameters
