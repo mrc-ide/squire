@@ -901,6 +901,7 @@ run_mcmc_chain_gibbs <- function(inputs,
                                  required_acceptance_ratio,
                                  start_adaptation,
                                  proposal_kernel,
+                                 scaling_factor,
                                  pars_discrete,
                                  pars_min,
                                  pars_max,
@@ -1004,7 +1005,6 @@ run_mcmc_chain_gibbs <- function(inputs,
   #----------------
   # main pmcmc loop
   #----------------
-  scaling_factor <- 1
   for(iter in seq_len(n_mcmc) + 1L) {
 
     # discrete parameter (start_date) update first
