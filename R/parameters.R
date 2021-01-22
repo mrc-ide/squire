@@ -564,7 +564,8 @@ parameters_explicit_SEEIR <- function(
                dur_get_mv_die = dur_get_mv_die,
                dur_not_get_mv_survive = dur_not_get_mv_survive,
                dur_not_get_mv_die = dur_not_get_mv_die,
-               dur_rec = dur_rec)
+               dur_rec = dur_rec,
+               dur_R = dur_R)
 
   class(pars) <- c("explicit_SEEIR_parameters", "squire_parameters")
 
