@@ -104,7 +104,7 @@ the squire_model framework." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1</span>
       </span>
     </div>
 
@@ -206,6 +206,7 @@ the <code>squire_model</code> framework.</p>
   pars_discrete <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>start_date <span class='op'>=</span> <span class='cn'>TRUE</span>, R0 <span class='op'>=</span> <span class='cn'>FALSE</span>, Meff <span class='op'>=</span> <span class='cn'>FALSE</span>, Meff_pl <span class='op'>=</span> <span class='cn'>FALSE</span>,
     R0_pl_shift <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>,
   proposal_kernel <span class='op'>=</span> <span class='cn'>NULL</span>,
+  scaling_factor <span class='op'>=</span> <span class='fl'>1</span>,
   reporting_fraction <span class='op'>=</span> <span class='fl'>1</span>,
   treated_deaths_only <span class='op'>=</span> <span class='cn'>FALSE</span>,
   country <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -308,6 +309,10 @@ list(phi_cases = 0.1,
     <tr>
       <th>proposal_kernel</th>
       <td><p>named matrix of proposal covariance for parameters</p></td>
+    </tr>
+    <tr>
+      <th>scaling_factor</th>
+      <td><p>numeric for starting scaling factor for covariance matrix. Default = 1</p></td>
     </tr>
     <tr>
       <th>reporting_fraction</th>
