@@ -17,6 +17,7 @@
 #' @param pars_min named list of lower reflecting boundaries for parameter proposals
 #' @param pars_max named list of upper reflecting boundaries for parameter proposals
 #' @param proposal_kernel named matrix of proposal covariance for parameters
+#' @param scaling_factor numeric for starting scaling factor for covariance matrix. Default = 1
 #' @param pars_discrete named list of logicals, indicating if proposed jump should be discrete
 #' @param log_likelihood function to calculate log likelihood, must take named parameter vector as input,
 #'                 allow passing of implicit arguments corresponding to the main function arguments.
@@ -144,6 +145,7 @@ pmcmc <- function(data,
                                        'Meff_pl'    = FALSE,
                                        "R0_pl_shift" = FALSE),
                   proposal_kernel = NULL,
+                  scaling_factor = 1,
                   reporting_fraction = 1,
                   treated_deaths_only = FALSE,
                   country = NULL,
@@ -429,6 +431,7 @@ pmcmc <- function(data,
                 pars_min = pars_min,
                 pars_max = pars_max,
                 proposal_kernel = proposal_kernel,
+                scaling_factor = scaling_factor,
                 pars_discrete = pars_discrete),
     n_particles = n_particles)
 
@@ -514,6 +517,7 @@ pmcmc <- function(data,
       required_acceptance_ratio = required_acceptance_ratio,
       start_adaptation = start_adaptation,
       proposal_kernel = proposal_kernel,
+      scaling_factor = scaling_factor,
       pars_discrete = pars_discrete,
       pars_min = pars_min,
       pars_max = pars_max)
@@ -532,6 +536,7 @@ pmcmc <- function(data,
       required_acceptance_ratio = required_acceptance_ratio,
       start_adaptation = start_adaptation,
       proposal_kernel = proposal_kernel,
+      scaling_factor = scaling_factor,
       pars_discrete = pars_discrete,
       pars_min = pars_min,
       pars_max = pars_max,
@@ -667,6 +672,7 @@ run_mcmc_chain <- function(inputs,
                            required_acceptance_ratio,
                            start_adaptation,
                            proposal_kernel,
+                           scaling_factor,
                            pars_discrete,
                            pars_min,
                            pars_max) {
@@ -769,7 +775,6 @@ run_mcmc_chain <- function(inputs,
   #----------------
   # main pmcmc loop
   #----------------
-  scaling_factor <- 1
   for(iter in seq_len(n_mcmc) + 1L) {
 
     prop_pars <- propose_parameters(curr_pars,
@@ -938,9 +943,9 @@ run_mcmc_chain_gibbs <- function(inputs,
   assert_neg(x = p_filter_est$log_likelihood,
              message1 = 'log_likelihood must be negative or zero')
 
-  #----------------..
+  #----------------
   # Create objects to store outputs
-  #----------------..
+  #----------------
   # extract loglikelihood estimate and sample state
   # calculate posterior
   curr_ll <- p_filter_est$log_likelihood

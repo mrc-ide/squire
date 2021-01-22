@@ -1549,3 +1549,97 @@ test_that("pmcmc with walker params", {
 
 
 })
+
+
+#------------------------------------------------
+test_that("pmcmc restarting covariance/scaling", {
+
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  pars_init = list('start_date'     = as.Date("2020-02-07"),
+                   'R0'             = 2.5,
+                   'Meff'           = 2)
+  pars_min = list('start_date'      = as.Date("2020-02-01"),
+                  'R0'              = 1e-10,
+                  'Meff'            = 0.1)
+  pars_max = list('start_date'      = as.Date("2020-02-20"),
+                  'R0'              = 5,
+                  'Meff'            = 5)
+  pars_discrete = list('start_date' = TRUE,
+                       'R0'         = FALSE,
+                       'Meff'       = FALSE)
+  pars_obs = list(phi_cases = 0.1,
+                  k_cases = 2,
+                  phi_death = 1,
+                  k_death = 2,
+                  exp_noise = 1e6)
+
+  steps_per_day = 1
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = explicit_model()
+  n_particles = 2
+  # proposal kernel covriance
+  proposal_kernel <- matrix(0.5, ncol=length(pars_init), nrow = length(pars_init))
+  diag(proposal_kernel) <- 1
+  rownames(proposal_kernel) <- colnames(proposal_kernel) <- names(pars_init)
+
+
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG"=TRUE)
+  out <- pmcmc(data = data,
+               n_mcmc = 200,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 20,
+               burnin = 0,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country)
+
+
+  out2 <- pmcmc(data = data,
+                n_mcmc = 200,
+                log_likelihood = NULL,
+                log_prior = NULL,
+                n_particles = 2,
+                steps_per_day = steps_per_day,
+                output_proposals = FALSE,
+                n_chains = 1,
+                replicates = 20,
+                burnin = 0,
+                squire_model = squire_model,
+                pars_init = pars_init,
+                pars_min = pars_min,
+                pars_max = pars_max,
+                pars_discrete = pars_discrete,
+                pars_obs = pars_obs,
+                proposal_kernel = tail(out$pmcmc_results$covariance_matrix, 1)[[1]],
+                scaling_factor = tail(na.omit(out$pmcmc_results$scaling_factor),1),
+                R0_change = R0_change,
+                date_R0_change = date_R0_change,
+                walker_params = TRUE,
+                country = country)
+
+  # check scaling factor has started closer to the old than 1
+  expect_lt(abs(out2$pmcmc_results$scaling_factor[1] - tail(na.omit(out$pmcmc_results$scaling_factor),1)),
+            abs(out2$pmcmc_results$scaling_factor[1] - 1))
+
+
+
+})

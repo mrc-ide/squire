@@ -1,3 +1,8 @@
+# squire 0.6.1
+
+* `pmcmc(..., scaling_factor)` allows scaling factors to be passed to pmcmc
+* Correction to `deterministic_model` model class
+
 # squire 0.6.0
 
 * Waning added to squire
