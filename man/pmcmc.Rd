@@ -25,6 +25,7 @@ pmcmc(
   pars_discrete = list(start_date = TRUE, R0 = FALSE, Meff = FALSE, Meff_pl = FALSE,
     R0_pl_shift = FALSE),
   proposal_kernel = NULL,
+  scaling_factor = 1,
   reporting_fraction = 1,
   treated_deaths_only = FALSE,
   country = NULL,
@@ -95,6 +96,8 @@ list(phi_cases = 0.1,
 \item{pars_discrete}{named list of logicals, indicating if proposed jump should be discrete}
 
 \item{proposal_kernel}{named matrix of proposal covariance for parameters}
+
+\item{scaling_factor}{numeric for starting scaling factor for covariance matrix. Default = 1}
 
 \item{reporting_fraction}{Reporting fraction. Numeric for what proportion of
 the total deaths the reported deaths represent. E.g. 0.5 results in
