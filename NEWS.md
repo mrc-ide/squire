@@ -1,3 +1,7 @@
+# squire 0.6.2
+
+* Typo in `dur_not_get_mv_survive`
+
 # squire 0.6.1
 
 * `pmcmc(..., scaling_factor)` allows scaling factors to be passed to pmcmc

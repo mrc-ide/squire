@@ -418,7 +418,7 @@ parse_durations <- function(dur_get_ox_survive = NULL,
       dur_get_mv_die <- durations$dur_get_mv_die
     }
     if (is.null(dur_not_get_mv_survive)) {
-      dur_not_get_mv_survive <- durations$dur_get_mv_survive
+      dur_not_get_mv_survive <- durations$dur_not_get_mv_survive
     }
     if (is.null(dur_not_get_mv_die)) {
       dur_not_get_mv_die <- durations$dur_not_get_mv_die
