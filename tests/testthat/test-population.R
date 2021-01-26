@@ -120,7 +120,7 @@ test_that("parse_duration mv_survive", {
   expect_true(pars$gamma_not_get_mv_survive == 2 * 1/(out$dur_not_get_mv_survive))
   expect_true(pars$gamma_get_mv_survive == 2 * 1/(out$dur_get_mv_survive))
   expect_true(pars$gamma_not_get_ox_survive == 2 * 1/(out$dur_not_get_ox_survive))
-  expect_true(pars$gamma_get_ox_survive == 2 * 1/(out$dur_not_get_ox_survive))
+  expect_true(pars$gamma_get_ox_survive == 2 * 1/(out$dur_get_ox_survive))
   expect_true(pars$gamma_not_get_mv_die == 2 * 1/(out$dur_not_get_mv_die))
   expect_true(pars$gamma_get_mv_die == 2 * 1/(out$dur_get_mv_die))
   expect_true(pars$gamma_not_get_ox_die == 2 * 1/(out$dur_not_get_ox_die))
