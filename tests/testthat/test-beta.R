@@ -88,10 +88,6 @@ test_that("best_est works for apothecary", {
 
   # mock out the function as we don't have it
   mod_exp$generate_beta_func <- mockery::mock()
-
-  beta <- beta_est(squire_model = mod_exp,
-                   model_params = model_params,
-                   R0 = 3)
   mockery::expect_args(mod_exp$generate_beta_func,
                        n = 1,
                        dur_IAsymp = 1/model_params$gamma_IAsymp,
@@ -103,5 +99,33 @@ test_that("best_est works for apothecary", {
                        prob_hosp = model_params$prob_hosp,
                        mixing_matrix = mat,
                        R0 = 3)
+
+})
+
+test_that("best_est works for nimue", {
+
+  mod_exp <- deterministic_model()
+  class(mod_exp) <- c("nimue_model", "squire_model")
+  model_params <- mod_exp$parameter_func("Angola")
+  model_params$rel_infectiousness <- rep(1,17)
+  mat <- process_contact_matrix_scaled_age(model_params$contact_matrix_set[[1]],
+                                           model_params$population)
+
+  # mock out the function as we don't have it
+  mod_exp$generate_beta_func <- mockery::mock()
+
+  beta <- beta_est(squire_model = mod_exp,
+                   model_params = model_params,
+                   R0 = 3)
+
+
+  expect_true(mockery::expect_args(mod_exp$generate_beta_func,
+                       n = 1,
+                       dur_IMild = 1/model_params$gamma_IMild,
+                       dur_ICase = 2/model_params$gamma_ICase,
+                       prob_hosp = model_params$prob_hosp,
+                       rel_infectiousness = model_params$rel_infectiousness,
+                       mixing_matrix = mat,
+                       R0 = 3))
 
 })
