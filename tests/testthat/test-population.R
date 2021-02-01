@@ -111,3 +111,24 @@ test_that("population n are all integers", {
   expect_true(sum(int_log) == length(population$n))
 
 })
+
+test_that("parse_duration mv_survive", {
+  out <- parse_durations(walker_params = FALSE)
+  out$dur_not_get_mv_survive
+  pars <- parameters_explicit_SEEIR("Iran")
+
+  expect_true(pars$gamma_not_get_mv_survive == 2 * 1/(out$dur_not_get_mv_survive))
+  expect_true(pars$gamma_get_mv_survive == 2 * 1/(out$dur_get_mv_survive))
+  expect_true(pars$gamma_not_get_ox_survive == 2 * 1/(out$dur_not_get_ox_survive))
+  expect_true(pars$gamma_get_ox_survive == 2 * 1/(out$dur_get_ox_survive))
+  expect_true(pars$gamma_not_get_mv_die == 2 * 1/(out$dur_not_get_mv_die))
+  expect_true(pars$gamma_get_mv_die == 2 * 1/(out$dur_get_mv_die))
+  expect_true(pars$gamma_not_get_ox_die == 2 * 1/(out$dur_not_get_ox_die))
+  expect_true(pars$gamma_get_ox_die == 2 * 1/(out$dur_get_ox_die))
+  expect_true(pars$gamma_E == 2 * 1/(out$dur_E))
+  expect_true(pars$gamma_IMild == 1/(out$dur_IMild))
+  expect_true(pars$gamma_ICase == 2 * 1/(out$dur_ICase))
+  expect_true(pars$gamma_rec == 2 * 1/(out$dur_rec))
+  expect_true(pars$gamma_R == 2 * 1/(out$dur_R))
+
+})
