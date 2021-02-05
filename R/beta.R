@@ -135,7 +135,7 @@ beta_est <- function(squire_model, model_params, R0) {
 
     new_beta <- squire_model$generate_beta_func(dur_IMild = 1/model_params$gamma_IMild,
                                                 dur_ICase = 2/model_params$gamma_ICase,
-                                                prob_hosp = model_params$prob_hosp,
+                                                prob_hosp = model_params$prob_hosp_baseline,
                                                 rel_infectiousness = model_params$rel_infectiousness,
                                                 mixing_matrix = mat,
                                                 R0 = R0)
