@@ -110,6 +110,7 @@ test_that("best_est works for nimue", {
   model_params$rel_infectiousness <- rep(1,17)
   mat <- process_contact_matrix_scaled_age(model_params$contact_matrix_set[[1]],
                                            model_params$population)
+  model_params$prob_hosp_baseline <- model_params$prob_hosp
 
   # mock out the function as we don't have it
   mod_exp$generate_beta_func <- mockery::mock()
@@ -123,7 +124,7 @@ test_that("best_est works for nimue", {
                        n = 1,
                        dur_IMild = 1/model_params$gamma_IMild,
                        dur_ICase = 2/model_params$gamma_ICase,
-                       prob_hosp = model_params$prob_hosp,
+                       prob_hosp = model_params$prob_hosp_baseline,
                        rel_infectiousness = model_params$rel_infectiousness,
                        mixing_matrix = mat,
                        R0 = 3))
