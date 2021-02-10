@@ -128,6 +128,18 @@ beta_est <- function(squire_model, model_params, R0) {
                                                 mixing_matrix = mat,
                                                 R0 = R0)
 
+  } else if (class(squire_model)[1] == "nimue_model") {
+
+    mat <- process_contact_matrix_scaled_age(model_params$contact_matrix_set[[1]],
+                                             model_params$population)
+
+    new_beta <- squire_model$generate_beta_func(dur_IMild = 1/model_params$gamma_IMild,
+                                                dur_ICase = 2/model_params$gamma_ICase,
+                                                prob_hosp = model_params$prob_hosp_baseline,
+                                                rel_infectiousness = model_params$rel_infectiousness,
+                                                mixing_matrix = mat,
+                                                R0 = R0)
+
   }
 
   return(new_beta)

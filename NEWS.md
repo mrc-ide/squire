@@ -1,3 +1,7 @@
+# squire 0.6.3
+
+* `beta_est` accepts `nimue` models
+
 # squire 0.6.2
 
 * Typo in `dur_not_get_mv_survive`
