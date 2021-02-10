@@ -88,6 +88,12 @@ test_that("best_est works for apothecary", {
 
   # mock out the function as we don't have it
   mod_exp$generate_beta_func <- mockery::mock()
+
+
+  beta <- beta_est(squire_model = mod_exp,
+                   model_params = model_params,
+                   R0 = 3)
+
   mockery::expect_args(mod_exp$generate_beta_func,
                        n = 1,
                        dur_IAsymp = 1/model_params$gamma_IAsymp,
