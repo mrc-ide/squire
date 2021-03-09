@@ -1,3 +1,7 @@
+# squire 0.6.4
+
+* `pmcmc` changes to adapt for `nimue` class models and vaccines
+
 # squire 0.6.3
 
 * `beta_est` accepts `nimue` models

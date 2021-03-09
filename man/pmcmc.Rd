@@ -41,6 +41,9 @@ pmcmc(
   ICU_bed_capacity = NULL,
   baseline_ICU_bed_capacity = NULL,
   date_ICU_bed_capacity_change = NULL,
+  date_vaccine_change = NULL,
+  baseline_max_vaccine = NULL,
+  max_vaccine = NULL,
   Rt_args = NULL,
   burnin = 0,
   replicates = 100,
@@ -157,6 +160,13 @@ hospital beds}
 \item{date_ICU_bed_capacity_change}{Calendar dates at which ICU bed
 capacity changes set in \code{model_params} change.
 Defaut = NULL, i.e. no change}
+
+\item{date_vaccine_change}{Date that vaccine doses per day change.
+Default = NULL.}
+
+\item{baseline_max_vaccine}{Baseline vaccine doses per day. Default = NULL}
+
+\item{max_vaccine}{Time varying maximum vaccine doeses per day. Default = NULL.}
 
 \item{Rt_args}{List of arguments to be passed to \code{evaluate_Rt_pmcmc} for calculating Rt.
 Current arguments are available in \code{Rt_args_list}}
