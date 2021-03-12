@@ -107,7 +107,7 @@ projections <- function(r,
   # ----------------------------------------------------------------------------
   ## assertion checks on parameters
   # ----------------------------------------------------------------------------
-  assert_custom_class(r, "squire_simulation")
+  # assert_custom_class(r, "squire_simulation")
   # TODO future asserts if these are our "end" classes
   if (is.null(r$output) & is.null(r$scan_results) & is.null(r$pmcmc_results)) {
     stop("Model must have been produced either with Squire Default, Scan Grid (calibrate), or pMCMC (pmcmc) Approach")

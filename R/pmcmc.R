@@ -33,6 +33,10 @@
 #' @param output_proposals Logical indicating whether proposed parameter jumps should be output along with results
 #' @param n_chains number of MCMC chains to run
 #' @inheritParams calibrate
+#' @param date_vaccine_change Date that vaccine doses per day change.
+#'   Default = NULL.
+#' @param baseline_max_vaccine Baseline vaccine doses per day. Default = NULL
+#' @param max_vaccine Time varying maximum vaccine doeses per day. Default = NULL.
 #' @param Rt_args List of arguments to be passed to \code{evaluate_Rt_pmcmc} for calculating Rt.
 #'   Current arguments are available in \code{Rt_args_list}
 #' @param burnin number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories
@@ -161,6 +165,9 @@ pmcmc <- function(data,
                   ICU_bed_capacity = NULL,
                   baseline_ICU_bed_capacity = NULL,
                   date_ICU_bed_capacity_change = NULL,
+                  date_vaccine_change = NULL,
+                  baseline_max_vaccine = NULL,
+                  max_vaccine = NULL,
                   Rt_args = NULL,
                   burnin = 0,
                   replicates = 100,
@@ -179,6 +186,11 @@ pmcmc <- function(data,
   #--------------------
   # assertions & checks
   #--------------------
+
+  # if nimue keep to 1 step per day
+  if(inherits(squire_model, "nimue_model")) {
+    steps_per_day <- 1
+  }
 
   # we work with pars_init being a list of inital conditions for starting
   if(any(c("start_date", "R0") %in% names(pars_init))) {
@@ -312,9 +324,6 @@ pmcmc <- function(data,
     if(as.Date(tail(date_contact_matrix_set_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_contact_matrix_set_change is greater than the last date in data")
     }
-    if(as.Date(pars_max$start_date) >= as.Date(head(date_contact_matrix_set_change, 1))) {
-      stop("First date in date_contact_matrix_set_change is earlier than maximum start date allowed in pars search")
-    }
 
     # Get in correct format
     if(is.matrix(baseline_contact_matrix)) {
@@ -343,9 +352,6 @@ pmcmc <- function(data,
     if(as.Date(tail(date_ICU_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_ICU_bed_capacity_change is greater than the last date in data")
     }
-    if(as.Date(pars_max$start_date) >= as.Date(head(date_ICU_bed_capacity_change, 1))) {
-      stop("First date in date_ICU_bed_capacity_change is earlier than maximum start date of epidemic")
-    }
 
     tt_ICU_beds <- c(0, seq_len(length(date_ICU_bed_capacity_change)))
     ICU_bed_capacity <- c(baseline_ICU_bed_capacity, ICU_bed_capacity)
@@ -353,6 +359,33 @@ pmcmc <- function(data,
   } else {
     tt_ICU_beds <- 0
     ICU_bed_capacity <- baseline_ICU_bed_capacity
+  }
+
+  # handle vaccine changes
+  if(!is.null(date_vaccine_change)) {
+
+    assert_date(date_vaccine_change)
+    assert_vector(max_vaccine)
+    assert_numeric(max_vaccine)
+    assert_numeric(baseline_max_vaccine)
+
+    if(is.null(baseline_max_vaccine)) {
+      stop("baseline_max_vaccine can't be NULL if date_vaccine_change is provided")
+    }
+    if(as.Date(tail(date_vaccine_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_vaccine_change is greater than the last date in data")
+    }
+
+    tt_vaccine <- c(0, seq_len(length(date_vaccine_change)))
+    max_vaccine <- c(baseline_max_vaccine, max_vaccine)
+
+  } else {
+    tt_vaccine <- 0
+    if(!is.null(baseline_max_vaccine)) {
+    max_vaccine <- baseline_max_vaccine
+    } else {
+      max_vaccine <- 0
+    }
   }
 
   # handle hosp bed changed
@@ -368,9 +401,6 @@ pmcmc <- function(data,
     assert_numeric(baseline_hosp_bed_capacity)
     if(as.Date(tail(date_hosp_bed_capacity_change,1)) > as.Date(tail(data$date, 1))) {
       stop("Last date in date_hosp_bed_capacity_change is greater than the last date in data")
-    }
-    if(as.Date(pars_max$start_date) >= as.Date(head(date_hosp_bed_capacity_change, 1))) {
-      stop("First date in date_hosp_bed_capacity_change is earlier than maximum start date of epidemic")
     }
 
     tt_hosp_beds <- c(0, seq_len(length(date_hosp_bed_capacity_change)))
@@ -403,6 +433,8 @@ pmcmc <- function(data,
                                               tt_hosp_beds = tt_hosp_beds,
                                               ICU_bed_capacity = ICU_bed_capacity,
                                               tt_ICU_beds = tt_ICU_beds,
+                                              max_vaccine = max_vaccine,
+                                              tt_vaccine = tt_vaccine,
                                               ...)
 
   # collect interventions for odin model likelihood
@@ -413,7 +445,9 @@ pmcmc <- function(data,
                         date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
                         ICU_bed_capacity = ICU_bed_capacity,
                         date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
-                        hosp_bed_capacity = hosp_bed_capacity)
+                        hosp_bed_capacity = hosp_bed_capacity,
+                        date_vaccine_change = date_vaccine_change,
+                        max_vaccine = max_vaccine)
 
   #----------------..
   # Collect Odin and MCMC Inputs
@@ -609,10 +643,13 @@ pmcmc <- function(data,
                              tt_hosp_beds = tt_hosp_beds,
                              ICU_bed_capacity = ICU_bed_capacity,
                              tt_ICU_beds = tt_ICU_beds,
+                             max_vaccine = max_vaccine,
+                             tt_vaccine = tt_vaccine,
                              population = population,
                              replicates = 1,
                              day_return = TRUE,
-                             time_period = nrow(pmcmc_samples$trajectories))
+                             time_period = nrow(pmcmc_samples$trajectories),
+                             ...)
 
   # and add the parameters that changed between each simulation, i.e. posterior draws
   r$replicate_parameters <- pmcmc_samples$sampled_PMCMC_Results
@@ -1195,6 +1232,7 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   date_contact_matrix_set_change <- interventions$date_contact_matrix_set_change
   date_ICU_bed_capacity_change <- interventions$date_ICU_bed_capacity_change
   date_hosp_bed_capacity_change <- interventions$date_hosp_bed_capacity_change
+  date_vaccine_change <- interventions$date_vaccine_change
 
   # change betas
   if (is.null(date_R0_change)) {
@@ -1243,6 +1281,19 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
                                            steps_per_day = round(1/model_params$dt))
     model_params$tt_hosp_beds <- tt_list$tt
     model_params$hosp_beds <- tt_list$change
+  }
+
+  # and vaccine coverage
+  if (is.null(date_vaccine_change)) {
+    tt_vaccine <- 0
+    max_vaccine <- 0
+  } else {
+    tt_list <- intervention_dates_for_odin(dates = sort(unique(c(start_date,date_vaccine_change))),
+                                           change = interventions$max_vaccine,
+                                           start_date = start_date,
+                                           steps_per_day = round(1/model_params$dt))
+    model_params$tt_vaccine <- tt_list$tt
+    model_params$max_vaccine <- tt_list$change
   }
 
   #--------------------..
