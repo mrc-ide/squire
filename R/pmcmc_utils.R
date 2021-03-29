@@ -198,7 +198,7 @@ offset_to_start_date <- function(first_data_date, start_date)
     first_data_date = as.Date(first_data_date)
   }
 
-  as.Date(start_date, origin=first_data_date)
+  as.Date(round(start_date), origin=first_data_date)
 }
 
 #..............................................................

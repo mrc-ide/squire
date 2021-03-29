@@ -1,3 +1,7 @@
+# squire 0.6.5
+
+* `pmcmc` now accepts dates of change for vaccine efficacy for `nimue` 
+
 # squire 0.6.4
 
 * `pmcmc` changes to adapt for `nimue` class models and vaccines

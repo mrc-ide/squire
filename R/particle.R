@@ -14,7 +14,7 @@
 #'
 #' @param obs_params List of parameters used for comparing
 #'   model to data in the particle filter
-#'
+#'t
 #' @param n_particles Number of particles
 #'
 #' @param forecast_days Days ahead to include in output
@@ -449,15 +449,18 @@ particle_filter_data <- function(data, start_date, steps_per_day) {
 #'
 #' @param change Variable that is changing at each of dates.
 #'
-#' @param start_date The date to start the simulation from.  Must be
-#'   earlier than the first date in \code{data}.
+#' @param start_date The date to start the simulation from..
+#'
+#' @param starting_change The first value to use for change in the case that
+#'   all provided dates are after start_date
 #'
 #' @param steps_per_day The number of steps per day
 #'
 intervention_dates_for_odin <- function(dates,
                                         change,
                                         start_date,
-                                        steps_per_day) {
+                                        steps_per_day,
+                                        starting_change = 1) {
 
   ## assertions
   assert_pos_int(steps_per_day)
@@ -474,7 +477,7 @@ intervention_dates_for_odin <- function(dates,
     stop("dates must be strictly increasing")
   }
 
-  # if start date is in out dates then just trip all earlier dates
+  # if start date is in our dates then just strip all earlier dates
   if (start_date %in% dates) {
 
     include <- which(dates >= start_date)
@@ -499,12 +502,12 @@ intervention_dates_for_odin <- function(dates,
     dates[1] <- as.Date(start_date)
 
   # if all the dates are after the start date then add the start date
-  # and we assume the first change value is 1 (i.e. the R0)
+  # and we assume the first change value is starting_change
   } else {
 
     extra_start <- seq.Date(start_date, dates[1]-1, 1)
     dates <- c(extra_start, dates)
-    change <- c(rep(1, length(extra_start)), change)
+    change <- c(rep(starting_change, length(extra_start)), change)
 
   }
 

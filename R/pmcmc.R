@@ -37,6 +37,18 @@
 #'   Default = NULL.
 #' @param baseline_max_vaccine Baseline vaccine doses per day. Default = NULL
 #' @param max_vaccine Time varying maximum vaccine doeses per day. Default = NULL.
+#' @param date_vaccine_efficacy_infection_change Date that vaccine efficacy
+#'   against infection changes. Default = NULL.
+#' @param baseline_vaccine_efficacy_infection Baseline vaccine effacy against infection.
+#'   Default = NULL
+#' @param vaccine_efficacy_infection Time varying vaccine efficacy against infection.
+#'   Default = NULL.
+#' @param date_vaccine_efficacy_disease_change Date that vaccine efficacy
+#'   against disease changes. Default = NULL.
+#' @param baseline_vaccine_efficacy_disease Baseline vaccine efficacy against disease
+#'   Default = NULL
+#' @param vaccine_efficacy_disease Time varying vaccine efficacy against infection.
+#'   Default = NULL.
 #' @param Rt_args List of arguments to be passed to \code{evaluate_Rt_pmcmc} for calculating Rt.
 #'   Current arguments are available in \code{Rt_args_list}
 #' @param burnin number of iterations to discard from the start of MCMC run when sampling from the posterior for trajectories
@@ -157,8 +169,8 @@ pmcmc <- function(data,
                   contact_matrix_set = NULL,
                   baseline_contact_matrix = NULL,
                   date_contact_matrix_set_change = NULL,
-                  date_R0_change = NULL,
                   R0_change = NULL,
+                  date_R0_change = NULL,
                   hosp_bed_capacity = NULL,
                   baseline_hosp_bed_capacity = NULL,
                   date_hosp_bed_capacity_change = NULL,
@@ -168,6 +180,12 @@ pmcmc <- function(data,
                   date_vaccine_change = NULL,
                   baseline_max_vaccine = NULL,
                   max_vaccine = NULL,
+                  date_vaccine_efficacy_infection_change = NULL,
+                  baseline_vaccine_efficacy_infection = NULL,
+                  vaccine_efficacy_infection = NULL,
+                  date_vaccine_efficacy_disease_change = NULL,
+                  baseline_vaccine_efficacy_disease = NULL,
+                  vaccine_efficacy_disease = NULL,
                   Rt_args = NULL,
                   burnin = 0,
                   replicates = 100,
@@ -311,6 +329,9 @@ pmcmc <- function(data,
   assert_same_length(contact_matrix_set, date_contact_matrix_set_change)
   assert_same_length(ICU_bed_capacity, date_ICU_bed_capacity_change)
   assert_same_length(hosp_bed_capacity, date_hosp_bed_capacity_change)
+  assert_same_length(max_vaccine, date_vaccine_change)
+  assert_same_length(vaccine_efficacy_infection, date_vaccine_efficacy_infection_change)
+  assert_same_length(vaccine_efficacy_disease, date_vaccine_efficacy_disease_change)
 
   # handle contact matrix changes
   if(!is.null(date_contact_matrix_set_change)) {
@@ -388,6 +409,67 @@ pmcmc <- function(data,
     }
   }
 
+  # handle vaccine efficacy disease changes
+  if(!is.null(date_vaccine_efficacy_infection_change)) {
+
+    assert_date(date_vaccine_efficacy_infection_change)
+    if(!is.list(vaccine_efficacy_infection)) {
+      vaccine_efficacy_infection <- list(vaccine_efficacy_infection)
+    }
+    assert_vector(vaccine_efficacy_infection[[1]])
+    assert_numeric(vaccine_efficacy_infection[[1]])
+    assert_numeric(baseline_vaccine_efficacy_infection)
+
+    if(is.null(baseline_vaccine_efficacy_infection)) {
+      stop("baseline_vaccine_efficacy_infection can't be NULL if date_vaccine_efficacy_infection_change is provided")
+    }
+    if(as.Date(tail(date_vaccine_efficacy_infection_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_vaccine_efficacy_infection_change is greater than the last date in data")
+    }
+
+    tt_vaccine_efficacy_infection <- c(0, seq_len(length(date_vaccine_efficacy_infection_change)))
+    vaccine_efficacy_infection <- c(list(baseline_vaccine_efficacy_infection), vaccine_efficacy_infection)
+
+  } else {
+    tt_vaccine_efficacy_infection <- 0
+    if(!is.null(baseline_vaccine_efficacy_infection)) {
+      vaccine_efficacy_infection <- baseline_vaccine_efficacy_infection
+    } else {
+      vaccine_efficacy_infection <- rep(0.8, 17)
+    }
+  }
+
+  # handle vaccine efficacy disease changes
+  if(!is.null(date_vaccine_efficacy_disease_change)) {
+
+    assert_date(date_vaccine_efficacy_disease_change)
+    if(!is.list(vaccine_efficacy_disease)) {
+      vaccine_efficacy_disease <- list(vaccine_efficacy_disease)
+    }
+    assert_vector(vaccine_efficacy_disease[[1]])
+    assert_numeric(vaccine_efficacy_disease[[1]])
+    assert_numeric(baseline_vaccine_efficacy_disease)
+
+    if(is.null(baseline_vaccine_efficacy_disease)) {
+      stop("baseline_vaccine_efficacy_disease can't be NULL if date_vaccine_efficacy_disease_change is provided")
+    }
+    if(as.Date(tail(date_vaccine_efficacy_disease_change,1)) > as.Date(tail(data$date, 1))) {
+      stop("Last date in date_vaccine_efficacy_disease_change is greater than the last date in data")
+    }
+
+    tt_vaccine_efficacy_disease <- c(0, seq_len(length(date_vaccine_efficacy_disease_change)))
+    vaccine_efficacy_disease <- c(list(baseline_vaccine_efficacy_disease), vaccine_efficacy_disease)
+
+  } else {
+    tt_vaccine_efficacy_disease <- 0
+    if(!is.null(baseline_vaccine_efficacy_disease)) {
+      vaccine_efficacy_disease <- baseline_vaccine_efficacy_disease
+    } else {
+      vaccine_efficacy_disease <- rep(0.95, 17)
+    }
+  }
+
+
   # handle hosp bed changed
   if(!is.null(date_hosp_bed_capacity_change)) {
 
@@ -424,30 +506,41 @@ pmcmc <- function(data,
   pars_obs$treated_deaths_only <- treated_deaths_only
 
   # build model parameters
-  model_params <- squire_model$parameter_func(country = country,
-                                              population = population,
-                                              dt = 1/steps_per_day,
-                                              contact_matrix_set = contact_matrix_set,
-                                              tt_contact_matrix = tt_contact_matrix,
-                                              hosp_bed_capacity = hosp_bed_capacity,
-                                              tt_hosp_beds = tt_hosp_beds,
-                                              ICU_bed_capacity = ICU_bed_capacity,
-                                              tt_ICU_beds = tt_ICU_beds,
-                                              max_vaccine = max_vaccine,
-                                              tt_vaccine = tt_vaccine,
-                                              ...)
+  model_params <- squire_model$parameter_func(
+    country = country,
+    population = population,
+    dt = 1/steps_per_day,
+    contact_matrix_set = contact_matrix_set,
+    tt_contact_matrix = tt_contact_matrix,
+    hosp_bed_capacity = hosp_bed_capacity,
+    tt_hosp_beds = tt_hosp_beds,
+    ICU_bed_capacity = ICU_bed_capacity,
+    tt_ICU_beds = tt_ICU_beds,
+    max_vaccine = max_vaccine,
+    tt_vaccine = tt_vaccine,
+    vaccine_efficacy_infection = vaccine_efficacy_infection,
+    tt_vaccine_efficacy_infection = tt_vaccine_efficacy_infection,
+    vaccine_efficacy_disease = vaccine_efficacy_disease,
+    tt_vaccine_efficacy_disease = tt_vaccine_efficacy_disease,
+    ...)
 
   # collect interventions for odin model likelihood
-  interventions <- list(R0_change = R0_change,
-                        date_R0_change = date_R0_change,
-                        date_contact_matrix_set_change = date_contact_matrix_set_change,
-                        contact_matrix_set = contact_matrix_set,
-                        date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
-                        ICU_bed_capacity = ICU_bed_capacity,
-                        date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
-                        hosp_bed_capacity = hosp_bed_capacity,
-                        date_vaccine_change = date_vaccine_change,
-                        max_vaccine = max_vaccine)
+  interventions <- list(
+    R0_change = R0_change,
+    date_R0_change = date_R0_change,
+    date_contact_matrix_set_change = date_contact_matrix_set_change,
+    contact_matrix_set = contact_matrix_set,
+    date_ICU_bed_capacity_change = date_ICU_bed_capacity_change,
+    ICU_bed_capacity = ICU_bed_capacity,
+    date_hosp_bed_capacity_change = date_hosp_bed_capacity_change,
+    hosp_bed_capacity = hosp_bed_capacity,
+    date_vaccine_change = date_vaccine_change,
+    max_vaccine = max_vaccine,
+    date_vaccine_efficacy_disease_change = date_vaccine_efficacy_disease_change,
+    vaccine_efficacy_disease = vaccine_efficacy_disease,
+    date_vaccine_efficacy_infection_change = date_vaccine_efficacy_infection_change,
+    vaccine_efficacy_infection = vaccine_efficacy_infection
+  )
 
   #----------------..
   # Collect Odin and MCMC Inputs
@@ -645,6 +738,10 @@ pmcmc <- function(data,
                              tt_ICU_beds = tt_ICU_beds,
                              max_vaccine = max_vaccine,
                              tt_vaccine = tt_vaccine,
+                             vaccine_efficacy_infection = vaccine_efficacy_infection,
+                             tt_vaccine_efficacy_infection = tt_vaccine_efficacy_infection,
+                             vaccine_efficacy_disease = vaccine_efficacy_disease,
+                             tt_vaccine_efficacy_disease = tt_vaccine_efficacy_disease,
                              population = population,
                              replicates = 1,
                              day_return = TRUE,
@@ -1233,6 +1330,8 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   date_ICU_bed_capacity_change <- interventions$date_ICU_bed_capacity_change
   date_hosp_bed_capacity_change <- interventions$date_hosp_bed_capacity_change
   date_vaccine_change <- interventions$date_vaccine_change
+  date_vaccine_efficacy_infection_change <- interventions$date_vaccine_efficacy_infection_change
+  date_vaccine_efficacy_disease_change <- interventions$date_vaccine_efficacy_disease_change
 
   # change betas
   if (is.null(date_R0_change)) {
@@ -1241,7 +1340,8 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
     tt_list <- intervention_dates_for_odin(dates = date_R0_change,
                                            change = R0_change,
                                            start_date = start_date,
-                                           steps_per_day = round(1/model_params$dt))
+                                           steps_per_day = round(1/model_params$dt),
+                                           starting_change = 1)
     model_params$tt_beta <- tt_list$tt
     R0_change <- tt_list$change
     date_R0_change <- tt_list$dates
@@ -1251,22 +1351,28 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   if (is.null(date_contact_matrix_set_change)) {
     tt_contact_matrix <- 0
   } else {
-    tt_list <- intervention_dates_for_odin(dates = sort(unique(c(start_date,date_contact_matrix_set_change))),
-                                           change = model_params$contact_matrix_set,
+
+    # here just provide positions for change and then use these to index mix_mat_set
+    tt_list <- intervention_dates_for_odin(dates = date_contact_matrix_set_change,
+                                           change = seq_along(interventions$contact_matrix_set)[-1],
                                            start_date = start_date,
-                                           steps_per_day = round(1/model_params$dt))
-    model_params$tt_contact_matrix <- tt_list$tt
-    model_params$contact_matrix_set <- tt_list$change
+                                           steps_per_day = round(1/model_params$dt),
+                                           starting_change = 1)
+
+
+    model_params$tt_matrix <- tt_list$tt
+    model_params$mix_mat_set <- model_params$mix_mat_set[tt_list$change,,]
   }
 
   # and icu beds
   if (is.null(date_ICU_bed_capacity_change)) {
     tt_ICU_beds <- 0
   } else {
-    tt_list <- intervention_dates_for_odin(dates = sort(unique(c(start_date,date_ICU_bed_capacity_change))),
-                                           change = model_params$ICU_beds,
+    tt_list <- intervention_dates_for_odin(dates = date_ICU_bed_capacity_change,
+                                           change = interventions$ICU_bed_capacity[-1],
                                            start_date = start_date,
-                                           steps_per_day = round(1/model_params$dt))
+                                           steps_per_day = round(1/model_params$dt),
+                                           starting_change = interventions$ICU_bed_capacity[1])
     model_params$tt_ICU_beds <- tt_list$tt
     model_params$ICU_beds <- tt_list$change
   }
@@ -1275,10 +1381,11 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   if (is.null(date_hosp_bed_capacity_change)) {
     tt_hosp_beds <- 0
   } else {
-    tt_list <- intervention_dates_for_odin(dates = sort(unique(c(start_date,date_hosp_bed_capacity_change))),
-                                           change = model_params$hosp_beds,
+    tt_list <- intervention_dates_for_odin(dates = date_hosp_bed_capacity_change,
+                                           change = interventions$hosp_bed_capacity[-1],
                                            start_date = start_date,
-                                           steps_per_day = round(1/model_params$dt))
+                                           steps_per_day = round(1/model_params$dt),
+                                           starting_change = interventions$hosp_bed_capacity[1])
     model_params$tt_hosp_beds <- tt_list$tt
     model_params$hosp_beds <- tt_list$change
   }
@@ -1286,14 +1393,52 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   # and vaccine coverage
   if (is.null(date_vaccine_change)) {
     tt_vaccine <- 0
-    max_vaccine <- 0
   } else {
-    tt_list <- intervention_dates_for_odin(dates = sort(unique(c(start_date,date_vaccine_change))),
-                                           change = interventions$max_vaccine,
+    tt_list <- intervention_dates_for_odin(dates = date_vaccine_change,
+                                           change = interventions$max_vaccine[-1],
                                            start_date = start_date,
-                                           steps_per_day = round(1/model_params$dt))
+                                           steps_per_day = round(1/model_params$dt),
+                                           starting_change = interventions$max_vaccine[1])
     model_params$tt_vaccine <- tt_list$tt
     model_params$max_vaccine <- tt_list$change
+  }
+
+  # and vaccine efficacy infection
+  if (is.null(date_vaccine_efficacy_infection_change)) {
+    tt_vaccine_efficacy_infection <- 0
+  } else {
+
+    # here we just pass the change as a position vector as we need to then
+    # index the array of vaccine efficacies
+    tt_list <- intervention_dates_for_odin(dates = date_vaccine_efficacy_infection_change,
+                                           change = seq_along(interventions$vaccine_efficacy_infection)[-1],
+                                           start_date = start_date,
+                                           steps_per_day = round(1/model_params$dt),
+                                           starting_change = 1)
+
+    model_params$tt_vaccine_efficacy_infection <- tt_list$tt
+
+    # here we have to not index the array by the postion vectors that are reutrned by intervention_dates_for_odin
+    model_params$vaccine_efficacy_infection <- model_params$vaccine_efficacy_infection[tt_list$change,,]
+  }
+
+  # and vaccine efficacy disease
+  if (is.null(date_vaccine_efficacy_disease_change)) {
+    tt_vaccine_efficacy_disease <- 0
+  } else {
+
+    # here we just pass the change as a position vector as we need to then
+    # index the array of vaccine efficacies
+    tt_list <- intervention_dates_for_odin(dates = date_vaccine_efficacy_disease_change,
+                                           change = seq_along(interventions$vaccine_efficacy_disease)[-1],
+                                           start_date = start_date,
+                                           steps_per_day = round(1/model_params$dt),
+                                           starting_change = 1)
+
+    model_params$tt_vaccine_efficacy_disease <- tt_list$tt
+
+    # here we have to not index the array by the position vectors that are returned by intervention_dates_for_odin
+    model_params$prob_hosp <- model_params$prob_hosp[tt_list$change,,]
   }
 
   #--------------------..

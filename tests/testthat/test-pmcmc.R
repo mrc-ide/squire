@@ -862,7 +862,6 @@ test_that("pmcmc multiple chains and rhat", {
                R0_change = R0_change,
                date_R0_change = date_R0_change,
                country = country)
-  expect_named(out$pmcmc_results$rhat, c("psrf","mpsrf"))
 
   pl <- plot(out$pmcmc_results)
   expect_warning(expect_s3_class(plot(out, particle_fit = TRUE), "gg"))

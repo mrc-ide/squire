@@ -33,8 +33,8 @@ pmcmc(
   contact_matrix_set = NULL,
   baseline_contact_matrix = NULL,
   date_contact_matrix_set_change = NULL,
-  date_R0_change = NULL,
   R0_change = NULL,
+  date_R0_change = NULL,
   hosp_bed_capacity = NULL,
   baseline_hosp_bed_capacity = NULL,
   date_hosp_bed_capacity_change = NULL,
@@ -44,6 +44,12 @@ pmcmc(
   date_vaccine_change = NULL,
   baseline_max_vaccine = NULL,
   max_vaccine = NULL,
+  date_vaccine_efficacy_infection_change = NULL,
+  baseline_vaccine_efficacy_infection = NULL,
+  vaccine_efficacy_infection = NULL,
+  date_vaccine_efficacy_disease_change = NULL,
+  baseline_vaccine_efficacy_disease = NULL,
+  vaccine_efficacy_disease = NULL,
   Rt_args = NULL,
   burnin = 0,
   replicates = 100,
@@ -129,11 +135,11 @@ matrix associated with the coutnry provided.}
 \item{date_contact_matrix_set_change}{Calendar dates at which the contact matrices
 set in \code{model_params} change. Defaut = NULL, i.e. no change}
 
-\item{date_R0_change}{Calendar dates at which R0_change occurs.
-Defaut = NULL, i.e. no change in R0}
-
 \item{R0_change}{Numeric vector for relative changes in R0. Default = NULL,
 i.e. no change in R0}
+
+\item{date_R0_change}{Calendar dates at which R0_change occurs.
+Defaut = NULL, i.e. no change in R0}
 
 \item{hosp_bed_capacity}{Number of hospital beds at each date specified in
 \code{date_hosp_bed_capacity_change}. Must be same length as
@@ -167,6 +173,24 @@ Default = NULL.}
 \item{baseline_max_vaccine}{Baseline vaccine doses per day. Default = NULL}
 
 \item{max_vaccine}{Time varying maximum vaccine doeses per day. Default = NULL.}
+
+\item{date_vaccine_efficacy_infection_change}{Date that vaccine efficacy
+against infection changes. Default = NULL.}
+
+\item{baseline_vaccine_efficacy_infection}{Baseline vaccine effacy against infection.
+Default = NULL}
+
+\item{vaccine_efficacy_infection}{Time varying vaccine efficacy against infection.
+Default = NULL.}
+
+\item{date_vaccine_efficacy_disease_change}{Date that vaccine efficacy
+against disease changes. Default = NULL.}
+
+\item{baseline_vaccine_efficacy_disease}{Baseline vaccine efficacy against disease
+Default = NULL}
+
+\item{vaccine_efficacy_disease}{Time varying vaccine efficacy against infection.
+Default = NULL.}
 
 \item{Rt_args}{List of arguments to be passed to \code{evaluate_Rt_pmcmc} for calculating Rt.
 Current arguments are available in \code{Rt_args_list}}
