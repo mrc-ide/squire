@@ -13,7 +13,12 @@ explicit_model <- function() {
     compare_output(model, pars_obs, data, type=model_class)
   }
 
-  parameter_func <-  function(..., tt_vaccine, max_vaccine) {
+  parameter_func <-  function(...,
+                              tt_vaccine, max_vaccine,
+                              tt_vaccine_efficacy_infection,
+                              vaccine_efficacy_infection,
+                              tt_vaccine_efficacy_disease,
+                              vaccine_efficacy_disease) {
 
     # build model parameters with no vaccine being passed through as
     # this is not the vaccine model
@@ -30,6 +35,10 @@ explicit_model <- function() {
                         tt_ICU_beds,
                         max_vaccine,
                         tt_vaccine,
+                        vaccine_efficacy_infection,
+                        tt_vaccine_efficacy_infection,
+                        vaccine_efficacy_disease,
+                        tt_vaccine_efficacy_disease,
                         population,
                         replicates,
                         day_return,
@@ -101,7 +110,12 @@ deterministic_model <- function() {
     compare_output(model, pars_obs, data, type=model_class)
   }
 
-  parameter_func <-  function(..., tt_vaccine, max_vaccine) {
+  parameter_func <-  function(...,
+                              tt_vaccine, max_vaccine,
+                              tt_vaccine_efficacy_infection,
+                              vaccine_efficacy_infection,
+                              tt_vaccine_efficacy_disease,
+                              vaccine_efficacy_disease) {
 
     # build model parameters with no vaccine being passed through as
     # this is not the vaccine model
@@ -117,6 +131,10 @@ deterministic_model <- function() {
                         tt_ICU_beds,
                         max_vaccine,
                         tt_vaccine,
+                        vaccine_efficacy_infection,
+                        tt_vaccine_efficacy_infection,
+                        vaccine_efficacy_disease,
+                        tt_vaccine_efficacy_disease,
                         population,
                         replicates,
                         day_return,

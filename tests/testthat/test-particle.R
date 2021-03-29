@@ -281,7 +281,8 @@ test_that("intervention_dates_for_odin early start_date", {
   tt <- intervention_dates_for_odin(dates = dates,
                                     change = seq(1, 0.2, length.out = length(dates)),
                                     start_date = as.Date("2019-12-29"),
-                                    steps_per_day = 4)
+                                    steps_per_day = 4,
+                                    starting_change = 2)
 
   expect_true(as.Date("2019-12-30") %in% tt$dates)
   expect_true(as.Date("2019-12-31") %in% tt$dates)

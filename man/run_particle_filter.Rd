@@ -29,7 +29,8 @@ the \code{parameters_<type>_model} functions.}
 \item{model_start_date}{Date to run model simulations from}
 
 \item{obs_params}{List of parameters used for comparing
-model to data in the particle filter}
+  model to data in the particle filter
+t}
 
 \item{n_particles}{Number of particles}
 
