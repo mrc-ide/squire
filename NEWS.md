@@ -1,3 +1,7 @@
+# squire 0.6.6
+
+* `projections` can be used now for `nimue` models
+
 # squire 0.6.5
 
 * `pmcmc` now accepts dates of change for vaccine efficacy for `nimue` 

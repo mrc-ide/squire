@@ -546,10 +546,11 @@ conduct_replicate <- function(x,
   r$model$set_user(ICU_beds = ICU_bed_capacity)
 
   # make sure these time varying parameters are also updated
-  r$model$set_user(tt_dur_get_mv_die = 0)
-  r$model$set_user(tt_dur_get_ox_die = 0)
-  r$model$set_user(tt_dur_get_mv_survive = 0)
-  r$model$set_user(tt_dur_get_ox_survive = 0)
+  # nimue models dont have time varying to so ignore the warnings
+  r$model$set_user(tt_dur_get_mv_die = 0, unused_user_action = "ignore")
+  r$model$set_user(tt_dur_get_ox_die = 0, unused_user_action = "ignore")
+  r$model$set_user(tt_dur_get_mv_survive = 0, unused_user_action = "ignore")
+  r$model$set_user(tt_dur_get_ox_survive = 0, unused_user_action = "ignore")
   r$model$set_user(gamma_get_mv_die = finals[[x]]$gamma_get_mv_die)
   r$model$set_user(gamma_get_ox_die = finals[[x]]$gamma_get_ox_die)
   r$model$set_user(gamma_get_mv_survive = finals[[x]]$gamma_get_mv_survive)
@@ -564,8 +565,7 @@ conduct_replicate <- function(x,
   initials <- seq_along(r$model$initial(0)) + 1L
   get <- r$model$run(step,
                      y = as.numeric(r$output[state_pos[x], initials, x, drop=TRUE]),
-                     use_names = TRUE,
-                     replicate = 1)
+                     use_names = TRUE)
 
   # coerce to array if deterministic
   if(length(dim(get)) == 2) {
@@ -694,6 +694,13 @@ t0_variables <- function(r) {
     wh <- "scan_results"
   }
 
+  # where are the parameters needed stored
+  if("odin_parameters" %in% names(r)) {
+    pars_name <- "odin_parameters"
+  } else {
+    pars_name <- "parameters"
+  }
+
   # quick check to make sure has t == 0
   has_t0 <- vapply(seq_len(dims[3]), function(x) {any(r$output[,"time",x] == 0)}, logical(1))
   if(!all(has_t0)) {
@@ -746,10 +753,10 @@ t0_variables <- function(r) {
           contact_matrix_set = tail(r$parameters$contact_matrix_set,1),
           hosp_bed_capacity = tail(r$parameters$hosp_bed_capacity,1),
           ICU_bed_capacity = tail(r$parameters$ICU_bed_capacity,1),
-          gamma_get_ox_survive = tail(r$parameters$gamma_get_ox_survive,1),
-          gamma_get_ox_die = tail(r$parameters$gamma_get_ox_die,1),
-          gamma_get_mv_die = tail(r$parameters$gamma_get_mv_die,1),
-          gamma_get_mv_survive = tail(r$parameters$gamma_get_mv_survive,1)
+          gamma_get_ox_survive = tail(r[[pars_name]]$gamma_get_ox_survive,1),
+          gamma_get_ox_die = tail(r[[pars_name]]$gamma_get_ox_die,1),
+          gamma_get_mv_die = tail(r[[pars_name]]$gamma_get_mv_die,1),
+          gamma_get_mv_survive = tail(r[[pars_name]]$gamma_get_mv_survive,1)
         )
       )
     })
@@ -761,32 +768,39 @@ t0_variables <- function(r) {
       which(r$output[,"time",x] == 0)
     }, FUN.VALUE = numeric(1))
 
+    last_check <- function(last) {
+      if(length(last) == 0) {
+        last <- 1
+      }
+      return(last)
+    }
+
     # build list of the final variables that change
     ret <- lapply(seq_len(dims[3]), function(i) {
 
       last <- tail(which(r$parameters$tt_R0 < state_pos[i]), 1)
-      R0 <- r$parameters$R0[last]
+      R0 <- r$parameters$R0[last_check(last)]
 
       last <- tail(which(r$parameters$tt_contact_matrix < state_pos[i]), 1)
-      contact_matrix_set <- r$parameters$contact_matrix_set[last]
+      contact_matrix_set <- r$parameters$contact_matrix_set[last_check(last)]
 
       last <- tail(which(r$parameters$tt_hosp_beds < state_pos[i]), 1)
-      hosp_bed_capacity <- r$parameters$hosp_bed_capacity[last]
+      hosp_bed_capacity <- r$parameters$hosp_bed_capacity[last_check(last)]
 
       last <- tail(which(r$parameters$tt_ICU_beds < state_pos[i]), 1)
-      ICU_bed_capacity <- r$parameters$ICU_bed_capacity[last]
+      ICU_bed_capacity <- r$parameters$ICU_bed_capacity[last_check(last)]
 
       last <- tail(which(r$parameters$tt_dur_get_ox_survive < state_pos[i]), 1)
-      gamma_get_ox_survive <- r$parameters$gamma_get_ox_survive[last]
+      gamma_get_ox_survive <- r[[pars_name]]$gamma_get_ox_survive[last_check(last)]
 
       last <- tail(which(r$parameters$tt_dur_get_ox_die < state_pos[i]), 1)
-      gamma_get_ox_die <- r$parameters$gamma_get_ox_die[last]
+      gamma_get_ox_die <- r[[pars_name]]$gamma_get_ox_die[last_check(last)]
 
       last <- tail(which(r$parameters$tt_dur_get_mv_die < state_pos[i]), 1)
-      gamma_get_mv_die <- r$parameters$gamma_get_mv_die[last]
+      gamma_get_mv_die <- r[[pars_name]]$gamma_get_mv_die[last_check(last)]
 
       last <- tail(which(r$parameters$tt_dur_get_mv_survive < state_pos[i]), 1)
-      gamma_get_mv_survive <- r$parameters$gamma_get_mv_survive[last]
+      gamma_get_mv_survive <- r[[pars_name]]$gamma_get_mv_survive[last_check(last)]
 
       return(
         list(
