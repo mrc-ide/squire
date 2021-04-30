@@ -36,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.6</span>
       </span>
     </div>
 
@@ -79,13 +79,13 @@
   <div class="contents col-md-9">
 <div id="squire" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#squire" class="anchor"></a>squire</h1></div>
+<a href="#squire" class="anchor" aria-hidden="true"></a>squire</h1></div>
 <!-- badges: start -->
 
 <p>squire enables users to simulate models of SARS-CoV-2 epidemics. This is done using an age-structured SEIR model that also explicitly considers healthcare capacity and disease severity.</p>
 <div id="important-notes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#important-notes" class="anchor"></a>IMPORTANT NOTES</h2>
+<a href="#important-notes" class="anchor" aria-hidden="true"></a>IMPORTANT NOTES</h2>
 <p><span class="emoji" data-emoji="warning">⚠️</span> This code is released with no support. Please submit any questions or bugs as <a href="https://github.com/mrc-ide/squire/issues" class="external-link">issues</a> and we will try to address them as quickly as possible.</p>
 <p><span class="emoji" data-emoji="warning">⚠️</span> This model is in active development and so parameter name and behaviours, and output file formats will change without notice.</p>
 <p><span class="emoji" data-emoji="warning">⚠️</span> The model is stochastic. Multiple runs with different seeds should be undertaken to see average behaviour.</p>
@@ -93,7 +93,7 @@
 </div>
 <div id="overview" class="section level2">
 <h2 class="hasAnchor">
-<a href="#overview" class="anchor"></a>Overview</h2>
+<a href="#overview" class="anchor" aria-hidden="true"></a>Overview</h2>
 <p>squire is a package enabling users to quickly and easily generate calibrated estimates of SARS-CoV-2 epidemic trajectories under different control scenarios. It consists of the following:</p>
 <ul>
 <li>An age-structured SEIR model incorporating explicit passage through healthcare settings and explicit progression through disease severity stages.</li>
@@ -104,10 +104,10 @@
 </div>
 <div id="model-structure" class="section level2">
 <h2 class="hasAnchor">
-<a href="#model-structure" class="anchor"></a>Model Structure</h2>
+<a href="#model-structure" class="anchor" aria-hidden="true"></a>Model Structure</h2>
 <div id="overall-structure" class="section level3">
 <h3 class="hasAnchor">
-<a href="#overall-structure" class="anchor"></a>Overall Structure</h3>
+<a href="#overall-structure" class="anchor" aria-hidden="true"></a>Overall Structure</h3>
 <p><img src="https://raw.githubusercontent.com/mrc-ide/squire/master/images/Explicit_Healthcare_Model_Structure.JPG" align="center" style="border: none; float: center;" width="600px"></p>
 <p>squire uses an age-structured SEIR model, with the infectious class divided into different stages reflecting progression through different disease severity pathways. These compartments are:<br>
 * S = Susceptibles<br>
@@ -122,7 +122,7 @@
 </div>
 <div id="decision-trees-for-healthcare-capacity" class="section level3">
 <h3 class="hasAnchor">
-<a href="#decision-trees-for-healthcare-capacity" class="anchor"></a>Decision Trees for Healthcare Capacity</h3>
+<a href="#decision-trees-for-healthcare-capacity" class="anchor" aria-hidden="true"></a>Decision Trees for Healthcare Capacity</h3>
 <p><img src="https://raw.githubusercontent.com/mrc-ide/squire/master/images/Explicit_Healthcare_Oxygen_Decision_Tree.JPG" align="center" style="border: none; float: center;" width="400px"></p>
 <p>Given initial inputs of hospital/ICU bed capacity and the average time cases spend in hospital, the model dynamically tracks available hospital and ICU beds over time.</p>
 <p>Individuals newly requiring hospitalisation (either a hospital or ICU bed) are then assigned to either receive care (if the relevant bed is available) or not (if maximum capacity would be exceeded otherwise). Whether or not an individual receives the required care modifies their probability of dying.</p>
@@ -130,7 +130,7 @@
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<a href="#installation" class="anchor" aria-hidden="true"></a>Installation</h2>
 <p><i>squire</i> utilises the package <a href="https://github.com/mrc-ide/odin" class="external-link">odin</a> to generate the model. <a href="https://github.com/mrc-ide/odin" class="external-link">odin</a> implements a high-level language for implementing mathematical models and can be installed by running the following command:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"odin"</span><span class="op">)</span></code></pre></div>
@@ -149,14 +149,14 @@
 </div>
 <div id="getting-started" class="section level2">
 <h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting Started</h2>
+<a href="#getting-started" class="anchor" aria-hidden="true"></a>Getting Started</h2>
 <div id="running-the-model-unmitigated" class="section level3">
 <h3 class="hasAnchor">
-<a href="#running-the-model-unmitigated" class="anchor"></a>Running the Model (Unmitigated)</h3>
+<a href="#running-the-model-unmitigated" class="anchor" aria-hidden="true"></a>Running the Model (Unmitigated)</h3>
 </div>
 <div id="1-running-the-model-using-baseline-parameters-and-no-control-interventions" class="section level3">
 <h3 class="hasAnchor">
-<a href="#1-running-the-model-using-baseline-parameters-and-no-control-interventions" class="anchor"></a>1. Running the model using baseline parameters and no control interventions</h3>
+<a href="#1-running-the-model-using-baseline-parameters-and-no-control-interventions" class="anchor" aria-hidden="true"></a>1. Running the model using baseline parameters and no control interventions</h3>
 <p>The full model is referred to as the <strong>explicit_SEEIR</strong> model, with hospital pathways explicitly exploring whether individuals will require a general hospital bed providing oxygen or an ICU bed that provides ventilation.</p>
 <p>To run the model we need to provide at least one of the following arguments:</p>
 <ul>
@@ -218,7 +218,7 @@
 </div>
 <div id="2-changing-parameters-in-the-model" class="section level3">
 <h3 class="hasAnchor">
-<a href="#2-changing-parameters-in-the-model" class="anchor"></a>2. Changing parameters in the model.</h3>
+<a href="#2-changing-parameters-in-the-model" class="anchor" aria-hidden="true"></a>2. Changing parameters in the model.</h3>
 <p>The model has a number of parameters for setting the R0, demography, contact matrices, the durations of each compartment and the health care outcomes and healthcare availability. In addition, the initial state of the population can be changed as well as simulation parameters, such as the number of replicates, length of simulation and the timestep. For a full list of model inputs, please see the function <a href="https://mrc-ide.github.io/squire/reference/run_explicit_SEEIR_model.html" class="external-link">documentation</a></p>
 <p>For example, changing the initial R0 (default = 3), number of replicates ( default = 10), simualtion length (default = 365 days) and time step (default = 0.5 days), as well as setting the population and contact matrix manually:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -319,7 +319,7 @@
 </div>
 <div id="3-extracting-and-plotting-relevant-outputs" class="section level3">
 <h3 class="hasAnchor">
-<a href="#3-extracting-and-plotting-relevant-outputs" class="anchor"></a>3. Extracting and Plotting Relevant Outputs</h3>
+<a href="#3-extracting-and-plotting-relevant-outputs" class="anchor" aria-hidden="true"></a>3. Extracting and Plotting Relevant Outputs</h3>
 <p>Whilst the above provides quick and easy ways to plot relevant outputs, we recognise users might want to play around with the data themselves. This can be done with the <code>format_output</code> function.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
@@ -336,22 +336,22 @@
 
 <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"Afghanistan"</span>, hosp_bed_capacity <span class="op">=</span> <span class="fl">500</span>, ICU_bed_capacity <span class="op">=</span> <span class="fl">200</span><span class="op">)</span>
 
-<span class="va">deaths</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, var_select <span class="op">=</span> <span class="st">"deaths"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">deaths</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, var_select <span class="op">=</span> <span class="st">"deaths"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>replicate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">replicate</span><span class="op">)</span><span class="op">)</span>
 <span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">deaths</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">y</span>, col <span class="op">=</span> <span class="va">replicate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Daily Deaths"</span><span class="op">)</span>
 
-<span class="va">infections</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, var_select <span class="op">=</span> <span class="st">"infections"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">infections</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, var_select <span class="op">=</span> <span class="st">"infections"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>replicate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">replicate</span><span class="op">)</span><span class="op">)</span>
 <span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">infections</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">y</span>, col <span class="op">=</span> <span class="va">replicate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Daily Infections"</span><span class="op">)</span>
 
-<span class="va">hosp_bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, var_select <span class="op">=</span> <span class="st">"hospital_occupancy"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">hosp_bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, var_select <span class="op">=</span> <span class="st">"hospital_occupancy"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>replicate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">replicate</span><span class="op">)</span><span class="op">)</span>
 <span class="va">c</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">hosp_bed</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">y</span>, col <span class="op">=</span> <span class="va">replicate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Hospital Bed Occupancy"</span><span class="op">)</span>
 
-<span class="va">ICU_bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, var_select <span class="op">=</span> <span class="st">"ICU_occupancy"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">ICU_bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_output.html">format_output</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, var_select <span class="op">=</span> <span class="st">"ICU_occupancy"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>replicate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">replicate</span><span class="op">)</span><span class="op">)</span>
 <span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">ICU_bed</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">y</span>, col <span class="op">=</span> <span class="va">replicate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"ICU Bed Occupancy"</span><span class="op">)</span>
@@ -366,7 +366,7 @@
 </div>
 <div id="4-calibrating-the-model-to-observed-deaths-data" class="section level3">
 <h3 class="hasAnchor">
-<a href="#4-calibrating-the-model-to-observed-deaths-data" class="anchor"></a>4. Calibrating the Model to Observed Deaths Data</h3>
+<a href="#4-calibrating-the-model-to-observed-deaths-data" class="anchor" aria-hidden="true"></a>4. Calibrating the Model to Observed Deaths Data</h3>
 <p>The model can be simply calibrated to time series of deaths reported in settings. This can be done using the <code>calibrate</code> function. For example, let’s use the time series of deaths in Algeria up to the 22nd April 2020:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu">squire</span><span class="fu">:::</span><span class="fu">squire_file</span><span class="op">(</span><span class="st">"extdata/example_DZA.csv"</span><span class="op">)</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
@@ -378,7 +378,7 @@
 <span class="co">#&gt; 4 4 2020-03-05T00:00:00Z      0     7</span>
 <span class="co">#&gt; 5 5 2020-03-06T00:00:00Z      0     5</span>
 <span class="co">#&gt; 6 6 2020-03-09T00:00:00Z      0     3</span></code></pre></div>
-<p>We can calibrate the model to this data. This calibration will infer the most likely start date of the epidemic and the R0 at the start of the epidemic. Calibration occurs by scanning across a range of possible R0 values and start dates. Fitting works using a particle filter, which can be parallelised using <code><a href="https://rdrr.io/pkg/future/man/plan.html" class="external-link">future::plan(future::multiprocess())</a></code> before running <code>calibrate</code>.</p>
+<p>We can calibrate the model to this data. This calibration will infer the most likely start date of the epidemic and the R0 at the start of the epidemic. Calibration occurs by scanning across a range of possible R0 values and start dates. Fitting works using a particle filter, which can be parallelised using <code>future::plan(future::multiprocess())</code> before running <code>calibrate</code>.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># set up for parallelisation</span>
 <span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/future/man/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/future/man/multiprocess.html" class="external-link">multiprocess</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
@@ -483,7 +483,7 @@
 </div>
 <div id="5-conducting-scenario-projections-to-fitted-data" class="section level3">
 <h3 class="hasAnchor">
-<a href="#5-conducting-scenario-projections-to-fitted-data" class="anchor"></a>5. Conducting scenario projections to fitted data</h3>
+<a href="#5-conducting-scenario-projections-to-fitted-data" class="anchor" aria-hidden="true"></a>5. Conducting scenario projections to fitted data</h3>
 <p>Once you have calibrated the model to death data, it is possible to then implement mitigation strategies forwards in time from the point of calibration. This is achieved using the <code>projections</code> function. For example, let’s consider a country that as of 28th April 2020 is yet to experience an epidemic take off but may be about to. Guinea reported its first COVID-19 death on 16th April 2020 and has reported 7 deaths by the 28th April 2020 according to data from the <a href="https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide" class="external-link">European CDC</a>.</p>
 <p>First let’s calibrate to this data with no interventions in place (there are likely some interventions in place but nothing major, such as a lockdown, has been implemented by 2020-04-28) and simulate forward for 180 days:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
@@ -574,7 +574,7 @@
                     add_parms_to_scenarios <span class="op">=</span> <span class="cn">FALSE</span>,
                     ci <span class="op">=</span> <span class="cn">FALSE</span>,summarise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-projection%20plotting%20absolute-1.png" width="100%"></p>
-<p>Lastly, in order to run simulations for longer than the number set in <code><a href="reference/calibrate.html">calibrate(forecast = x)</a></code>, we can use the argument <code>time_period</code> to set the numbers of days that <code>projections</code> should simulate for. For example, we could redo our calibration and have it only run up the current day:</p>
+<p>Lastly, in order to run simulations for longer than the number set in <code>calibrate(forecast = x)</code>, we can use the argument <code>time_period</code> to set the numbers of days that <code>projections</code> should simulate for. For example, we could redo our calibration and have it only run up the current day:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu">squire</span><span class="fu">:::</span><span class="fu">squire_file</span><span class="op">(</span><span class="st">"extdata/example_GIN.csv"</span><span class="op">)</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 

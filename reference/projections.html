@@ -84,7 +84,7 @@ that then get passed to each simulation replicate." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">squire</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.6</span>
       </span>
     </div>
 
@@ -252,7 +252,7 @@ Default = TRUE, which causes all replictes to be run.</p></td>
       <th>model_user_args</th>
       <td><p>List of other parameters to be passed to the model to
   be run. Default = NULL. An example would be:</p>
-<p><code><a href='https://rdrr.io/r/base/list.html'>list(
+<p><code>list(
   list(
   "prob_severe" = runif(17),
   "tt_dur_get_ox_survive" = c(0, 10),
@@ -261,7 +261,7 @@ Default = TRUE, which causes all replictes to be run.</p></td>
   "prob_severe" = runif(17),
   "tt_dur_get_mv_survive" = c(0, 5),
   "gamma_get_mv_survive" = 0.1)
-  )</a></code></p>
+  )</code></p>
 <p>The list should be the same length as the number of replicates in the
   simulations. Each list element should then be a list with elements
   named to match the arguments expected by the odin model with <code>r</code>.
