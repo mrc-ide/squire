@@ -144,7 +144,7 @@ This plot will plot each of the compartments of the model output. We can also pl
 plot(r, var_select = c("E", "IMild"))
 ```
 
-Or, you can specify one of `deaths`, `infections`, `hospital_occupancy`, `ICU_occupancy`, `hospital_demand` or `ICU_demand`, and plot these summary metrics that represent the combintion of a number of different compartment e.g:
+Or, you can specify one of `deaths`, `infections`, `hospital_occupancy`, `ICU_occupancy`, `hospital_demand` or `ICU_demand`, and plot these summary metrics that represent the combination of a number of different compartment e.g:
 
 ```{r subset variables plot2}
 plot(r, var_select = "deaths")
@@ -178,7 +178,7 @@ length of simulation and the timestep. For a full list of model inputs, please
 see the function [documentation](https://mrc-ide.github.io/squire/reference/run_explicit_SEEIR_model.html)
 
 For example, changing the initial R0 (default = 3), number of replicates (
-default = 10), simualtion length (default = 365 days) and time step (default = 
+default = 10), simulation length (default = 365 days) and time step (default = 
 0.5 days), as well as setting the population and contact matrix manually:
 
 ```{r set params}
@@ -201,7 +201,7 @@ plot(r)
 ```
 
 We can also change the R0 and contact matrix at set time points, to reflect 
-changing behaviour resulting from interventions. For example to set a 80%
+changing behaviour resulting from interventions. For example to set an 80%
 reduction in the contact matrix after 100 days :
 
 ```{r set contact matrix decrease}
@@ -356,7 +356,7 @@ three elements in `out` being the simulation outputs, the model and model parame
 plot(out, "deaths", date_0 = max(df$date), x_var = "date")
 ```
 
-With default parameters, `calibrate` will simulate up the maximum date in the data 
+With default parameters, `calibrate` will simulate up to the maximum date in the data 
 provided. The fit to this data can be shown using the plotting function and specifying `particle_fit`
 to be `TRUE`
 
@@ -380,7 +380,7 @@ plot(out$scan_results, what = "probability")
 
 The reason for the poor fits to the data shown earlier is because Algeria has implemented
 interventions prior to today. These can also be incorporated into `calibrate`. 
-For example, we can grab the assumed changes to transmission fased on government intervention
+For example, we can grab the assumed changes to transmission based on government intervention
 for Algeria.
 
 ```{r dza interventions}
@@ -420,7 +420,7 @@ plot(out, particle_fit = TRUE)
 That is a much better fit. 
 
 Any parameter that you could provide to `run_explicit_SEEIR_model` can be passed to `calibrate`. This
-includes time varying arguments such as `contact_matrix_set`, `ICU_bed_capacity` and `hosp_bed_capacity`. To incorporate these into model fitting correctly, the date at which these change must be provided (similarly to how `date_R0_change` was provided above) using `date_ICU_bed_capacity_change`, `date_ICU_bed_capacity_change` and `date_hosp_bed_capacity_change` respecitvely. In addition, the user must provide a baseline value for these, i.e. the contact matrix and bed capacity at the beginning of the epidemic:
+includes time varying arguments such as `contact_matrix_set`, `ICU_bed_capacity` and `hosp_bed_capacity`. To incorporate these into model fitting correctly, the date at which these change must be provided (similarly to how `date_R0_change` was provided above) using `date_ICU_bed_capacity_change`, `date_ICU_bed_capacity_change` and `date_hosp_bed_capacity_change` respectively. In addition, the user must provide a baseline value for these, i.e. the contact matrix and bed capacity at the beginning of the epidemic:
 
 ```{r particle with ints of all kinds, warning=FALSE, message=FALSE}
 out <- calibrate(
@@ -510,7 +510,7 @@ ggproj + ggplot2::geom_hline(yintercept = out$parameters$ICU_bed_capacity)
 
 We can see above that the intervention introduced is nearly sufficient to prevent ICU demand (solid line red) from exceeding the supply, whereas in the unmitigated strategy this did occur.
 
-We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 75% in a week before relaxing it to 80% in 30 days time, while increasing hospital and ICU beds by 20% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with `add_parms_to_scenarios = FALSE`):
+We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 75% in a week before relaxing it to 80% in 30 days time, while increasing hospital and ICU beds by 200% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with `add_parms_to_scenarios = FALSE`):
 
 ```{r projection relative beds}
 # create our projections
