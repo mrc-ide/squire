@@ -43,25 +43,10 @@
     <loc>/reference/calibrate.html</loc>
   </url>
   <url>
-    <loc>/reference/calibrate_output_parsing.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calibrate_stripped.html</loc>
-  </url>
-  <url>
     <loc>/reference/check_squire.html</loc>
   </url>
   <url>
     <loc>/reference/check_time_change.html</loc>
-  </url>
-  <url>
-    <loc>/reference/collapse_age.html</loc>
-  </url>
-  <url>
-    <loc>/reference/collapse_compartment.html</loc>
-  </url>
-  <url>
-    <loc>/reference/collapse_for_report.html</loc>
   </url>
   <url>
     <loc>/reference/compare_output.html</loc>
@@ -79,9 +64,6 @@
     <loc>/reference/create_master_chain.html</loc>
   </url>
   <url>
-    <loc>/reference/death_data_format.html</loc>
-  </url>
-  <url>
     <loc>/reference/default_durations.html</loc>
   </url>
   <url>
@@ -89,12 +71,6 @@
   </url>
   <url>
     <loc>/reference/deterministic_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/df_output.html</loc>
-  </url>
-  <url>
-    <loc>/reference/df_output_wide.html</loc>
   </url>
   <url>
     <loc>/reference/div_pop.html</loc>
@@ -109,9 +85,6 @@
     <loc>/reference/extract_ICU_occ.html</loc>
   </url>
   <url>
-    <loc>/reference/extract_all_outputs.html</loc>
-  </url>
-  <url>
     <loc>/reference/extract_deaths.html</loc>
   </url>
   <url>
@@ -119,12 +92,6 @@
   </url>
   <url>
     <loc>/reference/extract_infection_incidence.html</loc>
-  </url>
-  <url>
-    <loc>/reference/extract_report_summaries.html</loc>
-  </url>
-  <url>
-    <loc>/reference/extract_specific_output.html</loc>
   </url>
   <url>
     <loc>/reference/format_deterministic_output.html</loc>
@@ -172,12 +139,6 @@
     <loc>/reference/jc_prop_update.html</loc>
   </url>
   <url>
-    <loc>/reference/lci.html</loc>
-  </url>
-  <url>
-    <loc>/reference/long_output.html</loc>
-  </url>
-  <url>
     <loc>/reference/matrix_check.html</loc>
   </url>
   <url>
@@ -199,16 +160,10 @@
     <loc>/reference/particle_filter_data.html</loc>
   </url>
   <url>
-    <loc>/reference/plot.squire_calibration.html</loc>
-  </url>
-  <url>
     <loc>/reference/plot.squire_scan.html</loc>
   </url>
   <url>
     <loc>/reference/plot.squire_simulation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot.squire_untransform.html</loc>
   </url>
   <url>
     <loc>/reference/pmcmc.html</loc>
@@ -233,12 +188,6 @@
   </url>
   <url>
     <loc>/reference/projections.html</loc>
-  </url>
-  <url>
-    <loc>/reference/quick_long.html</loc>
-  </url>
-  <url>
-    <loc>/reference/run_SEEIR_model.html</loc>
   </url>
   <url>
     <loc>/reference/run_deterministic_SEIR_model.html</loc>
@@ -278,23 +227,5 @@
   </url>
   <url>
     <loc>/reference/trigger_projections.html</loc>
-  </url>
-  <url>
-    <loc>/reference/uci.html</loc>
-  </url>
-  <url>
-    <loc>/reference/untransformed_output.html</loc>
-  </url>
-  <url>
-    <loc>/reference/update_covariance_matrix.html</loc>
-  </url>
-  <url>
-    <loc>/reference/update_scaling_factor.html</loc>
-  </url>
-  <url>
-    <loc>/reference/vec_o.html</loc>
-  </url>
-  <url>
-    <loc>/reference/wide_output.html</loc>
   </url>
 </urlset>
