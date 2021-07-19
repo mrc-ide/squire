@@ -49,10 +49,17 @@ plot_pmcmc_sample  <- function(x, what = "deaths") {
 
     base_plot <- plot(x, "deaths", ci = FALSE, replicates = TRUE, x_var = "date",
                       date_0 = max(x$pmcmc_results$inputs$data$date))
+
+    if ("rf" %in% names(x$replicate_parameters)) {
+      rf <- mean(x$replicate_parameters$rf)
+    } else {
+      rf <- x$pmcmc_results$inputs$pars_obs$phi_death
+    }
+
     base_plot <- base_plot +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymin, x=as.Date(.data$date)), quants, linetype="dashed") +
       ggplot2::geom_line(ggplot2::aes(y=.data$ymax, x=as.Date(.data$date)), quants, linetype="dashed") +
-      ggplot2::geom_point(ggplot2::aes(y=.data$deaths/x$pmcmc_results$inputs$pars_obs$phi_death,
+      ggplot2::geom_point(ggplot2::aes(y=.data$deaths/rf,
                                        x=as.Date(.data$date)), x$pmcmc_results$inputs$data) +
       ggplot2::theme(legend.position = "top")
 

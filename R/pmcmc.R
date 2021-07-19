@@ -293,8 +293,8 @@ pmcmc <- function(data,
   }
   assert_logical(unlist(pars_discrete))
   assert_list(pars_obs)
-  assert_eq(names(pars_obs), c("phi_cases", "k_cases", "phi_death", "k_death", "exp_noise"))
-  assert_numeric(unlist(pars_obs))
+  assert_in(c("phi_cases", "k_cases", "phi_death", "k_death", "exp_noise"), names(pars_obs))
+  assert_numeric(unlist(pars_obs[c("phi_cases", "k_cases", "phi_death", "k_death", "exp_noise")]))
 
   # mcmc items
   assert_pos_int(n_mcmc)
@@ -1314,6 +1314,12 @@ calc_loglikelihood <- function(pars, data, squire_model, model_params,
   #----------------..
   R0 <- pars[["R0"]]
   start_date <- pars[["start_date"]]
+
+  # reporting fraction par if in pars list
+  if("rf" %in% names(pars)) {
+    assert_numeric(pars[["rf"]])
+    pars_obs$phi_death <- pars[["rf"]]
+  }
 
   #----------------..
   # more assertions

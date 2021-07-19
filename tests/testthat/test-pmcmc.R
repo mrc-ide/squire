@@ -1643,3 +1643,114 @@ test_that("pmcmc restarting covariance/scaling", {
 
 
 })
+
+
+
+#------------------------------------------------
+test_that("sero fitting works", {
+
+  set.seed(12)
+
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG" = "TRUE")
+  data <- read.csv(squire_file("extdata/example.csv"),stringsAsFactors = FALSE)
+  interventions <- read.csv(squire_file("extdata/example_intervention.csv"))
+  int_unique <- interventions_unique(interventions)
+  reporting_fraction = 1
+  country = "Algeria"
+  pars_init = list('start_date'     = as.Date("2020-02-07"),
+                   'R0'             = 3,
+                   'Meff'           = 2,
+                   "rf"             = 0.25) # correct rf for the data
+  pars_min = list('start_date'      = as.Date("2020-02-01"),
+                  'R0'              = 1e-10,
+                  'Meff'            = 0.1,
+                  "rf"              = 0.1)
+  pars_max = list('start_date'      = as.Date("2020-02-20"),
+                  'R0'              = 5,
+                  'Meff'            = 5,
+                  "rf"              = 1)
+  pars_discrete = list('start_date' = TRUE,
+                       'R0'         = FALSE,
+                       'Meff'       = FALSE,
+                       'rf'       = FALSE)
+  pars_obs = list(phi_cases = 0.1,
+                  k_cases = 2,
+                  phi_death = 1,
+                  k_death = 2,
+                  exp_noise = 1e6)
+
+  steps_per_day = 1
+  R0_change = int_unique$change
+  date_R0_change = as.Date(int_unique$dates_change)
+  date_contact_matrix_set_change = NULL
+  squire_model = squire:::deterministic_model()
+  n_particles = 2
+  # proposal kernel covriance
+  proposal_kernel <- matrix(0.5, ncol=length(pars_init), nrow = length(pars_init))
+  diag(proposal_kernel) <- 1
+  rownames(proposal_kernel) <- colnames(proposal_kernel) <- names(pars_init)
+
+  sero_df <- data.frame("samples" = 1000, "sero_pos" = 10,
+                        "date_start" = as.Date("2020-04-15"),
+                        "date_end" = as.Date("2020-04-19"))
+  # seroconversion data from brazeay report 34
+  prob_conversion <-  cumsum(dgamma(0:300,shape = 5, rate = 1/2))/max(cumsum(dgamma(0:300,shape = 5, rate = 1/2)))
+  sero_det <- cumsum(dweibull(0:300, 3.669807, scale = 143.7046))
+  sero_det <- prob_conversion-sero_det
+  sero_det[sero_det < 0] <- 0
+  sero_det <- sero_det/max(sero_det)
+
+  pars_obs$sero_df <- sero_df
+  pars_obs$sero_det <- sero_det
+
+  Sys.setenv("SQUIRE_PARALLEL_DEBUG"=TRUE)
+  out <- pmcmc(data = data,
+               n_mcmc = 5,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 20,
+               burnin = 5,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country)
+
+  pars_init$rf <- 1
+
+  out2 <- pmcmc(data = data,
+               n_mcmc = 5,
+               log_likelihood = NULL,
+               log_prior = NULL,
+               n_particles = 2,
+               steps_per_day = steps_per_day,
+               output_proposals = FALSE,
+               n_chains = 1,
+               replicates = 20,
+               burnin = 5,
+               squire_model = squire_model,
+               pars_init = pars_init,
+               pars_min = pars_min,
+               pars_max = pars_max,
+               pars_discrete = pars_discrete,
+               pars_obs = pars_obs,
+               proposal_kernel = proposal_kernel,
+               R0_change = R0_change,
+               date_R0_change = date_R0_change,
+               country = country)
+
+  expect_gt(sum(out$pmcmc_results$results$log_likelihood),
+            sum(out2$pmcmc_results$results$log_likelihood))
+
+  expect_s3_class(plot(out, what = "deaths", particle_fit = TRUE), "gg")
+
+})
