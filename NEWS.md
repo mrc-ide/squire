@@ -1,3 +1,8 @@
+# squire 0.6.7
+
+* `pmcmc` can now be used to fit to serology data (deterministic model only) 
+by passing `sero_df` and `sero_det` as names list elements of `pars_obs`
+
 # squire 0.6.6
 
 * `projections` can be used now for `nimue` models

@@ -650,6 +650,7 @@ scale_log_weights <- function(log_weights) {
 #'
 #' @return Results from particle filter
 #'
+#' @importFrom stats dbinom
 run_deterministic_comparison <- function(data,
                                          squire_model,
                                          model_params,
@@ -700,7 +701,7 @@ run_deterministic_comparison <- function(data,
   Ds[Ds < 0] <- 0
   deaths <- data$deaths[-1]
 
-  # calculate ll
+  # calculate ll for deaths
   if (obs_params$treated_deaths_only) {
 
     Ds_heathcare <- diff(rowSums(out[,index$D_get]))
@@ -713,6 +714,49 @@ run_deterministic_comparison <- function(data,
 
   }
 
+  # calculate ll for the seroprevalence
+  lls <- 0
+  if("sero_df" %in% obs_params && "sero_det" %in% obs_params) {
+
+    sero_df <- obs_params$sero_df
+    sero_det <- obs_params$sero_det
+
+    # were there actually seroprevalence data points to compare against
+    if(nrow(sero_df) > 0) {
+
+      sero_at_date <- function(date, symptoms, det, dates, N) {
+
+        di <- which(dates == date)
+        if(length(di) > 0) {
+          to_sum <- tail(symptoms[seq_len(di)], length(det))
+          min(sum(rev(to_sum)*head(det, length(to_sum)), na.rm=TRUE)/N, 0.99)
+        } else {
+          0
+        }
+
+      }
+
+    # get symptom incidence
+    symptoms <- rowSums(out[,index$E2]) * model_params$gamma_E
+
+    # dates of incidence, pop size and dates of sero surveys
+    dates <- data$date[[1]] + seq_len(nrow(out)) - 1L
+    N <- sum(model_params$population)
+    sero_dates <- list(sero_df$date_end, sero_df$date_start, sero_df$date_start + as.integer((sero_df$date_end - sero_df$date_start)/2))
+    unq_sero_dates <- unique(c(sero_df$date_end, sero_df$date_start, sero_df$date_start + as.integer((sero_df$date_end - sero_df$date_start)/2)))
+    det <- obs_params$sero_det
+
+    # estimate model seroprev
+    sero_model <- vapply(unq_sero_dates, sero_at_date, numeric(1), symptoms, det, dates, N)
+    sero_model_mat <- do.call(cbind,lapply(sero_dates, function(x) {sero_model[match(x, unq_sero_dates)]}))
+
+    # likelihood of model obvs
+    lls <- rowMeans(dbinom(sero_df$sero_pos, sero_df$samples, sero_model_mat, log = TRUE))
+
+    }
+
+  }
+
   # format the out object
   date <- data$date[[1]] + seq_len(nrow(out)) - 1L
   rownames(out) <- as.character(date)
@@ -720,7 +764,7 @@ run_deterministic_comparison <- function(data,
 
   # format similar to particle_filter nomenclature
   pf_results <- list()
-  pf_results$log_likelihood <- sum(ll)
+  pf_results$log_likelihood <- sum(ll) + sum(lls)
 
   # single returns final state
   if (save_history) {
