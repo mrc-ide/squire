@@ -1751,6 +1751,6 @@ test_that("sero fitting works", {
   expect_gt(sum(out$pmcmc_results$results$log_likelihood),
             sum(out2$pmcmc_results$results$log_likelihood))
 
-  expect_warning(expect_s3_class(plot(out, what = "deaths", particle_fit = TRUE), "gg"))
+  expect_s3_class(plot(out, what = "deaths", particle_fit = TRUE), "gg")
 
 })
