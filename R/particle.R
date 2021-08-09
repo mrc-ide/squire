@@ -361,7 +361,7 @@ compare_output <- function(model, pars_obs, data, type="explicit_SEEIR_model") {
       log_weights <- log_weights +
         ll_nbinom(data$deaths[t], model_deaths, phi_death, k_death, exp_noise)
 
-      }
+    }
 
     # We are not going to be bringing cases in so comment this out
 
@@ -484,9 +484,9 @@ intervention_dates_for_odin <- function(dates,
     dates <- dates[include]
     change <- change[include]
 
-  # if start date is in the middle of our dates but not incldued
-  # then remove all earlier dates and change the last date before the
-  # start date to the start date
+    # if start date is in the middle of our dates but not incldued
+    # then remove all earlier dates and change the last date before the
+    # start date to the start date
   } else if (any(start_date >= dates)) {
 
     # which are before the start date
@@ -501,8 +501,8 @@ intervention_dates_for_odin <- function(dates,
 
     dates[1] <- as.Date(start_date)
 
-  # if all the dates are after the start date then add the start date
-  # and we assume the first change value is starting_change
+    # if all the dates are after the start date then add the start date
+    # and we assume the first change value is starting_change
   } else {
 
     extra_start <- seq.Date(start_date, dates[1]-1, 1)
@@ -716,10 +716,13 @@ run_deterministic_comparison <- function(data,
 
   # calculate ll for the seroprevalence
   lls <- 0
-  if("sero_df" %in% obs_params && "sero_det" %in% obs_params) {
+  if("sero_df" %in% names(obs_params) && "sero_det" %in% names(obs_params)) {
 
     sero_df <- obs_params$sero_df
     sero_det <- obs_params$sero_det
+
+    # put some checks here that sero_df is correctly formatted
+    check_sero_df(sero_df)
 
     # were there actually seroprevalence data points to compare against
     if(nrow(sero_df) > 0) {
@@ -736,22 +739,22 @@ run_deterministic_comparison <- function(data,
 
       }
 
-    # get symptom incidence
-    symptoms <- rowSums(out[,index$E2]) * model_params$gamma_E
+      # get symptom incidence
+      symptoms <- rowSums(out[,index$E2]) * model_params$gamma_E
 
-    # dates of incidence, pop size and dates of sero surveys
-    dates <- data$date[[1]] + seq_len(nrow(out)) - 1L
-    N <- sum(model_params$population)
-    sero_dates <- list(sero_df$date_end, sero_df$date_start, sero_df$date_start + as.integer((sero_df$date_end - sero_df$date_start)/2))
-    unq_sero_dates <- unique(c(sero_df$date_end, sero_df$date_start, sero_df$date_start + as.integer((sero_df$date_end - sero_df$date_start)/2)))
-    det <- obs_params$sero_det
+      # dates of incidence, pop size and dates of sero surveys
+      dates <- data$date[[1]] + seq_len(nrow(out)) - 1L
+      N <- sum(model_params$population)
+      sero_dates <- list(sero_df$date_end, sero_df$date_start, sero_df$date_start + as.integer((sero_df$date_end - sero_df$date_start)/2))
+      unq_sero_dates <- unique(c(sero_df$date_end, sero_df$date_start, sero_df$date_start + as.integer((sero_df$date_end - sero_df$date_start)/2)))
+      det <- obs_params$sero_det
 
-    # estimate model seroprev
-    sero_model <- vapply(unq_sero_dates, sero_at_date, numeric(1), symptoms, det, dates, N)
-    sero_model_mat <- do.call(cbind,lapply(sero_dates, function(x) {sero_model[match(x, unq_sero_dates)]}))
+      # estimate model seroprev
+      sero_model <- vapply(unq_sero_dates, sero_at_date, numeric(1), symptoms, det, dates, N)
+      sero_model_mat <- do.call(cbind,lapply(sero_dates, function(x) {sero_model[match(x, unq_sero_dates)]}))
 
-    # likelihood of model obvs
-    lls <- rowMeans(dbinom(sero_df$sero_pos, sero_df$samples, sero_model_mat, log = TRUE))
+      # likelihood of model obvs
+      lls <- rowMeans(dbinom(sero_df$sero_pos, sero_df$samples, sero_model_mat, log = TRUE))
 
     }
 
@@ -783,4 +786,16 @@ run_deterministic_comparison <- function(data,
   }
 
   ret
+}
+
+
+#' @noRd
+check_sero_df <- function(sero_df) {
+
+  assert_date(sero_df$date_start)
+  assert_date(sero_df$date_end)
+  assert_pos_int(sero_df$sero_pos)
+  assert_pos_int(sero_df$samples)
+  assert_le(sero_df$sero_pos, sero_df$samples)
+
 }

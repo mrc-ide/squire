@@ -1,3 +1,7 @@
+# squire 0.6.8
+
+* `run_deterministic_comparison` patches for sero fitting and argument checks
+
 # squire 0.6.7
 
 * `pmcmc` can now be used to fit to serology data (deterministic model only) 
