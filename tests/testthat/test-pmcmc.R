@@ -1703,6 +1703,8 @@ test_that("sero fitting works", {
   pars_obs$sero_df <- sero_df
   pars_obs$sero_det <- sero_det
 
+  # following checks to see that it is being correctly used to get better likelihoods
+  # given contribution from the sero ll
   Sys.setenv("SQUIRE_PARALLEL_DEBUG"=TRUE)
   out <- pmcmc(data = data,
                n_mcmc = 5,
@@ -1753,4 +1755,73 @@ test_that("sero fitting works", {
 
   expect_s3_class(plot(out, what = "deaths", particle_fit = TRUE), "gg")
 
+
+  # and checks that the sero_df date is correctly formatted
+  pars_obs$sero_df$date_end <- factor(pars_obs$sero_df$date_end)
+  expect_error(pmcmc(data = data,
+                n_mcmc = 5,
+                log_likelihood = NULL,
+                log_prior = NULL,
+                n_particles = 2,
+                steps_per_day = steps_per_day,
+                output_proposals = FALSE,
+                n_chains = 1,
+                replicates = 20,
+                burnin = 5,
+                squire_model = squire_model,
+                pars_init = pars_init,
+                pars_min = pars_min,
+                pars_max = pars_max,
+                pars_discrete = pars_discrete,
+                pars_obs = pars_obs,
+                proposal_kernel = proposal_kernel,
+                R0_change = R0_change,
+                date_R0_change = date_R0_change,
+                country = country),
+               "date_end must be a date or ISO-formatted string")
+
+
 })
+
+
+#------------------------------------------------
+test_that("sero df checking works", {
+
+sero_df <- data.frame("samples" = 1000, "sero_pos" = 10,
+                      "date_start" = as.Date("2020-04-15"),
+                      "date_end" = as.Date("2020-04-19"))
+
+sero_df_fail <- sero_df
+
+# date_start
+sero_df_fail <- sero_df
+sero_df_fail$date_start <- factor(sero_df_fail$date_start)
+expect_error(check_sero_df(sero_df_fail),
+             "date_start must be a date or ISO-formatted string")
+
+# date end
+sero_df_fail <- sero_df
+sero_df_fail$date_end <- factor(sero_df_fail$date_end)
+expect_error(check_sero_df(sero_df_fail),
+             "date_end must be a date or ISO-formatted string")
+
+# integers
+sero_df_fail <- sero_df
+sero_df_fail$samples <- 101010.123
+expect_error(check_sero_df(sero_df_fail),
+             "samples must be integer valued")
+
+# integers
+sero_df_fail <- sero_df
+sero_df_fail$sero_pos <- 10.123
+expect_error(check_sero_df(sero_df_fail),
+             "sero_pos must be integer valued")
+
+# comparators
+sero_df_fail <- sero_df
+sero_df_fail$sero_pos <- 10000
+expect_error(check_sero_df(sero_df_fail),
+             "sero_pos must be less than")
+
+})
+
