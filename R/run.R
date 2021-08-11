@@ -486,7 +486,7 @@ run_deterministic_SEIR_model <- function(
   t <- seq(from = 1, to = time_period, by = dt)
 
   # if we ar doing day return then proceed in steps of day length
-  # We also will do an extra day so we know the numebr of infections/deaths
+  # We also will do an extra day so we know the number of infections/deaths
   # that would happen in the last day
   if (day_return) {
     t <- round(seq(from = 1, to = time_period))
