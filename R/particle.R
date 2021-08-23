@@ -770,6 +770,52 @@ run_deterministic_comparison <- function(data,
 
   }
 
+  # calculate ll for the PCR prevalence
+  llp <- 0
+  if("pcr_df" %in% names(obs_params) && "pcr_det" %in% names(obs_params)) {
+
+    pcr_df <- obs_params$pcr_df
+    pcr_det <- obs_params$pcr_det
+
+    # put some checks here that pcr_df is correctly formatted
+    check_pcr_df(pcr_df)
+
+    # were there actually pcr prevalence data points to compare against
+    if(nrow(pcr_df) > 0) {
+
+      pcr_at_date <- function(date, infections, det, dates, N) {
+
+        di <- which(dates == date)
+        if(length(di) > 0) {
+          to_sum <- tail(infections[seq_len(di)], length(det))
+          min(sum(rev(to_sum)*head(det, length(to_sum)), na.rm=TRUE)/N, 0.99)
+        } else {
+          0
+        }
+
+      }
+
+      # get infection incidence
+      infections <- c(0,rowSums(out[-nrow(out),index$S]-out[-1,index$S]))
+
+      # dates of incidence, pop size and dates of pcr surveys
+      dates <- data$date[[1]] + seq_len(nrow(out)) - 1L
+      N <- sum(model_params$population)
+      pcr_dates <- list(pcr_df$date_end, pcr_df$date_start, pcr_df$date_start + as.integer((pcr_df$date_end - pcr_df$date_start)/2))
+      unq_pcr_dates <- unique(c(pcr_df$date_end, pcr_df$date_start, pcr_df$date_start + as.integer((pcr_df$date_end - pcr_df$date_start)/2)))
+      det <- obs_params$pcr_det
+
+      # estimate model pcrprev
+      pcr_model <- vapply(unq_pcr_dates, pcr_at_date, numeric(1), infections, det, dates, N)
+      pcr_model_mat <- do.call(cbind,lapply(pcr_dates, function(x) {pcr_model[match(x, unq_pcr_dates)]}))
+
+      # likelihood of model obvs
+      llp <- rowMeans(dbinom(pcr_df$pcr_pos, pcr_df$samples, pcr_model_mat, log = TRUE))
+
+    }
+
+  }
+
   # format the out object
   date <- data$date[[1]] + seq_len(nrow(out)) - 1L
   rownames(out) <- as.character(date)
@@ -777,7 +823,7 @@ run_deterministic_comparison <- function(data,
 
   # format similar to particle_filter nomenclature
   pf_results <- list()
-  pf_results$log_likelihood <- sum(ll) + sum(lls)
+  pf_results$log_likelihood <- sum(ll) + sum(lls) + sum(llp)
 
   # single returns final state
   if (save_history) {
@@ -798,7 +844,6 @@ run_deterministic_comparison <- function(data,
   ret
 }
 
-
 #' @noRd
 check_sero_df <- function(sero_df) {
 
@@ -807,5 +852,16 @@ check_sero_df <- function(sero_df) {
   assert_pos_int(sero_df$sero_pos)
   assert_pos_int(sero_df$samples)
   assert_le(sero_df$sero_pos, sero_df$samples)
+
+}
+
+#' @noRd
+check_pcr_df <- function(pcr_df) {
+
+  assert_date(pcr_df$date_start)
+  assert_date(pcr_df$date_end)
+  assert_pos_int(pcr_df$pcr_pos)
+  assert_pos_int(pcr_df$samples)
+  assert_le(pcr_df$pcr_pos, pcr_df$samples)
 
 }
