@@ -187,7 +187,7 @@ plot(r, var_select = c("E", "IMild"))
 <img src="man/figures/README-subset variables plot-1.png" width="100%" />
 Or, you can specify one of `deaths`, `infections`, `hospital_occupancy`,
 `ICU_occupancy`, `hospital_demand` or `ICU_demand`, and plot these
-summary metrics that represent the combintion of a number of different
+summary metrics that represent the combination of a number of different
 compartment
 e.g:
 
@@ -251,7 +251,7 @@ full list of model inputs, please see the function
 [documentation](https://mrc-ide.github.io/squire/reference/run_explicit_SEEIR_model.html)
 
 For example, changing the initial R0 (default = 3), number of replicates
-( default = 10), simualtion length (default = 365 days) and time step
+( default = 10), simulation length (default = 365 days) and time step
 (default = 0.5 days), as well as setting the population and contact
 matrix manually:
 
@@ -282,7 +282,7 @@ plot(r)
 
 We can also change the R0 and contact matrix at set time points, to
 reflect changing behaviour resulting from interventions. For example to
-set a 80% reduction in the contact matrix after 100 days :
+set an 80% reduction in the contact matrix after 100 days :
 
 ``` r
 
@@ -306,7 +306,7 @@ plot(r, var_select = "infections")
 
 where `n_E2_I` is the daily number of new infections.
 
-To show an 80% reduction after 50 days but only maintained for 30 days :
+To show an 80% reduction after 80 days but only maintained for 40 days :
 
 ``` r
 
@@ -329,7 +329,7 @@ plot(r, var_select = "infections")
 
 <img src="man/figures/README-set contact matrix decrease and relax-1.png" width="100%" />
 
-Alternatively, we could set a changing R0, which falls below 1 after 50
+Alternatively, we could set a changing R0, which falls below 1 after 80
 days:
 
 ``` r
@@ -501,7 +501,7 @@ plot(out, "deaths", date_0 = max(df$date), x_var = "date")
 
 <img src="man/figures/README-plot particle deaths-1.png" width="100%" />
 
-With default parameters, `calibrate` will simulate up the maximum date
+With default parameters, `calibrate` will simulate up to the maximum date
 in the data provided. The fit to this data can be shown using the
 plotting function and specifying `particle_fit` to be `TRUE`
 
@@ -533,7 +533,7 @@ plot(out$scan_results, what = "probability")
 The reason for the poor fits to the data shown earlier is because
 Algeria has implemented interventions prior to today. These can also be
 incorporated into `calibrate`. For example, we can grab the assumed
-changes to transmission fased on government intervention for
+changes to transmission based on government intervention for
 Algeria.
 
 ``` r
@@ -590,7 +590,7 @@ incorporate these into model fitting correctly, the date at which these
 change must be provided (similarly to how `date_R0_change` was provided
 above) using `date_ICU_bed_capacity_change`,
 `date_ICU_bed_capacity_change` and `date_hosp_bed_capacity_change`
-respecitvely. In addition, the user must provide a baseline value for
+respectively. In addition, the user must provide a baseline value for
 these, i.e. the contact matrix and bed capacity at the beginning of the
 epidemic:
 
@@ -725,7 +725,7 @@ whereas in the unmitigated strategy this did occur.
 We can also model changing interventions by changing the contact matrix
 over time as well as the availability of ICU and hospital beds. E.g.
 decreasing contacts by 75% in a week before relaxing it to 80% in 30
-days time, while increasing hospital and ICU beds by 20% in 30 days
+days time, while increasing hospital and ICU beds by 200% in 30 days
 time. (N.B. We can turn off the automatic scenario parameter labelling
 with `add_parms_to_scenarios = FALSE`):
 
