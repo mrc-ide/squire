@@ -2,6 +2,8 @@
 
 * `atol` and `rtol` can be passed to `pmcmc` fitting as named arguments in 
 `pars_obs` to be used in `run_deterministic_comparison`
+* `pmcmc` can now be used to fit to PCR prevalence data (deterministic model only) 
+by passing `pcr_df` and `pcr_det` as named list elements of `pars_obs`
 
 # squire 0.6.8
 
