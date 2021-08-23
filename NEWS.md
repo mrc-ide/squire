@@ -1,3 +1,8 @@
+# squire 0.6.9
+
+* `atol` and `rtol` can be passed to `pmcmc` fitting as named arguments in 
+`pars_obs` to be used in `run_deterministic_comparison`
+
 # squire 0.6.8
 
 * `run_deterministic_comparison` patches for sero fitting and argument checks

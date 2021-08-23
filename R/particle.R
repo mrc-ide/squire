@@ -692,7 +692,17 @@ run_deterministic_comparison <- function(data,
   steps <- unique(c(steps,fore_steps))
 
   # model run
-  out <- model_func$run(t = seq(0, tail(steps,1), 1))
+  if("atol" %in% names(obs_params) && "rtol" %in% names(obs_params)) {
+    assert_numeric(obs_params$atol)
+    atol <- obs_params$atol
+    assert_numeric(obs_params$rtol)
+    rtol <- obs_params$rtol
+  } else {
+    atol <- 1e-6
+    rtol <- 1e-6
+  }
+
+  out <- model_func$run(t = seq(0, tail(steps,1), 1), atol = atol, rtol = rtol)
   index <- odin_index(model_func)
 
   # get deaths for comparison
