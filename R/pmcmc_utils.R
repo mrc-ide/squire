@@ -55,9 +55,6 @@ sample_pmcmc <- function(pmcmc_results,
     res <- pmcmc_results$results
   }
 
-  # Log Posterior must be negative and nonzero -- the later because the posterior should never be P(1)
-  assert_neg(res$log_posterior, zero_allowed = FALSE)
-
   # convert to probability by exponentiating it
   res <- unique(res)
   probs <- exp(res$log_posterior)
