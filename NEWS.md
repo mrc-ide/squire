@@ -1,3 +1,7 @@
+# squire 0.6.10
+
+* `sample_pmcmc` bug fix dor negative posterior checks incorrectly. 
+
 # squire 0.6.9
 
 * `atol` and `rtol` can be passed to `pmcmc` fitting as named arguments in 

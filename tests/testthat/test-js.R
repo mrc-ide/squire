@@ -63,7 +63,7 @@ test_that("js and R versions agree for basic model", {
     time_period = 365,
     hosp_bed_capacity = 100000,
     ICU_bed_capacity = 1000000,
-    mod_gen = gen_js,
+    mod_gen = gen_js$new,
     init = init
   )
 
