@@ -322,6 +322,9 @@ parameters_explicit_SEEIR <- function(
     dur_not_get_mv_die = dur_not_get_mv_die,
     dur_rec = dur_rec,
     dur_R = dur_R,
+    dur_E = dur_E,
+    dur_IMild = dur_IMild,
+    dur_ICase = dur_ICase,
     walker_params = walker_params)
 
   dur_get_ox_survive <- duration_params$dur_get_ox_survive
