@@ -175,10 +175,10 @@ matrices, the durations of each compartment and the health care outcomes and
 healthcare availability. In addition, the initial state of the population can
 be changed as well as simulation parameters, such as the number of replicates, 
 length of simulation and the timestep. For a full list of model inputs, please
-see the function [documentation](https://mrc-ide.github.io/squire/reference/run_explicit_SEEIR_model.html)
+see the function [documentation](https://mrc-ide.github.io/squire/reference/run_explicit_SEEIR_model.html).
 
-For example, changing the initial R0 (default = 3), number of replicates (
-default = 10), simulation length (default = 365 days) and time step (default = 
+For example, changing the initial R0 (default = 3), number of replicates (default = 10), 
+simulation length (default = 365 days) and time step (default = 
 0.5 days), as well as setting the population and contact matrix manually:
 
 ```{r set params}
@@ -190,7 +190,7 @@ population <- pop$n
 # Get the mixing matrix
 contact_matrix <- get_mixing_matrix("United Kingdom")
 
-# run the model
+# Run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               contact_matrix_set = contact_matrix,
                               R0 = 2.5, 
@@ -202,11 +202,11 @@ plot(r)
 
 We can also change the R0 and contact matrix at set time points, to reflect 
 changing behaviour resulting from interventions. For example to set an 80%
-reduction in the contact matrix after 100 days :
+reduction in the contact matrix after 100 days:
 
 ```{r set contact matrix decrease}
 
-# run the model
+# Run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               tt_contact_matrix = c(0, 100),
                               contact_matrix_set = list(contact_matrix,
@@ -220,11 +220,11 @@ plot(r, var_select = "infections")
 
 where `n_E2_I` is the daily number of new infections.
 
-To show an 80% reduction after 80 days but only maintained for 40 days :
+To show an 80% reduction after 80 days but only maintained for 40 days:
 
 ```{r set contact matrix decrease and relax}
 
-# run the model
+# Run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               tt_contact_matrix = c(0, 80, 120),
                               contact_matrix_set = list(contact_matrix,
@@ -241,7 +241,7 @@ Alternatively, we could set a changing R0, which falls below 1 after 80 days:
 
 ```{r set R0 decrease}
 
-# run the model
+# Run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               contact_matrix_set = contact_matrix,
                               tt_R0 = c(0, 80),
@@ -330,7 +330,7 @@ head(df)
 We can calibrate the model to this data. This calibration will infer the most likely start date of the epidemic and the R0 at the start of the epidemic. Calibration occurs by scanning across a range of possible R0 values and start dates. Fitting works using a particle filter, which can be parallelised using `future::plan(future::multiprocess())` before running `calibrate`. 
 
 ```{r calibration particle, warning=FALSE, message = FALSE}
-# set up for parallelisation
+# Set up for parallelisation
 future::plan(future::multiprocess())
 
 # Fit model
@@ -489,10 +489,10 @@ The fit is good and captures the stuttering chains at the beginning of the epide
 plot(out, "deaths")
 ```
 
-We can now use the output of `calibrate` to explore different scenario projections using `projections`. For example, to contast this unmitigated epidemic against a mitigation scenario with a 50% reduction in R0 today and a further 30% in 2 weeks time:
+We can now use the output of `calibrate` to explore different scenario projections using `projections`. For example, to contrast this unmitigated epidemic against a mitigation scenario with a 50% reduction in R0 today and a further 30% in 2 weeks time:
 
 ```{r projection}
-# create our projections
+# Create our projections
 p <- projections(r = out, R0_change = c(0.5, 0.2), tt_R0 = c(0, 14))
 ```
 
@@ -504,7 +504,7 @@ ggproj <- projection_plotting(r_list = list(out,p),
                     var_select = c("ICU_occupancy", "ICU_demand"),
                     add_parms_to_scenarios = TRUE,ci = FALSE,summarise = TRUE)
 
-# and lets add in the ICU capacity
+# And lets add in the ICU capacity
 ggproj + ggplot2::geom_hline(yintercept = out$parameters$ICU_bed_capacity)
 ```
 
@@ -513,7 +513,7 @@ We can see above that the intervention introduced is nearly sufficient to preven
 We can also model changing interventions by changing the contact matrix over time as well as the availability of ICU and hospital beds. E.g. decreasing contacts by 75% in a week before relaxing it to 80% in 30 days time, while increasing hospital and ICU beds by 200% in 30 days time. (N.B. We can turn off the automatic scenario parameter labelling with `add_parms_to_scenarios = FALSE`):
 
 ```{r projection relative beds}
-# create our projections
+# Create our projections
 p <- projections(r = out, 
                   contact_matrix_set_change = c(1, 0.25, 0.8), 
                   tt_contact_matrix = c(0, 7, 30), 
@@ -543,7 +543,7 @@ projection_plotting(r_list = list(out,p),
 Rather than using relative changes to the interventions, we can provide absolute measures. For example, to change the R0 to 2 today and add 500 ICU beds in 40 days time: 
 
 ```{r projection plotting absolute}
-# what is the current capacity
+# What is the current capacity
 icu <- tail(out$parameters$ICU_bed_capacity,1)
 
 # create our projections
