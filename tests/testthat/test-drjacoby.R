@@ -42,9 +42,8 @@ test_that("drjacoby overall test", {
   n_particles = 2
 
   # proposal kernel covriance
-  proposal_kernel <- matrix(0.5, ncol=length(pars_init), nrow = length(pars_init))
-  diag(proposal_kernel) <- 1
-  rownames(proposal_kernel) <- colnames(proposal_kernel) <- names(pars_init)
+  drjl <- list(cluster = NULL, rungs = 2, pb_markdown = TRUE)
+
 
   # following checks to see that it is being correctly used to get better likelihoods
   # given contribution from the sero ll

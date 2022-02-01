@@ -34,9 +34,9 @@ check_drjacoby_list <- function(drjl) {
 }
 
 #' @noRd
-calc_loglikelihood_drjacoby <- function(params, data, misc) {
+calc_loglikelihood_drjacoby <- function(ll_func = calc_loglikelihood) {
 
-  convert_log_likelihood_func_for_drjacoby(calc_loglikelihood)
+  convert_log_likelihood_func_for_drjacoby(ll_func)
 
 }
 
@@ -201,16 +201,6 @@ drjacoby_mcmc <- function(data,
   assert_pos(pars_max$R0)
   assert_pos(pars_init[[1]]$R0)
   assert_bounded(pars_init[[1]]$R0, left = pars_min$R0, right = pars_max$R0)
-
-  # check proposal kernel
-  assert_matrix(proposal_kernel)
-  if (gibbs_sampling) {
-    assert_eq(colnames(proposal_kernel), names(pars_init[[1]][-1]))
-    assert_eq(rownames(proposal_kernel), names(pars_init[[1]][-1]))
-  } else {
-    assert_eq(colnames(proposal_kernel), names(pars_init[[1]]))
-    assert_eq(rownames(proposal_kernel), names(pars_init[[1]]))
-  }
 
   # check likelihood items
   if ( !(is.null(log_likelihood) | inherits(log_likelihood, "function")) ) {
@@ -485,8 +475,6 @@ drjacoby_mcmc <- function(data,
                 pars_init = pars_init,
                 pars_min = pars_min,
                 pars_max = pars_max,
-                proposal_kernel = proposal_kernel,
-                scaling_factor = scaling_factor,
                 pars_discrete = pars_discrete),
     n_particles = n_particles)
 
@@ -503,7 +491,7 @@ drjacoby_mcmc <- function(data,
   check_drjacoby_logprior(calc_lprior)
 
   if(is.null(log_likelihood)) {
-    log_likelihood <- calc_loglikelihood_drjacoby
+    log_likelihood <- calc_loglikelihood_drjacoby()
   }
   calc_ll <- log_likelihood
   check_drjacoby_loglike(calc_ll)
@@ -772,7 +760,7 @@ sample_drjacoby <- function(pmcmc_results,
 }
 
 
-
+#' @noRd
 run_drjacoby_mcmc <- function(loglike,
                               logprior,
                               inputs,
@@ -804,7 +792,7 @@ run_drjacoby_mcmc <- function(loglike,
                forecast_days = 0,
                Rt_args = inputs$Rt_args,
                return = "ll",
-               first_date = data$date[1])
+               first_date = inputs$data$date[1])
 
   args <- list("data" = data_list,
        "df_params" = df_params,
