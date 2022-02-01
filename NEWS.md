@@ -1,3 +1,7 @@
+# squire 0.6.11
+
+* `parse_durations` bug fix. Handles dur_E, dur_IMild and dur_ICase correctly now
+
 # squire 0.6.10
 
 * `sample_pmcmc` bug fix dor negative posterior checks incorrectly. 

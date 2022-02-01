@@ -281,3 +281,23 @@ test_that("default probs", {
                  "prob_severe_death_no_treatment","p_dist"))
 
 })
+
+
+
+test_that("duration E, IMild, ICase, changes through parse_durations", {
+
+  r <- run_deterministic_SEIR_model("Iran", time_period = 2, dur_E = 1, day_return = TRUE)
+  r2 <- run_deterministic_SEIR_model("Iran", time_period = 2, dur_E = 10, day_return = TRUE)
+  expect_true(r$parameters$gamma_E != r2$parameters$gamma_E)
+
+
+  r <- run_deterministic_SEIR_model("Iran", time_period = 2, dur_IMild = 1, day_return = TRUE)
+  r2 <- run_deterministic_SEIR_model("Iran", time_period = 2, dur_IMild = 10, day_return = TRUE)
+  expect_true(r$parameters$gamma_IMild != r2$parameters$gamma_IMild)
+
+
+  r <- run_deterministic_SEIR_model("Iran", time_period = 2, dur_ICase = 1, day_return = TRUE)
+  r2 <- run_deterministic_SEIR_model("Iran", time_period = 2, dur_ICase = 10, day_return = TRUE)
+  expect_true(r$parameters$gamma_ICase != r2$parameters$gamma_ICase)
+
+})
