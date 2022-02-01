@@ -194,6 +194,7 @@ pmcmc <- function(data,
                   start_adaptation = round(n_mcmc/2),
                   gibbs_sampling = FALSE,
                   gibbs_days = NULL,
+                  drjacoby_list = NULL,
                   ...
 ) {
 
