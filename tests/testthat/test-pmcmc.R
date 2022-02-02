@@ -1199,6 +1199,10 @@ test_that("offsetting", {
   expect_equal(start_date_to_offset(as.Date("2020-04-01"), as.Date("2020-03-01")), 31)
   expect_equal(start_date_to_offset(("2020-04-01"), ("2020-03-01")), 31)
   expect_equal(offset_to_start_date(("2020-04-01"), -31), as.Date("2020-03-01"))
+  expect_equal(numeric_to_start_date(as.Date("2020-01-06"), 18262), as.Date("2020-01-01"))
+  expect_false(identical(numeric_to_start_date(as.Date("2020-01-06"), 18262.1, integer = FALSE), as.Date("2020-01-01")))
+  expect_true(identical(numeric_to_start_date(as.Date("2020-01-06"), 18262.1, integer = TRUE), as.Date("2020-01-01")))
+  expect_equal(offset_to_numeric(("2020-04-01"), -31), 18322)
 
 })
 

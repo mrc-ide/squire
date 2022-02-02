@@ -158,6 +158,7 @@ sample_pmcmc <- function(pmcmc_results,
 #..............................................................
 # Converts dates from data into a numeric offset as used in the MCMC
 # Automatically converts type
+#' @noRd
 start_date_to_offset <- function(first_data_date, start_date)
 {
   # Format conversion cascades as required
@@ -196,6 +197,61 @@ offset_to_start_date <- function(first_data_date, start_date)
   }
 
   as.Date(round(start_date), origin=first_data_date)
+}
+
+# Converts dates from  numeric to a Date
+# Automatically converts type
+numeric_to_start_date <- function(first_data_date, start_date, integer = TRUE)
+{
+
+  # Convert any strings to Dates
+  if (class(first_data_date) == "character" || class(first_data_date) == "factor") {
+    first_data_date = as.Date(first_data_date)
+  }
+
+  if (integer) {
+  offset_to_start_date(
+    first_data_date,
+    as.numeric(as.integer(start_date)) - as.numeric(as.integer(first_data_date))
+  )
+  } else {
+    as.Date(as.numeric(start_date) - as.numeric((first_data_date)), origin=first_data_date)
+  }
+
+}
+
+# Offset to numeric
+offset_to_numeric <- function(first_data_date, start_date)
+{
+
+  # Convert any strings to Dates
+  if (class(first_data_date) == "character" || class(first_data_date) == "factor") {
+    first_data_date = as.Date(first_data_date)
+  }
+
+  if (class(start_date) != "numeric") {
+    stop("Offset start date must be numeric")
+  }
+
+  as.numeric(first_data_date) + start_date
+
+}
+
+# numberic date to offset
+numeric_to_offset <- function(first_data_date, start_date)
+{
+
+  # Convert any strings to Dates
+  if (class(first_data_date) == "character" || class(first_data_date) == "factor") {
+    first_data_date = as.Date(first_data_date)
+  }
+
+  if (class(start_date) != "numeric") {
+    stop("Offset start date must be numeric")
+  }
+
+  start_date - as.numeric(first_data_date)
+
 }
 
 #..............................................................

@@ -1,3 +1,18 @@
+# squire 0.7.0
+
+* The `drjacoby` package can now be used to fit mcmc for deterministic model
+* `drjacoby_mcmc` function analogous to `pmcmc` for fitting models
+* `convert_log_likelihood_func_for_drjacoby` helps convert log likelihood
+functions, e.g. `calc_loglikelihood` into suitable likelihood functions that can
+be correctly passed as `log_likelihood` to `drjacoby_mcmc`.
+* `convert_log_prior_func_for_drjacoby` does the same for priors
+* The above changes are because `drjacoby` requires initial parameters and ranges
+to be passed as a `data.frame` internally, which means dates are internally handled
+as numerics, e.g. "2020-01-01" is 18262. Consequently, the sampled parameters from
+`drjacoby_mcmc` will have `start_date` values as numerics. See `sample_drjacoby`
+function for how these are handled correctly to align with converted log likelihood
+function draws. 
+
 # squire 0.6.11
 
 * `parse_durations` bug fix. Handles dur_E, dur_IMild and dur_ICase correctly now
