@@ -13,7 +13,10 @@ scan_R0_date(
   day_step,
   data,
   model_params,
-  Rt_func = function(R0_change, R0, Meff) {     exp(log(R0) - Meff * (1 - R0_change)) },
+  Rt_func = function(R0_change, R0, Meff) {
+     exp(log(R0) - Meff * (1 - R0_change))
+
+    },
   R0_prior = NULL,
   R0_change = NULL,
   date_R0_change = NULL,
