@@ -4,9 +4,14 @@
 # squire
 
 <!-- badges: start -->
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
-[![R build status](https://github.com/mrc-ide/squire/workflows/R-CMD-check/badge.svg)](https://github.com/mrc-ide/squire/actions)
-[![Codecov test coverage](https://codecov.io/gh/mrc-ide/squire/branch/master/graph/badge.svg)](https://codecov.io/gh/mrc-ide/squire?branch=master)
+
+[![Project Status: WIP – Initial development is in progress, but there
+has not yet been a stable, usable release suitable for the
+public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![R build
+status](https://github.com/mrc-ide/squire/workflows/R-CMD-check/badge.svg)](https://github.com/mrc-ide/squire/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/mrc-ide/squire/branch/master/graph/badge.svg)](https://codecov.io/gh/mrc-ide/squire?branch=master)
 <!-- badges: end -->
 
 squire enables users to simulate models of SARS-CoV-2 epidemics. This is
@@ -46,8 +51,7 @@ control scenarios. It consists of the following:
 
 If you are new to squire, the best place to start is below, where we
 detail how to install the package, how to set up the model, and how to
-run it with and without control
-interventions.
+run it with and without control interventions.
 
 ## Model Structure
 
@@ -66,8 +70,7 @@ disease severity pathways. These compartments are:
 \* I<sub>ICU</sub> = ICU (Requires ICU Bed)  
 \* I<sub>Rec</sub> = Recovering from ICU Stay (Requires Hospital Bed)  
 \* R = Recovered  
-\* D =
-Dead
+\* D = Dead
 
 ### Decision Trees for Healthcare Capacity
 
@@ -124,8 +127,7 @@ devtools::install_github("mrc-ide/squire")
 If you have any problems installing then please raise an issue on the
 <i>squire</i> [`GitHub`](https://github.com/mrc-ide/squire/issues).
 
-If everything has installed correctly, we then need to load the
-package:
+If everything has installed correctly, we then need to load the package:
 
 ``` r
 library(squire)
@@ -157,7 +159,7 @@ To run the model by providing the `country` we use
 `run_explicit_SEEIR_model()`:
 
 ``` r
-r <- run_explicit_SEEIR_model(country = "Afghanistan")
+r <- run_explicit_SEEIR_model(country = "Afghanistan", replicates = 5)
 ```
 
 The returned object is a `squire_simulation` object, which is a list of
@@ -170,6 +172,12 @@ two ojects:
 
 ``` r
 plot(r)
+#> Warning in plot.squire_simulation(r): Summary statistic estimated from <10
+#> replicates
+#> Warning in plot.squire_simulation(r): Confidence bounds estimated from <10
+#> replicates
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-base plot-1.png" width="100%" />
@@ -177,22 +185,33 @@ plot(r)
 This plot will plot each of the compartments of the model output. We can
 also plot specific compartments using the `var_select` argument that can
 be passed to `plot()`. Arguments passed to `var_select` must be one of
-the variables in the plot
-above.
+the variables in the plot above.
 
 ``` r
 plot(r, var_select = c("E", "IMild"))
+#> Warning in plot.squire_simulation(r, var_select = c("E", "IMild")): Summary
+#> statistic estimated from <10 replicates
+#> Warning in plot.squire_simulation(r, var_select = c("E", "IMild")): Confidence
+#> bounds estimated from <10 replicates
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-subset variables plot-1.png" width="100%" />
+
 Or, you can specify one of `deaths`, `infections`, `hospital_occupancy`,
 `ICU_occupancy`, `hospital_demand` or `ICU_demand`, and plot these
 summary metrics that represent the combination of a number of different
-compartment
-e.g:
+compartment e.g:
 
 ``` r
 plot(r, var_select = "deaths")
+#> Warning in plot.squire_simulation(r, var_select = "deaths"): Summary statistic
+#> estimated from <10 replicates
+#> Warning in plot.squire_simulation(r, var_select = "deaths"): Confidence bounds
+#> estimated from <10 replicates
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-subset variables plot2-1.png" width="100%" />
@@ -210,15 +229,15 @@ compartment name (`compartment`), timestep (`t`), model run number
 
 output <- format_output(r, var_select = "E")
 head(output)
-#> # A tibble: 6 x 4
+#> # A tibble: 6 × 4
 #>   replicate compartment     t     y
 #>       <dbl> <chr>       <dbl> <dbl>
 #> 1         1 E             0.1    20
 #> 2         1 E             0.2    20
 #> 3         1 E             0.3    20
 #> 4         1 E             0.4    20
-#> 5         1 E             0.5    20
-#> 6         1 E             0.6    20
+#> 5         1 E             0.5    19
+#> 6         1 E             0.6    19
 ```
 
 If we wanted age-disaggregated data, we could set `reduce_age` to
@@ -229,7 +248,7 @@ additional column indicating the age-group.
 
 output <- format_output(r, var_select = "E", reduce_age = FALSE)
 head(output)
-#> # A tibble: 6 x 5
+#> # A tibble: 6 × 5
 #>   replicate age_group compartment     t     y
 #>       <dbl>     <int> <chr>       <dbl> <dbl>
 #> 1         1         1 E             0.1     0
@@ -248,10 +267,10 @@ outcomes and healthcare availability. In addition, the initial state of
 the population can be changed as well as simulation parameters, such as
 the number of replicates, length of simulation and the timestep. For a
 full list of model inputs, please see the function
-[documentation](https://mrc-ide.github.io/squire/reference/run_explicit_SEEIR_model.html)
+[documentation](https://mrc-ide.github.io/squire/reference/run_explicit_SEEIR_model.html).
 
 For example, changing the initial R0 (default = 3), number of replicates
-( default = 10), simulation length (default = 365 days) and time step
+(default = 10), simulation length (default = 365 days) and time step
 (default = 0.5 days), as well as setting the population and contact
 matrix manually:
 
@@ -264,7 +283,7 @@ population <- pop$n
 # Get the mixing matrix
 contact_matrix <- get_mixing_matrix("United Kingdom")
 
-# run the model
+# Run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               contact_matrix_set = contact_matrix,
                               R0 = 2.5, 
@@ -276,17 +295,19 @@ plot(r)
 #> replicates
 #> Warning in plot.squire_simulation(r): Confidence bounds estimated from <10
 #> replicates
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-set params-1.png" width="100%" />
 
 We can also change the R0 and contact matrix at set time points, to
 reflect changing behaviour resulting from interventions. For example to
-set an 80% reduction in the contact matrix after 100 days :
+set an 80% reduction in the contact matrix after 100 days:
 
 ``` r
 
-# run the model
+# Run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               tt_contact_matrix = c(0, 100),
                               contact_matrix_set = list(contact_matrix,
@@ -300,17 +321,19 @@ plot(r, var_select = "infections")
 #> statistic estimated from <10 replicates
 #> Warning in plot.squire_simulation(r, var_select = "infections"): Confidence
 #> bounds estimated from <10 replicates
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-set contact matrix decrease-1.png" width="100%" />
 
 where `n_E2_I` is the daily number of new infections.
 
-To show an 80% reduction after 80 days but only maintained for 40 days :
+To show an 80% reduction after 80 days but only maintained for 40 days:
 
 ``` r
 
-# run the model
+# Run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               tt_contact_matrix = c(0, 80, 120),
                               contact_matrix_set = list(contact_matrix,
@@ -325,6 +348,8 @@ plot(r, var_select = "infections")
 #> statistic estimated from <10 replicates
 #> Warning in plot.squire_simulation(r, var_select = "infections"): Confidence
 #> bounds estimated from <10 replicates
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-set contact matrix decrease and relax-1.png" width="100%" />
@@ -334,7 +359,7 @@ days:
 
 ``` r
 
-# run the model
+# Run the model
 r <- run_explicit_SEEIR_model(population = population, 
                               contact_matrix_set = contact_matrix,
                               tt_R0 = c(0, 80),
@@ -347,6 +372,8 @@ plot(r, var_select = "infections")
 #> statistic estimated from <10 replicates
 #> Warning in plot.squire_simulation(r, var_select = "infections"): Confidence
 #> bounds estimated from <10 replicates
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-set R0 decrease-1.png" width="100%" />
@@ -372,6 +399,8 @@ r <- run_explicit_SEEIR_model(population = population,
 c <- plot(r, var_select = "hospital_occupancy")
 d <- plot(r, var_select = "ICU_occupancy")
 c / d 
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please use `guide = "none"` instead.
+#> It is deprecated to specify `guide = FALSE` to remove a guide. Please use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-change healthcare capacity-1.png" width="100%" />
@@ -468,7 +497,7 @@ be parallelised using `future::plan(future::multiprocess())` before
 running `calibrate`.
 
 ``` r
-# set up for parallelisation
+# Set up for parallelisation
 future::plan(future::multiprocess())
 
 # Fit model
@@ -484,9 +513,6 @@ out <- calibrate(
       n_particles = 20,
       country = "Algeria"
     )
-#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────        100% Progress: ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────        100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
-#> 
-#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
 
 `calibrate` returns the same output as `run_explicit_SEEIR_model`, with
@@ -497,12 +523,14 @@ same plotting functions as before:
 
 ``` r
 plot(out, "deaths", date_0 = max(df$date), x_var = "date")
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-plot particle deaths-1.png" width="100%" />
 
-With default parameters, `calibrate` will simulate up to the maximum date
-in the data provided. The fit to this data can be shown using the
+With default parameters, `calibrate` will simulate up to the maximum
+date in the data provided. The fit to this data can be shown using the
 plotting function and specifying `particle_fit` to be `TRUE`
 
 ``` r
@@ -533,8 +561,7 @@ plot(out$scan_results, what = "probability")
 The reason for the poor fits to the data shown earlier is because
 Algeria has implemented interventions prior to today. These can also be
 incorporated into `calibrate`. For example, we can grab the assumed
-changes to transmission based on government intervention for
-Algeria.
+changes to transmission based on government intervention for Algeria.
 
 ``` r
 interventions <- read.csv(squire:::squire_file("extdata/example_DZA_intervention.csv"))
@@ -568,9 +595,6 @@ out <- calibrate(
       date_R0_change = int_unique$dates_change,
       country = "Algeria"
     )
-#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
-#> 
-#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
 
 Let’s see if that is any better.
@@ -619,9 +643,6 @@ out <- calibrate(
       date_ICU_bed_capacity_change = c("2020-04-10"),
       country = "Algeria"
     )
-#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
-#> 
-#>  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────                           100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
 
 (N.B. Given the potentially long running time for the grid search, the
@@ -647,8 +668,7 @@ CDC](https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geogra
 First let’s calibrate to this data with no interventions in place (there
 are likely some interventions in place but nothing major, such as a
 lockdown, has been implemented by 2020-04-28) and simulate forward for
-180
-days:
+180 days:
 
 ``` r
 df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
@@ -666,9 +686,6 @@ out <- calibrate(
       forecast = 180,
       country = "Guinea"
     )
-#>  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
-#> 
-#>  Progress: ───────────────────────────────────────────────────────────────                                                                100% Progress: ────────────────────────────────────────────────────────────────────────────────────────                                       100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 ```
 
 Firstly, let’s plot the fit up to the current day
@@ -683,22 +700,23 @@ plot(out, particle_fit = TRUE) +
 
 The fit is good and captures the stuttering chains at the beginning of
 the epidemic. However, if we plot the forecasted deaths we can see the
-epidemic is likely to take
-off:
+epidemic is likely to take off:
 
 ``` r
 plot(out, "deaths")
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-particle gin forecast-1.png" width="100%" />
 
 We can now use the output of `calibrate` to explore different scenario
-projections using `projections`. For example, to contast this
+projections using `projections`. For example, to contrast this
 unmitigated epidemic against a mitigation scenario with a 50% reduction
 in R0 today and a further 30% in 2 weeks time:
 
 ``` r
-# create our projections
+# Create our projections
 p <- projections(r = out, R0_change = c(0.5, 0.2), tt_R0 = c(0, 14))
 ```
 
@@ -712,8 +730,10 @@ ggproj <- projection_plotting(r_list = list(out,p),
                     var_select = c("ICU_occupancy", "ICU_demand"),
                     add_parms_to_scenarios = TRUE,ci = FALSE,summarise = TRUE)
 
-# and lets add in the ICU capacity
+# And lets add in the ICU capacity
 ggproj + ggplot2::geom_hline(yintercept = out$parameters$ICU_bed_capacity)
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-projection plotting-1.png" width="100%" />
@@ -730,7 +750,7 @@ time. (N.B. We can turn off the automatic scenario parameter labelling
 with `add_parms_to_scenarios = FALSE`):
 
 ``` r
-# create our projections
+# Create our projections
 p <- projections(r = out, 
                   contact_matrix_set_change = c(1, 0.25, 0.8), 
                   tt_contact_matrix = c(0, 7, 30), 
@@ -745,6 +765,8 @@ projection_plotting(r_list = list(out, p),
                     add_parms_to_scenarios = FALSE,
                     ci = FALSE,summarise = TRUE) + 
 ggplot2::geom_hline(yintercept = out$parameters$ICU_bed_capacity)
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-projection relative beds-1.png" width="100%" />
@@ -761,6 +783,8 @@ projection_plotting(r_list = list(out,p),
                     var_select = c("D"),
                     add_parms_to_scenarios = FALSE,
                     ci = FALSE,summarise = TRUE)
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-total deaths projection-1.png" width="100%" />
@@ -770,7 +794,7 @@ absolute measures. For example, to change the R0 to 2 today and add 500
 ICU beds in 40 days time:
 
 ``` r
-# what is the current capacity
+# What is the current capacity
 icu <- tail(out$parameters$ICU_bed_capacity,1)
 
 # create our projections
@@ -785,6 +809,8 @@ projection_plotting(r_list = list(out,p),
                     var_select = c("ICU_occupancy", "ICU_demand","deaths"),
                     add_parms_to_scenarios = FALSE,
                     ci = FALSE,summarise = TRUE)
+#> Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please
+#> use `guide = "none"` instead.
 ```
 
 <img src="man/figures/README-projection plotting absolute-1.png" width="100%" />
@@ -792,8 +818,7 @@ projection_plotting(r_list = list(out,p),
 Lastly, in order to run simulations for longer than the number set in
 `calibrate(forecast = x)`, we can use the argument `time_period` to set
 the numbers of days that `projections` should simulate for. For example,
-we could redo our calibration and have it only run up the current
-day:
+we could redo our calibration and have it only run up the current day:
 
 ``` r
 df <- read.csv(squire:::squire_file("extdata/example_GIN.csv"), stringsAsFactors = FALSE)
@@ -811,9 +836,6 @@ out <- calibrate(
       forecast = 0,
       country = "Guinea"
     )
-#>  Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
-#> 
-#>  Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────              100% Progress: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 100%
 
 plot(out, particle_fit = TRUE)
 ```

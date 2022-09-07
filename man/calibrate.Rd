@@ -17,7 +17,9 @@ calibrate(
   Meff_max = 1,
   Meff_step = 0.1,
   squire_model = explicit_model(),
-  Rt_func = function(R0_change, R0, Meff) {     exp(log(R0) - Meff * (1 - R0_change)) },
+  Rt_func = function(R0_change, R0, Meff) {
+     exp(log(R0) - Meff * (1 - R0_change))
+ },
   pars_obs = NULL,
   forecast = 0,
   n_particles = 100,
